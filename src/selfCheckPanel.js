@@ -4,6 +4,7 @@ import {
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, elenaDay147 } from "./elenaSelfCheck.js";
 import { createSelfCheckCamera } from "./selfCheckCamera.js";
 import { ELENA } from "./elenaMissionScenario.js";
+import { loadNasaEvidence, nasaWatchPlan } from "./nasaWatch.js";
 
 const STEPS = [["safety", "Safety"], ["movement", "Movement"], ["reaction", "Reaction"], ["mind", "Sleep & mood"], ["body", "Body"], ["result", "Result & action"]];
 const STATUS = {
@@ -11,6 +12,7 @@ const STATUS = {
   baseline: ["BASELINE", "Building your baseline"], stable: ["STABLE", "Within your usual range"], notChecked: ["NOT CHECKED", "No data this check"],
 };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const RULE_STATUS = { active: "On", scheduled: "Scheduled", "on-return": "On return", routine: "Routine", "no-alarm": "No alarm" };
 
 function el(tag, attrs = {}, ...children) {
   const node = document.createElement(tag);
@@ -33,6 +35,26 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   const camStatus = el("small", { class: "sc-cam-status", role: "status" }, "Camera off");
   let camera = null, liveAngle = el("b", {}, "--");
   try { state.persist = localStorage.getItem("astrobone-self-check-consent") === "1"; } catch { /* storage unavailable */ }
+  // NASA life-science data sets what this check asks for and when (src/nasaWatch.js).
+  let evidence = null, evidenceError = null;
+  loadNasaEvidence(import.meta.env.BASE_URL).then(data => { evidence = data; render(); }).catch(error => { evidenceError = error.message; render(); });
+  // Elena reaches Mars (back in gravity) at the end of the transit; "You" has no mission timing.
+  const missionContext = () => (state.profile === "elena" ? { missionDay: 147, returnDay: ELENA.identity.duration.value } : {});
+  const plan = () => (evidence ? nasaWatchPlan(evidence, missionContext()) : null);
+  const ruleFor = id => plan()?.find(rule => rule.id === id) ?? null;
+  const why = (id, text) => { const rule = ruleFor(id); return rule ? el("p", { class: "sc-why" }, el("b", {}, rule.sources[0]), ` ${text ?? rule.rule}`) : null; };
+  function planCard() {
+    const rules = plan();
+    if (!rules) return evidenceError ? el("p", { class: "sc-note" }, `NASA evidence unavailable (${evidenceError}); checks run in their standard order.`) : null;
+    return el("section", { class: "sc-plan", "aria-label": "Today's checks, set by NASA data" },
+      el("header", {}, el("b", {}, "Today's checks · set by NASA data"), el("small", {}, "Priority and timing only. Your own baseline sets every threshold.")),
+      rules.map(rule => el("div", { class: `sc-rule sc-rule-${rule.status}` },
+        el("div", { class: "sc-rule-head" }, el("strong", {}, rule.check), el("span", { class: "sc-pill" }, RULE_STATUS[rule.status] ?? rule.status)),
+        el("p", { class: "sc-rule-text" }, rule.rule),
+        rule.note ? el("p", { class: "sc-rule-when" }, rule.note) : null,
+        el("p", { class: "sc-rule-finding" }, rule.finding),
+        el("div", { class: "sc-src" }, rule.sources.map(source => el("span", {}, source))))));
+  }
 
   const history = () => (state.profile === "elena" ? [...ELENA_HISTORY, ...(store.load("DEMO-ELENA", false))] : store.load("you", state.persist));
   function reset() {
@@ -155,7 +177,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   function stepBody() {
     const [key] = STEPS[state.step], c = state.check, demo = state.profile === "elena";
     if (key === "safety") {
-      return [el("p", { class: "sc-lead" }, "Right now, do you have any of these?"),
+      return [planCard(), el("p", { class: "sc-lead" }, "Right now, do you have any of these?"),
         el("div", { class: "sc-checks" }, RED_FLAGS.map(([k, label]) => checkbox(`rf-${k}`, label, Boolean(c.redFlags?.[k]), value => { c.redFlags = { ...(c.redFlags || {}), [k]: value }; render(); }))),
         Object.values(c.redFlags || {}).some(Boolean) ? el("p", { class: "sc-urgent", role: "alert" }, "Contact your crew medical officer now. Finish the check only if it is safe to do so.") : null,
         el("button", { type: "button", class: "sc-secondary", onclick: () => { c.redFlags = {}; go(1); } }, "None of these · continue")];
@@ -163,7 +185,8 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
     if (key === "movement") {
       const cap = state.capture, usable = cap && !cap.capturing && c.quality.kneeExtension;
       const camOn = camera?.running;
-      return [el("p", { class: "sc-lead" }, "Seated knee extension, 10 seconds. Sit side-on or facing the camera with both legs visible. Straighten and bend both knees slowly."),
+      return [why("bone", "In spaceflight the legs lose the most bone, so this test comes first."),
+        el("p", { class: "sc-lead" }, "Seated knee extension, 10 seconds. Sit side-on or facing the camera with both legs visible. Straighten and bend both knees slowly."),
         demo ? el("div", { class: "sc-row" },
           el("button", { type: "button", class: "sc-secondary", "data-demo": "poor", onclick: () => demoCapture("poor") }, "Demo capture · poor framing"),
           el("button", { type: "button", class: "sc-secondary", "data-demo": "usable", onclick: () => demoCapture("usable") }, "Demo capture · usable"))
@@ -206,14 +229,17 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
     }
     if (key === "body") {
       const v = c.values;
-      return [el("fieldset", { class: "sc-fieldset" }, el("legend", {}, "New since your last check"),
+      const immune = ruleFor("immune");
+      return [immune ? why("immune", immune.status === "active" ? `Daily now: ${immune.cadence.toLowerCase()}.` : `${immune.rule}${immune.note ? ` ${immune.note}` : ""}`) : null,
+        el("fieldset", { class: "sc-fieldset" }, el("legend", {}, "New since your last check"),
           IMMUNE_SYMPTOMS.map(([k, label]) => checkbox(`sym-${k}`, label, Boolean(c.symptoms?.[k]), value => { c.symptoms = { ...(c.symptoms || {}), [k]: value }; })),
           el("button", { type: "button", class: "sc-link", onclick: () => { c.symptoms = {}; render(); } }, "None of these")),
         number("Resting heart rate", "bpm", v.restingHr, 30, 200, 1, value => { v.restingHr = value; c.protocols.restingHr = c.protocols.restingHr ?? "resting-self-reported-v1"; }),
         el("label", { class: "sc-text" }, "Heart-rate source",
           el("select", { onchange: e => { c.sources.restingHr = e.target.value; } }, ["Wearable or chest strap", "Pulse oximeter", "Manual pulse count", "Synthetic demo"].map(s => el("option", { selected: (c.sources.restingHr ?? (demo ? "Synthetic demo" : "Wearable or chest strap")) === s || undefined }, s)))),
         number("Personal dosimeter, cumulative (context only)", "mGy", c.dosimeter, 0, 10000, 0.01, value => { c.dosimeter = value; }),
-        el("p", { class: "sc-note" }, "Radiation dose is recorded as mission context. It is never turned into a health status.")];
+        why("heart", "showed no consistent heart effect from radiation, so dose never raises an alarm. It is logged beside heart rate for the medical reviewer.")
+          ?? el("p", { class: "sc-note" }, "Radiation dose is recorded as mission context. It is never turned into a health status.")];
     }
     return resultBody();
   }

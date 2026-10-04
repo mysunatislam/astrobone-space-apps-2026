@@ -288,6 +288,7 @@ npm run test:ui -- http://127.0.0.1:8000/ "E:\AstroBone\data\raw\FracAtlas\image
 
 ## Research Documentation
 
+- [NASA data pipeline](docs/nasa-data-pipeline.md) - raw NASA OSDR / ALSDA files, reproducible summaries, and the rules the data drives in the self-check (knee test first, immune checklist after landing, no radiation alarm)
 - [Daily Self-Check](docs/self-check.md) - gather, evaluate and act loop: instruments, quality gates, personal review triggers, storage and verification status
 - [240-second presentation and voiceover](docs/pitch-voiceover.md) - `pitch.html`: timed video-style pitch with live tracking and twin demos, teleprompter, recording checklist and script
 - [Space Apps 2026 pitch kit](docs/space-apps-2026-pitch.md) - brief mapping, 240-second and 30-second scripts, judge questions and claims to avoid
