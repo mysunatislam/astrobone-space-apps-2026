@@ -47,6 +47,7 @@ import {
   simulationScenarioToUiState,
   validateSimulationEvidence,
 } from "./simulationEvidence.js";
+import "./labShell.js"; // shared header, menu and palette with the twin (imported last: its theme wins)
 
 const WEB_MODEL_INPUTS = Object.freeze({
   impactDurationMs: MODEL_DEFAULTS.impactDurationMs,

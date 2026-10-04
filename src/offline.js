@@ -1,5 +1,5 @@
 // Registers the offline pack (public/sw.js) in production builds and reports its state.
-export const OFFLINE_CACHE = "astrobone-offline-v3";
+export const OFFLINE_CACHE = "astrobone-offline-v4";
 
 export function registerOffline() {
   if (!import.meta.env.PROD || !("serviceWorker" in navigator)) return Promise.resolve(null);

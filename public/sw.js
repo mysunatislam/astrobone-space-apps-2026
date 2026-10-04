@@ -1,15 +1,16 @@
-// AstroBone offline pack. After one online visit, the twin, self-check, pitch and their
+// AstroBone offline pack. After one online visit, the twin (home), Live Capture, the pitch and their
 // models, NASA summaries and pose runtime are served from this device's cache.
-const CACHE = "astrobone-offline-v3";
+const CACHE = "astrobone-offline-v4";
 const CORE = [
-  "./", "twin.html", "pitch.html",
+  "./", "lab.html", "pitch.html", "clip.html",
   "models/anatomy/musculoskeletal.glb", "models/anatomy/musculoskeletal-rigged.glb", "models/anatomy/cardiovascular.glb", "models/anatomy/SOURCE-LICENSE.txt",
   "models/pose_landmarker_lite.task",
   "mediapipe/vision_wasm_internal.js", "mediapipe/vision_wasm_internal.wasm",
   "mediapipe/vision_wasm_nosimd_internal.js", "mediapipe/vision_wasm_nosimd_internal.wasm",
   "mediapipe/vision_wasm_module_internal.js", "mediapipe/vision_wasm_module_internal.wasm",
   "simulations/astrobone-level-a-v1.json",
-  "data/mission-research.json", "data/mission-research-extended.json", "data/osdr-804-summary.json",
+  "data/mission-research.json", "data/mission-research-extended.json", "data/osdr-804-summary.json", "data/circulation-reference.json",
+  "inference/demo/IMG0001739_prediction.json", "inference/demo/IMG0001739_overlay.png",
   "pitch/broll-bone-loss.mp4", "pitch/concept-camera-baseline.mp4", "pitch/squat-pexels-4921644.mp4", "pitch/squat-pose.json", "pitch/challenge-details.mp4",
   "pitch/team-mysunat.webp", "pitch/team-redwan.webp", "pitch/team-borno.jpg",
 ];
@@ -32,7 +33,7 @@ async function discover(cache) {
       }
     } catch { /* offline during install: runtime caching fills in later */ }
   };
-  for (const page of ["twin.html", "pitch.html"]) await scan(url(page), 0);
+  for (const page of ["./", "lab.html", "pitch.html", "clip.html"]) await scan(url(page), 0);
 }
 
 self.addEventListener("install", event => {
@@ -71,7 +72,7 @@ self.addEventListener("fetch", event => {
     // Pages: network first so updates arrive, cache when offline.
     if (request.mode === "navigate") {
       try { const fresh = await fetch(request); cache.put(cacheKey.split("?")[0], fresh.clone()); return fresh; }
-      catch { return (await cache.match(cacheKey.split("?")[0])) || (await cache.match(url("twin.html"))) || Response.error(); }
+      catch { return (await cache.match(cacheKey.split("?")[0])) || (await cache.match(url("./"))) || Response.error(); }
     }
     const cached = await cache.match(cacheKey, { ignoreSearch: true });
     if (cached) {

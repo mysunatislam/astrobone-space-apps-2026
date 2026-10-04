@@ -7,8 +7,8 @@ import { IMPACT_SCENARIO, evaluateImpact, runMonteCarlo, eventDistributions, env
 import { RISK_THRESHOLDS } from "./riskModel.js";
 import { createSelfCheckPanel } from "./selfCheckPanel.js";
 import { ELENA_HISTORY } from "./elenaSelfCheck.js";
+import { EXPERIENCES, CAPTURE, experienceFromHash } from "./siteNav.js";
 
-const EXPERIENCES = [["mission", "Mission Control"], ["selfcheck", "Self-Check"], ["twin", "Digital Twin"], ["functional", "Functional Scan"], ["impact", "Impact Lab"], ["physiology", "Physiology"], ["evidence", "Evidence"]];
 const SYSTEMS = [["body", "Body"], ["skeleton", "Skeleton"], ["muscle", "Muscle"], ["cardiovascular", "Cardiovascular"], ["renal", "Renal"], ["radiation", "Radiation"], ["multisystem", "Multisystem"]];
 const SYSTEM_FOCUS = { body: "body", skeleton: "body", muscle: "body", cardiovascular: "thorax", renal: "kidneys", radiation: "body", multisystem: "body", functional: "legs", impact: "leftLeg" };
 // Self-check step -> [scene system, camera focus].
@@ -49,12 +49,13 @@ export function createTwinApp(root) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.classList.add("tw-links"); svg.setAttribute("aria-hidden", "true");
   const nav = el("nav", { class: "tw-nav", "aria-label": "AstroBone experiences" }, EXPERIENCES.map(([key, label]) =>
     el("button", { type: "button", "data-experience": key, onclick: () => { stopDemo(); setExperience(key); } }, label)));
+  const liveLink = el("a", { class: "tw-live", href: CAPTURE.href, title: "Camera movement capture, crew records and research tools" }, el("i", { "aria-hidden": "true" }), CAPTURE.label);
   const dayValue = el("strong", { id: "tw-day" }, String(state.day));
   const startButton = el("button", { type: "button", class: "tw-start", onclick: () => (state.demo ? stopDemo() : runDemo()) }, "Start mission simulation");
   const header = el("header", { class: "tw-top" },
     el("a", { class: "tw-brand", href: "#", "aria-label": "AstroBone digital twin home", onclick: e => { e.preventDefault(); stopDemo(); setExperience("mission"); } },
       el("span", { class: "tw-mark", "aria-hidden": "true" }), el("span", {}, el("b", {}, "ASTROBONE"), el("small", {}, "DIGITAL PHYSIOLOGICAL TWIN"))),
-    nav,
+    nav, liveLink,
     el("div", { class: "tw-ident" }, el("b", {}, "ELENA TORRES"), el("small", {}, `SYNTHETIC ASTRONAUT · ${ELENA.identity.mission.value}`)),
     el("div", { class: "tw-daybox", "aria-live": "polite" }, el("small", {}, "MISSION DAY"), el("span", {}, dayValue, el("i", {}, `/ ${MISSION_LENGTH}`))),
     startButton);
@@ -155,8 +156,11 @@ export function createTwinApp(root) {
     if (experience === "impact" && state.impactDone && !state.impactRunning) { scene.showStress(true); scene.focus("leftLeg"); }
     if (experience === "impact" || experience === "functional") ensureSimulations();
     if (previous !== experience) drawer.scrollTop = 0;
+    // The address names the section, so a link (or Back from Live Capture) returns to it.
+    if (location.hash !== `#${experience}`) history.replaceState(null, "", `${location.pathname}${location.search}#${experience}`);
     render();
   }
+  window.addEventListener("hashchange", () => { const key = experienceFromHash(location.hash); if (key && key !== state.experience) { stopDemo(); setExperience(key); } });
 
   function toggleCompare() {
     state.compare = !state.compare;
@@ -732,10 +736,12 @@ export function createTwinApp(root) {
   // ---------- Boot ----------
   const skipIntro = (() => { try { return sessionStorage.getItem("astrobone-twin-intro") === "1"; } catch { return false; } })() || reduceMotion;
   if (skipIntro) { introDone = true; intro.remove(); }
+  const linked = experienceFromHash(location.hash);
+  if (linked) state.experience = linked;
   current = twinState(state.day); render();
   scene.load().then(async () => {
     loading.classList.add("tw-done"); setTimeout(() => loading.remove(), 600);
-    scene.setState(current, { bonesSolidity: current.bone.evidence.solidity }); scene.setSystem(sceneSystem(), { focusTarget: "body", animate: false });
+    scene.setState(current, { bonesSolidity: current.bone.evidence.solidity }); scene.setSystem(sceneSystem(), { focusTarget: linked ? sceneFocus(sceneSystem()) : "body", animate: false });
     const positions = scene.tibiaPositions();
     if (positions && scene.impactLocal) {
       const result = bendingStressField(positions, { impactPoint: scene.impactLocal.toArray(), loadDirection: scene.impactOutward.toArray() });

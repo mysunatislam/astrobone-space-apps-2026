@@ -46,17 +46,27 @@ body.twin-body { overflow: hidden; }
 }
 
 /* Header */
-.tw-top { position: fixed; top: 10px; left: 14px; right: 14px; z-index: 10; display: grid; grid-template-columns: auto 1fr auto auto auto; align-items: center; gap: 18px; height: 56px; padding: 0 10px 0 16px; border-radius: 14px; }
+.tw-top { position: fixed; top: 10px; left: 14px; right: 14px; z-index: 10; display: grid; grid-template-columns: auto 1fr auto auto auto auto; align-items: center; gap: 14px; height: 56px; padding: 0 10px 0 16px; border-radius: 14px; }
 .tw-brand { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
 .tw-brand b { display: block; font: 700 15px/1 var(--tw-sans); letter-spacing: .32em; }
 .tw-brand small { display: block; margin-top: 4px; font: 600 9px/1 var(--tw-mono); letter-spacing: .22em; color: var(--tw-cyan); }
 .tw-mark { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--tw-cyan); position: relative; }
 .tw-mark::after { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: var(--tw-cyan); }
 .tw-nav { display: flex; justify-content: safe center; gap: 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
-.tw-nav button { border: 0; background: none; padding: 9px 11px; border-radius: 8px; font: 600 11px/1 var(--tw-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--tw-dim); white-space: nowrap; position: relative; }
+.tw-nav button { border: 0; background: none; padding: 9px 10px; border-radius: 8px; font: 600 11px/1 var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-dim); white-space: nowrap; position: relative; }
 .tw-nav button:hover { color: var(--tw-ink); background: rgba(127, 227, 255, .06); }
 .tw-nav button[aria-pressed="true"] { color: var(--tw-ink); background: rgba(127, 227, 255, .1); }
 .tw-nav button[aria-pressed="true"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 2px; height: 2px; border-radius: 2px; background: var(--tw-cyan); }
+/* Links in the menu (Live Capture; the twin sections on the Live Capture page) look like the section buttons. */
+.tw-nav a { display: inline-flex; align-items: center; padding: 9px 10px; border-radius: 8px; font: 600 11px/1 var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-dim); text-decoration: none; white-space: nowrap; }
+.tw-nav a:hover { color: var(--tw-ink); background: rgba(127, 227, 255, .06); }
+/* Live Capture: the camera workspace, beside the menu on both pages */
+.tw-live { display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 9px; border: 1px solid rgba(109, 255, 176, .35); font: 600 11px/1 var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-ink); text-decoration: none; white-space: nowrap; }
+.tw-live:hover { background: rgba(109, 255, 176, .08); border-color: rgba(109, 255, 176, .6); }
+.tw-live[aria-current="page"] { background: rgba(109, 255, 176, .1); border-color: rgba(109, 255, 176, .6); }
+.tw-live i { width: 7px; height: 7px; border-radius: 50%; background: var(--tw-green); box-shadow: 0 0 8px var(--tw-green); animation: tw-live 2s ease-in-out infinite; }
+@keyframes tw-live { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .tw-live i { animation: none; } }
 .tw-ident { text-align: right; line-height: 1.2; }
 .tw-ident b { display: block; font: 700 12px var(--tw-sans); letter-spacing: .18em; }
 .tw-ident small { font: 600 9px var(--tw-mono); letter-spacing: .14em; color: var(--tw-amber); }
@@ -68,6 +78,15 @@ body.twin-body { overflow: hidden; }
 .tw-start { border: 1px solid rgba(127, 227, 255, .55); background: linear-gradient(180deg, rgba(60, 170, 255, .28), rgba(30, 90, 200, .18)); padding: 10px 16px; border-radius: 10px; font: 700 11px/1 var(--tw-mono) !important; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; }
 .tw-start:hover { border-color: var(--tw-cyan); }
 [data-demo="true"] .tw-start { border-color: rgba(255, 159, 67, .6); background: rgba(255, 159, 67, .16); }
+/* Narrower desktops: the astronaut's name gives way so every section stays visible. */
+@media (max-width: 1760px) { .tw-ident { display: none; } }
+@media (max-width: 1500px) {
+  .tw-start { padding: 10px 12px; letter-spacing: .06em; }
+  .tw-nav button, .tw-nav a { padding: 9px 8px; letter-spacing: .06em; }
+  .tw-brand b { letter-spacing: .2em; }
+  .tw-brand small { letter-spacing: .12em; }
+  .tw-daybox { display: none; } /* the timeline shows the mission day */
+}
 
 /* System rail */
 .tw-systems { position: fixed; z-index: 6; left: 14px; top: 50%; transform: translateY(-58%); display: flex; flex-direction: column; gap: 3px; padding: 12px 8px; border-radius: 14px; width: 168px; }
@@ -302,6 +321,7 @@ body.twin-body { overflow: hidden; }
   .tw-top { position: sticky; top: 0; order: 1; margin: 8px 0; left: auto; right: auto; grid-template-columns: auto 1fr auto; height: auto; padding: 10px 12px; gap: 10px; }
   .tw-top .tw-nav { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
   .tw-top .tw-start { grid-column: 3; grid-row: 1; padding: 8px 10px; }
+  .tw-top > .tw-live { grid-column: 1 / -1; grid-row: 3; justify-self: start; }
   .tw-daybox { grid-column: 2; grid-row: 1; justify-self: end; border: 0; padding: 0; }
   .tw-systems { position: static; order: 3; transform: none; width: auto; flex-direction: row; overflow-x: auto; margin-top: 12px; }
   .tw-systems .tw-eyebrow { display: none; }
@@ -317,4 +337,10 @@ body.twin-body { overflow: hidden; }
   .tw-params { grid-template-columns: repeat(2, 1fr); }
   .tw-phases { grid-template-columns: repeat(2, 1fr); }
   .tw-bands { grid-template-columns: repeat(2, 1fr); }
+}
+/* Phones: brand and the simulation button on one row, sections as a swipeable row below. */
+@media (max-width: 600px) {
+  .tw-top { grid-template-columns: minmax(0, 1fr) auto; }
+  .tw-top .tw-start { grid-column: 2; font-size: 10px !important; padding: 8px 9px; letter-spacing: .04em; }
+  .tw-brand small { display: none; }
 }

@@ -6,14 +6,9 @@ const themeLabel = document.getElementById("theme-label");
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const compactViewport = window.matchMedia("(max-width: 700px)");
 
+// Live Capture shares the twin's dark look, so the theme is fixed.
 function preferredTheme() {
-  try {
-    const saved = localStorage.getItem("astrobone-theme");
-    if (saved === "light" || saved === "dark") return saved;
-  } catch {
-    // Theme persistence can be unavailable in privacy-restricted WebViews.
-  }
-  return "light";
+  return "dark";
 }
 
 function applyTheme(theme) {

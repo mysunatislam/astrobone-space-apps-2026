@@ -1,0 +1,1088 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" href="data:," />
+    <title>AstroBone | Live Capture</title>
+  </head>
+  <body>
+    <canvas id="astro-particles" class="astro-particles" aria-hidden="true"></canvas>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <div class="brand-eyebrow">Human systems // mission health</div>
+            <h1>AstroBone</h1>
+            <p id="brand-subtitle">Mission health evidence for exploration crews</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="prototype-badge system-live-badge"><i class="status-dot"></i> Research mode</span>
+          <span class="prototype-badge">Edge-first architecture</span>
+          <span id="platform-status" class="status-badge">Research prototype</span>
+          <button id="open-mission-review" type="button">Implementation status</button>
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Toggle light or dark mode">
+            <span class="theme-orbit" aria-hidden="true"><i></i></span>
+            <span id="theme-label">Light</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="mission-brief" aria-labelledby="mission-question">
+        <div class="brief-block problem-block">
+          <span class="section-label">Exploration medicine problem</span>
+          <h2 id="mission-question">Movement changes can be missed over a long mission.</h2>
+          <p id="problem-copy">
+            Crews need a way to review functional changes against their own history when
+            specialist support is delayed. A camera observation cannot measure bone health by itself.
+          </p>
+          <div class="hero-tags" aria-label="AstroBone evidence layers">
+            <span>Video movement</span><span>Personal baseline</span><span>Measured mission context</span><span>Evidence review</span>
+          </div>
+        </div>
+        <div class="brief-divider" aria-hidden="true">
+          <span>Evidence</span>
+          <i></i>
+          <span>Decision</span>
+        </div>
+        <div class="brief-block solution-block">
+          <span class="section-label">Mission objective</span>
+          <p id="solution-copy">
+            Convert local movement observations into protocol-matched trends, bounded NASA
+            evidence context, and a human-reviewed medical handoff.
+          </p>
+          <div class="hero-actions">
+            <button id="guided-demo" class="primary-action hero-primary" type="button">Explore impact research <span aria-hidden="true">&rarr;</span></button>
+            <a class="secondary-link" href="#validation-title">View technical evidence</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="support-lifecycle" aria-label="How AstroBone helps">
+        <div class="lifecycle-intro">
+          <span class="section-label">How it helps</span>
+          <strong id="lifecycle-title">One onboard workflow from prevention to medical handoff</strong>
+        </div>
+        <div class="lifecycle-step">
+          <span>01</span>
+          <div>
+            <strong>Prevent</strong>
+            <small id="help-prevent">Screen a task or loose-object impact before exposure.</small>
+          </div>
+        </div>
+        <div class="lifecycle-step">
+          <span>02</span>
+          <div>
+            <strong>Assess</strong>
+            <small id="help-assess">Compare imaging, event mechanics, bone reserve, and crew condition.</small>
+          </div>
+        </div>
+        <div class="lifecycle-step">
+          <span>03</span>
+          <div>
+            <strong>Respond</strong>
+            <small id="help-respond">Turn priority into a checkable, protocol-linked action plan.</small>
+          </div>
+        </div>
+        <div class="lifecycle-step">
+          <span>04</span>
+          <div>
+            <strong>Monitor & relay</strong>
+            <small id="help-monitor">Log change over time and export a compact medical packet.</small>
+          </div>
+        </div>
+      </section>
+
+      <main class="workspace">
+        <section class="simulation-shell" aria-label="Live crew movement and synchronized rigged human view">
+          <div class="capture-source-bar">
+            <div role="group" aria-label="Motion source"><button id="source-live" type="button" aria-pressed="true">Live camera</button><button id="source-video" type="button" aria-pressed="false">Recorded exercise</button></div>
+            <label><input id="video-precompute" type="checkbox" checked /> Prepare synchronized video replay</label>
+            <a href="#engineering-validation">Mechanics & validation</a>
+          </div>
+          <p id="video-upload-feedback" class="video-upload-feedback" role="alert" hidden></p>
+          <p id="video-clip-info" class="video-clip-info" role="status" hidden></p>
+          <div id="twin-view-grid" class="twin-view-grid">
+            <section class="twin-view live-view" aria-label="Original live camera video">
+              <div class="twin-pane-header">
+                <div>
+                  <span id="twin-feed-label" class="twin-pane-kicker">Live crew feed</span>
+                  <strong>Original video</strong>
+                  <small>Body tracking / optional detail</small>
+                </div>
+                <div class="twin-pane-actions">
+                  <span id="camera-status" class="status-badge" data-state="off">Camera off</span>
+                  <button id="toggle-camera" class="primary-action twin-camera-action" type="button">Start camera</button>
+                  <button id="upload-video" class="twin-camera-action" type="button">Upload video</button>
+                  <input id="exercise-video-file" type="file" accept=".mp4,.webm,video/mp4,video/webm" hidden aria-label="Choose a local exercise video" />
+                </div>
+              </div>
+              <div id="pose-viewport" class="pose-viewport twin-camera-viewport" data-mirrored="true">
+                <video id="pose-video" autoplay muted playsinline></video>
+                <canvas id="pose-overlay" aria-label="Live pose landmarks"></canvas>
+                <div class="pose-live-strip" aria-live="polite">
+                  <span id="pose-link-state" data-state="waiting">Waiting for full body</span>
+                  <strong id="pose-live-fps">-- fps</strong>
+                </div>
+                <div id="safety-alert" class="safety-alert" data-severity="reminder" role="status" hidden>
+                  <strong id="safety-alert-title">Movement reminder</strong>
+                  <span id="safety-alert-message"></span>
+                </div>
+                <div id="pose-empty" class="pose-empty">
+                  <span>Camera link ready</span>
+                  <small>Video stays on this device</small>
+                </div>
+                <div id="assessment-progress" class="assessment-progress" hidden><span></span></div>
+              </div>
+            </section>
+            <section class="twin-view skeleton-view" aria-label="Synchronized pose-driven human view">
+              <canvas id="twin-canvas" aria-label="Rigged human movement view"></canvas>
+              <div class="twin-pane-header twin-pane-header--model">
+                <div>
+                  <span class="twin-pane-kicker">Estimated 3D motion</span>
+                  <strong>3D movement view</strong>
+                  <small id="motionguard-twin-state">MotionGuard disconnected</small>
+                </div>
+                <span class="twin-source-badge">Rigged mesh</span>
+              </div>
+            </section>
+          </div>
+          <div id="recorded-playback" class="recorded-playback" hidden>
+            <button id="video-play-pause" type="button" aria-label="Pause recorded video">Pause</button>
+            <input id="video-scrub" type="range" min="0" max="120" value="0" step="0.01" aria-label="Video position" />
+            <output id="video-time">0:00</output>
+            <select id="video-speed" aria-label="Video playback speed"><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="1.5">1.5x</option></select>
+          </div>
+          <section class="twin-kinematics-deck" aria-label="Camera-derived bilateral movement telemetry">
+            <div class="twin-side-readout" data-side="left">
+              <div class="twin-side-heading">
+                <b>L</b>
+                <span id="twin-left-joint-label">Knee flexion</span>
+              </div>
+              <strong id="twin-left-knee">--</strong>
+              <div class="twin-side-meter" aria-hidden="true"><i id="twin-left-knee-bar"></i></div>
+            </div>
+            <div class="twin-motion-trace">
+              <div class="twin-trace-header">
+                <div>
+                  <span>Observed movement</span>
+                  <strong id="twin-motion-state">Waiting for full body</strong>
+                </div>
+                <div class="twin-trace-controls">
+                  <label for="motionguard-trace-joint">Joint</label>
+                  <select id="motionguard-trace-joint" aria-label="Joint shown in live movement trace">
+                    <option value="shoulder">Shoulder</option>
+                    <option value="elbow">Elbow</option>
+                    <option value="hip">Hip</option>
+                    <option value="knee" selected>Knee</option>
+                  </select>
+                  <div class="twin-trace-legend" aria-label="Trace legend">
+                    <span data-side="left">Left</span>
+                    <span data-side="right">Right</span>
+                  </div>
+                </div>
+              </div>
+              <canvas id="motionguard-trace-canvas" aria-label="Live left and right joint motion history"></canvas>
+              <div class="twin-trace-footer">
+                <span id="twin-knee-difference">L/R difference --</span>
+                <small>Camera kinematics / force not measured</small>
+              </div>
+            </div>
+            <div class="twin-side-readout" data-side="right">
+              <div class="twin-side-heading">
+                <b>R</b>
+                <span id="twin-right-joint-label">Knee flexion</span>
+              </div>
+              <strong id="twin-right-knee">--</strong>
+              <div class="twin-side-meter" aria-hidden="true"><i id="twin-right-knee-bar"></i></div>
+            </div>
+          </section>
+          <div class="scene-hud">
+            <div>
+              <span class="hud-label">Research review state</span>
+              <strong id="scene-decision-score">Incomplete</strong>
+            </div>
+            <div>
+              <span class="hud-label">Demand / capacity</span>
+              <strong id="risk-score">--</strong>
+              <small id="load-path">--</small>
+              <small id="impact-object-label">EVA hand tool</small>
+            </div>
+            <div>
+              <span class="hud-label">Evidence channels</span>
+              <strong id="scene-evidence-count">2 of 3</strong>
+            </div>
+            <div>
+              <span class="hud-label">Current assessment</span>
+              <strong id="risk-status">Calibrating</strong>
+            </div>
+          </div>
+          <div class="motion-switch" role="group" aria-label="Linked body movement">
+            <span>Human motion</span>
+            <button class="motion-button active" data-motion="stand" type="button">Stand</button>
+            <button class="motion-button" data-motion="walk" type="button">Idle</button>
+            <button class="motion-button" data-motion="space" type="button">Space traveler</button>
+            <button id="camera-motion" class="motion-button" data-motion="camera" type="button" disabled>Camera linked</button>
+          </div>
+          <div class="timeline" aria-label="Impact process timeline">
+            <div class="timeline-step active" data-step="0">Trajectory</div>
+            <div class="timeline-step" data-step="1">Contact</div>
+            <div class="timeline-step" data-step="2">Load transfer</div>
+            <div class="timeline-step" data-step="3">Capacity review</div>
+            <div id="response-timeline-label" class="timeline-step" data-step="4">Crew response</div>
+          </div>
+        </section>
+
+        <section class="telemetry-deck telemetry-card" aria-label="Sampled AstroBone scenario history">
+          <div class="telemetry-header">
+            <div>
+              <span class="section-label">Scenario history</span>
+              <strong>Demand, reserve &amp; evidence</strong>
+            </div>
+            <div class="telemetry-header-actions">
+              <span class="telemetry-context">scenario trace</span>
+              <span class="telemetry-live"><i></i> Sampled inputs</span>
+            </div>
+          </div>
+          <div class="telemetry-plot-wrap">
+            <canvas id="live-telemetry-canvas" aria-label="Normalized scenario history without synthetic variation"></canvas>
+            <div class="telemetry-axis-label telemetry-axis-top">1.0</div>
+            <div class="telemetry-axis-label telemetry-axis-bottom">0.0</div>
+          </div>
+          <div class="telemetry-legend">
+            <div data-series="demand"><i></i><span>Mechanical DCR</span><strong id="telemetry-demand">--</strong></div>
+            <div data-series="capacity"><i></i><span>Capacity reduction</span><strong id="telemetry-capacity">--</strong></div>
+            <div data-series="evidence"><i></i><span>Evidence coverage</span><strong id="telemetry-evidence">--</strong></div>
+          </div>
+          <small class="telemetry-disclaimer">Scenario samples only. DCR / 1.35 (capped at 1); capacity reduction / 100; available sources / 3. It does not combine the evidence into a medical score.</small>
+        </section>
+
+        <aside class="controls" aria-label="Guided fracture-risk investigation">
+          <div class="panel-heading">
+            <div>
+              <span class="section-label">Guided workflow</span>
+              <h2>Investigation</h2>
+            </div>
+            <button id="reset-button" type="button">Reset</button>
+          </div>
+
+          <div class="workflow-tabs" role="tablist" aria-label="Investigation stages">
+            <button class="workflow-tab active" data-workflow-stage="0" role="tab" aria-selected="true" aria-controls="stage-evidence" type="button">
+              <span>1</span><b id="tab-label-evidence">Evidence</b>
+            </button>
+            <button class="workflow-tab" data-workflow-stage="1" role="tab" aria-selected="false" aria-controls="stage-impact" type="button">
+              <span>2</span><b id="tab-label-impact">Event</b>
+            </button>
+            <button class="workflow-tab" data-workflow-stage="2" role="tab" aria-selected="false" aria-controls="stage-bone" type="button">
+              <span>3</span><b id="tab-label-bone">Crew</b>
+            </button>
+            <button class="workflow-tab" data-workflow-stage="3" role="tab" aria-selected="false" aria-controls="stage-decision" type="button">
+              <span>4</span><b id="tab-label-decision">Response</b>
+            </button>
+          </div>
+
+          <div class="stage-heading">
+            <span id="stage-kicker" class="section-label">Step 1 of 4</span>
+            <h3 id="stage-title">Inspect structural evidence</h3>
+            <p id="stage-description">
+              Begin with image evidence so the twin can compare a visible fracture signal with the
+              reconstructed impact.
+            </p>
+          </div>
+
+          <section id="stage-evidence" class="stage-panel evidence-stack" data-stage-panel="0" role="tabpanel">
+            <div class="ai-panel" id="ai-panel" aria-label="AI X-ray evidence">
+              <div class="panel-heading">
+                <div>
+                  <span class="section-label">Structural channel</span>
+                  <h3>AI X-ray evidence</h3>
+                </div>
+                <span id="ai-service-status" class="status-badge" data-state="checking">Checking local AI</span>
+              </div>
+              <div class="evidence-result-heading">
+                <span>Model result</span>
+                <strong id="ai-decision">Not loaded</strong>
+              </div>
+              <img id="ai-overlay" class="ai-overlay hidden" alt="AI fracture mask overlay" />
+              <div id="ai-empty-state" class="ai-empty-state">
+                <span class="empty-state-mark" aria-hidden="true"></span>
+                <p id="ai-empty-text">No X-ray evidence connected</p>
+              </div>
+              <div class="metric-grid ai-metrics">
+                <div>
+                  <span>AI screening score</span>
+                  <strong id="ai-score">--</strong>
+                </div>
+                <div>
+                  <span>Localized mask area</span>
+                  <strong id="ai-mask-area">--</strong>
+                </div>
+              </div>
+              <p id="ai-warning">Research model score. Not a calibrated probability or diagnosis.</p>
+              <p id="ai-provenance" class="evidence-provenance">DenseNet121 + U-Net++ | FracAtlas held-out evaluation</p>
+              <div class="action-row">
+                <button id="analyze-xray" class="primary-action" type="button">Analyze X-ray</button>
+                <button id="load-demo-prediction" type="button">Verified held-out case</button>
+                <button id="clear-prediction" class="quiet-action" type="button">Clear</button>
+              </div>
+              <input id="xray-file" class="hidden" type="file" accept="image/jpeg,image/png,image/webp" />
+              <p class="privacy-note">Configured service analysis | image not retained | 15 MB maximum</p>
+              <details id="native-api-config" class="native-api-config" hidden>
+                <summary>AI service connection</summary>
+                <label for="api-base-url">Secure endpoint</label>
+                <input
+                  id="api-base-url"
+                  type="url"
+                  inputmode="url"
+                  autocomplete="url"
+                  spellcheck="false"
+                  placeholder="https://ai.example.org"
+                />
+                <div class="action-row">
+                  <button id="save-api-base" type="button">Save endpoint</button>
+                  <button id="clear-api-base" class="quiet-action" type="button">Clear</button>
+                </div>
+                <p id="api-base-status" class="evidence-provenance">No external service configured</p>
+              </details>
+            </div>
+
+            <div class="functional-panel" id="functional-panel" aria-label="MotionGuard movement evidence">
+              <div class="panel-heading">
+                <div>
+                  <span class="section-label">Live movement evidence</span>
+                  <h3>MotionGuard</h3>
+                </div>
+                <span class="status-badge" data-state="ready">Local protocol</span>
+              </div>
+              <details class="motionguard-capture-details">
+              <summary>Tracking and capture results</summary>
+              <div class="metric-grid functional-metrics">
+                <div>
+                  <span>Tracking quality</span>
+                  <strong id="tracking-quality">--</strong>
+                </div>
+                <div>
+                  <span>Rig coverage</span>
+                  <strong id="rig-coverage">--</strong>
+                </div>
+                <div>
+                  <span>Inference</span>
+                  <strong id="pose-latency">--</strong>
+                </div>
+                <div>
+                  <span>Knee asymmetry</span>
+                  <strong id="knee-asymmetry">--</strong>
+                </div>
+                <div>
+                  <span>Knee range L / R</span>
+                  <strong id="knee-range">--</strong>
+                </div>
+                <div>
+                  <span>Baseline change</span>
+                  <strong id="baseline-change">--</strong>
+                </div>
+              </div>
+              </details>
+              <section class="detail-analysis" aria-labelledby="detail-title">
+                <div class="safety-monitor-heading">
+                  <h4 id="detail-title">Face and hand tracking</h4>
+                  <span id="detail-status" class="status-badge" data-state="off">Off</span>
+                </div>
+                <div class="detail-readouts" aria-live="polite">
+                  <div><span>Hands / fingers</span><strong id="detail-hands">Not visible</strong></div>
+                  <div><span>Eyes</span><strong id="detail-eyes">Not resolved</strong></div>
+                  <div><span>Lips / jaw</span><strong id="detail-mouth">Not resolved</strong></div>
+                  <div><span>Rest cue</span><strong id="detail-rest">No cue</strong></div>
+                </div>
+                <label class="compact-toggle" for="detail-tracking">
+                  <input id="detail-tracking" type="checkbox" />
+                  <span>Track face mesh and fingers locally</span>
+                </label>
+                <small>Prolonged eye closure is an observation, not proof of sleep or alertness.</small>
+              </section>
+              <div class="action-row pose-control-row">
+                <button id="center-pose" type="button" disabled>Center pose</button>
+                <button id="record-baseline" type="button" disabled>Record baseline</button>
+                <button id="record-assessment" type="button" disabled>Assess 8 s</button>
+                <button id="replay-video" type="button" hidden>Replay video</button>
+                <button id="export-movement-evidence" type="button" disabled>Export evidence</button>
+              </div>
+              <div class="camera-device-row">
+                <label for="camera-device">Webcam source</label>
+                <div class="camera-device-control">
+                  <select id="camera-device">
+                    <option value="">System default camera</option>
+                  </select>
+                  <button id="refresh-cameras" type="button" title="Refresh webcam list">Refresh</button>
+                </div>
+                <small id="camera-device-status">PC and phone cameras are detected by the browser</small>
+              </div>
+              <div class="camera-facing-row">
+                <span>Camera orientation</span>
+                <div class="camera-facing-control" role="group" aria-label="Preferred camera orientation">
+                  <button class="camera-facing-button is-active" data-facing="user" type="button" aria-pressed="true">Crew</button>
+                  <button class="camera-facing-button" data-facing="environment" type="button" aria-pressed="false">Environment</button>
+                </div>
+              </div>
+              <div class="pose-settings">
+                <label class="compact-toggle" for="mirror-preview">
+                  <input id="mirror-preview" type="checkbox" checked />
+                  <span>Mirror camera + twin</span>
+                </label>
+                <span>Video is not stored</span>
+              </div>
+              <section class="motionguard-analysis" aria-labelledby="motionguard-title">
+                <div class="safety-monitor-heading">
+                  <h4 id="motionguard-title">Observed movement state</h4>
+                  <span id="motionguard-status" class="status-badge" data-state="waiting">Waiting</span>
+                </div>
+                <label class="motionguard-protocol" for="motionguard-mode">
+                  <span>Observation protocol</span>
+                  <select id="motionguard-mode">
+                    <option value="monitor">Movement observation</option>
+                    <option value="squat">Squat repetitions</option>
+                    <option value="gait">Alternating knee cycles</option>
+                    <option value="reach">Controlled reach cycles</option>
+                  </select>
+                </label>
+                <div class="motionguard-joint-table" role="table" aria-label="Live bilateral joint motion">
+                  <div class="motionguard-joint-row motionguard-joint-row--head" role="row">
+                    <span role="columnheader">Joint</span>
+                    <span role="columnheader">L</span>
+                    <span role="columnheader">R</span>
+                    <span role="columnheader">Diff</span>
+                  </div>
+                  <div class="motionguard-joint-row" data-joint="shoulder" role="row">
+                    <strong role="rowheader">Shoulder</strong>
+                    <span data-side="left">--</span><span data-side="right">--</span><span data-side="difference">--</span>
+                  </div>
+                  <div class="motionguard-joint-row" data-joint="elbow" role="row">
+                    <strong role="rowheader">Elbow</strong>
+                    <span data-side="left">--</span><span data-side="right">--</span><span data-side="difference">--</span>
+                  </div>
+                  <div class="motionguard-joint-row" data-joint="hip" role="row">
+                    <strong role="rowheader">Hip</strong>
+                    <span data-side="left">--</span><span data-side="right">--</span><span data-side="difference">--</span>
+                  </div>
+                  <div class="motionguard-joint-row" data-joint="knee" role="row">
+                    <strong role="rowheader">Knee</strong>
+                    <span data-side="left">--</span><span data-side="right">--</span><span data-side="difference">--</span>
+                  </div>
+                </div>
+                <div class="motionguard-readouts">
+                  <div><span id="motionguard-flexion-label">Knee flexion L / R</span><strong id="motionguard-flexion">--</strong></div>
+                  <div><span id="motionguard-difference-label">Knee L/R difference</span><strong id="motionguard-difference">--</strong></div>
+                  <div><span>Trunk axis deviation</span><strong id="motionguard-trunk">--</strong></div>
+                  <div><span id="motionguard-speed-label">Knee angular speed</span><strong id="motionguard-speed">--</strong></div>
+                  <div><span id="motionguard-count-label">Fresh samples</span><strong id="motionguard-count">0</strong></div>
+                  <div><span id="motionguard-timing-label">Protocol state</span><strong id="motionguard-timing">Waiting</strong></div>
+                </div>
+                <div class="motionguard-observation" role="status">
+                  <strong id="motionguard-state">Waiting for fresh full-body tracking</strong>
+                  <p id="motionguard-recommendation">Keep the complete body visible.</p>
+                </div>
+                <p id="motionguard-detail" class="evidence-provenance">No completed movement cycles.</p>
+                <div class="motionguard-footer">
+                  <span>Bone load: not measured</span>
+                  <button id="motionguard-reset" class="quiet-action" type="button">Reset counters</button>
+                </div>
+                <p class="privacy-note">Kinematics only. Cycle thresholds are prototype counting rules, not exercise targets. Video-derived motion cannot measure bone strength, contact force, or fall risk.</p>
+              </section>
+              <section class="safety-monitor" aria-labelledby="safety-monitor-title">
+                <div class="safety-monitor-heading">
+                  <div>
+                    <span class="section-label">On-device awareness</span>
+                    <h4 id="safety-monitor-title">Awareness and reminders</h4>
+                  </div>
+                  <span id="safety-monitor-status" class="status-badge" data-state="off">Monitor off</span>
+                </div>
+                <div class="safety-readouts" aria-live="polite">
+                  <div>
+                    <span>Posture</span>
+                    <strong id="posture-status">Waiting for body</strong>
+                    <small id="posture-timer">0 s held</small>
+                  </div>
+                  <div>
+                    <span>Visible objects</span>
+                    <strong id="object-count">0 supported</strong>
+                    <small id="object-inference">Detector ready</small>
+                  </div>
+                  <div>
+                    <span>Direction cue</span>
+                    <strong id="approach-status">No approach signal</strong>
+                    <small>Left / ahead / right estimate</small>
+                  </div>
+                  <div>
+                    <span>Spoken alerts</span>
+                    <strong id="voice-status">Checking voice</strong>
+                    <small>Cooldown protected</small>
+                  </div>
+                </div>
+                <div id="detected-objects" class="detected-objects">
+                  <span>No supported objects in view</span>
+                </div>
+                <div class="safety-controls">
+                  <label class="compact-toggle" for="object-awareness">
+                    <input id="object-awareness" type="checkbox" />
+                    <span>Object awareness</span>
+                  </label>
+                  <label class="compact-toggle" for="voice-alerts">
+                    <input id="voice-alerts" type="checkbox" checked />
+                    <span>Voice alerts</span>
+                  </label>
+                  <label class="safety-threshold" for="posture-threshold">
+                    <span>Posture reminder</span>
+                    <select id="posture-threshold">
+                      <option value="20000" selected>20 s demo</option>
+                      <option value="60000">1 minute</option>
+                      <option value="300000">5 minutes</option>
+                    </select>
+                  </label>
+                  <button id="test-voice" type="button">Test voice</button>
+                </div>
+                <ol id="safety-event-log" class="safety-event-log" aria-label="Recent safety cues">
+                  <li>No safety cues in this session</li>
+                </ol>
+              </section>
+              <p id="functional-warning" class="privacy-note">Full-body motion is estimated from one camera. It cannot confirm or exclude fracture.</p>
+              <p class="privacy-note">A single camera only monitors its field of view. Object classes, approach direction, and posture duration are prototype estimates, not collision avoidance or medical diagnosis.</p>
+            </div>
+          </section>
+
+          <section id="stage-impact" class="stage-panel" data-stage-panel="1" role="tabpanel" hidden>
+            <div class="scenario-reference-actions">
+              <button id="save-scenario-reference" type="button">Save comparison reference</button>
+              <button id="clear-scenario-reference" type="button" disabled>Clear reference</button>
+            </div>
+            <div id="scenario-comparison" class="scenario-comparison" hidden aria-live="polite">
+              <div><span>Reference DCR</span><strong id="reference-dcr">--</strong></div>
+              <div><span>Current DCR</span><strong id="current-dcr">--</strong></div>
+              <b id="comparison-delta"></b>
+              <p id="comparison-inputs"></p>
+              <small id="comparison-boundary"></small>
+            </div>
+            <label class="field">
+              <span>Target region</span>
+              <select id="target-region">
+                <option value="tibia" selected>Tibia shaft</option>
+                <option value="femur">Femur shaft</option>
+                <option value="knee">Knee joint</option>
+                <option value="ankle">Ankle joint</option>
+              </select>
+            </label>
+
+            <button class="preset-button" data-preset="eva" type="button">Restore EVA tool case</button>
+
+            <div class="active-object">
+              <span>Simulated object</span>
+              <strong id="active-object-name">EVA hand tool</strong>
+            </div>
+
+            <label class="field">
+              <span>Object mass <output id="mass-output">2000 g</output></span>
+              <input id="mass" type="range" min="1" max="5000" value="2000" />
+            </label>
+
+            <label class="field">
+              <span>Impact speed <output id="speed-output">4 m/s</output></span>
+              <input id="speed" type="range" min="0" max="120" value="4" />
+            </label>
+
+            <label class="field">
+              <span>Angle from surface plane <output id="angle-output">75 deg</output></span>
+              <input id="angle" type="range" min="0" max="90" value="75" />
+            </label>
+
+            <label class="field">
+              <span>Contact area <output id="area-output">12 mm2</output></span>
+              <input id="contact-area" type="range" min="1" max="5000" value="12" />
+            </label>
+          </section>
+
+          <section id="stage-bone" class="stage-panel" data-stage-panel="2" role="tabpanel" hidden>
+            <label class="field">
+              <span>Bone strength index <output id="bone-output">0.90</output></span>
+              <input id="bone-index" type="range" min="45" max="120" value="90" />
+            </label>
+
+            <div id="space-fields" class="mode-fields">
+              <label class="field">
+                <span>Microgravity exposure <output id="days-output">180 d</output></span>
+                <input id="microgravity-days" type="range" min="0" max="420" value="180" />
+              </label>
+            </div>
+
+            <section class="nasa-evidence" aria-labelledby="nasa-evidence-title">
+              <div class="panel-heading">
+                <div>
+                  <span class="section-label">NASA biological evidence</span>
+                  <h3 id="nasa-evidence-title">OSDR-804 skeletal microCT</h3>
+                </div>
+                <span id="nasa-evidence-status" class="status-badge">Loading</span>
+              </div>
+              <div class="nasa-evidence-grid">
+                <div>
+                  <span>Study</span>
+                  <strong id="nasa-study-summary">37-day ISS mouse study</strong>
+                </div>
+                <div>
+                  <span>Distal femur BV / TV</span>
+                  <strong id="nasa-distal-change">--</strong>
+                </div>
+                <div>
+                  <span>Cortical thickness</span>
+                  <strong id="nasa-cortical-change">--</strong>
+                </div>
+                <div>
+                  <span>Vertebral BV / TV</span>
+                  <strong id="nasa-vertebra-change">--</strong>
+                </div>
+              </div>
+              <p id="nasa-evidence-boundary" class="privacy-note">
+                Animal evidence supports plausibility; it does not calibrate human fracture risk.
+              </p>
+            </section>
+
+            <div class="section-divider">
+              <span id="condition-heading">Crew condition</span>
+              <small>Changes response priority, not the AI fracture score.</small>
+            </div>
+
+            <label class="field">
+              <span>Reported pain <output id="pain-output">6 / 10</output></span>
+              <input id="pain-score" type="range" min="0" max="10" value="6" />
+            </label>
+
+            <label class="field">
+              <span>Swelling</span>
+              <select id="swelling">
+                <option value="none">None</option>
+                <option value="mild">Mild</option>
+                <option value="moderate" selected>Moderate</option>
+                <option value="severe">Severe</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span id="mobility-label">Ability to use limb</span>
+              <select id="mobility">
+                <option value="normal">Normal</option>
+                <option value="limited" selected>Limited</option>
+                <option value="unable">Unable</option>
+              </select>
+            </label>
+
+            <label class="condition-check">
+              <input id="sensation-change" type="checkbox" />
+              <span>Reported numbness, tingling, or altered sensation</span>
+            </label>
+
+            <div class="metric-grid" aria-label="Computed mechanics">
+              <div>
+                <span>Kinetic energy</span>
+                <strong id="energy-metric">--</strong>
+              </div>
+              <div>
+                <span>Contact stress</span>
+                <strong id="stress-metric">--</strong>
+              </div>
+              <div>
+                <span>Adjusted capacity</span>
+                <strong id="fragility-metric">--</strong>
+              </div>
+              <div>
+                <span>Model scope</span>
+                <strong id="confidence-metric">Research model</strong>
+              </div>
+            </div>
+          </section>
+
+          <section id="stage-decision" class="stage-panel" data-stage-panel="3" role="tabpanel" hidden>
+            <div class="fusion-map" aria-label="AstroBone evidence fusion">
+              <div>
+                <span>01</span>
+                <strong>X-ray evidence</strong>
+              </div>
+              <i>+</i>
+              <div>
+                <span>02</span>
+                <strong>Impact demand</strong>
+              </div>
+              <i>+</i>
+              <div>
+                <span>03</span>
+                <strong>Bone fragility</strong>
+              </div>
+              <i>=</i>
+              <div class="fusion-result">
+                <span>04</span>
+                <strong>Crew action plan</strong>
+              </div>
+            </div>
+
+            <div class="method-note">
+              <span class="section-label">Rule-based review</span>
+              <p>
+                Image evidence, mechanical DCR, and modeled capacity reduction remain separate.
+                Explicit review rules and crew-condition flags set priority; no cross-domain
+                weighted score is calculated.
+              </p>
+            </div>
+
+            <details class="research-details">
+              <summary>Current validation limits</summary>
+              <p>
+                Prior final-epoch experiments reported classifier AUC 0.899, fracture recall 0.656,
+                and segmenter Dice 0.394. Checkpoint-aligned evaluation of the models served by this
+                prototype is pending. External clinical, astronaut, and lab validation are required.
+              </p>
+            </details>
+          </section>
+
+          <div class="workflow-actions">
+            <button id="workflow-back" class="quiet-action" type="button" disabled>Back</button>
+            <span id="workflow-progress">1 / 4</span>
+            <button id="workflow-next" class="primary-action" type="button">Next: impact</button>
+          </div>
+        </aside>
+
+        <section class="decision-panel" aria-label="AstroBone crew medical support">
+          <div class="panel-heading">
+            <div>
+              <span class="section-label">Onboard support</span>
+              <h2 id="support-panel-title">Crew medical support</h2>
+            </div>
+            <span id="assistant-mode" class="status-badge">Research support</span>
+          </div>
+
+          <div id="decision-summary" class="decision-summary" data-band="incomplete">
+            <div id="decision-gauge" class="decision-gauge" aria-label="Evidence source coverage">
+              <strong id="decision-score">--</strong>
+              <span>sources</span>
+            </div>
+            <div>
+              <span id="decision-band" class="decision-band">Incomplete evidence</span>
+              <h3 id="decision-title">Connect all three evidence sources</h3>
+              <p id="decision-recommendation">
+                Connect image evidence when available, while following condition checks and approved response rules.
+              </p>
+            </div>
+          </div>
+
+          <div class="source-breakdown" aria-label="Separate evidence channels">
+            <div class="source-row">
+              <div>
+                <span>X-ray model score</span>
+                <strong id="source-imaging-value">Missing</strong>
+              </div>
+              <div class="source-track"><span id="source-imaging-bar"></span></div>
+            </div>
+            <div class="source-row">
+              <div>
+                <span>Mechanical demand/capacity</span>
+                <strong id="source-impact-value">--</strong>
+              </div>
+              <div class="source-track"><span id="source-impact-bar"></span></div>
+            </div>
+            <div class="source-row">
+              <div>
+                <span>Modeled capacity reduction</span>
+                <strong id="source-fragility-value">--</strong>
+              </div>
+              <div class="source-track"><span id="source-fragility-bar"></span></div>
+            </div>
+          </div>
+
+          <div class="decision-context">
+            <div>
+              <span>Evidence coverage</span>
+              <strong id="decision-coverage">2 of 3 sources</strong>
+            </div>
+            <div>
+              <span>Uncertainty</span>
+              <strong id="decision-uncertainty">Wide</strong>
+            </div>
+          </div>
+
+          <p id="decision-rationale" class="decision-rationale">
+            Impact and fragility are estimated, but structural image evidence is still missing.
+          </p>
+
+          <section class="competition-panel" aria-labelledby="competition-title">
+            <div class="panel-heading">
+              <div>
+                <span class="section-label">Mission evidence</span>
+                <h3 id="competition-title">Current case readiness</h3>
+              </div>
+              <span class="status-badge">Prototype</span>
+            </div>
+            <div class="competition-grid">
+              <div>
+                <span>Problem</span>
+                <strong>Delayed care risk</strong>
+                <small>Exploration crews need a way to screen, assess, respond, and hand off evidence.</small>
+              </div>
+              <div>
+                <span>Solution</span>
+                <strong>Explainable twin</strong>
+                <small>3D mechanics, AI image evidence, fragility inputs, and response actions stay linked.</small>
+              </div>
+              <div>
+                <span>Validation</span>
+                <strong>Implementation checked</strong>
+                <small>Simulink reproduces the analytical equations; external biomechanics validation remains open.</small>
+              </div>
+            </div>
+            <p id="mission-artifact-count" class="privacy-note">Checking session evidence</p>
+            <div id="mission-readiness-list" aria-label="Current session evidence"></div>
+            <p class="privacy-note">Artifact availability is not validation. Official challenge alignment and independent scientific evaluation remain open.</p>
+            <button id="export-competition-brief" type="button">Export competition brief</button>
+          </section>
+
+          <section class="validation-panel" aria-labelledby="validation-title">
+            <div class="panel-heading">
+              <div>
+                <span class="section-label">Validation layer</span>
+                <h3 id="validation-title">Model cards & evidence</h3>
+              </div>
+              <span class="status-badge">Transparent</span>
+            </div>
+
+            <div class="formula-stack" aria-label="Physics model formulas">
+              <div>
+                <span>Impact energy</span>
+                <code>0.5 * mass * speed^2</code>
+              </div>
+              <div>
+                <span>Normal impact</span>
+                <code>speed * sin(angle)</code>
+              </div>
+              <div>
+                <span>Contact stress</span>
+                <code>(mass * normal speed / duration) / area</code>
+              </div>
+              <div>
+                <span>Relative concern</span>
+                <code>demand / adjusted capacity</code>
+              </div>
+            </div>
+
+            <section class="simulation-evidence-band" aria-labelledby="simulation-evidence-title">
+              <div class="panel-heading">
+                <div>
+                  <span class="section-label">Simulink evidence</span>
+                  <h3 id="simulation-evidence-title">Level-A control envelope</h3>
+                </div>
+                <span id="simulation-evidence-status" class="status-badge">Loading</span>
+              </div>
+
+              <div class="simulation-evidence-grid">
+                <div class="simulation-result">
+                  <div class="simulation-metrics" aria-label="Simulation verification metrics">
+                    <div>
+                      <span>Baseline DCR</span>
+                      <strong id="simulation-dcr">--</strong>
+                      <small id="simulation-band">--</small>
+                    </div>
+                    <div>
+                      <span>Peak stress</span>
+                      <strong id="simulation-stress">--</strong>
+                      <small>Nominal contact stress</small>
+                    </div>
+                    <div>
+                      <span>Verification</span>
+                      <strong id="simulation-verification">--</strong>
+                      <small>Equation comparison runs</small>
+                    </div>
+                    <div>
+                      <span>Capacity exceeded</span>
+                      <strong id="simulation-exceeded">--</strong>
+                      <small>Fraction of assumed scenarios</small>
+                    </div>
+                  </div>
+                  <p id="simulation-interpretation" class="simulation-interpretation">
+                    Internal implementation evidence is loading.
+                  </p>
+                  <button id="load-simulation-case" class="primary-action" type="button" disabled>
+                    Load verified EVA case
+                  </button>
+                </div>
+
+                <div class="sensitivity-summary">
+                  <span class="section-label">What drives the envelope</span>
+                  <ol id="simulation-sensitivity" aria-label="Global sensitivity ranking"></ol>
+                </div>
+              </div>
+
+              <details class="research-details simulation-limits">
+                <summary>What this evidence proves and does not prove</summary>
+                <p id="simulation-proof">
+                  It checks implementation consistency. It does not establish biological accuracy,
+                  astronaut fracture probability, or operational readiness.
+                </p>
+              </details>
+            </section>
+
+            <div class="model-card-grid" aria-label="Prototype model cards">
+              <article>
+                <span>Mechanics envelope</span>
+                <strong>Simulink Level-A</strong>
+                <small>25 comparison runs | 100% band agreement | internal verification only</small>
+              </article>
+              <article>
+                <span>Image classifier</span>
+                <strong>DenseNet121</strong>
+                <small>FracAtlas prototype | served-checkpoint evaluation pending</small>
+              </article>
+              <article>
+                <span>Mask localizer</span>
+                <strong>U-Net++</strong>
+                <small>DenseNet121 encoder | checkpoint-aligned evaluation pending</small>
+              </article>
+              <article>
+                <span>Use boundary</span>
+                <strong>Decision support</strong>
+                <small>Research only. It does not diagnose, prescribe, or replace medical review.</small>
+              </article>
+            </div>
+
+            <div class="evidence-links" aria-label="Source-backed evidence links">
+              <a href="https://ntrs.nasa.gov/citations/20240005190" target="_blank" rel="noreferrer">NASA 2024 evidence report</a>
+              <a href="https://www.nasa.gov/directorates/esdmd/hhp/risk-of-bone-fracture-due-to-spaceflight-induced-changes-to-bone/" target="_blank" rel="noreferrer">NASA fracture risk</a>
+              <a href="https://www.nasa.gov/reference/risk-of-spaceflight-induced-bone-changes/" target="_blank" rel="noreferrer">NASA bone changes</a>
+              <a href="https://ntrs.nasa.gov/citations/20110011355" target="_blank" rel="noreferrer">NASA EVA impact study</a>
+              <a href="https://pubmed.ncbi.nlm.nih.gov/33597120/" target="_blank" rel="noreferrer">Astronaut tibia study</a>
+              <a href="https://osdr.nasa.gov/bio/repo/data/studies/OSD-804" target="_blank" rel="noreferrer">NASA OSDR-804 skeletal data</a>
+              <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10404222/" target="_blank" rel="noreferrer">FracAtlas paper</a>
+              <span>User-supplied rigged human</span>
+            </div>
+
+            <button id="export-validation-report" type="button">Export validation report</button>
+          </section>
+
+          <section class="care-plan" aria-labelledby="care-plan-title">
+            <div class="panel-heading">
+              <div>
+                <span class="section-label">Next actions</span>
+                <h3 id="care-plan-title">Onboard response plan</h3>
+              </div>
+              <span id="care-priority" class="status-badge">Assisted review</span>
+            </div>
+            <p id="care-summary" class="care-summary">
+              The response plan can begin while image evidence is being collected.
+            </p>
+            <div id="care-actions" class="care-actions" aria-live="polite"></div>
+            <div class="crew-tools">
+              <button id="log-observation" type="button">Log observation</button>
+              <button id="export-handoff" class="primary-action" type="button">Export handoff</button>
+            </div>
+            <div class="observation-status">
+              <span>Trend log</span>
+              <strong id="observation-count">0 observations</strong>
+            </div>
+            <p id="protocol-note" class="protocol-note">
+              Operational use requires an approved musculoskeletal response protocol.
+            </p>
+          </section>
+
+        </section>
+      </main>
+
+      <button id="copilot-launcher" class="copilot-launcher" type="button" aria-controls="copilot-panel" aria-expanded="false" aria-label="Open Astra, AstroBone research copilot">
+        <span class="copilot-avatar copilot-avatar-launcher" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img">
+            <defs>
+              <linearGradient id="astra-glow" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#39bfa8" />
+                <stop offset="1" stop-color="#6578c9" />
+              </linearGradient>
+            </defs>
+            <circle cx="32" cy="32" r="18" fill="none" stroke="url(#astra-glow)" stroke-width="2.6" />
+            <path d="M24 25c4-5 12-5 16 0M24 39c4 5 12 5 16 0M26 24l12 16M38 24L26 40" fill="none" stroke="url(#astra-glow)" stroke-width="3" stroke-linecap="round" />
+            <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="#39bfa8" stroke-opacity=".75" stroke-width="1.8" transform="rotate(-18 32 32)" />
+            <circle cx="55" cy="24" r="2.4" fill="currentColor" />
+          </svg>
+        </span>
+        <span class="copilot-launcher-copy"><strong>Astra</strong><small>AstroBone Copilot</small></span>
+        <span class="copilot-launcher-pulse" aria-hidden="true"></span>
+      </button>
+
+      <aside id="copilot-panel" class="copilot-panel" aria-label="Astra AstroBone research copilot" hidden>
+        <header class="copilot-header">
+          <div class="copilot-identity">
+            <span class="copilot-avatar" aria-hidden="true">
+              <svg viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="18" fill="none" stroke="currentColor" stroke-width="2.6" />
+                <path d="M24 25c4-5 12-5 16 0M24 39c4 5 12 5 16 0M26 24l12 16M38 24L26 40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="currentColor" stroke-opacity=".7" stroke-width="1.8" transform="rotate(-18 32 32)" />
+                <circle cx="55" cy="24" r="2.4" fill="currentColor" />
+              </svg>
+            </span>
+            <div>
+              <span class="section-label">Research copilot</span>
+              <div class="copilot-name-row"><h3>Astra</h3><span class="copilot-online"><i></i> Ready</span></div>
+              <small class="copilot-role">Explains evidence and workflow. It does not diagnose.</small>
+            </div>
+          </div>
+          <div class="copilot-window-actions">
+            <button id="copilot-minimize" type="button" aria-label="Minimize Astra">&minus;</button>
+            <button id="copilot-close" type="button" aria-label="Close Astra">&times;</button>
+          </div>
+        </header>
+
+        <div class="copilot-context-strip">
+          <span><i></i> Twin-linked</span>
+          <span>Reads current mechanics, imaging, movement, and evidence state</span>
+        </div>
+        <div id="chat-log" class="chat-log copilot-chat-log" aria-live="polite"></div>
+        <div class="suggestions copilot-suggestions" aria-label="Suggested prompts">
+          <button data-prompt="Explain the current mechanical index." type="button">Explain current case</button>
+          <button data-prompt="What evidence is missing?" type="button">Missing evidence</button>
+          <button data-prompt="What would make this NASA-ready?" type="button">NASA-ready</button>
+          <button data-prompt="Explain the camera evidence boundary." type="button">Camera boundary</button>
+        </div>
+        <form id="chat-form" class="chat-form copilot-chat-form">
+          <input id="chat-input" autocomplete="off" placeholder="Ask Astra about the current AstroBone state" />
+          <button type="submit" aria-label="Send question to Astra">Send</button>
+        </form>
+        <footer class="copilot-footer">
+          <span>Astra // research support</span>
+          <span id="copilot-engine-label">deterministic support ready</span>
+        </footer>
+      </aside>
+
+      <footer class="app-footer">
+        AstroBone supports prevention, assessment, response tracking, and medical handoff. It does
+        not diagnose fracture, prescribe treatment, or replace qualified medical or mission decisions.
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+    <dialog id="mission-review-dialog" class="mission-review-dialog" aria-labelledby="mission-review-title">
+      <div class="mission-review-heading">
+        <div><span class="section-label">AstroBone / research demonstration</span><h2 id="mission-review-title">Mission evidence review</h2></div>
+        <button id="close-mission-review" type="button">Close</button>
+      </div>
+      <p class="mission-review-summary">One traceable case, with each evidence channel kept separate. No autonomous diagnosis or operational clearance.</p>
+      <div id="mission-review-checks" aria-label="Evidence availability and scientific scope"></div>
+      <section class="mission-review-boundary">
+        <h3>Before a competition submission</h3>
+        <ul>
+          <li>Select an official 2026 challenge and map each deliverable to its requirements.</li>
+          <li>Disclose this pre-event prototype and identify work completed during the hackathon.</li>
+          <li>Confirm current submission rules, team eligibility, and asset permissions.</li>
+          <li>Publish checkpoint-aligned image evaluation, movement error measurements, and failure cases.</li>
+        </ul>
+        <p>2026 event: November 14-15. The specific challenge and current submission-format requirements are not confirmed in this prototype.</p>
+        <a href="https://www.spaceappschallenge.org/2026/" target="_blank" rel="noreferrer">Official 2026 event</a>
+        <a href="https://www.spaceappschallenge.org/resources/" target="_blank" rel="noreferrer">Current participant resources</a>
+      </section>
+      <div class="mission-review-actions">
+        <button id="review-export" class="primary-action" type="button">Export review packet</button>
+        <span>Summary only. No video or raw landmarks.</span>
+      </div>
+    </dialog>
+  </body>
+</html>

@@ -11,23 +11,26 @@ page.on("pageerror", e => errors.push(e.message));
 // ERR_ABORTED is a scene releasing its video on purpose, not a missing file.
 page.on("requestfailed", r => { if (r.failure()?.errorText !== "net::ERR_ABORTED") errors.push(`failed ${r.url()} ${r.failure()?.errorText}`); });
 page.on("console", m => { if (m.type() === "error") errors.push(m.text()); });
-await page.goto(`${base}twin.html`, { waitUntil: "load" });
+await page.goto(`${base}`, { waitUntil: "load" });
 await page.waitForFunction(() => navigator.serviceWorker?.controller || navigator.serviceWorker?.ready, null, { timeout: 30000 });
 await page.evaluate(() => navigator.serviceWorker.ready);
 // Wait until the install step has cached the core pack.
-await page.waitForFunction(async () => (await (await caches.open("astrobone-offline-v3")).keys()).length >= 20, null, { timeout: 120000, polling: 1000 });
+await page.waitForFunction(async () => (await (await caches.open("astrobone-offline-v4")).keys()).length >= 20, null, { timeout: 120000, polling: 1000 });
 await page.reload({ waitUntil: "load" });
 await page.waitForFunction(() => window.__astroboneTwin?.scene?.ready, null, { timeout: 120000 });
-const cachedKeys = await page.evaluate(async () => (await (await caches.open("astrobone-offline-v3")).keys()).map(r => r.url.replace(location.origin, "")));
+const cachedKeys = await page.evaluate(async () => (await (await caches.open("astrobone-offline-v4")).keys()).map(r => r.url.replace(location.origin, "")));
 const cached = cachedKeys.length;
 console.log(cachedKeys.filter(k => /assets|mediapipe|task/.test(k)).join(" | "));
 await context.setOffline(true);
 const result = {};
-for (const path of ["twin.html", "pitch.html"]) {
+for (const path of ["", "lab.html", "pitch.html"]) {
   await page.goto(`${base}${path}`, { waitUntil: "load" });
-  if (path === "twin.html") {
+  if (path === "") {
     await page.waitForFunction(() => window.__astroboneTwin?.scene?.ready, null, { timeout: 120000 });
     result.twin = await page.evaluate(() => ({ online: navigator.onLine, layers: document.getElementById("tw-canvas").dataset.layers.split(",").length }));
+  } else if (path === "lab.html") {
+    await page.waitForSelector(".lab-top", { timeout: 60000 });
+    result.lab = await page.evaluate(() => ({ online: navigator.onLine, header: !!document.querySelector(".lab-top .tw-live"), tabs: [...document.querySelectorAll(".companion-tabs button")].map(b => b.textContent) }));
   } else {
     await page.waitForFunction(() => window.__astroPitch, null, { timeout: 60000 });
     await page.keyboard.press("Space");

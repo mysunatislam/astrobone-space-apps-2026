@@ -54,8 +54,7 @@ export function createMissionCasePanel({ parent, onDay, onSaveAction, onDemo, on
     getExternal: () => researchPanel.exportEvidence() });
   command.setActive(false);
   const intelligence = createMissionIntelligence({ getExternal: () => researchPanel.exportEvidence(), ready: researchPanel.ready, onResearch, onCapture });
-  const demoLink = el("a", "Open mission presentation"); demoLink.href = "#mission-demo"; demoLink.className = "mission-demo-link";
-  $(".case-empty").append(demoLink);
+  // The mission story is the home page (the digital twin), so no presentation link is repeated here.
   $("#case-demo").onclick = onDemo; $("#case-capture").onclick = onCapture;
   $("#case-record-action").onclick = async () => {
     if (!current?.current || current.status === "human_review_now" || !$("#case-action-consent").checked) return;

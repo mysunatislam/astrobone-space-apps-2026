@@ -1,0 +1,85 @@
+/* Live Capture in the twin's visual language: the twin's palette mapped onto this page's tokens, its
+   fixed glass header (from twin.css) in place of the old top bar, and its mono section labels. */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #dcebff;
+  --muted: #8ea7c4;
+  --line: rgba(110, 190, 255, .16);
+  --line-strong: rgba(127, 227, 255, .42);
+  --panel: rgba(6, 14, 28, .86);
+  --panel-strong: #060e1c;
+  --soft: rgba(18, 36, 64, .56);
+  --teal: #7fe3ff;
+  --teal-dark: #4aa8ff;
+  --green: #6dffb0;
+  --amber: #ffd27a;
+  --red: #ff5a4f;
+  --violet: #b9a6ff;
+  --space-0: #010205;
+  --space-1: #040a16;
+  --space-2: #0a1426;
+  --glow: 0 0 28px rgba(127, 227, 255, .12);
+  --curve-demand: #7fe3ff;
+  --curve-capacity: #b9a6ff;
+  --curve-evidence: #4aa8ff;
+  --astro-cyan: #7fe3ff;
+  --astro-blue: #4aa8ff;
+  --astro-violet: #b9a6ff;
+  --astro-gold: #ffd27a;
+  --astro-panel: rgba(6, 14, 28, .86);
+  --astro-panel-2: rgba(10, 22, 40, .78);
+  --astro-border: rgba(110, 190, 255, .16);
+  --astro-border-hot: rgba(127, 227, 255, .36);
+  --astro-glow: 0 0 35px rgba(127, 227, 255, .10);
+  --v5-text-muted: #8ea7c4;
+}
+
+body.lab-body {
+  font-family: var(--tw-sans);
+  background: radial-gradient(circle at 50% -10%, rgba(40, 110, 200, .14), transparent 45%), var(--tw-bg);
+}
+.lab-body .topbar { display: none !important; }
+.lab-body #app { padding-top: 76px; }
+
+/* Header chip: what the page promises */
+.lab-top { grid-template-columns: auto 1fr auto auto; }
+.lab-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(109, 255, 176, .3); font: 600 10px/1 var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-ink); white-space: nowrap; }
+.lab-chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--tw-green); box-shadow: 0 0 8px var(--tw-green); }
+
+/* Page tabs as a quiet sub-menu under the header */
+.lab-body .companion-tabs { justify-content: center; gap: 4px; padding: 10px 14px; background: transparent; border-bottom: 1px solid var(--tw-line); }
+.lab-body .companion-tabs button { border: 1px solid transparent; background: none; color: var(--tw-dim); padding: 10px 16px; border-radius: 10px; font: 600 11px/1 var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; box-shadow: none; }
+.lab-body .companion-tabs button:hover { color: var(--tw-ink); background: rgba(127, 227, 255, .06); }
+.lab-body .companion-tabs button[aria-selected="true"] { color: var(--tw-ink); background: rgba(127, 227, 255, .1); border-color: rgba(127, 227, 255, .35); }
+
+/* Section labels in the twin's mono eyebrow style */
+.lab-body .section-label, .lab-body .brand-eyebrow { font-family: var(--tw-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--tw-cyan); }
+
+/* Tabs and toggles that hard-code the old teal (some with !important upstream) */
+html[data-theme] body.lab-body .companion-tabs { background: transparent !important; border-color: var(--tw-line) !important; }
+html[data-theme] body.lab-body .companion-tabs button { color: var(--tw-dim) !important; }
+html[data-theme] body.lab-body .companion-tabs button[aria-selected="true"] { background: rgba(127, 227, 255, .1) !important; color: var(--tw-ink) !important; border-color: rgba(127, 227, 255, .35) !important; }
+html[data-theme] body.lab-body .simulation-shell .anatomy-view-tabs button[aria-selected=true],
+.lab-body .capture-source-bar button[aria-pressed=true] { background: rgba(127, 227, 255, .14) !important; color: var(--tw-ink) !important; border-color: rgba(127, 227, 255, .4) !important; }
+.lab-body #anatomical-coverage { color: var(--tw-dim); }
+.lab-body .camera-facing-control button.is-active { background: rgba(127, 227, 255, .16); color: var(--tw-ink); }
+
+/* Crew records: the review panel's own palette, in navy instead of green-grey */
+html[data-theme="dark"] .lab-body .companion-shell { --cp-bg: #050c18; --cp-line: rgba(110, 190, 255, .18); --cp-text: #dcebff; --cp-muted: #8ea7c4; }
+html[data-theme="dark"] .lab-body .companion-message { background: rgba(127, 227, 255, .08); }
+html[data-theme="dark"] .lab-body .companion-message[data-error="true"] { background: rgba(255, 90, 79, .14); }
+html[data-theme="dark"] .lab-body .companion-sources a, html[data-theme="dark"] .lab-body .companion-environment a { color: var(--tw-cyan); }
+.lab-body .companion-shell input[type="checkbox"] { accent-color: var(--tw-cyan); }
+
+/* Panels that were drawn for the light theme only */
+.lab-body .engineering-band { background: rgba(6, 14, 28, .7); color: var(--tw-ink); border-top-color: var(--tw-line); }
+.lab-body .densepose-panel { background: rgba(10, 22, 40, .78); color: var(--tw-ink); border-bottom-color: var(--tw-line); }
+.lab-body .densepose-panel small, .lab-body .densepose-panel p { color: var(--tw-dim); }
+
+@media (max-width: 1500px) { .lab-chip { display: none; } }
+@media (max-width: 960px) {
+  .lab-body #app { padding-top: 0; }
+  .lab-top { margin: 8px 16px; }
+  .lab-top > .tw-live { grid-column: 3; grid-row: 1; justify-self: end; }
+  .lab-chip { display: none; }
+}

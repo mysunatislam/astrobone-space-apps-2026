@@ -1,6 +1,6 @@
 # AstroBone
 
-**NASA Space Apps 2026 · Create Health Monitoring Software for Astronauts on Space Missions.** On long missions astronauts must spot health changes in themselves. AstroBone's **Daily Self-Check** (in [`twin.html`](https://mysunatislam.github.io/astrobone-space-apps-2026/twin.html)) does the three things the brief asks for:
+**NASA Space Apps 2026 · Create Health Monitoring Software for Astronauts on Space Missions.** On long missions astronauts must spot health changes in themselves. AstroBone's **Daily Self-Check** (on the [home page](https://mysunatislam.github.io/astrobone-space-apps-2026/#selfcheck)) does the three things the brief asks for:
 
 - **Gather:** camera knee extension, a 3-minute reaction test (PVT-B), sleep, fatigue, mood, stress, immune symptoms, resting heart rate and dosimeter context.
 - **Evaluate:** quality gates first, then a comparison with the astronaut's own baseline across bone & muscle, cardiovascular, behavioral health and immune.
@@ -10,7 +10,7 @@ A 3D digital twin shows the result on the body. The self-check runs in the brows
 
 AstroBone helps astronauts and crew medical officers review personal health observations, distinguish usable changes from poor measurements, and prepare an evidence-linked follow-up record. The camera avatar is an estimated-motion visualization, not a validated anatomical digital twin. External X-ray research is clearly separated from crew imaging; impact calculations remain in the research tools.
 
-The default **Health review** retains the Research Lab's movement, cardiovascular, radiation and external X-ray channels. The dedicated `/#mission-demo` route now opens **Mission Intelligence**: Commander Elena Torres, ARES TRANSIT-1, Day 147 of a fictional 240-day transit. Eight authored checkpoints, seven anatomical/context layers, evidence graph, data lineage, verification gates, contextual Astra actions, isolated what-if controls, simulated Earth-link loss and handoff export share one deterministic state. **Play demo** runs a cancellable 50-second sequence; **Shift+D** opens presenter controls. See [implementation and truth contract](docs/mission-intelligence.md).
+**Live Capture → Crew records** (`lab.html#crew-companion`) retains the Research Lab's movement, cardiovascular, radiation and external X-ray channels. The dedicated `lab.html#mission-demo` route opens **Mission Intelligence**: Commander Elena Torres, ARES TRANSIT-1, Day 147 of a fictional 240-day transit. Eight authored checkpoints, seven anatomical/context layers, evidence graph, data lineage, verification gates, contextual Astra actions, isolated what-if controls, simulated Earth-link loss and handoff export share one deterministic state. **Play demo** runs a cancellable 50-second sequence; **Shift+D** opens presenter controls. See [implementation and truth contract](docs/mission-intelligence.md).
 
 Elena's scenario lives only in memory and never overwrites crew profiles. The older Alex Morgan test fixture remains in Research Lab for regression continuity. Neither persona represents real astronaut observations. Presentation Astra uses deterministic calculations and local prepared-source lookup, not an LLM. The local AI service remains optional in Research Lab.
 
@@ -20,8 +20,7 @@ The cardiovascular view now uses an anatomical Z-Anatomy heart/vessel GLB. **Ins
 
 See the [October 3 implementation audit, evidence limits, and competition assessment](docs/competition-audit-2026-10-03.md) and [exact demo script](docs/competition-demo-2026-10-03.md). These supersede older maturity and presentation claims below. Public deployments have not been updated by this local work.
 
-- Live app: https://mysunatislam.github.io/astrobone-space-apps-2026/
-- Digital twin: https://mysunatislam.github.io/astrobone-space-apps-2026/twin.html
+- Live app (one link): https://mysunatislam.github.io/astrobone-space-apps-2026/ opens the digital twin. Its menu holds every section (Mission Control, Self-Check, Digital Twin, Functional Scan, Impact Lab, Physiology, Evidence) and **Live Capture** (camera movement capture, crew records and research tools, `lab.html`), with the same header and design on both pages. Sections have their own addresses, e.g. `/#selfcheck`, `/#impact`; the old `/twin.html` link redirects home.
 - Public repository: https://github.com/mysunatislam/astrobone-space-apps-2026
 - Project owner: Mysunat Islam / [@mysunatislam](https://github.com/mysunatislam)
 
@@ -292,7 +291,7 @@ npm run test:ui -- http://127.0.0.1:8000/ "E:\AstroBone\data\raw\FracAtlas\image
 - [Daily Self-Check](docs/self-check.md) - gather, evaluate and act loop: instruments, quality gates, personal review triggers, storage and verification status
 - [240-second presentation and voiceover](docs/pitch-voiceover.md) - `pitch.html`: timed video-style pitch with live tracking and twin demos, teleprompter, recording checklist and script
 - [Space Apps 2026 pitch kit](docs/space-apps-2026-pitch.md) - brief mapping, 240-second and 30-second scripts, judge questions and claims to avoid
-- [Digital twin page and visual requirement](docs/ui-visual-experience.md) - `twin.html`: full-screen 3D digital twin (Mission Control, Digital Twin, Functional Scan, Impact Lab, Physiology, Evidence); every visual tied to fixture data or a tested model
+- [Digital twin and visual requirement](docs/ui-visual-experience.md) - the home page: full-screen 3D digital twin (Mission Control, Digital Twin, Functional Scan, Impact Lab, Physiology, Evidence); every visual tied to fixture data or a tested model
 - [Articulated anatomical reference](docs/anatomical-rig.md) - generated GLB, observed/coupled motion, bone/muscle layers, provenance, and software verification
 - [Local DensePose setup and limitations](docs/densepose.md) - camera/video surface maps, private GPU runtime, tests, and anatomical atlas boundaries
 - `docs/architecture-freeze-v2.md` - frozen architecture, terminology, evidence boundaries, and change gate

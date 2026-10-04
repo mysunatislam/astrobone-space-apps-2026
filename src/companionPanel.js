@@ -102,9 +102,8 @@ export function initCompanion({ getAssessment, getPulse = () => null }) {
   $("companion-title").textContent = "Mission health review";
   $("crew-demo").textContent = "Load demo astronaut";
   $("companion-run").textContent = "Run bounded evidence review";
-  document.querySelector("#companion-tab").textContent = "Health review";
+  document.querySelector("#companion-tab").textContent = "Crew records";
   document.querySelector("#research-tab").textContent = "Experimental tools";
-  tabs.prepend(document.querySelector("#companion-tab"));
   const labButton = document.querySelector("#research-tab");
   labButton.removeAttribute("role"); labButton.removeAttribute("aria-controls"); advanced.append(labButton);
   const manage = node("details", "", "crew-management"); manage.append(node("summary", "Crew & data management"));
@@ -419,12 +418,12 @@ export function initCompanion({ getAssessment, getPulse = () => null }) {
     setView("review", { connectIfNeeded: false });
     // The presentation uses an isolated in-memory fixture, never a saved crew record.
   }
-  const presentationLink = node("a", "Open mission presentation", "mission-demo-link"); presentationLink.href = "#mission-demo"; advanced.append(presentationLink);
+  // The mission story lives on the home page (the digital twin); it is not repeated here.
   window.addEventListener("hashchange", () => {
     if (location.hash === "#mission-demo") void startPresentation();
     else if (location.hash === "#crew-companion") { missionDemo = false; setView("review"); }
   });
-  const startingMode = !location.hash || ["#crew-companion", "#validation-title", "#mission-demo"].includes(location.hash) ? "review"
+  const startingMode = ["#crew-companion", "#validation-title", "#mission-demo"].includes(location.hash) ? "review"
     : location.hash === "#research-tools" ? "research" : "capture";
   if (missionDemo) void startPresentation();
   else setView(startingMode, { updateHash: false });
