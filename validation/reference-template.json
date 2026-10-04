@@ -1,0 +1,21 @@
+{
+  "schema": "astrobone-timed-angle-reference-v1",
+  "videoSha256": "",
+  "subjectId": "",
+  "trialId": "",
+  "split": "development",
+  "unit": "deg",
+  "angleDefinition": "unsigned_hip_knee_ankle_flexion_deg",
+  "independentFromPoseModel": false,
+  "synthetic": false,
+  "referenceDevice": "",
+  "sourceUrl": "",
+  "protocol": "",
+  "synchronization": {
+    "method": "",
+    "referenceMinusVideoSeconds": null,
+    "maxMatchDeltaSeconds": 0.02,
+    "lockedBeforeEvaluation": false
+  },
+  "samples": []
+}

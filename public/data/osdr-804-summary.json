@@ -1,0 +1,331 @@
+{
+  "schemaVersion": "astrobone-osdr-summary-v1",
+  "source": {
+    "accession": "OSD-804",
+    "alsdaId": "LSDS-130",
+    "doi": "10.26030/yh5h-h706",
+    "license": "CC0-1.0",
+    "releaseDate": "2025-01-29",
+    "studyUrl": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-804",
+    "apiManifestUrl": "https://visualization.osdr.nasa.gov/biodata/api/v2/dataset/OSD-804/files/",
+    "dataFile": "LSDS-130_microCT_Cahill_microCT_TRANSFORMED.csv",
+    "dataSha256": "499541f23b4c3afcd39762456d98cb3046e1f56467fdf8ec5987f684534ccf0c",
+    "dictionaryFile": "LSDS-130_microCT_Data_Dictionary.csv",
+    "dictionarySha256": "48435279f43e902280ce22ccb7025226b90a396f61b46458ab1c0323528012b8"
+  },
+  "study": {
+    "organism": "Mus musculus",
+    "sex": "female",
+    "spaceflightDurationDays": 37,
+    "assay": "Micro-computed tomography",
+    "sampleRecords": 170,
+    "groups": [
+      {
+        "code": "BSL",
+        "label": "Basal control",
+        "records": 42
+      },
+      {
+        "code": "VIV",
+        "label": "Vivarium control",
+        "records": 42
+      },
+      {
+        "code": "GC",
+        "label": "Ground control",
+        "records": 40
+      },
+      {
+        "code": "FLT",
+        "label": "Spaceflight",
+        "records": 46
+      }
+    ],
+    "sites": [
+      {
+        "name": "CorticalFemur",
+        "records": 40
+      },
+      {
+        "name": "DistalFemur",
+        "records": 40
+      },
+      {
+        "name": "FemoralHead",
+        "records": 24
+      },
+      {
+        "name": "FemoralNeck",
+        "records": 27
+      },
+      {
+        "name": "Vertebrae",
+        "records": 39
+      }
+    ]
+  },
+  "flightVsGroundControl": [
+    {
+      "site": "CorticalFemur",
+      "measure": "bone_area_total_area_millimeter_squared",
+      "flightN": 10,
+      "groundN": 8,
+      "flightMean": 53.501243,
+      "groundMean": 55.543491,
+      "percentDifference": -3.68
+    },
+    {
+      "site": "CorticalFemur",
+      "measure": "cortical_thickness_millimeter",
+      "flightN": 10,
+      "groundN": 8,
+      "flightMean": 0.214222,
+      "groundMean": 0.225655,
+      "percentDifference": -5.07
+    },
+    {
+      "site": "CorticalFemur",
+      "measure": "endosteal _perimeter_millimeter",
+      "flightN": 10,
+      "groundN": 10,
+      "flightMean": 3.612417,
+      "groundMean": 3.615084,
+      "percentDifference": -0.07
+    },
+    {
+      "site": "CorticalFemur",
+      "measure": "periosteal_perimeter_millimeter",
+      "flightN": 10,
+      "groundN": 10,
+      "flightMean": 5.089538,
+      "groundMean": 5.123466,
+      "percentDifference": -0.66
+    },
+    {
+      "site": "DistalFemur",
+      "measure": "bone_volume_total_volume_millimeter_cubed",
+      "flightN": 10,
+      "groundN": 10,
+      "flightMean": 3.089864,
+      "groundMean": 6.798813,
+      "percentDifference": -54.55
+    },
+    {
+      "site": "DistalFemur",
+      "measure": "connectivity_density_per_millimeter_cubed",
+      "flightN": 8,
+      "groundN": 8,
+      "flightMean": 89.178914,
+      "groundMean": 186.334387,
+      "percentDifference": -52.14
+    },
+    {
+      "site": "DistalFemur",
+      "measure": "degree_of_anistropy",
+      "flightN": 10,
+      "groundN": 9,
+      "flightMean": 1.432643,
+      "groundMean": 1.4863,
+      "percentDifference": -3.61
+    },
+    {
+      "site": "DistalFemur",
+      "measure": "trabecular_bone_pattern_factor",
+      "flightN": 10,
+      "groundN": 8,
+      "flightMean": 43.621945,
+      "groundMean": 34.228,
+      "percentDifference": 27.45
+    },
+    {
+      "site": "DistalFemur",
+      "measure": "trabecular_number_per_millimeter",
+      "flightN": 10,
+      "groundN": 9,
+      "flightMean": 0.71389,
+      "groundMean": 1.229376,
+      "percentDifference": -41.93
+    },
+    {
+      "site": "DistalFemur",
+      "measure": "trabecular_separation_millimeter",
+      "flightN": 10,
+      "groundN": 9,
+      "flightMean": 0.315063,
+      "groundMean": 0.27588,
+      "percentDifference": 14.2
+    },
+    {
+      "site": "DistalFemur",
+      "measure": "trabecular_thickness_millimeter",
+      "flightN": 10,
+      "groundN": 10,
+      "flightMean": 0.043341,
+      "groundMean": 0.044797,
+      "percentDifference": -3.25
+    },
+    {
+      "site": "FemoralHead",
+      "measure": "bone_volume_total_volume_millimeter_cubed",
+      "flightN": 8,
+      "groundN": 5,
+      "flightMean": 39.81625,
+      "groundMean": 54.878,
+      "percentDifference": -27.45
+    },
+    {
+      "site": "FemoralHead",
+      "measure": "connectivity_density_per_millimeter_cubed",
+      "flightN": 8,
+      "groundN": 5,
+      "flightMean": 170.545,
+      "groundMean": 232.916,
+      "percentDifference": -26.78
+    },
+    {
+      "site": "FemoralHead",
+      "measure": "degree_of_anistropy",
+      "flightN": 8,
+      "groundN": 5,
+      "flightMean": 1.75625,
+      "groundMean": 1.706,
+      "percentDifference": 2.95
+    },
+    {
+      "site": "FemoralHead",
+      "measure": "trabecular_bone_pattern_factor",
+      "flightN": 8,
+      "groundN": 5,
+      "flightMean": 9.51625,
+      "groundMean": 1.112,
+      "percentDifference": 755.78
+    },
+    {
+      "site": "FemoralHead",
+      "measure": "trabecular_number_per_millimeter",
+      "flightN": 8,
+      "groundN": 5,
+      "flightMean": 5.3825,
+      "groundMean": 6.15,
+      "percentDifference": -12.48
+    },
+    {
+      "site": "FemoralHead",
+      "measure": "trabecular_separation_millimeter",
+      "flightN": 8,
+      "groundN": 5,
+      "flightMean": 0.12,
+      "groundMean": 0.096,
+      "percentDifference": 25.0
+    },
+    {
+      "site": "FemoralHead",
+      "measure": "trabecular_thickness_millimeter",
+      "flightN": 8,
+      "groundN": 5,
+      "flightMean": 0.075,
+      "groundMean": 0.088,
+      "percentDifference": -14.77
+    },
+    {
+      "site": "FemoralNeck",
+      "measure": "bone_area_total_area_millimeter_squared",
+      "flightN": 8,
+      "groundN": 5,
+      "flightMean": 84.0125,
+      "groundMean": 88.882,
+      "percentDifference": -5.48
+    },
+    {
+      "site": "FemoralNeck",
+      "measure": "cortical_thickness_millimeter",
+      "flightN": 8,
+      "groundN": 5,
+      "flightMean": 0.21125,
+      "groundMean": 0.224,
+      "percentDifference": -5.69
+    },
+    {
+      "site": "FemoralNeck",
+      "measure": "endosteal _perimeter_millimeter",
+      "flightN": 8,
+      "groundN": 4,
+      "flightMean": 1.4475,
+      "groundMean": 1.3525,
+      "percentDifference": 7.02
+    },
+    {
+      "site": "FemoralNeck",
+      "measure": "periosteal_perimeter_millimeter",
+      "flightN": 8,
+      "groundN": 5,
+      "flightMean": 2.84125,
+      "groundMean": 2.862,
+      "percentDifference": -0.73
+    },
+    {
+      "site": "Vertebrae",
+      "measure": "bone_volume_total_volume_millimeter_cubed",
+      "flightN": 10,
+      "groundN": 10,
+      "flightMean": 28.447312,
+      "groundMean": 30.530392,
+      "percentDifference": -6.82
+    },
+    {
+      "site": "Vertebrae",
+      "measure": "connectivity_density_per_millimeter_cubed",
+      "flightN": 10,
+      "groundN": 9,
+      "flightMean": 2526.6654,
+      "groundMean": 2647.566111,
+      "percentDifference": -4.57
+    },
+    {
+      "site": "Vertebrae",
+      "measure": "degree_of_anistropy",
+      "flightN": 10,
+      "groundN": 10,
+      "flightMean": 2.300443,
+      "groundMean": 2.041965,
+      "percentDifference": 12.66
+    },
+    {
+      "site": "Vertebrae",
+      "measure": "trabecular_bone_pattern_factor",
+      "flightN": 10,
+      "groundN": 10,
+      "flightMean": 21.278334,
+      "groundMean": 20.824147,
+      "percentDifference": 2.18
+    },
+    {
+      "site": "Vertebrae",
+      "measure": "trabecular_number_per_millimeter",
+      "flightN": 10,
+      "groundN": 10,
+      "flightMean": 5.721026,
+      "groundMean": 6.23611,
+      "percentDifference": -8.26
+    },
+    {
+      "site": "Vertebrae",
+      "measure": "trabecular_separation_millimeter",
+      "flightN": 10,
+      "groundN": 10,
+      "flightMean": 0.144723,
+      "groundMean": 0.136303,
+      "percentDifference": 6.18
+    },
+    {
+      "site": "Vertebrae",
+      "measure": "trabecular_thickness_millimeter",
+      "flightN": 10,
+      "groundN": 10,
+      "flightMean": 0.049727,
+      "groundMean": 0.048556,
+      "percentDifference": 2.41
+    }
+  ],
+  "useBoundary": "Animal microCT evidence supports biological plausibility and site-specific trends. It is not a human fracture-risk calibration and does not set the crew bone-strength slider."
+}

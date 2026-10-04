@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AstroBone Twin</string>
+    <string name="title_activity_main">AstroBone Twin</string>
+    <string name="package_name">com.mysunatislam.astrobone</string>
+    <string name="custom_url_scheme">com.mysunatislam.astrobone</string>
+</resources>

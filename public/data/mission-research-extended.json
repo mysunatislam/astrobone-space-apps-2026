@@ -1,0 +1,515 @@
+{
+  "schema": "astrobone-extended-research-v1",
+  "scope": "NASA external research, not personal crew observations or a calibration cohort",
+  "studies": [
+    {
+      "accession": "OSD-569",
+      "title": "Inspiration4 complete blood count",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-569",
+      "population": "Human / Inspiration4 three-day flight",
+      "boundary": "Short-duration Inspiration4 cohort, not a long-duration astronaut baseline. Blood counts do not measure cardiac output, oxygen saturation or diagnose disease.",
+      "exclusions": "Hemoglobin is excluded because its source column names the unit as percent. We do not silently relabel that field or apply clinical reference ranges.",
+      "sources": [
+        {
+          "file": "LSDS-7_Complete_Blood_Count_CBC_TRANSFORMED.csv",
+          "url": "https://osdr.nasa.gov/geode-py/ws/studies/OSD-569/download?source=datamanager&file=LSDS-7_Complete_Blood_Count_CBC_TRANSFORMED.csv",
+          "sha256": "32e4f9c97d3b636b5d5c2e72dab8c4d3319dee64c437508b092dad04603b2b8f",
+          "bytes": 9317,
+          "restricted": false
+        }
+      ],
+      "records": 28,
+      "participants": 4,
+      "metrics": [
+        {
+          "field": "hematocrit_value_percent",
+          "label": "Hematocrit",
+          "unit": "%",
+          "points": [
+            {
+              "visit": "L-92",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 41.65,
+              "min": 40.7,
+              "max": 49.1
+            },
+            {
+              "visit": "L-44",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 43.85,
+              "min": 37.8,
+              "max": 50.0
+            },
+            {
+              "visit": "L-3",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 43.05,
+              "min": 35.9,
+              "max": 49.0
+            },
+            {
+              "visit": "R+1",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 42.5,
+              "min": 36.4,
+              "max": 48.3
+            },
+            {
+              "visit": "R+45",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 43.8,
+              "min": 37.1,
+              "max": 49.0
+            },
+            {
+              "visit": "R+82",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 45.35,
+              "min": 34.7,
+              "max": 47.5
+            },
+            {
+              "visit": "R+194",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 41.1,
+              "min": 38.3,
+              "max": 48.0
+            }
+          ]
+        },
+        {
+          "field": "red_blood_cell_count_value_million_per_microliter",
+          "label": "Red blood cells",
+          "unit": "million/uL",
+          "points": [
+            {
+              "visit": "L-92",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 4.52,
+              "min": 4.36,
+              "max": 5.48
+            },
+            {
+              "visit": "L-44",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 4.735,
+              "min": 3.93,
+              "max": 5.57
+            },
+            {
+              "visit": "L-3",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 4.595,
+              "min": 3.72,
+              "max": 5.4
+            },
+            {
+              "visit": "R+1",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 4.755,
+              "min": 4.02,
+              "max": 5.55
+            },
+            {
+              "visit": "R+45",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 4.86,
+              "min": 4.02,
+              "max": 5.54
+            },
+            {
+              "visit": "R+82",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 4.955,
+              "min": 3.84,
+              "max": 5.45
+            },
+            {
+              "visit": "R+194",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 4.65,
+              "min": 4.11,
+              "max": 5.58
+            }
+          ]
+        },
+        {
+          "field": "white_blood_cell_count_value_thousand_per_microliter",
+          "label": "White blood cells",
+          "unit": "thousand/uL",
+          "points": [
+            {
+              "visit": "L-92",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 7.1,
+              "min": 5.4,
+              "max": 9.6
+            },
+            {
+              "visit": "L-44",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 5.95,
+              "min": 5.4,
+              "max": 9.3
+            },
+            {
+              "visit": "L-3",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 8.5,
+              "min": 7.0,
+              "max": 10.6
+            },
+            {
+              "visit": "R+1",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 6.25,
+              "min": 5.0,
+              "max": 8.1
+            },
+            {
+              "visit": "R+45",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 6.6,
+              "min": 4.9,
+              "max": 7.8
+            },
+            {
+              "visit": "R+82",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 6.6,
+              "min": 4.9,
+              "max": 8.8
+            },
+            {
+              "visit": "R+194",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 6.9,
+              "min": 4.9,
+              "max": 8.3
+            }
+          ]
+        },
+        {
+          "field": "platelet_count_value_thousand_per_microliter",
+          "label": "Platelets",
+          "unit": "thousand/uL",
+          "points": [
+            {
+              "visit": "L-92",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 240.0,
+              "min": 12.9,
+              "max": 241.0
+            },
+            {
+              "visit": "L-44",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 233.0,
+              "min": 227.0,
+              "max": 345.0
+            },
+            {
+              "visit": "L-3",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 276.5,
+              "min": 241.0,
+              "max": 367.0
+            },
+            {
+              "visit": "R+1",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 246.0,
+              "min": 227.0,
+              "max": 359.0
+            },
+            {
+              "visit": "R+45",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 266.5,
+              "min": 228.0,
+              "max": 396.0
+            },
+            {
+              "visit": "R+82",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 251.0,
+              "min": 198.0,
+              "max": 345.0
+            },
+            {
+              "visit": "R+194",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 228.5,
+              "min": 185.0,
+              "max": 256.0
+            }
+          ]
+        }
+      ],
+      "blankColumnsIgnored": 0,
+      "method": "Median, minimum and maximum of finite source values by visit. No imputation, outlier trimming, clinical thresholds or hypothesis tests. n is available records, not independent longitudinal subjects. L = days before launch; R = days after return, not mission day."
+    },
+    {
+      "accession": "OSD-656",
+      "title": "Inspiration4 urine immune-protein panel",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-656",
+      "population": "Human / Inspiration4 three-day flight",
+      "boundary": "Exploratory urine assay context. NPQ is the reported normalized assay unit, not a mass concentration. No conversion to ng/mL, immune-health score, radiation effect or personal risk.",
+      "exclusions": "Only explicitly named NPQ columns are used. Blank/unnamed columns and percent-normalized fields are excluded. Reported zeroes are retained, not interpreted as absence of protein; detection limits are not inferred.",
+      "sources": [
+        {
+          "file": "LSDS-64_Multiplex_urine.immune.AlamarPanel_TRANSFORMED.csv",
+          "url": "https://osdr.nasa.gov/geode-py/ws/studies/OSD-656/download?source=datamanager&file=LSDS-64_Multiplex_urine.immune.AlamarPanel_TRANSFORMED.csv",
+          "sha256": "f81b6dff9c34accab6dffe7a0b2970854f2f0b8d2712e92cfd0e91e6bb59c94a",
+          "bytes": 114890,
+          "restricted": false
+        }
+      ],
+      "records": 22,
+      "participants": 4,
+      "metrics": [
+        {
+          "field": "vcam1_concentration_npq",
+          "label": "VCAM1",
+          "unit": "NPQ",
+          "points": [
+            {
+              "visit": "L-92",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 1,
+              "median": 1.60405,
+              "min": 0.0,
+              "max": 6.089062822
+            },
+            {
+              "visit": "L-44",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 1,
+              "median": 1.00506,
+              "min": 0.0,
+              "max": 5.535225882
+            },
+            {
+              "visit": "L-3",
+              "n": 3,
+              "missing": 0,
+              "reportedZeros": 1,
+              "median": 0.32764,
+              "min": 0.0,
+              "max": 5.18962556
+            },
+            {
+              "visit": "R+1",
+              "n": 3,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 2.03699,
+              "min": 1.196159587,
+              "max": 4.014507273
+            },
+            {
+              "visit": "R+45",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 1,
+              "median": 2.11579,
+              "min": 0.0,
+              "max": 6.251255346
+            },
+            {
+              "visit": "R+82",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 2,
+              "median": 0.45791,
+              "min": 0.0,
+              "max": 3.830087368
+            }
+          ]
+        },
+        {
+          "field": "il6_concentration_npq",
+          "label": "IL6",
+          "unit": "NPQ",
+          "points": [
+            {
+              "visit": "L-92",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 13.14605,
+              "min": 11.38643785,
+              "max": 14.46432132
+            },
+            {
+              "visit": "L-44",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 11.19494,
+              "min": 8.535287332,
+              "max": 13.19220828
+            },
+            {
+              "visit": "L-3",
+              "n": 3,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 12.23744,
+              "min": 11.18916509,
+              "max": 12.89484551
+            },
+            {
+              "visit": "R+1",
+              "n": 3,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 14.43202,
+              "min": 12.69328209,
+              "max": 15.01982305
+            },
+            {
+              "visit": "R+45",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 13.02731,
+              "min": 9.334999894,
+              "max": 14.86592262
+            },
+            {
+              "visit": "R+82",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 11.0383,
+              "min": 8.944743226,
+              "max": 11.22222238
+            }
+          ]
+        },
+        {
+          "field": "spp1_concentration_npq",
+          "label": "SPP1",
+          "unit": "NPQ",
+          "points": [
+            {
+              "visit": "L-92",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 17.49719,
+              "min": 17.1930079,
+              "max": 17.6214885
+            },
+            {
+              "visit": "L-44",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 17.34172,
+              "min": 17.0826118,
+              "max": 17.5456286
+            },
+            {
+              "visit": "L-3",
+              "n": 3,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 17.89022,
+              "min": 17.6785283,
+              "max": 17.9392424
+            },
+            {
+              "visit": "R+1",
+              "n": 3,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 17.5841,
+              "min": 16.1466174,
+              "max": 17.8219653
+            },
+            {
+              "visit": "R+45",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 17.61428,
+              "min": 17.2906876,
+              "max": 17.786582
+            },
+            {
+              "visit": "R+82",
+              "n": 4,
+              "missing": 0,
+              "reportedZeros": 0,
+              "median": 17.3161,
+              "min": 16.7126894,
+              "max": 17.5746004
+            }
+          ]
+        }
+      ],
+      "blankColumnsIgnored": 2,
+      "method": "Median, minimum and maximum of finite source values by visit. No imputation, outlier trimming, clinical thresholds or hypothesis tests. n is available records, not independent longitudinal subjects. L = days before launch; R = days after return, not mission day."
+    }
+  ]
+}

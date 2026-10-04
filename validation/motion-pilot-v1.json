@@ -1,0 +1,22 @@
+{
+  "schema": "astrobone-motion-pilot-v1",
+  "protocolId": "motion-pilot-2026-10-02-v1",
+  "split": "development",
+  "independentReferenceAvailable": false,
+  "samplingHz": 12,
+  "targets": {
+    "baselineMinimumCoverage": 0.9,
+    "occludedLegMaximumCoverage": 0.1,
+    "inferenceP95Ms": 150,
+    "captureToResultP95Ms": 250,
+    "repeatabilityMeanDifferenceDeg": 3
+  },
+  "targetMeaning": "Predeclared internal engineering targets, not clinical acceptance criteria. Do not adjust after seeing this run.",
+  "clips": [
+    {"id":"rear-squat","subjectId":"dev-01","path":"D:/Downloads/4921644-hd_1066_1920_25fps.mp4","role":"baseline","repeats":3,"syntheticModification":false,"source":"User supplied; redistribution rights unverified"},
+    {"id":"oblique-squat","subjectId":"dev-02","path":".artifacts/knee-video/squat-7s.mp4","role":"baseline","repeats":3,"syntheticModification":false,"source":"Seven-second excerpt of TensorFlow.js pose_squats.mp4, used previously for development"},
+    {"id":"rear-occluded-legs","subjectId":"dev-01","path":".artifacts/validation-fixtures/rear-occluded.mp4","role":"occluded_legs","repeats":1,"syntheticModification":true,"source":"Rear squat with opaque lower 32 percent; robustness condition, not a new participant"},
+    {"id":"rear-dark","subjectId":"dev-01","path":".artifacts/validation-fixtures/rear-dark.mp4","role":"stress","repeats":1,"syntheticModification":true,"source":"Rear squat with brightness -0.3 and gamma 0.7; synthetic lighting stress"},
+    {"id":"blank","subjectId":"none","path":".artifacts/validation-fixtures/blank.mp4","role":"blank","repeats":1,"syntheticModification":true,"source":"All-black frames with source timing preserved"}
+  ]
+}

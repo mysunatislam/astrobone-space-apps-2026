@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "astrobone-held-out-evidence-v1",
+  "imageId": "IMG0001739",
+  "dataset": "FracAtlas prototype split",
+  "classifier": "DenseNet121",
+  "segmenter": "U-Net++ with DenseNet121 encoder",
+  "fractureScore": 0.9988875985145569,
+  "calibratedProbability": false,
+  "classificationThreshold": 0.5,
+  "fractureDetected": true,
+  "maskThreshold": 0.5,
+  "maskAreaFraction": 0.0040130615234375,
+  "retained": false,
+  "split": "held-out test image",
+  "modelWarning": "Real FracAtlas held-out X-ray. Research score; not calibrated, astronaut-specific, or diagnostic."
+}

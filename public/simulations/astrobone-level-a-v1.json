@@ -1,0 +1,1194 @@
+{
+  "schemaVersion": "astrobone-simulation-evidence-v1",
+  "title": "AstroBone Level-A EVA tool impact",
+  "provenance": {
+    "sourceArchive": "exported.zip",
+    "sourceArchiveSha256": "a9d913bef574ee598046f4a8be31f53b8b8c4a0e0ab28d731f7d993d714b1d27",
+    "sourceGeneratedUtc": "2026-07-23T23:03:09Z",
+    "matlabRelease": "R2021b",
+    "modelName": "Level-A Simulink Control Envelope",
+    "modelClass": "Simulink mathematical control-envelope model",
+    "simscapeUsed": false,
+    "verificationLevel": "internal implementation consistency"
+  },
+  "scope": {
+    "target": "tibia",
+    "missionMonths": [
+      0,
+      1,
+      3,
+      6
+    ],
+    "researchOnly": true,
+    "clinicalProbability": false,
+    "externalBiomechanicalValidation": false
+  },
+  "angleConvention": {
+    "canonicalField": "impactAngleFromSurfacePlaneDegrees",
+    "reference": "local surface plane",
+    "zeroDegrees": "tangential or glancing",
+    "ninetyDegrees": "normal impact",
+    "monteCarloSensitivityField": "impactAngleFromSurfaceNormalDegrees",
+    "conversion": "impactAngleFromSurfacePlaneDegrees = 90 - impactAngleFromSurfaceNormalDegrees"
+  },
+  "thresholds": {
+    "lower": "DCR < 0.50",
+    "monitor": "0.50 <= DCR < 0.80",
+    "elevated": "0.80 <= DCR < 1.00",
+    "capacityExceeded": "DCR >= 1.00",
+    "values": {
+      "monitor": 0.5,
+      "elevated": 0.8,
+      "capacityExceeded": 1
+    },
+    "interpretation": "Research comparison bands only; they are not clinical decision thresholds."
+  },
+  "scenario": {
+    "id": "eva-tool-tibia-6-month",
+    "label": "EVA tool impact on tibia",
+    "mode": "space",
+    "objectType": "evaTool",
+    "targetRegion": "tibia",
+    "objectMassKg": 2,
+    "impactSpeedMps": 4,
+    "impactAngleFromSurfacePlaneDegrees": 75,
+    "contactAreaMm2": 60,
+    "impactDurationMs": 8,
+    "impactTimeSeconds": 0.05,
+    "boneElasticModulusGPa": 17,
+    "baselineCapacityMPa": 25,
+    "capacityDefinition": "Effective research-envelope stress proxy; not calibrated whole-tibia strength.",
+    "boneStrengthIndex": 1,
+    "microgravityMonths": 6,
+    "monthlyCapacityLossFraction": 0.0125,
+    "maximumCapacityLossFraction": 0.35
+  },
+  "outputs": {
+    "peakImpactForceN": 965.9258262890683,
+    "peakContactStressMPa": 16.09876377148447,
+    "peakStrainMicrostrain": 946.9861042049688,
+    "adjustedCapacityMPa": 23.125,
+    "demandCapacityRatio": 0.6961627576858149,
+    "bandKey": "monitor",
+    "bandLabel": "Monitor",
+    "mitigationActivated": false
+  },
+  "monteCarlo": {
+    "runs": 5000,
+    "randomSeed": 24072026,
+    "interpretation": "Fractions of simulated research-envelope scenarios under assumed input distributions; not mission-occurrence or clinical probabilities.",
+    "assumedInputDistributions": [
+      {
+        "input": "Object mass",
+        "distribution": "triangular",
+        "unit": "kg",
+        "minimum": 0.5,
+        "mode": 2,
+        "maximum": 4
+      },
+      {
+        "input": "Impact speed",
+        "distribution": "triangular",
+        "unit": "m/s",
+        "minimum": 1,
+        "mode": 4,
+        "maximum": 8
+      },
+      {
+        "input": "Impact angle from surface normal",
+        "distribution": "uniform",
+        "unit": "degrees",
+        "minimum": 0,
+        "maximum": 90
+      },
+      {
+        "input": "Contact area",
+        "distribution": "triangular",
+        "unit": "mm2",
+        "minimum": 40,
+        "mode": 60,
+        "maximum": 100
+      },
+      {
+        "input": "Impact duration",
+        "distribution": "triangular",
+        "unit": "ms",
+        "minimum": 5,
+        "mode": 8,
+        "maximum": 15
+      },
+      {
+        "input": "Microgravity exposure",
+        "distribution": "triangular",
+        "unit": "months",
+        "minimum": 0,
+        "mode": 12,
+        "maximum": 24,
+        "outsideFrozenScope": true
+      },
+      {
+        "input": "Baseline capacity",
+        "distribution": "truncated normal",
+        "unit": "MPa",
+        "mean": 25,
+        "standardDeviation": 2.5,
+        "minimum": 18,
+        "maximum": 32
+      },
+      {
+        "input": "Monthly capacity loss",
+        "distribution": "truncated normal",
+        "unit": "fraction/month",
+        "mean": 0.0125,
+        "standardDeviation": 0.0025,
+        "minimum": 0.005,
+        "maximum": 0.02
+      }
+    ],
+    "dcrSummary": {
+      "mean": 0.494455,
+      "median": 0.4061,
+      "standardDeviation": 0.398063,
+      "p05": 0.048081,
+      "p95": 1.292422,
+      "p99": 1.809166,
+      "maximum": 2.958413
+    },
+    "scenarioFractions": {
+      "lower": 0.6036,
+      "monitor": 0.213,
+      "elevated": 0.0776,
+      "capacityExceeded": 0.1058
+    }
+  },
+  "sensitivity": [
+    {
+      "rank": 1,
+      "input": "Physical angle",
+      "spearmanRho": -0.672312
+    },
+    {
+      "rank": 2,
+      "input": "Impact speed",
+      "spearmanRho": 0.380396
+    },
+    {
+      "rank": 3,
+      "input": "Object mass",
+      "spearmanRho": 0.364659
+    },
+    {
+      "rank": 4,
+      "input": "Impact duration",
+      "spearmanRho": -0.237273
+    },
+    {
+      "rank": 5,
+      "input": "Contact area",
+      "spearmanRho": -0.20578
+    },
+    {
+      "rank": 6,
+      "input": "Baseline capacity",
+      "spearmanRho": -0.113456
+    },
+    {
+      "rank": 7,
+      "input": "Microgravity months",
+      "spearmanRho": 0.094123
+    },
+    {
+      "rank": 8,
+      "input": "Monthly capacity loss",
+      "spearmanRho": 0.049248
+    }
+  ],
+  "internalVerification": {
+    "comparisonRuns": 25,
+    "maximumAbsoluteDcrErrorPercent": 9.12479639e-14,
+    "riskBandAgreementFraction": 1,
+    "proves": "The Simulink block diagram reproduces the analytical equations for the verification cases.",
+    "doesNotProve": "Biological accuracy, clinical validity, astronaut fracture probability, or operational readiness."
+  },
+  "mitigationWhatIf": {
+    "type": "hypothetical demand-reduction controller",
+    "activationThresholdDcr": 0.8,
+    "assumedDemandReductionFraction": 0.35,
+    "activationFraction": 0.1834,
+    "capacityExceededFractionBefore": 0.1058,
+    "capacityExceededFractionAfter": 0.0234,
+    "scenarioFractionsAfter": {
+      "lower": 0.6036,
+      "monitor": 0.3378,
+      "elevated": 0.0352,
+      "capacityExceeded": 0.0234
+    },
+    "interpretation": "Illustrative what-if result produced by an assumed 35% DCR reduction after activation; not evidence of physical mitigation effectiveness."
+  },
+  "timeSeries": {
+    "sampleCount": 119,
+    "originalSampleCount": 2001,
+    "fixedStepSeconds": 0.0001,
+    "samples": [
+      {
+        "timeSeconds": 0,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0017000000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0034000000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0051,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0068000000000000005,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0085,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0102,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0119,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.013600000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.015300000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.017,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0187,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0204,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0221,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0238,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.025500000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.027200000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.028900000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.030600000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0323,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.034,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0357,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0374,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0391,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0408,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0425,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0442,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0459,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0476,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.049300000000000004,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.051000000000000004,
+        "impactForceN": 965.9258262890683,
+        "contactStressMPa": 16.09876377148447,
+        "demandCapacityRatio": 0.6961627576858149,
+        "riskBand": 1,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.052700000000000004,
+        "impactForceN": 965.9258262890683,
+        "contactStressMPa": 16.09876377148447,
+        "demandCapacityRatio": 0.6961627576858149,
+        "riskBand": 1,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.054400000000000004,
+        "impactForceN": 965.9258262890683,
+        "contactStressMPa": 16.09876377148447,
+        "demandCapacityRatio": 0.6961627576858149,
+        "riskBand": 1,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.056100000000000004,
+        "impactForceN": 965.9258262890683,
+        "contactStressMPa": 16.09876377148447,
+        "demandCapacityRatio": 0.6961627576858149,
+        "riskBand": 1,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.057800000000000004,
+        "impactForceN": 965.9258262890683,
+        "contactStressMPa": 16.09876377148447,
+        "demandCapacityRatio": 0.6961627576858149,
+        "riskBand": 1,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.059500000000000004,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.061200000000000004,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0629,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0646,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0663,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.068,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0697,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0714,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0731,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0748,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0765,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0782,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0799,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0816,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0833,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.085,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0867,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0884,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0901,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0918,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0935,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0952,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.0969,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.09860000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1003,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.10200000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1037,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.10540000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1071,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.10880000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1105,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.11220000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1139,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.11560000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1173,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.11900000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1207,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.12240000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1241,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1258,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1275,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1292,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.13090000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1326,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1343,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.136,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.13770000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1394,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1411,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1428,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.14450000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1462,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1479,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1496,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.15130000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.153,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1547,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1564,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.15810000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1598,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1615,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1632,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.16490000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1666,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1683,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.17,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.17170000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1734,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1751,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1768,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.17850000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1802,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1819,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1836,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.18530000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.187,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1887,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1904,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.19210000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1938,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.1955,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.19720000000000001,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.19890000000000002,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      },
+      {
+        "timeSeconds": 0.2,
+        "impactForceN": 0,
+        "contactStressMPa": 0,
+        "demandCapacityRatio": 0,
+        "riskBand": 0,
+        "mitigationCommand": 0
+      }
+    ]
+  },
+  "limitations": [
+    "Research simulation only. Not a diagnosis, medical device, or validated human fracture probability model.",
+    "The 25 MPa capacity is an effective research-envelope parameter without external calibration.",
+    "Input distributions are scenario assumptions rather than measured mission-occurrence distributions.",
+    "The model does not include suit attenuation, local bone geometry, anisotropy, soft tissue, or fracture propagation.",
+    "The 24-month uncertainty sweep extends beyond the public v1 frozen mission scope of 0, 1, 3, and 6 months."
+  ]
+}

@@ -1,0 +1,4 @@
+public/mediapipe/* binary
+public/models/*.task binary
+public/models/*.glb binary
+*.wasm binary

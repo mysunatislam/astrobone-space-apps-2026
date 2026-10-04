@@ -1,0 +1,38 @@
+.health-coverage { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 12px 0; border-bottom: 1px solid #879b9b55; font-size: 12px; }
+.multisystem-band td small, .health-chart small { display: block; color: #718989; font-size: 11px; margin-top: 5px; overflow-wrap: anywhere; }
+.multisystem-band table { min-width: 480px; }
+.multisystem-band h4 { margin: 20px 0 8px; }
+.health-charts { display: grid; gap: 14px; }
+.health-chart { min-width: 0; padding: 8px 0; border-bottom: 1px solid #879b9b44; }
+.health-chart canvas { display: block; width: 100%; height: 120px; }
+.health-chart strong { font-size: 13px; }
+.health-caution, .health-evidence { font-size: 12px; line-height: 1.5; color: #718989; }
+.health-evidence { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 14px; }
+.health-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-top: 14px; }
+.health-form label { min-width: 0; display: grid; gap: 6px; font-size: 12px; }
+.health-form input, .health-form select { width: 100%; min-width: 0; }
+.health-form .health-consent { grid-column: 1 / -1; display: flex; align-items: center; }
+.health-form input[type=checkbox] { width: auto; }
+.health-form p { grid-column: 1 / -1; margin: 0; font-size: 12px; }
+.pulse-capture { margin-top: 14px; border-top: 1px solid #879b9b55; padding-top: 14px; }
+.local-mesh-panel { margin-top: 14px; padding-top: 14px; border-top: 1px solid #879b9b55; }
+.local-mesh-panel h4 { margin: 0 0 8px; }
+.local-mesh-panel label { display: grid; gap: 6px; margin-bottom: 10px; font-size: 12px; }
+.local-mesh-panel .mesh-consent { display: flex; align-items: center; line-height: 1.5; }
+.local-mesh-panel input[type=checkbox] { flex: 0 0 auto; width: auto; }
+.local-mesh-panel select { width: 100%; min-width: 0; }
+.local-mesh-panel p, .local-mesh-panel small { font-size: 12px; overflow-wrap: anywhere; line-height: 1.5; }
+.pulse-capture h4 { margin: 0 0 8px; }
+.pulse-capture output { display: block; font-size: 22px; font-weight: 600; margin: 8px 0; }
+.pulse-capture p, .pulse-capture small { font-size: 12px; line-height: 1.5; }
+.pulse-capture canvas { width: 100%; height: 60px; }
+.anatomy-layers { display: flex; flex-wrap: wrap; gap: 2px; padding: 4px; background: #142322; border: 1px solid #365553; border-radius: 4px; }
+.anatomy-layers button { border: 0; border-radius: 2px; font-size: 11px; color: #c9dbd9; background: transparent; min-height: 32px; padding: 6px 10px; }
+.anatomy-layers button[aria-pressed=true] { background: #30645e; color: white; }
+.anatomy-toolbar { position: absolute; bottom: 12px; left: 14px; right: 14px; z-index: 5; display: grid; justify-items: start; gap: 5px; pointer-events: none; }
+.simulation-shell .anatomy-layers button { background: transparent !important; color: #c9dbd9 !important; border: 0 !important; box-shadow: none !important; }
+.simulation-shell .anatomy-layers button[aria-pressed=true] { background: #30645e !important; color: white !important; }
+.local-wholebody-overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; z-index: 4; }
+.anatomy-toolbar>* { pointer-events: auto; }
+.anatomy-toolbar small { color: #d9e5e3; background: #142322e6; padding: 4px 7px; font-size: 10px; max-width: 100%; }
+@media(max-width: 600px) { .health-form { grid-template-columns: 1fr; } .anatomy-toolbar { left: 8px; right: 8px; } .anatomy-layers button { font-size: 10px; padding: 6px; } }

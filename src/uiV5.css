@@ -1,0 +1,3322 @@
+/* Layered visual polish adapted from AstroBone_UI_V5_Polish.zip. */
+/* ==========================================================
+   AstroBone UI V2 — mission-control presentation layer
+   Visual-only overrides. Existing ids / JS behavior unchanged.
+   ========================================================== */
+:root {
+  color-scheme: dark;
+  --ink: #eff9f7;
+  --muted: #8ea9a5;
+  --line: rgba(121, 176, 168, 0.19);
+  --line-strong: rgba(112, 228, 208, 0.42);
+  --panel: rgba(9, 21, 28, 0.88);
+  --panel-strong: #0d1d25;
+  --soft: rgba(20, 55, 61, 0.56);
+  --teal: #35dcc1;
+  --teal-dark: #20a995;
+  --green: #61df92;
+  --amber: #f0b65a;
+  --red: #ff6b66;
+  --violet: #9e8cff;
+  --space-0: #03090e;
+  --space-1: #07141c;
+  --space-2: #0c2029;
+  --glow: 0 0 28px rgba(53, 220, 193, 0.12);
+}
+
+html,
+body {
+  background: var(--space-0);
+}
+
+body {
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 18% 2%, rgba(33, 132, 155, 0.18), transparent 32%),
+    radial-gradient(circle at 82% 12%, rgba(95, 75, 182, 0.15), transparent 28%),
+    linear-gradient(180deg, #03090e 0%, #061119 48%, #03090e 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.42;
+  background-image:
+    radial-gradient(circle at 16px 18px, rgba(255,255,255,.34) 0 1px, transparent 1.3px),
+    radial-gradient(circle at 88px 52px, rgba(91,224,202,.28) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 150px 104px, rgba(255,255,255,.18) 0 1px, transparent 1.3px);
+  background-size: 180px 140px, 240px 190px, 310px 230px;
+  mask-image: linear-gradient(to bottom, black, transparent 68%);
+}
+
+#app { background: transparent; }
+
+.topbar {
+  min-height: 86px;
+  padding: 14px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  border-bottom: 1px solid rgba(111, 204, 191, 0.16);
+  background: rgba(3, 10, 15, 0.84);
+  box-shadow: 0 16px 48px rgba(0,0,0,.22);
+  backdrop-filter: blur(22px) saturate(135%);
+}
+
+.brand { gap: 15px; }
+.brand-mark {
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(94, 231, 209, 0.7);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(53,220,193,.22) 0 5px, transparent 6px),
+    radial-gradient(circle at 50% 50%, transparent 0 12px, rgba(158,140,255,.18) 13px 14px, transparent 15px),
+    linear-gradient(145deg, rgba(53,220,193,.08), rgba(158,140,255,.08));
+  box-shadow: 0 0 30px rgba(53, 220, 193, 0.15), inset 0 0 18px rgba(53,220,193,.06);
+}
+.brand-mark::before,
+.brand-mark::after { background: #effffb; }
+.brand-mark::after { background: var(--teal); }
+
+.brand-eyebrow {
+  margin-bottom: 4px;
+  color: var(--teal);
+  font-size: .62rem;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+.brand h1 {
+  font-size: 1.18rem;
+  letter-spacing: -.02em;
+}
+.brand p { color: #78928f; }
+
+.prototype-badge,
+.status-badge {
+  border-color: rgba(107, 195, 183, 0.19);
+  color: #a9c0bd;
+  background: rgba(10, 27, 34, 0.82);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.015);
+}
+.status-dot {
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  display: inline-block;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 4px rgba(97,223,146,.08), 0 0 14px rgba(97,223,146,.5);
+}
+
+.mission-brief {
+  grid-template-columns: minmax(0, 1.3fr) 90px minmax(330px, .7fr);
+  gap: 26px;
+  padding: 28px 26px 25px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(95, 194, 181, 0.14);
+  background:
+    linear-gradient(110deg, rgba(7, 25, 34, .98), rgba(8, 21, 31, .94) 48%, rgba(21, 18, 45, .9)),
+    radial-gradient(circle at 18% 32%, rgba(53,220,193,.12), transparent 34%);
+}
+.mission-brief::after {
+  content: "ASTROBONE // EXP-01";
+  position: absolute;
+  right: 25px;
+  top: 12px;
+  color: rgba(171, 212, 204, .11);
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  pointer-events: none;
+}
+.section-label {
+  margin-bottom: 7px;
+  color: var(--teal);
+  font-size: .67rem;
+  letter-spacing: .13em;
+}
+.problem-block h2 {
+  max-width: 900px;
+  margin-top: 2px;
+  color: #f5fffd;
+  font-size: clamp(1.55rem, 2.2vw, 2.35rem);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+.brief-block p {
+  max-width: 780px;
+  margin-top: 10px;
+  color: #9db2af;
+  font-size: .91rem;
+}
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 14px;
+}
+.hero-tags span {
+  padding: 5px 8px;
+  border: 1px solid rgba(83, 206, 189, .16);
+  border-radius: 999px;
+  color: #94bab4;
+  background: rgba(7, 24, 31, .58);
+  font-size: .65rem;
+  font-weight: 700;
+}
+.brief-divider { color: #718d88; }
+.brief-divider i { background: linear-gradient(90deg, rgba(53,220,193,.2), rgba(158,140,255,.55)); }
+.brief-divider i::after { border-left-color: rgba(158,140,255,.75); }
+.solution-block { align-items: center; }
+.hero-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+.hero-primary {
+  min-height: 44px;
+  padding-inline: 16px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #20aa96, #2bbfa9);
+  box-shadow: 0 10px 26px rgba(32, 169, 149, .18);
+}
+.hero-primary span { margin-left: 8px; }
+.secondary-link {
+  min-height: 44px;
+  padding: 0 13px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(144, 166, 255, .2);
+  border-radius: 9px;
+  color: #b7b0ff;
+  background: rgba(99, 77, 164, .08);
+  text-decoration: none;
+  font-size: .76rem;
+  font-weight: 800;
+}
+.secondary-link:hover { border-color: rgba(158,140,255,.48); background: rgba(99,77,164,.15); }
+
+.support-lifecycle {
+  border-color: rgba(92, 180, 167, .12);
+  background: rgba(5, 15, 20, .9);
+}
+.lifecycle-intro,
+.lifecycle-step {
+  border-color: rgba(92,180,167,.11);
+  background: linear-gradient(180deg, rgba(12, 31, 38, .76), rgba(8, 22, 29, .78));
+}
+.lifecycle-step { position: relative; }
+.lifecycle-step::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  transform: scaleX(.28);
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--teal), transparent);
+  transition: transform .25s ease;
+}
+.lifecycle-step:hover::after { transform: scaleX(1); }
+.lifecycle-step > span { color: var(--teal); }
+.lifecycle-step strong { color: #eaf5f2; }
+.lifecycle-step small { color: #78928f; }
+
+.workspace {
+  grid-template-columns: minmax(560px, 1.15fr) minmax(340px, .72fr) minmax(370px, .82fr);
+  gap: 14px;
+  padding: 14px;
+}
+
+.simulation-shell,
+.controls,
+.chat {
+  border: 1px solid rgba(100, 190, 176, .17);
+  border-radius: 14px;
+  background: rgba(7, 19, 25, .9);
+  box-shadow: 0 20px 60px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.025);
+}
+.simulation-shell {
+  overflow: hidden;
+  border-color: rgba(53,220,193,.22);
+  background: #030a0e;
+  box-shadow: 0 22px 72px rgba(0,0,0,.35), 0 0 40px rgba(53,220,193,.05);
+}
+#twin-canvas {
+  background:
+    radial-gradient(circle at 50% 34%, rgba(26, 103, 104, .17), transparent 30%),
+    radial-gradient(circle at 50% 70%, rgba(158,140,255,.08), transparent 34%),
+    #030a0e;
+}
+.anatomy-view-label {
+  top: 128px;
+  border-left-color: var(--teal);
+  border-radius: 0 8px 8px 0;
+  background: rgba(5, 17, 22, .76);
+  box-shadow: 0 8px 30px rgba(0,0,0,.2);
+}
+
+.scene-hud {
+  gap: 8px;
+  padding: 10px;
+  background: linear-gradient(180deg, rgba(2,8,12,.82), rgba(3,12,17,.34));
+}
+.scene-hud > div {
+  border: 1px solid rgba(116, 202, 189, .16);
+  border-radius: 10px;
+  background: rgba(6, 19, 24, .72);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 8px 20px rgba(0,0,0,.12);
+  backdrop-filter: blur(14px);
+}
+.hud-label { color: #688a85; letter-spacing: .08em; }
+.scene-hud strong { color: #f3fffc; }
+
+.motion-switch {
+  border: 1px solid rgba(104, 192, 180, .16);
+  border-radius: 10px;
+  background: rgba(3, 13, 18, .84);
+  box-shadow: 0 10px 34px rgba(0,0,0,.24);
+  backdrop-filter: blur(14px);
+}
+.motion-button { color: #7e9e99; border-radius: 7px; }
+.motion-button.active {
+  color: #03100e;
+  background: linear-gradient(135deg, #55e6cc, #28bba5);
+  box-shadow: 0 0 22px rgba(53,220,193,.16);
+}
+.timeline {
+  border-top-color: rgba(93, 185, 171, .14);
+  background: rgba(3, 12, 16, .92);
+}
+.timeline-step { color: #657f7b; border-color: rgba(93,185,171,.11); }
+.timeline-step.active {
+  color: #dffff8;
+  background: linear-gradient(180deg, rgba(53,220,193,.14), rgba(53,220,193,.05));
+  box-shadow: inset 0 -2px 0 var(--teal);
+}
+
+.controls,
+.chat {
+  padding: 16px;
+}
+.panel-heading h2,
+.panel-heading h3,
+.stage-heading h3,
+.assistant-heading h3 { color: #f3fbf9; }
+.panel-heading { border-color: rgba(87, 169, 158, .12); }
+
+.workflow-tabs {
+  gap: 7px;
+  padding: 5px;
+  border: 1px solid rgba(88, 179, 166, .13);
+  border-radius: 11px;
+  background: rgba(4, 14, 19, .7);
+}
+.workflow-tab {
+  border-color: transparent;
+  border-radius: 8px;
+  color: #758e8a;
+  background: transparent;
+}
+.workflow-tab span {
+  border-color: rgba(119, 202, 190, .18);
+  color: #7fa59f;
+  background: rgba(14, 38, 44, .7);
+}
+.workflow-tab.active {
+  border-color: rgba(53,220,193,.2);
+  color: #edfffb;
+  background: linear-gradient(135deg, rgba(31,151,135,.22), rgba(64,50,113,.14));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.018);
+}
+.workflow-tab.active span { color: #03100e; background: var(--teal); }
+
+.stage-heading {
+  margin-top: 12px;
+  padding: 13px 14px;
+  border: 1px solid rgba(88, 178, 166, .1);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(12,35,41,.62), rgba(11,26,38,.45));
+}
+.stage-heading p { color: #819b97; }
+.stage-panel { margin-top: 12px; }
+
+.ai-panel,
+.functional-panel,
+.nasa-evidence,
+.competition-panel,
+.validation-panel,
+.care-plan,
+.method-note,
+.research-details {
+  border-color: rgba(96, 185, 172, .13) !important;
+  border-radius: 11px !important;
+  background: rgba(8, 25, 31, .74) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+}
+
+.evidence-result-heading,
+.active-object,
+.decision-context > div,
+.metric-grid > div,
+.nasa-evidence-grid > div,
+.simulation-metrics > div,
+.model-card-grid article,
+.competition-grid > div {
+  border-color: rgba(96, 185, 172, .12) !important;
+  background: rgba(6, 19, 25, .68) !important;
+}
+
+.ai-overlay,
+.pose-viewport {
+  border-color: rgba(80, 208, 190, .17) !important;
+  border-radius: 10px !important;
+  background: #030b0f !important;
+}
+.ai-empty-state { color: #6f8985; background: radial-gradient(circle at center, rgba(53,220,193,.06), transparent 50%); }
+.privacy-note,
+.evidence-provenance,
+#ai-warning,
+#functional-warning,
+.protocol-note { color: #708b86 !important; }
+
+button,
+input,
+select {
+  border-color: rgba(105, 179, 169, .18);
+  color: #d8e8e5;
+  background-color: rgba(7, 23, 29, .9);
+}
+button {
+  border-radius: 8px;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(66, 218, 194, .38);
+  color: #effffb;
+  background: rgba(17, 46, 53, .9);
+}
+.primary-action {
+  border-color: rgba(53,220,193,.58);
+  color: #03100e;
+  background: linear-gradient(135deg, #49e0c6, #24b8a1);
+  box-shadow: 0 8px 22px rgba(37,184,161,.12);
+}
+.primary-action:hover {
+  border-color: #64efd7;
+  color: #02100d;
+  background: linear-gradient(135deg, #64ead3, #2bc2a9);
+  box-shadow: 0 10px 30px rgba(37,184,161,.2);
+}
+.quiet-action { color: #75918d; background: transparent; }
+select { color-scheme: dark; }
+
+input[type="range"] { accent-color: var(--teal); }
+.field > span { color: #9ab1ad; }
+.field output { color: #eafffa; }
+
+.fusion-map > div {
+  border-color: rgba(99, 190, 177, .14) !important;
+  background: rgba(6, 19, 25, .65) !important;
+}
+.fusion-map i { color: #6b8984; }
+.fusion-result { box-shadow: inset 0 -2px 0 var(--teal); }
+
+.decision-panel { position: relative; }
+.decision-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(158,140,255,.45), rgba(53,220,193,.25), transparent);
+}
+.decision-summary {
+  overflow: hidden;
+  border: 1px solid rgba(117, 206, 193, .15);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 12% 24%, rgba(53,220,193,.09), transparent 26%),
+    linear-gradient(135deg, rgba(9,31,37,.9), rgba(11,22,37,.88));
+  box-shadow: var(--glow);
+}
+.decision-gauge {
+  border: 1px solid rgba(53,220,193,.28);
+  background: radial-gradient(circle, rgba(16,46,48,.92) 0 56%, transparent 57%), conic-gradient(var(--teal) 0 35%, rgba(70,105,103,.18) 35% 100%);
+  box-shadow: inset 0 0 24px rgba(53,220,193,.06), 0 0 25px rgba(53,220,193,.08);
+}
+.decision-gauge strong { color: #f5fffd; }
+.source-track { background: rgba(92, 145, 138, .12); }
+.source-track span { background: linear-gradient(90deg, var(--teal-dark), var(--teal)); box-shadow: 0 0 16px rgba(53,220,193,.18); }
+.decision-rationale { color: #8da5a1; }
+
+.formula-stack code {
+  border-color: rgba(112, 202, 189, .11) !important;
+  color: #9ce7da !important;
+  background: rgba(3,14,19,.82) !important;
+}
+.evidence-links a {
+  border-color: rgba(105, 180, 170, .12) !important;
+  color: #91c7be !important;
+  background: rgba(6,20,26,.62) !important;
+}
+.evidence-links a:hover { border-color: rgba(53,220,193,.32) !important; color: #cffff6 !important; }
+
+.chat-log {
+  border-color: rgba(100, 188, 176, .12) !important;
+  border-radius: 11px !important;
+  background: rgba(3, 13, 18, .68) !important;
+}
+.message {
+  border-color: rgba(110, 194, 183, .12) !important;
+  color: #cbdedb !important;
+  background: rgba(10, 31, 37, .72) !important;
+}
+.message.user {
+  border-color: rgba(158,140,255,.2) !important;
+  background: rgba(72, 57, 127, .16) !important;
+}
+.suggestions button { color: #a7bbb8; background: rgba(7,23,29,.72); }
+.chat-form input { border-radius: 9px; }
+.chat-form button { color: #03100e; background: linear-gradient(135deg, #49e0c6, #25b8a2); }
+
+.app-footer {
+  border-top: 1px solid rgba(100, 190, 176, .12);
+  color: #66807c;
+  background: rgba(3, 10, 14, .94);
+}
+
+/* Scrollbars */
+* { scrollbar-color: rgba(60, 155, 143, .45) rgba(4, 14, 18, .65); scrollbar-width: thin; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: rgba(4,14,18,.65); }
+*::-webkit-scrollbar-thumb { border: 2px solid rgba(4,14,18,.65); border-radius: 99px; background: rgba(60,155,143,.45); }
+
+@media (max-width: 1380px) {
+  .workspace { grid-template-columns: minmax(500px, 1fr) minmax(340px, 400px); }
+}
+@media (max-width: 980px) {
+  .mission-brief { grid-template-columns: 1fr 1fr; }
+  .mission-brief::after { font-size: 1.1rem; }
+  .workspace { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .topbar { position: static; padding: 13px 15px; }
+  .mission-brief { grid-template-columns: 1fr; padding: 22px 16px; }
+  .mission-brief::after { display: none; }
+  .problem-block h2 { font-size: 1.62rem; }
+  .hero-actions { align-items: stretch; flex-direction: column; }
+  .hero-actions > * { width: 100%; justify-content: center; }
+  .controls, .chat { padding: 12px; }
+}
+
+/* ============================================================================
+   ASTROBONE UI V3 — MISSION CONTROL / DYNAMIC TELEMETRY
+   Visual-only enhancement. Keeps all existing scientific IDs and logic intact.
+   ============================================================================ */
+
+:root {
+  --curve-demand: #43e6c8;
+  --curve-capacity: #9e8cff;
+  --curve-evidence: #65b8ff;
+  --astro-cyan: #48f0d1;
+  --astro-blue: #65b8ff;
+  --astro-violet: #a18cff;
+  --astro-gold: #ffc867;
+  --astro-panel: rgba(6, 18, 25, .86);
+  --astro-panel-2: rgba(9, 27, 35, .78);
+  --astro-border: rgba(94, 221, 201, .17);
+  --astro-border-hot: rgba(80, 245, 216, .36);
+  --astro-shadow: 0 24px 80px rgba(0, 0, 0, .33);
+  --astro-glow: 0 0 35px rgba(53, 220, 193, .10);
+}
+
+html[data-theme="dark"] { color-scheme: dark; }
+html[data-theme="light"] {
+  color-scheme: light;
+  --curve-demand: #008d7a;
+  --curve-capacity: #6a55d6;
+  --curve-evidence: #1677c8;
+  --ink: #12232c;
+  --muted: #607983;
+  --line: rgba(31, 84, 102, .16);
+  --line-strong: rgba(24, 95, 117, .28);
+  --panel: rgba(255, 255, 255, .86);
+  --panel-strong: #ffffff;
+  --soft: rgba(223, 239, 242, .68);
+  --teal: #008b79;
+  --teal-dark: #006e61;
+  --green: #19894b;
+  --amber: #9a6710;
+  --red: #b33b36;
+  --violet: #6654d8;
+  --astro-panel: rgba(250, 254, 255, .88);
+  --astro-panel-2: rgba(239, 249, 251, .82);
+  --astro-border: rgba(25, 107, 127, .17);
+  --astro-border-hot: rgba(0, 139, 121, .32);
+  --astro-shadow: 0 24px 70px rgba(40, 77, 93, .13);
+  --astro-glow: 0 0 32px rgba(0, 139, 121, .08);
+}
+
+/* Ambient orbital field */
+.astro-particles {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -18vh -12vw;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 24% 20%, rgba(42, 205, 191, .10), transparent 34%),
+    radial-gradient(ellipse at 78% 24%, rgba(121, 96, 239, .10), transparent 32%),
+    radial-gradient(ellipse at 55% 86%, rgba(30, 117, 184, .08), transparent 34%);
+  filter: blur(18px);
+  animation: astroAurora 14s ease-in-out infinite alternate;
+}
+
+html[data-theme="light"] body {
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 16% 4%, rgba(62, 199, 190, .14), transparent 26%),
+    radial-gradient(circle at 83% 8%, rgba(111, 91, 219, .10), transparent 25%),
+    linear-gradient(180deg, #edf6f8 0%, #f8fbfc 50%, #eef6f8 100%);
+}
+html[data-theme="light"] body::before { opacity: .18; }
+html[data-theme="light"] body::after {
+  background:
+    radial-gradient(ellipse at 24% 20%, rgba(0, 139, 121, .08), transparent 34%),
+    radial-gradient(ellipse at 78% 24%, rgba(102, 84, 216, .07), transparent 32%);
+}
+
+/* Topbar + theme control */
+.topbar { isolation: isolate; }
+.topbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  opacity: .85;
+  background: linear-gradient(90deg, transparent 2%, var(--astro-cyan) 28%, var(--astro-violet) 70%, transparent 98%);
+  box-shadow: 0 0 18px rgba(70, 238, 210, .22);
+}
+.system-live-badge { color: #bff9ed; }
+.theme-toggle {
+  min-height: 34px;
+  padding: 5px 9px 5px 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--astro-border-hot);
+  border-radius: 999px;
+  background: rgba(7, 25, 31, .82);
+  color: #dffcf6;
+  font-size: .74rem;
+  font-weight: 800;
+}
+.theme-orbit {
+  width: 23px;
+  height: 23px;
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+  border: 1px solid rgba(93, 235, 212, .35);
+  border-radius: 50%;
+  box-shadow: inset 0 0 10px rgba(61, 222, 197, .09), 0 0 14px rgba(61, 222, 197, .10);
+}
+.theme-orbit::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff9cb 0 20%, #63e7cf 21% 55%, #136f74 56% 100%);
+  box-shadow: 0 0 9px rgba(87, 234, 207, .28);
+}
+.theme-orbit i {
+  width: 27px;
+  height: 9px;
+  position: absolute;
+  border: 1px solid rgba(157, 140, 255, .55);
+  border-radius: 50%;
+  transform: rotate(-22deg);
+  animation: orbitSpin 7s linear infinite;
+}
+html[data-theme="light"] .theme-toggle {
+  color: #1b3a43;
+  border-color: rgba(0, 124, 109, .24);
+  background: rgba(255, 255, 255, .84);
+}
+
+/* Mission hero becomes a living orbital scene */
+.mission-brief::before {
+  content: "";
+  position: absolute;
+  width: 430px;
+  height: 430px;
+  right: -118px;
+  top: -215px;
+  border: 1px solid rgba(110, 239, 218, .12);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 46px rgba(103, 91, 216, .025),
+    0 0 0 92px rgba(82, 203, 190, .018),
+    inset 0 0 70px rgba(74, 229, 206, .035);
+  animation: heroOrbit 18s linear infinite;
+}
+.problem-block h2 {
+  text-shadow: 0 0 28px rgba(65, 225, 199, .10);
+}
+.hero-tags span {
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.hero-tags span:hover {
+  transform: translateY(-2px);
+  border-color: rgba(74, 234, 209, .32);
+  box-shadow: 0 0 20px rgba(58, 209, 188, .10);
+}
+
+/* PRIMARY LAYOUT FIX: two balanced columns, decision dashboard full-width below. */
+.workspace {
+  width: min(1900px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.52fr) minmax(365px, .74fr) !important;
+  align-items: start;
+  gap: 16px !important;
+  padding: 16px !important;
+}
+.simulation-shell {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+  min-height: 760px;
+}
+.controls {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  align-self: stretch;
+}
+.decision-panel {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  min-width: 0;
+}
+
+/* Make the twin feel like the visual anchor instead of an empty left column. */
+.twin-view-grid,
+.twin-view,
+.skeleton-view {
+  min-height: 520px;
+}
+#twin-canvas { min-height: 520px; }
+.simulation-shell { position: relative; }
+.simulation-shell::before {
+  content: "";
+  position: absolute;
+  z-index: 8;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 92px;
+  pointer-events: none;
+  opacity: .38;
+  background: linear-gradient(180deg, transparent, rgba(76, 235, 211, .06), transparent);
+  transform: translateY(-110px);
+  animation: scanTwin 7.2s linear infinite;
+}
+.simulation-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(70, 238, 210, .05) 1px, transparent 1px),
+    linear-gradient(rgba(70, 238, 210, .035) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, black 0 62%, transparent 78%);
+  opacity: .34;
+}
+
+/* Dynamic telemetry deck */
+.telemetry-deck {
+  margin: 10px 12px 8px;
+  padding: 12px 12px 10px;
+  position: relative;
+  z-index: 9;
+  overflow: hidden;
+  border: 1px solid rgba(82, 225, 203, .17);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(61, 226, 201, .08), transparent 35%),
+    linear-gradient(180deg, rgba(4, 18, 24, .92), rgba(4, 13, 19, .82));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025), 0 10px 38px rgba(0, 0, 0, .20);
+}
+.telemetry-deck::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 90px;
+  left: -100px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(91, 242, 217, .055), transparent);
+  animation: telemetrySweep 5.8s linear infinite;
+}
+.telemetry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+.telemetry-header strong {
+  display: block;
+  color: #effffb;
+  font-size: .9rem;
+}
+.telemetry-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #93e7d8;
+  font-size: .65rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+.telemetry-live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #5ee4a2;
+  box-shadow: 0 0 0 4px rgba(94, 228, 162, .08), 0 0 14px rgba(94, 228, 162, .52);
+  animation: livePulse 1.55s ease-out infinite;
+}
+.telemetry-plot-wrap {
+  height: 142px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(86, 199, 183, .10);
+  border-radius: 9px;
+  background: linear-gradient(180deg, rgba(3, 15, 21, .82), rgba(3, 11, 16, .60));
+}
+#live-telemetry-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.telemetry-axis-label {
+  position: absolute;
+  right: 7px;
+  color: rgba(142, 179, 173, .48);
+  font-size: .58rem;
+  font-weight: 800;
+  pointer-events: none;
+}
+.telemetry-axis-top { top: 5px; }
+.telemetry-axis-bottom { bottom: 5px; }
+.telemetry-legend {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+.telemetry-legend > div {
+  min-width: 0;
+  padding: 7px 8px;
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(89, 187, 174, .10);
+  border-radius: 8px;
+  background: rgba(8, 27, 33, .56);
+}
+.telemetry-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 9px currentColor;
+}
+.telemetry-legend [data-series="demand"] i { color: var(--curve-demand); background: var(--curve-demand); }
+.telemetry-legend [data-series="capacity"] i { color: var(--curve-capacity); background: var(--curve-capacity); }
+.telemetry-legend [data-series="evidence"] i { color: var(--curve-evidence); background: var(--curve-evidence); }
+.telemetry-legend span {
+  overflow: hidden;
+  color: #789793;
+  font-size: .65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.telemetry-legend strong {
+  color: #e7fbf7;
+  font-size: .66rem;
+}
+.telemetry-disclaimer {
+  display: block;
+  margin-top: 7px;
+  color: #5f7c78;
+  font-size: .58rem;
+  line-height: 1.35;
+}
+
+/* Full-width decision dashboard rather than a never-ending right column. */
+.decision-panel {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    "decision-head decision-head"
+    "decision-summary competition"
+    "sources competition"
+    "context competition"
+    "rationale competition"
+    "care assistant-head"
+    "care chatlog"
+    "care suggestions"
+    "care chatform"
+    "validation validation";
+  gap: 12px 14px;
+  align-items: start;
+}
+.decision-panel > .panel-heading { grid-area: decision-head; }
+.decision-panel > .decision-summary { grid-area: decision-summary; margin: 0; }
+.decision-panel > .source-breakdown { grid-area: sources; margin: 0; }
+.decision-panel > .decision-context { grid-area: context; margin: 0; }
+.decision-panel > .decision-rationale { grid-area: rationale; margin: 0; }
+.decision-panel > .competition-panel { grid-area: competition; margin: 0 !important; height: 100%; }
+.decision-panel > .care-plan { grid-area: care; margin: 0 !important; height: 100%; }
+.decision-panel > .assistant-heading { grid-area: assistant-head; margin: 0; }
+.decision-panel > .chat-log { grid-area: chatlog; margin: 0; min-height: 164px; max-height: 250px; }
+.decision-panel > .suggestions { grid-area: suggestions; margin: 0; }
+.decision-panel > .chat-form { grid-area: chatform; margin: 0; }
+.decision-panel > .validation-panel { grid-area: validation; margin: 2px 0 0 !important; }
+
+.validation-panel {
+  display: grid;
+  grid-template-columns: minmax(300px, .78fr) minmax(0, 1.22fr);
+  gap: 12px;
+}
+.validation-panel > .panel-heading { grid-column: 1 / -1; }
+.validation-panel > .formula-stack { grid-column: 1; grid-row: 2; margin: 0; }
+.validation-panel > .simulation-evidence-band { grid-column: 2; grid-row: 2 / span 2; margin: 0; }
+.validation-panel > .model-card-grid { grid-column: 1; grid-row: 3; margin: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.validation-panel > .evidence-links,
+.validation-panel > #export-validation-report { grid-column: 1 / -1; }
+
+/* Additional motion and glow treatment */
+.simulation-shell,
+.controls,
+.decision-panel,
+.competition-panel,
+.validation-panel,
+.care-plan {
+  transition: border-color .28s ease, box-shadow .28s ease, transform .28s ease;
+}
+.simulation-shell:hover,
+.controls:hover,
+.decision-panel:hover {
+  border-color: rgba(80, 238, 213, .26);
+  box-shadow: 0 24px 78px rgba(0, 0, 0, .28), 0 0 42px rgba(53, 220, 193, .055);
+}
+.metric-flash { animation: metricFlash .52s ease-out; }
+.primary-action { position: relative; overflow: hidden; isolation: isolate; }
+.primary-action::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -40%;
+  bottom: -40%;
+  width: 44px;
+  left: -70px;
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.36), transparent);
+  transition: left .45s ease;
+}
+.primary-action:hover::after { left: calc(100% + 30px); }
+.timeline-step.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 12px var(--teal);
+  animation: livePulse 1.7s ease-out infinite;
+}
+.timeline-step { position: relative; }
+.scene-hud > div { transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.scene-hud > div:hover {
+  transform: translateY(-2px);
+  border-color: rgba(76, 236, 211, .28);
+  box-shadow: 0 9px 26px rgba(0,0,0,.16), 0 0 18px rgba(53,220,193,.06);
+}
+
+/* Reveal motion */
+.mission-brief,
+.support-lifecycle,
+.simulation-shell,
+.controls,
+.decision-panel,
+.competition-panel,
+.validation-panel,
+.care-plan {
+  opacity: .965;
+  transform: translateY(5px);
+}
+.ui-revealed {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  transition: opacity .55s ease, transform .55s cubic-bezier(.2,.8,.2,1), border-color .28s ease, box-shadow .28s ease !important;
+}
+
+/* LIGHT MODE — full contrast correction */
+html[data-theme="light"] .topbar {
+  border-bottom-color: rgba(30, 103, 123, .13);
+  background: rgba(248, 253, 254, .88);
+  box-shadow: 0 13px 34px rgba(49, 88, 103, .10);
+}
+html[data-theme="light"] .brand h1,
+html[data-theme="light"] .panel-heading h2,
+html[data-theme="light"] .panel-heading h3,
+html[data-theme="light"] .stage-heading h3,
+html[data-theme="light"] .assistant-heading h3,
+html[data-theme="light"] .telemetry-header strong,
+html[data-theme="light"] .scene-hud strong,
+html[data-theme="light"] .telemetry-legend strong,
+html[data-theme="light"] .problem-block h2 { color: #132c35 !important; }
+html[data-theme="light"] .brand p,
+html[data-theme="light"] .brief-block p,
+html[data-theme="light"] .stage-heading p,
+html[data-theme="light"] .decision-rationale,
+html[data-theme="light"] .lifecycle-step small { color: #607b83 !important; }
+html[data-theme="light"] .mission-brief {
+  border-bottom-color: rgba(32, 108, 126, .12);
+  background:
+    linear-gradient(110deg, rgba(245, 253, 253, .98), rgba(238, 248, 251, .97) 48%, rgba(244, 241, 255, .95)),
+    radial-gradient(circle at 18% 32%, rgba(0, 139, 121, .08), transparent 34%);
+}
+html[data-theme="light"] .mission-brief::after { color: rgba(35, 90, 105, .08); }
+html[data-theme="light"] .support-lifecycle { background: rgba(243, 250, 251, .82); }
+html[data-theme="light"] .lifecycle-intro,
+html[data-theme="light"] .lifecycle-step {
+  border-color: rgba(31, 100, 118, .10);
+  background: linear-gradient(180deg, rgba(255,255,255,.90), rgba(238,248,250,.82));
+}
+html[data-theme="light"] .lifecycle-step strong { color: #17333b; }
+html[data-theme="light"] .simulation-shell,
+html[data-theme="light"] .controls,
+html[data-theme="light"] .chat,
+html[data-theme="light"] .ai-panel,
+html[data-theme="light"] .functional-panel,
+html[data-theme="light"] .nasa-evidence,
+html[data-theme="light"] .competition-panel,
+html[data-theme="light"] .validation-panel,
+html[data-theme="light"] .care-plan,
+html[data-theme="light"] .method-note,
+html[data-theme="light"] .research-details {
+  border-color: rgba(29, 108, 125, .14) !important;
+  color: #19343d;
+  background: rgba(251, 254, 255, .86) !important;
+  box-shadow: var(--astro-shadow);
+}
+html[data-theme="light"] .simulation-shell { background: #eef8fa !important; }
+html[data-theme="light"] #twin-canvas {
+  background:
+    radial-gradient(circle at 50% 34%, rgba(0, 139, 121, .10), transparent 31%),
+    radial-gradient(circle at 50% 70%, rgba(102, 84, 216, .07), transparent 34%),
+    #eff8fa !important;
+}
+html[data-theme="light"] .scene-hud,
+html[data-theme="light"] .timeline,
+html[data-theme="light"] .motion-switch,
+html[data-theme="light"] .workflow-tabs,
+html[data-theme="light"] .chat-log,
+html[data-theme="light"] .telemetry-deck {
+  border-color: rgba(28, 105, 123, .13) !important;
+  background: rgba(246, 252, 253, .90) !important;
+}
+html[data-theme="light"] .scene-hud > div,
+html[data-theme="light"] .metric-grid > div,
+html[data-theme="light"] .nasa-evidence-grid > div,
+html[data-theme="light"] .simulation-metrics > div,
+html[data-theme="light"] .competition-grid > div,
+html[data-theme="light"] .model-card-grid article,
+html[data-theme="light"] .decision-context > div,
+html[data-theme="light"] .evidence-result-heading,
+html[data-theme="light"] .active-object,
+html[data-theme="light"] .telemetry-legend > div {
+  border-color: rgba(28, 105, 123, .10) !important;
+  color: #17343d;
+  background: rgba(255, 255, 255, .72) !important;
+}
+html[data-theme="light"] .telemetry-plot-wrap { background: rgba(239, 248, 250, .80); }
+html[data-theme="light"] .telemetry-legend span,
+html[data-theme="light"] .telemetry-disclaimer,
+html[data-theme="light"] .hud-label { color: #65828b; }
+html[data-theme="light"] button,
+html[data-theme="light"] input,
+html[data-theme="light"] select {
+  color: #183740;
+  border-color: rgba(26, 103, 121, .17);
+  background-color: rgba(255, 255, 255, .86);
+}
+html[data-theme="light"] select { color-scheme: light; }
+html[data-theme="light"] .primary-action {
+  color: #ffffff;
+  border-color: rgba(0, 126, 109, .55);
+  background: linear-gradient(135deg, #078f7c, #08766d);
+  box-shadow: 0 9px 24px rgba(0, 126, 109, .13);
+}
+html[data-theme="light"] .decision-summary {
+  border-color: rgba(32, 112, 126, .14);
+  background:
+    radial-gradient(circle at 12% 24%, rgba(0, 139, 121, .07), transparent 26%),
+    linear-gradient(135deg, rgba(249,254,255,.94), rgba(241,248,252,.92));
+}
+html[data-theme="light"] .decision-gauge {
+  background:
+    radial-gradient(circle, rgba(251,255,255,.96) 0 56%, transparent 57%),
+    conic-gradient(var(--teal) 0 35%, rgba(47,104,111,.12) 35% 100%);
+}
+html[data-theme="light"] .decision-gauge strong { color: #16343b; }
+html[data-theme="light"] .message {
+  color: #29474f !important;
+  background: rgba(239, 248, 250, .82) !important;
+}
+html[data-theme="light"] .message.user { background: rgba(235, 231, 255, .74) !important; }
+html[data-theme="light"] .formula-stack code {
+  color: #006e61 !important;
+  background: rgba(238,248,250,.84) !important;
+}
+html[data-theme="light"] .app-footer {
+  color: #6b838a;
+  border-color: rgba(28, 103, 119, .12);
+  background: rgba(245,251,252,.94);
+}
+html[data-theme="light"] * { scrollbar-color: rgba(37, 126, 136, .35) rgba(226, 239, 242, .75); }
+
+/* Responsive rules */
+@media (max-width: 1180px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1.35fr) minmax(340px, .78fr) !important;
+  }
+  .simulation-shell { min-height: 720px; }
+  .twin-view-grid, .twin-view, .skeleton-view, #twin-canvas { min-height: 470px; }
+  .telemetry-legend { grid-template-columns: 1fr; }
+  .telemetry-legend > div { grid-template-columns: 8px 1fr auto; }
+}
+
+@media (max-width: 980px) {
+  .workspace { grid-template-columns: 1fr !important; }
+  .simulation-shell,
+  .controls,
+  .decision-panel { grid-column: 1; grid-row: auto; }
+  .simulation-shell { min-height: auto; }
+  .decision-panel {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "decision-head"
+      "decision-summary"
+      "sources"
+      "context"
+      "rationale"
+      "competition"
+      "care"
+      "assistant-head"
+      "chatlog"
+      "suggestions"
+      "chatform"
+      "validation";
+  }
+  .validation-panel { grid-template-columns: 1fr; }
+  .validation-panel > .panel-heading,
+  .validation-panel > .formula-stack,
+  .validation-panel > .simulation-evidence-band,
+  .validation-panel > .model-card-grid,
+  .validation-panel > .evidence-links,
+  .validation-panel > #export-validation-report {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .topbar-actions .prototype-badge:not(.system-live-badge) { display: none; }
+}
+
+@media (max-width: 700px) {
+  .system-live-badge { display: none; }
+  .theme-toggle { padding-right: 7px; }
+  #theme-label { display: none; }
+  .telemetry-plot-wrap { height: 118px; }
+  .telemetry-legend { grid-template-columns: 1fr; }
+  .twin-view-grid, .twin-view, .skeleton-view, #twin-canvas { min-height: 390px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  .astro-particles { display: none; }
+}
+
+@keyframes astroAurora {
+  0% { transform: translate3d(-1.5%, -1%, 0) scale(1); opacity: .78; }
+  55% { transform: translate3d(1.6%, 1.1%, 0) scale(1.035); opacity: 1; }
+  100% { transform: translate3d(-.4%, 1.8%, 0) scale(1.015); opacity: .84; }
+}
+@keyframes orbitSpin { to { transform: rotate(338deg); } }
+@keyframes heroOrbit { to { transform: rotate(360deg); } }
+@keyframes scanTwin {
+  0% { transform: translateY(-115px); opacity: 0; }
+  10% { opacity: .45; }
+  82% { opacity: .28; }
+  100% { transform: translateY(770px); opacity: 0; }
+}
+@keyframes telemetrySweep { to { left: calc(100% + 110px); } }
+@keyframes livePulse {
+  0% { transform: scale(.82); box-shadow: 0 0 0 0 rgba(94,228,162,.30), 0 0 12px rgba(94,228,162,.42); }
+  70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(94,228,162,0), 0 0 18px rgba(94,228,162,.52); }
+  100% { transform: scale(.86); box-shadow: 0 0 0 0 rgba(94,228,162,0), 0 0 12px rgba(94,228,162,.40); }
+}
+@keyframes metricFlash {
+  0% { text-shadow: 0 0 0 transparent; }
+  35% { text-shadow: 0 0 18px var(--astro-cyan); }
+  100% { text-shadow: 0 0 0 transparent; }
+}
+
+/* ==========================================================
+   AstroBone UI V4 — layout repair + floating Astra copilot
+   ========================================================== */
+
+/* Stop the investigation column from making a giant blank left row. */
+.workspace {
+  grid-template-columns: minmax(0, 1.58fr) minmax(360px, .78fr) !important;
+  grid-template-areas:
+    "simulation controls"
+    "telemetry controls"
+    "decision decision";
+  grid-template-rows: auto auto auto;
+  align-items: start;
+  gap: 14px !important;
+}
+
+.simulation-shell {
+  grid-area: simulation !important;
+  width: 100%;
+  height: clamp(560px, 61vh, 690px) !important;
+  min-height: 560px !important;
+  align-self: start;
+}
+
+/* The 3D scene now owns its panel completely; telemetry no longer overlays it. */
+.twin-view-grid,
+.twin-view,
+.skeleton-view,
+#twin-canvas {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.telemetry-card {
+  grid-area: telemetry;
+  width: 100%;
+  margin: 0 !important;
+  align-self: start;
+}
+
+.telemetry-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.telemetry-context {
+  padding: 5px 8px;
+  border: 1px solid rgba(96, 205, 190, .12);
+  border-radius: 999px;
+  color: #789792;
+  background: rgba(8, 27, 33, .5);
+  font-size: .58rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.controls {
+  grid-area: controls !important;
+  min-height: 0 !important;
+  height: min(900px, calc(100vh - 132px));
+  max-height: 900px;
+  position: sticky;
+  top: 92px;
+  overflow: hidden !important;
+  align-self: start !important;
+}
+
+.controls > .stage-panel:not([hidden]) {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 5px;
+  scrollbar-gutter: stable;
+}
+
+.controls > .stage-panel:not([hidden])::-webkit-scrollbar { width: 6px; }
+.controls > .stage-panel:not([hidden])::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(79, 211, 191, .22);
+}
+
+.workflow-actions {
+  flex: 0 0 auto;
+  margin-top: 0 !important;
+  padding-top: 10px;
+  background: linear-gradient(180deg, rgba(7,19,25,0), rgba(7,19,25,.9) 26%);
+}
+
+.decision-panel {
+  grid-area: decision !important;
+  grid-column: auto !important;
+  grid-row: auto !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+  grid-template-areas:
+    "decision-head decision-head"
+    "decision-summary competition"
+    "sources competition"
+    "context competition"
+    "rationale competition"
+    "care care"
+    "validation validation" !important;
+  gap: 12px 14px;
+  min-height: 0 !important;
+}
+
+.decision-panel > .panel-heading { grid-area: decision-head; }
+.decision-panel > .decision-summary { grid-area: decision-summary; }
+.decision-panel > .source-breakdown { grid-area: sources; }
+.decision-panel > .decision-context { grid-area: context; }
+.decision-panel > .decision-rationale { grid-area: rationale; }
+.decision-panel > .competition-panel { grid-area: competition; }
+.decision-panel > .care-plan { grid-area: care; }
+.decision-panel > .validation-panel { grid-area: validation; }
+
+/* Ensure old in-panel chat layout rules cannot create phantom grid rows. */
+.decision-panel > .assistant-heading,
+.decision-panel > .chat-log,
+.decision-panel > .suggestions,
+.decision-panel > .chat-form { display: none !important; }
+
+/* Keep HUD readable and away from the telemetry area. */
+.scene-hud {
+  width: min(820px, calc(100% - 28px));
+  top: 14px;
+  left: 14px;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.anatomy-view-label { top: 108px !important; }
+
+/* ---------- Floating Astra copilot ---------- */
+.copilot-launcher {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1400;
+  min-width: 164px;
+  height: 58px;
+  display: grid;
+  grid-template-columns: 44px 1fr 10px;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px 7px 7px;
+  border: 1px solid rgba(91, 238, 214, .32);
+  border-radius: 18px;
+  color: #effffb;
+  background:
+    radial-gradient(circle at 18% 15%, rgba(85, 230, 204, .14), transparent 38%),
+    linear-gradient(135deg, rgba(8, 31, 38, .97), rgba(13, 18, 37, .97));
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, .4),
+    0 0 0 1px rgba(255,255,255,.025) inset,
+    0 0 30px rgba(53, 220, 193, .12);
+  backdrop-filter: blur(20px);
+  cursor: pointer;
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+.copilot-launcher:hover {
+  transform: translateY(-3px) scale(1.015);
+  border-color: rgba(102, 246, 222, .58);
+  box-shadow: 0 22px 58px rgba(0,0,0,.46), 0 0 38px rgba(53,220,193,.2);
+}
+
+.copilot-avatar {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  border: 1px solid rgba(96, 239, 217, .26);
+  border-radius: 50%;
+  color: #63edd7;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(91, 235, 211, .18), transparent 35%),
+    rgba(8, 27, 34, .95);
+  box-shadow: inset 0 0 18px rgba(75, 227, 204, .08), 0 0 20px rgba(68, 223, 199, .08);
+  overflow: hidden;
+}
+
+.copilot-avatar svg { width: 36px; height: 36px; }
+.copilot-avatar-launcher { width: 44px; height: 44px; }
+
+.copilot-launcher-copy {
+  display: grid;
+  gap: 1px;
+  text-align: left;
+}
+.copilot-launcher-copy strong { color: #f1fffc; font-size: .88rem; }
+.copilot-launcher-copy small { color: #7eaaa3; font-size: .62rem; }
+
+.copilot-launcher-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #61e7a3;
+  box-shadow: 0 0 0 4px rgba(97,231,163,.09), 0 0 16px rgba(97,231,163,.62);
+  animation: livePulse 1.55s ease-out infinite;
+}
+
+.copilot-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 94px;
+  z-index: 1399;
+  width: min(430px, calc(100vw - 32px));
+  height: min(640px, calc(100vh - 130px));
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
+  overflow: hidden;
+  border: 1px solid rgba(91, 238, 214, .27);
+  border-radius: 20px;
+  color: #eafaf7;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(61, 226, 201, .1), transparent 34%),
+    radial-gradient(circle at 90% 12%, rgba(145, 124, 255, .08), transparent 31%),
+    rgba(4, 16, 23, .97);
+  box-shadow: 0 28px 80px rgba(0,0,0,.58), 0 0 52px rgba(53,220,193,.09), inset 0 1px 0 rgba(255,255,255,.03);
+  backdrop-filter: blur(24px);
+  transform-origin: right bottom;
+  animation: copilotIn .24s cubic-bezier(.2,.8,.2,1);
+}
+
+.copilot-panel[hidden] { display: none !important; }
+
+.copilot-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .18;
+  background:
+    linear-gradient(90deg, rgba(74, 234, 209, .05) 1px, transparent 1px),
+    linear-gradient(rgba(74, 234, 209, .035) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(to bottom, black, transparent 60%);
+}
+
+.copilot-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid rgba(92, 194, 179, .12);
+}
+
+.copilot-identity { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.copilot-identity > div { min-width: 0; }
+.copilot-name-row { display: flex; align-items: center; gap: 8px; }
+.copilot-name-row h3 { margin: 0; color: #f2fffc; font-size: 1rem; }
+.copilot-identity small { color: #789892; font-size: .63rem; }
+
+.copilot-online {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #75dca8;
+  font-size: .54rem;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+.copilot-online i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
+
+.copilot-window-actions { display: flex; gap: 5px; }
+.copilot-window-actions button {
+  width: 30px;
+  height: 30px;
+  min-height: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(104, 190, 179, .12);
+  border-radius: 8px;
+  color: #8ca9a4;
+  background: rgba(10, 29, 35, .7);
+  font-size: .95rem;
+}
+.copilot-window-actions button:hover { color: #effffb; border-color: rgba(89,229,207,.3); background: rgba(30,91,87,.22); }
+
+.copilot-context-strip {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(92, 194, 179, .09);
+  color: #6f8f8a;
+  background: rgba(5, 21, 27, .62);
+  font-size: .58rem;
+}
+.copilot-context-strip span:first-child { display: flex; align-items: center; gap: 6px; color: #93dace; font-weight: 800; }
+.copilot-context-strip i { width: 5px; height: 5px; border-radius: 50%; background: #55e6cc; box-shadow: 0 0 10px #55e6cc; }
+
+.copilot-chat-log {
+  position: relative;
+  z-index: 1;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 14px;
+  overflow-y: auto;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.copilot-chat-log .message {
+  max-width: 88%;
+  margin-bottom: 10px;
+  border-radius: 12px 12px 12px 4px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.12);
+}
+.copilot-chat-log .message.user {
+  margin-left: auto;
+  border-radius: 12px 12px 4px 12px;
+}
+
+.copilot-suggestions {
+  position: relative;
+  z-index: 1;
+  margin: 0 !important;
+  padding: 8px 12px;
+  display: flex !important;
+  gap: 6px;
+  overflow-x: auto;
+  border-top: 1px solid rgba(92, 194, 179, .08);
+}
+.copilot-suggestions button {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 5px 9px;
+  border-color: rgba(87, 188, 174, .14);
+  border-radius: 999px;
+  color: #91b8b1;
+  background: rgba(8, 28, 34, .7);
+  font-size: .62rem;
+}
+.copilot-suggestions button:hover { color: #eafffb; border-color: rgba(91,235,211,.34); background: rgba(25,89,82,.24); }
+
+.copilot-chat-form {
+  position: relative;
+  z-index: 1;
+  margin: 0 !important;
+  padding: 10px 12px 12px;
+  border-top: 1px solid rgba(92, 194, 179, .08);
+  background: rgba(4, 17, 23, .84);
+}
+.copilot-chat-form input {
+  min-height: 44px;
+  border-color: rgba(91, 196, 181, .17);
+  border-radius: 11px;
+  background: rgba(7, 27, 33, .92);
+}
+.copilot-chat-form button {
+  min-height: 44px;
+  border-radius: 11px;
+  box-shadow: 0 0 20px rgba(53,220,193,.08);
+}
+
+.copilot-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 13px;
+  border-top: 1px solid rgba(92, 194, 179, .07);
+  color: #58736f;
+  background: rgba(3, 13, 18, .95);
+  font-size: .52rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@keyframes copilotIn {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Light theme for Astra */
+html[data-theme="light"] .copilot-launcher,
+html[data-theme="light"] .copilot-panel {
+  color: #163a42;
+  border-color: rgba(26, 139, 146, .22);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(32, 183, 167, .10), transparent 34%),
+    radial-gradient(circle at 90% 12%, rgba(119, 91, 226, .07), transparent 31%),
+    rgba(247, 253, 253, .98);
+  box-shadow: 0 24px 70px rgba(38, 83, 95, .18), 0 0 36px rgba(28, 156, 147, .07);
+}
+html[data-theme="light"] .copilot-launcher-copy strong,
+html[data-theme="light"] .copilot-name-row h3 { color: #15383f; }
+html[data-theme="light"] .copilot-avatar { color: #138d83; background: rgba(232, 249, 247, .96); }
+html[data-theme="light"] .copilot-context-strip,
+html[data-theme="light"] .copilot-chat-form,
+html[data-theme="light"] .copilot-footer { background: rgba(240, 249, 250, .9); }
+html[data-theme="light"] .copilot-chat-form input { color: #163a42; background: #ffffff; }
+html[data-theme="light"] .copilot-window-actions button,
+html[data-theme="light"] .copilot-suggestions button { background: rgba(234, 247, 248, .9); }
+
+@media (max-width: 1180px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1.32fr) minmax(340px, .82fr) !important;
+  }
+  .simulation-shell { height: 590px !important; min-height: 590px !important; }
+  .controls { top: 82px; height: min(820px, calc(100vh - 112px)); }
+}
+
+@media (max-width: 980px) {
+  .workspace {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "simulation"
+      "telemetry"
+      "controls"
+      "decision";
+  }
+  .controls {
+    position: relative;
+    top: auto;
+    height: auto;
+    max-height: none;
+    overflow: visible !important;
+  }
+  .controls > .stage-panel:not([hidden]) { overflow: visible; }
+  .decision-panel {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "decision-head"
+      "decision-summary"
+      "sources"
+      "context"
+      "rationale"
+      "competition"
+      "care"
+      "validation" !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .simulation-shell { height: 520px !important; min-height: 520px !important; }
+  .scene-hud {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: calc(100% - 20px);
+    top: 10px;
+    left: 10px;
+  }
+  .scene-hud > div { min-height: 58px; padding: 8px; }
+  .anatomy-view-label { display: none; }
+  .motion-switch {
+    right: 10px;
+    bottom: 70px;
+    left: 10px;
+    overflow-x: auto;
+  }
+  .timeline { right: 10px; bottom: 10px; left: 10px; }
+  .timeline-step { min-height: 44px; padding: 6px 3px; font-size: .62rem; }
+  .copilot-launcher {
+    right: 12px;
+    bottom: 12px;
+    min-width: 54px;
+    width: 54px;
+    padding: 5px;
+    grid-template-columns: 44px;
+    border-radius: 50%;
+  }
+  .copilot-launcher-copy,
+  .copilot-launcher-pulse { display: none; }
+  .copilot-panel {
+    right: 10px;
+    bottom: 78px;
+    width: calc(100vw - 20px);
+    height: min(620px, calc(100vh - 94px));
+    border-radius: 16px;
+  }
+  .copilot-context-strip span:last-child { display: none; }
+}
+
+/* V4 explicit decision-panel surface after removing the legacy .chat wrapper class. */
+.decision-panel {
+  padding: 16px;
+  border: 1px solid rgba(100, 190, 176, .17);
+  border-radius: 14px;
+  background: rgba(7, 19, 25, .9);
+  box-shadow: 0 20px 60px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.025);
+}
+html[data-theme="light"] .decision-panel {
+  border-color: rgba(28, 103, 119, .14);
+  background: rgba(248, 252, 252, .96);
+  box-shadow: 0 18px 48px rgba(42, 85, 96, .10), inset 0 1px 0 rgba(255,255,255,.82);
+}
+
+/* ============================================================================
+   ASTROBONE UI V5 — readability / hierarchy / true light theme / Astra docking
+   ============================================================================ */
+
+:root {
+  --v5-radius-xl: 18px;
+  --v5-radius-lg: 14px;
+  --v5-radius-md: 10px;
+  --v5-gap: 16px;
+  --v5-page-pad: clamp(14px, 1.4vw, 24px);
+}
+
+html[data-theme="dark"] {
+  --v5-page: #040d12;
+  --v5-surface: rgba(7, 20, 27, .94);
+  --v5-surface-2: rgba(10, 29, 37, .86);
+  --v5-surface-3: rgba(13, 37, 45, .72);
+  --v5-text: #edf9f7;
+  --v5-text-2: #a7c0bc;
+  --v5-text-3: #78928e;
+  --v5-border: rgba(102, 190, 178, .15);
+  --v5-border-soft: rgba(102, 190, 178, .085);
+  --v5-accent: #4be1ca;
+  --v5-accent-2: #8f82f5;
+  --v5-focus-bg: rgba(23, 77, 74, .25);
+  --v5-shadow: 0 18px 54px rgba(0,0,0,.28);
+}
+
+html[data-theme="light"] {
+  --v5-page: #f4f8fa;
+  --v5-surface: #ffffff;
+  --v5-surface-2: #f7fbfc;
+  --v5-surface-3: #edf5f7;
+  --v5-text: #122f38;
+  --v5-text-2: #405f68;
+  --v5-text-3: #66818a;
+  --v5-border: rgba(30, 88, 106, .15);
+  --v5-border-soft: rgba(30, 88, 106, .08);
+  --v5-accent: #087f76;
+  --v5-accent-2: #6552cf;
+  --v5-focus-bg: #e6f5f3;
+  --v5-shadow: 0 14px 42px rgba(42, 80, 96, .10);
+}
+
+html, body {
+  background-color: var(--v5-page);
+}
+
+body {
+  color: var(--v5-text);
+  font-size: 14px;
+  line-height: 1.48;
+}
+
+/* Stronger, readable type scale */
+.section-label {
+  font-size: .72rem !important;
+  line-height: 1.25;
+  letter-spacing: .075em !important;
+}
+.panel-heading h2 { font-size: 1.15rem !important; }
+.panel-heading h3,
+.stage-heading h3,
+.assistant-heading h3 { font-size: 1rem !important; line-height: 1.25; }
+.stage-heading p,
+.brief-block p,
+.decision-rationale,
+.research-details,
+.method-note { font-size: .82rem !important; line-height: 1.5 !important; }
+.metric-grid span,
+.scene-hud .hud-label,
+.telemetry-legend span,
+.privacy-note,
+.evidence-provenance { font-size: .68rem !important; }
+.metric-grid strong { font-size: .96rem !important; }
+
+/* More breathing room, fewer nested-box vibes */
+.workspace {
+  padding: var(--v5-page-pad) !important;
+  gap: var(--v5-gap) !important;
+}
+.controls,
+.decision-panel,
+.telemetry-card {
+  border-radius: var(--v5-radius-xl) !important;
+}
+.controls { padding: 16px !important; }
+.stage-heading {
+  margin: 12px 0 14px !important;
+  padding: 15px 16px !important;
+  border: 0 !important;
+  border-left: 3px solid var(--v5-accent) !important;
+  border-radius: 0 12px 12px 0 !important;
+  background: var(--v5-focus-bg) !important;
+}
+.evidence-stack,
+.stage-panel { gap: 14px !important; }
+.ai-panel,
+.functional-panel,
+.nasa-evidence,
+.competition-panel,
+.validation-panel,
+.care-plan,
+.research-details,
+.method-note {
+  border-color: var(--v5-border-soft) !important;
+  border-radius: var(--v5-radius-lg) !important;
+}
+.ai-panel,
+.functional-panel,
+.nasa-evidence {
+  padding: 14px !important;
+}
+
+/* Reduce top-strip density and make it scan faster */
+.support-lifecycle {
+  min-height: 72px !important;
+  padding: 0 var(--v5-page-pad) !important;
+}
+.lifecycle-intro,
+.lifecycle-step {
+  min-height: 72px !important;
+  padding: 11px 13px !important;
+}
+.lifecycle-step small {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.32 !important;
+}
+
+/* Twin is the visual hero */
+.simulation-shell {
+  border-radius: 18px !important;
+  overflow: hidden;
+  box-shadow: 0 22px 64px rgba(0,0,0,.22) !important;
+}
+.scene-hud {
+  width: min(720px, calc(100% - 28px)) !important;
+  gap: 7px !important;
+}
+.scene-hud > div {
+  min-height: 66px !important;
+  padding: 9px 11px !important;
+  border-radius: 10px !important;
+}
+.scene-hud strong {
+  font-size: .92rem !important;
+  line-height: 1.18;
+}
+.scene-hud small {
+  font-size: .58rem !important;
+  line-height: 1.22 !important;
+}
+.anatomy-view-label {
+  padding: 8px 10px !important;
+  border-radius: 9px !important;
+  backdrop-filter: blur(12px);
+}
+
+/* Make telemetry a supporting layer, not the hero */
+.telemetry-card { padding: 13px 14px !important; }
+.telemetry-plot-wrap { height: 118px !important; }
+.telemetry-header strong { font-size: .95rem !important; }
+.telemetry-disclaimer { font-size: .62rem !important; }
+
+/* Clear workflow hierarchy */
+.workflow-tabs {
+  padding: 5px !important;
+  gap: 5px !important;
+  border-radius: 12px !important;
+}
+.workflow-tab {
+  min-height: 48px !important;
+  border: 0 !important;
+  border-radius: 9px !important;
+  opacity: .72;
+}
+.workflow-tab.active {
+  opacity: 1;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--v5-accent) 34%, transparent), 0 6px 18px color-mix(in srgb, var(--v5-accent) 8%, transparent) !important;
+}
+.workflow-tab.active span {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--v5-accent) 10%, transparent), 0 0 14px color-mix(in srgb, var(--v5-accent) 28%, transparent);
+}
+
+/* Three clear button families */
+.primary-action {
+  min-height: 42px !important;
+  font-weight: 800 !important;
+}
+.quiet-action,
+.secondary-link { opacity: .78; }
+.quiet-action:hover,
+.secondary-link:hover { opacity: 1; }
+
+/* Astra: more readable, more personality */
+.copilot-panel {
+  width: min(430px, calc(100vw - 32px)) !important;
+  height: min(610px, calc(100vh - 118px)) !important;
+  border-radius: 22px !important;
+}
+.copilot-role {
+  display: block;
+  margin-top: 3px;
+  color: #789892;
+  font-size: .66rem !important;
+  line-height: 1.3;
+}
+.copilot-chat-log { padding: 16px !important; }
+.copilot-chat-log .message {
+  max-width: 91% !important;
+  padding: 11px 13px !important;
+  font-size: .79rem !important;
+  line-height: 1.5 !important;
+  border: 0 !important;
+}
+.copilot-chat-form input { font-size: .82rem !important; }
+.copilot-launcher.is-open { display: none !important; }
+
+/* On wide desktop, Astra opens to the LEFT of the investigation panel.
+   uiEffects.js sets --astra-safe-right from the live controls position. */
+@media (min-width: 1181px) {
+  .copilot-panel {
+    right: var(--astra-safe-right, 24px) !important;
+    bottom: 24px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   TRUE LIGHT MODE
+   The 3D viewport remains a dark instrument display by design; everything
+   around it uses a high-contrast light system.
+   -------------------------------------------------------------------------- */
+html[data-theme="light"] body {
+  color: var(--v5-text) !important;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(31, 175, 165, .08), transparent 25%),
+    radial-gradient(circle at 88% 0%, rgba(112, 91, 219, .065), transparent 25%),
+    var(--v5-page) !important;
+}
+
+html[data-theme="light"] .topbar {
+  color: var(--v5-text) !important;
+  border-bottom: 1px solid var(--v5-border) !important;
+  background: rgba(255,255,255,.94) !important;
+}
+html[data-theme="light"] .brand h1,
+html[data-theme="light"] .brand-eyebrow { color: #12323a !important; }
+html[data-theme="light"] .brand p { color: #58747d !important; }
+html[data-theme="light"] .prototype-badge,
+html[data-theme="light"] .status-badge {
+  color: #355660 !important;
+  border-color: var(--v5-border) !important;
+  background: #f4f9fa !important;
+}
+html[data-theme="light"] .system-live-badge {
+  color: #176545 !important;
+  background: #edf9f2 !important;
+}
+html[data-theme="light"] .theme-toggle {
+  color: #173d46 !important;
+  border-color: rgba(25, 108, 119, .20) !important;
+  background: #ffffff !important;
+}
+
+html[data-theme="light"] .mission-brief,
+html[data-theme="light"] .support-lifecycle {
+  color: var(--v5-text) !important;
+  border-color: var(--v5-border) !important;
+  background: rgba(248,252,253,.92) !important;
+}
+html[data-theme="light"] .lifecycle-intro,
+html[data-theme="light"] .lifecycle-step {
+  color: var(--v5-text) !important;
+  border-color: var(--v5-border-soft) !important;
+  background: rgba(255,255,255,.84) !important;
+}
+html[data-theme="light"] .lifecycle-step strong,
+html[data-theme="light"] .lifecycle-intro strong { color: #16343c !important; }
+html[data-theme="light"] .lifecycle-step small { color: #58737c !important; }
+
+/* Keep the digital-twin viewport intentionally dark in both themes. */
+html[data-theme="light"] .simulation-shell {
+  border-color: rgba(15, 72, 79, .20) !important;
+  background: #061113 !important;
+  box-shadow: 0 20px 54px rgba(34, 67, 79, .16) !important;
+}
+html[data-theme="light"] #twin-canvas,
+html[data-theme="light"] .twin-view,
+html[data-theme="light"] .skeleton-view {
+  background: #071110 !important;
+}
+html[data-theme="light"] .scene-hud {
+  background: transparent !important;
+  border: 0 !important;
+}
+html[data-theme="light"] .scene-hud > div {
+  color: #eaf9f6 !important;
+  border-color: rgba(114, 222, 204, .16) !important;
+  background: rgba(5, 20, 24, .78) !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.20) !important;
+  backdrop-filter: blur(16px);
+}
+html[data-theme="light"] .scene-hud .hud-label { color: #8fb2ad !important; }
+html[data-theme="light"] .scene-hud strong { color: #effffb !important; }
+html[data-theme="light"] .scene-hud small { color: #83a19c !important; }
+html[data-theme="light"] .anatomy-view-label,
+html[data-theme="light"] .motion-switch,
+html[data-theme="light"] .timeline {
+  color: #dff7f2 !important;
+  border-color: rgba(114, 222, 204, .15) !important;
+  background: rgba(5, 20, 24, .82) !important;
+}
+html[data-theme="light"] .anatomy-view-label small,
+html[data-theme="light"] .motion-switch span,
+html[data-theme="light"] .timeline-step { color: #9bb7b2 !important; }
+html[data-theme="light"] .motion-button {
+  color: #b9d2cd !important;
+  border-color: transparent !important;
+  background: transparent !important;
+}
+html[data-theme="light"] .motion-button.active {
+  color: #052521 !important;
+  background: #4bd9c4 !important;
+}
+html[data-theme="light"] .timeline-step.active { color: #effffb !important; }
+
+/* High-contrast light surfaces */
+html[data-theme="light"] .controls,
+html[data-theme="light"] .decision-panel,
+html[data-theme="light"] .telemetry-deck,
+html[data-theme="light"] .competition-panel,
+html[data-theme="light"] .validation-panel,
+html[data-theme="light"] .care-plan,
+html[data-theme="light"] .ai-panel,
+html[data-theme="light"] .functional-panel,
+html[data-theme="light"] .nasa-evidence,
+html[data-theme="light"] .research-details,
+html[data-theme="light"] .method-note {
+  color: var(--v5-text) !important;
+  border-color: var(--v5-border) !important;
+  background: var(--v5-surface) !important;
+  box-shadow: var(--v5-shadow) !important;
+}
+html[data-theme="light"] .controls > .stage-panel:not([hidden]) {
+  color: var(--v5-text) !important;
+  background: transparent !important;
+}
+html[data-theme="light"] .stage-heading {
+  color: #14333b !important;
+  background: #e8f5f3 !important;
+}
+html[data-theme="light"] .stage-heading h3 { color: #16343c !important; }
+html[data-theme="light"] .stage-heading p { color: #4a6871 !important; }
+
+/* Broad text contrast correction for dashboard content */
+html[data-theme="light"] :where(.controls,.decision-panel,.telemetry-deck,.competition-panel,.validation-panel,.care-plan,.mission-brief,.support-lifecycle)
+  :where(h1,h2,h3,h4,strong,b,label,summary) {
+  color: #15343c !important;
+}
+html[data-theme="light"] :where(.controls,.decision-panel,.telemetry-deck,.competition-panel,.validation-panel,.care-plan,.mission-brief,.support-lifecycle)
+  :where(p,small,li,dd,dt) {
+  color: #4c6871 !important;
+}
+html[data-theme="light"] :where(.controls,.decision-panel,.telemetry-deck,.competition-panel,.validation-panel,.care-plan,.mission-brief,.support-lifecycle)
+  .section-label {
+  color: #08776f !important;
+}
+html[data-theme="light"] .evidence-provenance,
+html[data-theme="light"] .privacy-note,
+html[data-theme="light"] .telemetry-disclaimer,
+html[data-theme="light"] .method-meta,
+html[data-theme="light"] .validation-limit {
+  color: #637d85 !important;
+}
+
+html[data-theme="light"] .workflow-tabs {
+  border-color: var(--v5-border-soft) !important;
+  background: #edf5f7 !important;
+}
+html[data-theme="light"] .workflow-tab {
+  color: #527078 !important;
+  background: transparent !important;
+}
+html[data-theme="light"] .workflow-tab b { color: #405e67 !important; }
+html[data-theme="light"] .workflow-tab span {
+  color: #4f7078 !important;
+  background: #e0ecef !important;
+}
+html[data-theme="light"] .workflow-tab.active {
+  color: #103d3a !important;
+  background: #ffffff !important;
+}
+html[data-theme="light"] .workflow-tab.active b { color: #15363b !important; }
+html[data-theme="light"] .workflow-tab.active span {
+  color: #063c35 !important;
+  background: #62d9c7 !important;
+}
+
+html[data-theme="light"] .metric-grid > div,
+html[data-theme="light"] .nasa-evidence-grid > div,
+html[data-theme="light"] .simulation-metrics > div,
+html[data-theme="light"] .competition-grid > div,
+html[data-theme="light"] .model-card-grid article,
+html[data-theme="light"] .decision-context > div,
+html[data-theme="light"] .evidence-result-heading,
+html[data-theme="light"] .active-object,
+html[data-theme="light"] .telemetry-legend > div {
+  color: #183940 !important;
+  border-color: var(--v5-border-soft) !important;
+  background: #f8fbfc !important;
+}
+html[data-theme="light"] .metric-grid span,
+html[data-theme="light"] .nasa-evidence-grid span,
+html[data-theme="light"] .simulation-metrics span,
+html[data-theme="light"] .telemetry-legend span { color: #5c7780 !important; }
+html[data-theme="light"] .metric-grid strong,
+html[data-theme="light"] .nasa-evidence-grid strong,
+html[data-theme="light"] .simulation-metrics strong,
+html[data-theme="light"] .telemetry-legend strong { color: #173a42 !important; }
+
+html[data-theme="light"] button,
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea {
+  color: #173942 !important;
+  border-color: rgba(31, 94, 111, .18) !important;
+  background: #ffffff !important;
+}
+html[data-theme="light"] button:hover { background: #edf6f6 !important; }
+html[data-theme="light"] .primary-action,
+html[data-theme="light"] .hero-primary {
+  color: #ffffff !important;
+  border-color: #087e72 !important;
+  background: linear-gradient(135deg, #0a9787, #08756d) !important;
+}
+html[data-theme="light"] .primary-action:hover,
+html[data-theme="light"] .hero-primary:hover {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #0aa28f, #087d73) !important;
+}
+html[data-theme="light"] .status-badge[data-state="checking"],
+html[data-theme="light"] .status-badge[data-state="off"] {
+  color: #486871 !important;
+  background: #f2f7f8 !important;
+}
+
+html[data-theme="light"] .telemetry-plot-wrap {
+  border-color: rgba(33, 102, 120, .12) !important;
+  background: linear-gradient(180deg, #f8fcfd, #edf5f7) !important;
+}
+html[data-theme="light"] .telemetry-context {
+  color: #5d7680 !important;
+  border-color: rgba(32,101,117,.12) !important;
+  background: #edf5f7 !important;
+}
+html[data-theme="light"] .telemetry-live { color: #14765f !important; }
+
+/* Decision state should read as the primary result. */
+.decision-summary {
+  border-left: 3px solid var(--v5-accent) !important;
+}
+.decision-summary h3,
+#risk-status {
+  font-weight: 850 !important;
+}
+
+/* Astra light theme — every text class gets explicit contrast. */
+html[data-theme="light"] .copilot-panel,
+html[data-theme="light"] .copilot-launcher {
+  color: #173a42 !important;
+  border-color: rgba(24, 119, 126, .22) !important;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(35, 189, 171, .09), transparent 34%),
+    radial-gradient(circle at 94% 8%, rgba(110, 88, 221, .06), transparent 31%),
+    rgba(250, 254, 255, .99) !important;
+}
+html[data-theme="light"] .copilot-header,
+html[data-theme="light"] .copilot-context-strip,
+html[data-theme="light"] .copilot-suggestions,
+html[data-theme="light"] .copilot-chat-form,
+html[data-theme="light"] .copilot-footer {
+  border-color: rgba(28, 104, 119, .10) !important;
+}
+html[data-theme="light"] .copilot-context-strip,
+html[data-theme="light"] .copilot-chat-form,
+html[data-theme="light"] .copilot-footer { background: #f2f8f9 !important; }
+html[data-theme="light"] .copilot-name-row h3,
+html[data-theme="light"] .copilot-launcher-copy strong { color: #17363e !important; }
+html[data-theme="light"] .copilot-role,
+html[data-theme="light"] .copilot-identity small,
+html[data-theme="light"] .copilot-launcher-copy small { color: #627d85 !important; }
+html[data-theme="light"] .copilot-chat-log .message {
+  color: #24464f !important;
+  background: #eef6f7 !important;
+  box-shadow: 0 8px 22px rgba(43, 86, 98, .08) !important;
+}
+html[data-theme="light"] .copilot-chat-log .message.user {
+  color: #352e67 !important;
+  background: #efecff !important;
+}
+html[data-theme="light"] .copilot-suggestions button {
+  color: #36626a !important;
+  border-color: rgba(28, 104, 119, .12) !important;
+  background: #f1f8f8 !important;
+}
+html[data-theme="light"] .copilot-suggestions button:hover {
+  color: #0b625b !important;
+  background: #e4f4f2 !important;
+}
+html[data-theme="light"] .copilot-window-actions button {
+  color: #54727a !important;
+  background: #f2f8f9 !important;
+}
+html[data-theme="light"] .copilot-chat-form input {
+  color: #173a42 !important;
+  background: #ffffff !important;
+}
+html[data-theme="light"] .copilot-footer { color: #6d858c !important; }
+
+/* Small screens */
+@media (max-width: 1180px) {
+  .scene-hud { width: calc(100% - 24px) !important; }
+  .support-lifecycle { overflow-x: auto; }
+}
+
+@media (max-width: 700px) {
+  body { font-size: 13px; }
+  .workspace { padding: 10px !important; }
+  .controls { padding: 12px !important; }
+  .scene-hud { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  .copilot-panel { bottom: 12px !important; }
+}
+
+/* Compatibility with the Android-ready and full MediaPipe interface. */
+#app *,
+.copilot-panel *,
+.copilot-launcher * {
+  letter-spacing: 0 !important;
+}
+
+.problem-block h2 {
+  font-size: 2rem !important;
+}
+
+.topbar {
+  padding-top: calc(14px + env(safe-area-inset-top)) !important;
+}
+
+.app-footer {
+  padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+}
+
+.controls,
+.decision-panel,
+.telemetry-deck,
+.competition-panel,
+.validation-panel,
+.care-plan,
+.ai-panel,
+.functional-panel,
+.nasa-evidence,
+.research-details,
+.method-note,
+.copilot-panel,
+.copilot-launcher,
+.copilot-chat-log .message {
+  border-radius: 8px !important;
+}
+
+.theme-toggle,
+.hero-tags span,
+.telemetry-context,
+.telemetry-live,
+.copilot-online {
+  letter-spacing: 0 !important;
+}
+
+.native-api-config,
+.pose-settings,
+.pose-live-strip {
+  color: inherit;
+}
+
+.native-api-config input {
+  width: 100%;
+}
+
+.pose-control-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.copilot-launcher {
+  bottom: calc(22px + env(safe-area-inset-bottom)) !important;
+}
+
+.copilot-panel {
+  bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+}
+
+@media (max-width: 700px) {
+  .astro-particles {
+    display: none;
+  }
+
+  .telemetry-deck::before,
+  .simulation-shell::after,
+  .telemetry-live i,
+  .status-dot,
+  .copilot-launcher-pulse {
+    animation: none !important;
+  }
+
+  .problem-block h2 {
+    font-size: 1.45rem !important;
+  }
+
+  .copilot-launcher {
+    bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .copilot-panel {
+    bottom: calc(78px + env(safe-area-inset-bottom)) !important;
+    max-height: calc(100dvh - 100px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+}
+/* END V5 IMPORT */
+
+/* MotionGuard uses unframed metric rows inside the camera workspace. */
+.motionguard-capture-details { margin: 10px 0; }
+.motionguard-capture-details > summary {
+  min-height: 40px;
+  padding: 10px 0;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.detail-analysis {
+  display: grid;
+  gap: 10px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.detail-analysis h4 { margin: 0; color: var(--ink); font-size: 0.88rem; }
+.detail-readouts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.detail-readouts > div { min-width: 0; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.detail-readouts span { display: block; color: var(--muted); font-size: 0.66rem; }
+.detail-readouts strong { display: block; margin-top: 3px; color: var(--ink); font-size: 0.8rem; overflow-wrap: anywhere; }
+.detail-analysis > small { color: var(--muted); font-size: 0.68rem; line-height: 1.45; }
+.detail-analysis .compact-toggle { color: var(--ink); font-size: 0.72rem; }
+.motionguard-analysis {
+  display: grid;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.motionguard-analysis h4 { margin: 0; font-size: 0.92rem; color: var(--ink); }
+.motionguard-protocol { display: grid; gap: 5px; font-size: 0.72rem; color: var(--muted); }
+.motionguard-protocol select { width: 100%; min-width: 0; min-height: 40px; }
+.motionguard-readouts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+.motionguard-readouts > div { min-width: 0; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.motionguard-readouts span { display: block; color: var(--muted); font-size: 0.66rem; line-height: 1.4; }
+.motionguard-readouts strong { display: block; min-height: 28px; margin-top: 3px; color: var(--ink); font-size: 0.82rem; line-height: 1.35; overflow-wrap: anywhere; }
+.motionguard-observation { padding-left: 10px; border-left: 3px solid var(--teal); }
+.motionguard-observation strong { color: var(--ink); font-size: 0.8rem; }
+.motionguard-observation p { margin: 4px 0 0; color: var(--muted); font-size: 0.72rem; line-height: 1.5; }
+.motionguard-footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.motionguard-footer > span { color: var(--muted); font-size: 0.72rem; }
+.motionguard-footer button { min-height: 40px; flex: 0 0 auto; font-size: 0.72rem; }
+#motionguard-status[data-state="tracking"] { color: var(--teal); }
+#motionguard-status[data-state="review"] { color: var(--amber); }
+#motionguard-detail { margin: 0; overflow-wrap: anywhere; }
+
+/* Camera-linked crew safety monitor */
+.safety-alert {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  padding: 9px 10px;
+  border: 1px solid rgba(246, 190, 79, 0.72);
+  border-radius: 6px;
+  color: #fff7e4;
+  background: rgba(45, 34, 11, 0.9);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(8px);
+}
+
+.safety-alert[hidden] {
+  display: none;
+}
+
+.safety-alert[data-severity="caution"] {
+  border-color: rgba(255, 116, 92, 0.82);
+  background: rgba(65, 24, 19, 0.92);
+}
+
+.safety-alert strong {
+  font-size: 0.76rem;
+}
+
+.safety-alert span {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.camera-facing-row {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.camera-facing-control {
+  width: min(210px, 62%);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+}
+
+.camera-facing-control button {
+  min-width: 0;
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 0;
+  color: var(--muted);
+  background: transparent;
+  font-size: 0.7rem;
+}
+
+.camera-facing-control button + button {
+  border-left: 1px solid var(--line-strong);
+}
+
+.camera-facing-control button.is-active {
+  color: #ffffff;
+  background: var(--ink);
+}
+
+.safety-monitor {
+  display: grid;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.safety-monitor-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.safety-monitor-heading h4 {
+  margin: 3px 0 0;
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+
+.safety-readouts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.safety-readouts > div {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  padding-left: 9px;
+  border-left: 2px solid var(--line-strong);
+}
+
+.safety-readouts > div:has(#posture-status),
+.safety-readouts > div:has(#approach-status) {
+  border-left-color: var(--teal);
+}
+
+.safety-readouts span,
+.safety-readouts small {
+  color: var(--muted);
+  font-size: 0.65rem;
+  line-height: 1.3;
+}
+
+.safety-readouts strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+.detected-objects {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.detected-object {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.detected-object::before {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--teal);
+  content: "";
+}
+
+.detected-object[data-motion="approaching"] {
+  border-color: rgba(189, 123, 19, 0.55);
+  color: var(--amber);
+}
+
+.detected-object[data-motion="approaching"]::before {
+  background: var(--amber);
+}
+
+.safety-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 9px 12px;
+}
+
+.safety-threshold {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.safety-threshold select,
+.safety-controls button {
+  width: 100%;
+  min-height: 34px;
+  font-size: 0.7rem;
+}
+
+.safety-event-log {
+  max-height: 116px;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 0 0 18px;
+  overflow: auto;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.67rem;
+  line-height: 1.35;
+}
+
+.safety-event-log li::marker {
+  color: var(--teal);
+}
+
+#safety-monitor-status[data-state="ready"],
+#safety-monitor-status[data-state="monitoring"],
+#object-inference[data-state="ready"] {
+  color: var(--teal);
+}
+
+#safety-monitor-status[data-state="alert"],
+#object-inference[data-state="error"] {
+  color: var(--amber);
+}
+
+@media (max-width: 640px) {
+  .camera-facing-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .camera-facing-control {
+    width: 100%;
+  }
+
+  .safety-readouts {
+    gap: 10px;
+  }
+
+  .safety-controls {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .safety-controls .compact-toggle {
+    min-height: 32px;
+  }
+}
+
+/* Synchronized camera / rig stage */
+.simulation-shell {
+  height: auto !important;
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto auto;
+  align-self: start;
+  overflow: hidden;
+  border-radius: 8px !important;
+  background: #02090d !important;
+}
+
+.twin-view-grid {
+  height: clamp(420px, 43vw, 560px) !important;
+  min-height: 420px !important;
+  position: relative !important;
+  inset: auto !important;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: #030b0f;
+}
+
+.twin-view {
+  width: auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.live-view {
+  border-right: 1px solid rgba(113, 164, 158, 0.24);
+  background: #071116;
+}
+
+.skeleton-view,
+#twin-canvas {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.twin-camera-viewport {
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #071116 !important;
+}
+
+.twin-camera-viewport .pose-live-strip {
+  top: auto;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+}
+
+.twin-camera-viewport .pose-empty {
+  padding-top: 78px;
+  background:
+    linear-gradient(rgba(8, 22, 27, 0.88), rgba(5, 14, 18, 0.96)),
+    #071116;
+}
+
+.twin-pane-header {
+  min-width: 0;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  left: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.twin-pane-header > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border-left: 3px solid #4fd9ef;
+  background: rgba(3, 13, 17, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.twin-pane-header--model > div:first-child {
+  border-left-color: #f2a642;
+}
+
+.twin-pane-kicker {
+  color: #87a8a4;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.twin-pane-header strong {
+  min-width: 0;
+  color: #f4fbfa;
+  font-size: 1.08rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.twin-pane-header small {
+  min-width: 0;
+  color: #83a09c;
+  font-size: 0.64rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.twin-pane-actions {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  justify-items: end;
+  gap: 7px;
+  pointer-events: auto;
+}
+
+.twin-pane-actions #camera-status {
+  grid-column: 1 / -1;
+  justify-self: end;
+}
+
+.twin-camera-action {
+  min-height: 34px;
+  padding: 7px 10px;
+  white-space: nowrap;
+  font-size: 0.7rem;
+}
+
+#exercise-video-file[hidden], #replay-video[hidden] {
+  display: none !important;
+}
+
+.twin-source-badge {
+  padding: 6px 8px;
+  border: 1px solid rgba(242, 166, 66, 0.42);
+  border-radius: 4px;
+  color: #f2b865;
+  background: rgba(32, 23, 9, 0.76);
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.twin-kinematics-deck {
+  min-width: 0;
+  min-height: 132px;
+  position: relative;
+  z-index: 9;
+  display: grid;
+  grid-template-columns: minmax(118px, 0.34fr) minmax(260px, 1fr) minmax(118px, 0.34fr);
+  border-top: 1px solid rgba(113, 164, 158, 0.2);
+  border-bottom: 1px solid rgba(113, 164, 158, 0.2);
+  background: #061116;
+}
+
+.twin-side-readout {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  padding: 14px;
+}
+
+.twin-side-readout[data-side="left"] {
+  border-right: 1px solid rgba(113, 164, 158, 0.16);
+}
+
+.twin-side-readout[data-side="right"] {
+  border-left: 1px solid rgba(113, 164, 158, 0.16);
+}
+
+.twin-side-heading {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.twin-side-heading b {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 3px;
+  color: #071116;
+  background: #f2a642;
+  font-size: 0.72rem;
+}
+
+.twin-side-readout[data-side="right"] .twin-side-heading b {
+  background: #4fd9ef;
+}
+
+.twin-side-heading span,
+.twin-trace-header span,
+.twin-trace-footer {
+  color: #789691;
+  font-size: 0.62rem;
+}
+
+.twin-side-readout > strong {
+  color: #f4fbfa;
+  font-size: 0.98rem;
+}
+
+.twin-side-meter {
+  height: 5px;
+  overflow: hidden;
+  background: #17282d;
+}
+
+.twin-side-meter i {
+  width: 0;
+  height: 100%;
+  display: block;
+  background: #f2a642;
+  transition: width 120ms linear;
+}
+
+.twin-side-readout[data-side="right"] .twin-side-meter i {
+  background: #4fd9ef;
+}
+
+.twin-motion-trace {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto 74px auto;
+  gap: 4px;
+  padding: 10px 12px 8px;
+}
+
+.twin-trace-header,
+.twin-trace-footer {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.twin-trace-header > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.twin-trace-header strong {
+  color: #e9f5f3;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.twin-trace-legend {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.twin-trace-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.twin-trace-legend span::before {
+  width: 12px;
+  height: 2px;
+  background: #f2a642;
+  content: "";
+}
+
+.twin-trace-legend span[data-side="right"]::before {
+  background: #4fd9ef;
+}
+
+#motionguard-trace-canvas {
+  width: 100%;
+  height: 74px;
+  min-height: 74px;
+  display: block;
+  background: #061116;
+}
+
+.twin-trace-footer {
+  white-space: nowrap;
+}
+
+.twin-trace-footer small {
+  min-width: 0;
+  overflow: hidden;
+  color: #617d79;
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+}
+
+.simulation-shell .scene-hud {
+  width: 100% !important;
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  z-index: 9;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 !important;
+  padding: 0 !important;
+  background: #081419 !important;
+}
+
+.simulation-shell .scene-hud > div {
+  min-height: 68px !important;
+  padding: 10px 12px !important;
+  border: 0;
+  border-right: 1px solid rgba(113, 164, 158, 0.16);
+  border-radius: 0 !important;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.simulation-shell .scene-hud > div:last-child {
+  border-right: 0;
+}
+
+.simulation-shell .motion-switch {
+  width: 100%;
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  z-index: 9;
+  justify-content: flex-end;
+  overflow-x: auto;
+  border-width: 1px 0 0;
+  border-radius: 0;
+  background: #061116;
+  box-shadow: none;
+}
+
+.simulation-shell .timeline {
+  width: 100%;
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  z-index: 9;
+  border-width: 1px 0 0;
+  border-radius: 0;
+  background: #040d11;
+}
+
+html[data-theme="light"] .simulation-shell {
+  background: #02090d !important;
+}
+
+@media (max-width: 820px) {
+  .twin-view-grid {
+    height: auto !important;
+    min-height: 0 !important;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .twin-view {
+    height: clamp(300px, 76vw, 420px) !important;
+  }
+
+  .live-view {
+    border-right: 0;
+    border-bottom: 1px solid rgba(113, 164, 158, 0.24);
+  }
+
+  .twin-kinematics-deck {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .twin-side-readout[data-side="left"] {
+    grid-column: 1;
+    grid-row: 1;
+    border-right: 1px solid rgba(113, 164, 158, 0.16);
+    border-bottom: 1px solid rgba(113, 164, 158, 0.16);
+  }
+
+  .twin-side-readout[data-side="right"] {
+    grid-column: 2;
+    grid-row: 1;
+    border-right: 0;
+    border-bottom: 1px solid rgba(113, 164, 158, 0.16);
+    border-left: 0;
+  }
+
+  .twin-motion-trace {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-height: 126px;
+    grid-template-rows: auto 82px auto;
+  }
+
+  #motionguard-trace-canvas {
+    height: 82px;
+    min-height: 82px;
+  }
+}
+
+@media (max-width: 560px) {
+  .twin-view {
+    height: clamp(280px, 92vw, 380px) !important;
+  }
+
+  .twin-pane-header {
+    top: 8px;
+    right: 8px;
+    left: 8px;
+    gap: 6px;
+  }
+
+  .twin-pane-header > div:first-child {
+    padding: 7px 8px;
+  }
+
+  .twin-pane-header strong {
+    font-size: 0.88rem;
+  }
+
+  .twin-pane-header small {
+    max-width: 150px;
+  }
+
+  .twin-pane-actions {
+    gap: 4px;
+  }
+
+  .twin-camera-action {
+    min-height: 32px;
+    padding: 6px 8px;
+  }
+
+  .twin-source-badge {
+    font-size: 0.56rem;
+  }
+
+  .twin-side-readout {
+    padding: 11px;
+  }
+
+  .twin-trace-footer small {
+    display: none;
+  }
+
+  .simulation-shell .scene-hud {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .simulation-shell .scene-hud > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .simulation-shell .scene-hud > div:nth-child(-n + 2) {
+    border-bottom: 1px solid rgba(113, 164, 158, 0.16);
+  }
+
+  .simulation-shell .motion-switch {
+    justify-content: flex-start;
+  }
+}
+
+/* Explicit camera source selection for desktop browsers and Android WebView. */
+.camera-device-row {
+  display: grid;
+  gap: 6px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.camera-device-row > label {
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.camera-device-control {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.camera-device-control select,
+.camera-device-control button {
+  min-width: 0;
+  min-height: 38px;
+}
+
+.camera-device-control button {
+  padding: 7px 11px;
+  white-space: nowrap;
+  font-size: 0.7rem;
+}
+
+.camera-device-row small {
+  min-width: 0;
+  font-size: 0.66rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* Full-body values remain measurements, not a combined score. */
+.motionguard-joint-table {
+  display: grid;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.motionguard-joint-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(86px, 1.2fr) repeat(3, minmax(48px, 0.8fr));
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 5px 7px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.68rem;
+}
+
+.mission-review-dialog {
+  width: min(860px, calc(100vw - 28px));
+  max-height: calc(100dvh - 32px);
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #f8faf9;
+  overflow: auto;
+}
+.mission-review-dialog::backdrop { background: rgba(7, 14, 17, .7); }
+[data-theme="dark"] .mission-review-dialog { background: #14201f; }
+.mission-review-heading, .mission-review-actions, .scenario-reference-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.mission-review-heading > div { flex: 1; min-width: 160px; }
+.mission-review-heading h2 { margin: 6px 0; font-size: 1.3rem; letter-spacing: 0; }
+.mission-review-summary { line-height: 1.6; color: var(--muted); }
+.mission-check {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 16px;
+  align-items: start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: .8rem;
+}
+.mission-check > strong { overflow-wrap: anywhere; }
+.mission-check p, .mission-check small { grid-column: 1 / -1; margin: 0; line-height: 1.5; }
+.mission-check small { color: var(--muted); }
+.mission-check[data-available="false"] .status-badge { color: #a35900; border-color: #b97b38; }
+.mission-check[data-available="true"] .status-badge { color: var(--teal); }
+.mission-review-boundary { padding: 18px 0; border-bottom: 1px solid var(--line); }
+.mission-review-boundary h3 { font-size: 1rem; }
+.mission-review-boundary ul { padding-left: 20px; line-height: 1.8; font-size: .82rem; }
+.mission-review-boundary p, .mission-review-actions span { font-size: .78rem; line-height: 1.6; color: var(--muted); }
+.mission-review-boundary a { display: inline-block; margin: 4px 18px 4px 0; color: var(--teal); font-size: .8rem; }
+.mission-review-actions { padding-top: 18px; }
+.scenario-reference-actions { margin: 4px 0 16px; }
+.scenario-reference-actions button { flex: 1 1 140px; }
+.scenario-comparison:not([hidden]) { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px 0; margin-bottom: 16px; border-block: 1px solid var(--line); }
+.scenario-comparison > div { display: grid; gap: 5px; }
+.scenario-comparison > div span { color: var(--muted); font-size: .75rem; }
+.scenario-comparison > div strong { font-size: 1.2rem; }
+.scenario-comparison > b, .scenario-comparison > p, .scenario-comparison > small { grid-column: 1 / -1; margin: 0; line-height: 1.5; font-size: .78rem; overflow-wrap: anywhere; }
+.scenario-comparison > small { color: var(--muted); }
+@media (max-width: 560px) {
+  .mission-review-dialog { padding: 16px; }
+  .mission-review-heading h2 { font-size: 1.1rem; }
+  .mission-check { gap: 8px; }
+}
+
+.motionguard-joint-row:last-child {
+  border-bottom: 0;
+}
+
+.motionguard-joint-row > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.motionguard-joint-row > span {
+  color: var(--muted);
+  text-align: right;
+}
+
+.motionguard-joint-row > strong {
+  color: var(--ink);
+  font-size: 0.7rem;
+}
+
+.motionguard-joint-row--head {
+  min-height: 28px;
+  color: var(--muted);
+  background: var(--soft);
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.motionguard-joint-row.is-selected {
+  box-shadow: inset 3px 0 0 var(--teal);
+  background: rgba(17, 139, 124, 0.06);
+}
+
+.motionguard-joint-row.is-unavailable > span {
+  opacity: 0.55;
+}
+
+@media (max-width: 700px) {
+  .brand-eyebrow, .brand p, .hero-tags, .support-lifecycle,
+  .brief-divider, .solution-block > .section-label, .solution-block > p {
+    display: none !important;
+  }
+  .mission-brief { min-height: 0; padding: 12px 16px !important; gap: 10px !important; }
+  .problem-block h2 { font-size: 1.1rem !important; line-height: 1.35; }
+  .brief-block p { margin: 8px 0 0; font-size: .78rem; line-height: 1.5; }
+  .hero-actions { margin-top: 0; gap: 8px; }
+  .topbar-actions { flex-wrap: wrap; gap: 8px; }
+}
+
+.twin-trace-controls {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.twin-trace-controls > label {
+  color: #789691;
+  font-size: 0.6rem;
+}
+
+.twin-trace-controls select {
+  width: 92px;
+  min-width: 0;
+  min-height: 28px;
+  padding: 4px 6px;
+  border-color: rgba(113, 164, 158, 0.34);
+  border-radius: 4px;
+  color: #e9f5f3;
+  background: #0e1b20;
+  font-size: 0.64rem;
+}
+
+@media (max-width: 560px) {
+  .twin-trace-header {
+    align-items: flex-start;
+  }
+
+  .twin-trace-controls {
+    flex-wrap: wrap;
+    gap: 5px 8px;
+  }
+
+  .twin-trace-controls > label {
+    display: none;
+  }
+
+  .twin-trace-controls select {
+    width: 86px;
+  }
+
+  .motionguard-joint-row {
+    grid-template-columns: minmax(74px, 1.15fr) repeat(3, minmax(44px, 0.8fr));
+    gap: 5px;
+    padding-inline: 5px;
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "astrobone-demo-mission-v1",
+  "synthetic": true,
+  "generation": "AI-assisted fictional fixture; not collected from people or flight instruments. Team review required before submission.",
+  "label": "Synthetic astronaut scenario used to demonstrate system behavior. Not flight data or a treatment-effect study.",
+  "profile": { "display_name": "Commander Alex Morgan", "mission_name": "Transit analog / fictional 194-day mission", "equipment": ["camera"] },
+  "protocol": "restrained-knee-extension-demo-v1",
+  "gravity": "microgravity",
+  "pose_model": "synthetic-script-v1",
+  "angle_definition": "Knee extension is the 95th percentile hip-knee-ankle interior angle; 180 degrees is straight. ROM is max minus min over a fixed observation.",
+  "notes": "The onboard Day 1 baseline shares gravity and protocol with later observations. Earth preflight squats are not a microgravity comparator. The camera pipeline is not validated in microgravity.",
+  "observations": [
+    { "mission_day": 1, "stage": "Baseline", "tracking_quality": 0.94, "sample_count": 120, "is_baseline": true, "metrics": { "knee_extension_deg": 165, "knee_rom_left_deg": 80, "knee_rom_right_deg": 78, "knee_asymmetry_deg": 2 } },
+    { "mission_day": 30, "stage": "Early observation", "tracking_quality": 0.93, "sample_count": 120, "is_baseline": false, "metrics": { "knee_extension_deg": 164, "knee_rom_left_deg": 79, "knee_rom_right_deg": 77, "knee_asymmetry_deg": 2 } },
+    { "mission_day": 90, "stage": "Trend", "tracking_quality": 0.92, "sample_count": 120, "is_baseline": false, "metrics": { "knee_extension_deg": 158, "knee_rom_left_deg": 73, "knee_rom_right_deg": 69, "knee_asymmetry_deg": 4 } },
+    { "mission_day": 180, "stage": "Review change", "tracking_quality": 0.94, "sample_count": 120, "is_baseline": false, "metrics": { "knee_extension_deg": 151, "knee_rom_left_deg": 62, "knee_rom_right_deg": 60, "knee_asymmetry_deg": 2 } },
+    { "mission_day": 182, "stage": "Poor capture", "tracking_quality": 0.35, "sample_count": 8, "is_baseline": false, "metrics": { "knee_extension_deg": 135, "knee_rom_left_deg": 40, "knee_rom_right_deg": 38, "knee_asymmetry_deg": 2 } },
+    { "mission_day": 194, "stage": "Usable follow-up", "tracking_quality": 0.93, "sample_count": 120, "is_baseline": false, "metrics": { "knee_extension_deg": 160, "knee_rom_left_deg": 74, "knee_rom_right_deg": 72, "knee_asymmetry_deg": 2 } }
+  ],
+  "health": [
+    { "mission_day": 1, "observed_at": "2025-01-01T12:00:00Z", "source": "synthetic", "device_id": "DEMO-PPG", "protocol": "resting-restrained-demo-v1", "quality": 0.95, "metrics": { "heart_rate_bpm": 64 } },
+    { "mission_day": 30, "observed_at": "2025-01-30T12:00:00Z", "source": "synthetic", "device_id": "DEMO-PPG", "protocol": "resting-restrained-demo-v1", "quality": 0.95, "metrics": { "heart_rate_bpm": 66 } },
+    { "mission_day": 90, "observed_at": "2025-03-31T12:00:00Z", "source": "synthetic", "device_id": "DEMO-PPG", "protocol": "resting-restrained-demo-v1", "quality": 0.93, "metrics": { "heart_rate_bpm": 70 } },
+    { "mission_day": 180, "observed_at": "2025-06-29T12:00:00Z", "source": "synthetic", "device_id": "DEMO-PPG", "protocol": "resting-restrained-demo-v1", "quality": 0.94, "metrics": { "heart_rate_bpm": 76 } },
+    { "mission_day": 182, "observed_at": "2025-07-01T12:00:00Z", "source": "synthetic", "device_id": "DEMO-PPG", "protocol": "resting-restrained-demo-v1", "quality": 0.3, "metrics": { "heart_rate_bpm": 112 } },
+    { "mission_day": 194, "observed_at": "2025-07-13T12:00:00Z", "source": "synthetic", "device_id": "DEMO-PPG", "protocol": "resting-restrained-demo-v1", "quality": 0.96, "metrics": { "heart_rate_bpm": 69 } }
+  ],
+  "radiation": [
+    { "mission_day": 1, "cumulative_personal_absorbed_dose_mgy": 0 },
+    { "mission_day": 30, "cumulative_personal_absorbed_dose_mgy": 4.5 },
+    { "mission_day": 90, "cumulative_personal_absorbed_dose_mgy": 13.5 },
+    { "mission_day": 180, "cumulative_personal_absorbed_dose_mgy": 27 },
+    { "mission_day": 182, "cumulative_personal_absorbed_dose_mgy": 27.3 },
+    { "mission_day": 194, "cumulative_personal_absorbed_dose_mgy": 29.1 }
+  ]
+}

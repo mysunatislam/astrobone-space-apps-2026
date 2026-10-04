@@ -1,0 +1,24 @@
+import { readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
+import { NodeIO } from "@gltf-transform/core";
+import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
+import { meshopt } from "@gltf-transform/functions";
+import { MeshoptEncoder } from "meshoptimizer";
+import { rigAnatomicalAtlas } from "../src/anatomicalRigging.js";
+
+globalThis.FileReader = class { readAsArrayBuffer(blob) { blob.arrayBuffer().then(result => { this.result = result; this.onloadend?.(); }); } };
+const dir = "public/models/anatomy", bytes = await readFile(`${dir}/musculoskeletal.glb`);
+const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), "");
+const { model, records } = rigAnatomicalAtlas(gltf.scene);
+const binary = await new GLTFExporter().parseAsync(model, { binary: true });
+await MeshoptEncoder.ready;
+const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ "meshopt.encoder": MeshoptEncoder });
+const document = await io.readBinary(new Uint8Array(binary));
+await document.transform(meshopt({ encoder: MeshoptEncoder, level: "medium" }));
+const output = await io.writeBinary(document);
+await writeFile(`${dir}/musculoskeletal-rigged.glb`, output);
+await writeFile(`${dir}/rig-manifest.json`, JSON.stringify({ ...model.userData, generatedAt: new Date().toISOString(), sourceSha256: createHash("sha256").update(bytes).digest("hex"), outputSha256: createHash("sha256").update(output).digest("hex"), bytes: output.length, drawMeshes: 2, structures: records }, null, 2));
+console.log(JSON.stringify({ ...model.userData, bytes: output.length, drawMeshes: 2 }));

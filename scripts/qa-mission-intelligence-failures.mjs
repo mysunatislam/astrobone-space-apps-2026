@@ -1,0 +1,33 @@
+import assert from "node:assert/strict";
+import { mkdir, writeFile } from "node:fs/promises";
+import { chromium } from "playwright";
+const base = process.env.ASTROBONE_QA_BASE_URL || "http://127.0.0.1:5180/";
+const out = process.env.ASTROBONE_QA_OUTPUT || ".artifacts/mission-intelligence-failures";
+await mkdir(out, { recursive: true });
+const browser = await chromium.launch({ headless: true, args: ["--use-angle=d3d11"] }), results = [];
+try {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce" });
+  const errors = []; page.on("pageerror", e => errors.push(e.message));
+  await page.route("**/models/anatomy/musculoskeletal-rigged.glb", route => route.abort());
+  await page.route("**/data/mission-research.json", route => route.abort());
+  await page.goto(`${base}#mission-demo`, { waitUntil: "networkidle", timeout: 90000 });
+  await page.waitForFunction(() => document.querySelector("#mi-human-canvas")?.dataset.error);
+  assert.match(await page.locator("#mi-human-stage").innerText(), /3D reference unavailable/);
+  assert.equal(await page.locator("#mi-cache").getAttribute("data-ready"), "false");
+  await page.locator("#mi-why").click(); assert.match(await page.locator("#mi-dialog-body").innerText(), /OSD-804/); assert.doesNotMatch(await page.locator("#mi-dialog-body").innerText(), /OSD-575/);
+  await page.screenshot({ path: `${out}/failure-fallback.png` }); await page.locator("#mi-close").click();
+  await page.locator("#mi-reset").click(); assert.equal(await page.locator("#mi-day").innerText(), "147"); assert.deepEqual(errors, []);
+  results.push({ check: "blocked 3D and two NASA assets; review remains usable and retrieval abstains", passed: true }); await page.close();
+  const demo = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce" });
+  await demo.goto(`${base}#mission-demo`, { waitUntil: "networkidle", timeout: 90000 });
+  await demo.waitForFunction(() => document.querySelector("#mi-cache")?.dataset.ready === "true");
+  await demo.locator("#mi-demo").click(); assert.equal(await demo.locator("#mi-day").innerText(), "1");
+  await demo.waitForFunction(() => document.querySelector("#mi-dialog-title")?.textContent === "Mission health packet ready" && document.querySelector("#mi-dialog")?.open, null, { timeout: 65000 });
+  assert.equal(await demo.locator("#mi-day").innerText(), "147"); assert.match(await demo.locator("#mi-event-marker").innerText(), /SYNTHETIC EVENT/);
+  await demo.screenshot({ path: `${out}/automated-handoff.png` });
+  await demo.locator("#mi-close").click(); await demo.locator("#mi-reset").click(); assert.equal(await demo.locator("#mi-event-marker").innerText(), "");
+  await demo.locator("#mi-demo").click(); await demo.locator("#mi-demo").click(); await demo.waitForTimeout(5200); assert.equal(await demo.locator("#mi-day").innerText(), "1");
+  results.push({ check: "complete 50-second automated sequence, reduced motion and cancellation", passed: true });
+  await demo.close();
+} finally { await browser.close(); await writeFile(`${out}/report.json`, JSON.stringify(results, null, 2)); }
+console.log(JSON.stringify(results));

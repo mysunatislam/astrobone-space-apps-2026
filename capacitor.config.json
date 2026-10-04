@@ -1,0 +1,19 @@
+{
+  "appId": "com.mysunatislam.astrobone",
+  "appName": "AstroBone Twin",
+  "webDir": "dist",
+  "loggingBehavior": "debug",
+  "backgroundColor": "#edf1ee",
+  "android": {
+    "backgroundColor": "#edf1ee",
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false,
+    "zoomEnabled": false
+  },
+  "server": {
+    "hostname": "localhost",
+    "androidScheme": "https",
+    "cleartext": false
+  }
+}

@@ -1,0 +1,12 @@
+.anatomical-motion { border-bottom: 1px solid #36534e; padding-bottom: 8px; margin-bottom: 8px; font-size: 11px; color: #e3efeb; }
+.anatomical-motion[hidden] { display: none; }
+.anatomical-switches { display: flex; flex-wrap: wrap; gap: 7px 14px; align-items: center; }
+.anatomical-switches label { display: inline-flex; align-items: center; gap: 5px; margin: 0; color: inherit; font-size: 11px; }
+.anatomical-switches input { width: 14px; height: 14px; margin: 0; accent-color: #8ee0c3; }
+.anatomical-switches a { margin-left: auto; color: #a9e5d5; }
+.anatomical-opacity { display: flex; align-items: center; gap: 8px; font-size: 11px; color: inherit; margin: 6px 0; }
+.anatomical-opacity input { flex: 1; min-width: 60px; max-width: 170px; height: 15px; accent-color: #c37686; }
+#anatomical-coverage { display: block; font-size: 10px; line-height: 1.5; color: #a5dbc9; overflow-wrap: anywhere; }
+.anatomical-motion[data-state="held"] #anatomical-coverage, .anatomical-motion[data-state="partial"] #anatomical-coverage { color: #edc273; }
+.anatomical-motion small { display: block; font-size: 10px; line-height: 1.4; color: #b6c5c0; margin-top: 3px; }
+@media (max-width: 820px) { body.health-active .simulation-shell .skeleton-view, .simulation-shell .skeleton-view { height: 660px !important; } }

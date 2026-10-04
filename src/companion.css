@@ -1,0 +1,151 @@
+.companion-tabs { display:flex; gap:4px; padding:10px 22px; border-bottom:1px solid #bacbc4; background:#f6faf8; }
+.companion-tabs button { border:0; border-radius:4px; padding:9px 18px; background:transparent; color:#344c43; }
+.companion-tabs button[aria-selected="true"] { background:#0e7567; color:white; }
+html[data-theme] .companion-tabs button[aria-selected="true"] { background:#0e7567 !important; color:white !important; }
+.companion-active #copilot-launcher, .companion-active #copilot-panel { display:none !important; }
+.companion-shell { --cp-bg:#f6faf8; --cp-line:#c9d6cf; --cp-text:#1b3028; --cp-muted:#526c60; color:var(--cp-text); background:var(--cp-bg); padding:24px; }
+.companion-shell[hidden], .workspace[hidden], .mission-brief[hidden], .support-lifecycle[hidden] { display:none !important; }
+.companion-heading {display:flex;justify-content:space-between;align-items:center;gap:20px;max-width:1700px;margin:auto;padding-bottom:20px;}
+.companion-heading h2 {font-size:26px;line-height:1.25;margin:5px 0;letter-spacing:0;}
+.companion-heading p {font-size:14px;color:var(--cp-muted);margin:0;}
+.companion-heading>div:last-child {display:flex;flex-wrap:wrap;align-items:center;gap:12px;}
+.companion-shell h3 {font-size:17px;margin:0 0 16px;letter-spacing:0;}
+.companion-shell h4 {font-size:14px;letter-spacing:0;}
+.companion-shell p,.companion-shell li,.companion-shell dd {font-size:14px;line-height:1.55;overflow-wrap:anywhere;}
+.companion-message {max-width:1700px;margin:0 auto 20px;padding:12px 14px;background:#e3efea;border-left:3px solid #087f6f;font-size:14px;line-height:1.5;}
+.companion-message[data-error="true"] {border-color:#be4c3f;background:#f9e7e4;}
+.companion-layout {display:grid;grid-template-columns:240px minmax(0,1fr) 270px;max-width:1700px;margin:auto;gap:24px;}
+.companion-profile {border-right:1px solid var(--cp-line);padding-right:20px;}
+.companion-profile>label {display:block;font-size:12px;margin:16px 0 6px;color:var(--cp-muted);}
+.companion-shell input:not([type="checkbox"]),.companion-shell select,.companion-shell textarea {width:100%;min-width:0;background:var(--cp-bg);color:var(--cp-text);border:1px solid var(--cp-line);border-radius:4px;padding:10px;font:inherit;font-size:14px;box-sizing:border-box;}
+.companion-shell button {font-size:13px;line-height:1.3;white-space:normal;min-height:38px;border-radius:4px;letter-spacing:0;}
+.companion-profile>button {width:100%;margin-top:10px;}
+.companion-radiation {border-top:1px solid var(--cp-line);margin-top:18px;padding-top:14px;}
+.companion-radiation summary {font-size:13px;font-weight:700;cursor:pointer;}
+.companion-radiation form label {display:block;font-size:12px;color:var(--cp-muted);margin:12px 0 6px;}
+.companion-radiation form .companion-dose-consent {line-height:1.4;}
+.companion-radiation form button {width:100%;margin:10px 0;}
+.companion-environment {border-top:1px solid var(--cp-line);border-bottom:1px solid var(--cp-line);margin:18px 0;padding:10px 0 16px;}
+.companion-environment p {margin:7px 0;}
+.companion-environment a {display:inline-block;margin-top:8px;color:#087765;font-size:12px;}
+.companion-actions {display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+.companion-actions button {flex:1 1 auto;}
+.companion-shell small {display:block;font-size:12px;line-height:1.5;color:var(--cp-muted);margin-top:4px;overflow-wrap:anywhere;}
+#crew-identity {margin:24px 0;}
+#crew-identity p {margin:5px 0;}
+.companion-demo-badge {display:block;color:#9c4d18;font-size:11px;margin-top:10px;}
+.companion-shell hr {border:0;border-top:1px solid var(--cp-line);margin:24px 0;}
+.companion-boundaries dt {font-size:13px;margin-top:10px;}
+.companion-boundaries dd {margin:2px 0;color:var(--cp-muted);}
+.companion-danger {color:#a43e35;}
+.companion-main {min-width:0;}
+.companion-band {padding:0 0 24px;margin:0 0 24px;border-bottom:1px solid var(--cp-line);}
+.companion-band-heading {display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.companion-band-heading select {width:auto;max-width:240px;}
+#crew-timeline {display:block;width:100%;height:240px;margin-top:16px;}
+#crew-timeline[hidden] {display:none;}
+#companion-prompt-group[hidden], #browser-review-note[hidden] {display:none;}
+.companion-empty {color:var(--cp-muted);padding:20px 0;}
+.companion-table-scroll {overflow-x:auto;}
+.companion-shell table {border-collapse:collapse;width:100%;font-size:13px;}
+.companion-shell th,.companion-shell td {text-align:left;padding:10px 8px;border-bottom:1px solid var(--cp-line);font-weight:400;}
+.companion-shell th {font-size:11px;color:var(--cp-muted);}
+.companion-shell td:not(:first-child) {white-space:nowrap;}
+.companion-review-options {display:flex;flex-wrap:wrap;gap:16px;margin:12px 0;font-size:13px;}
+.companion-shell input[type="checkbox"] {accent-color:#0e7567;vertical-align:middle;margin-right:6px;}
+#companion-result h4 {text-transform:capitalize;}
+#companion-result ul {padding-left:20px;}
+.companion-warning {color:#a15122;}
+.companion-sources article {padding:14px 0;border-bottom:1px solid var(--cp-line);}
+.companion-sources a {color:#087765;font-size:14px;font-weight:600;}
+.companion-sources p {margin:8px 0;}
+.companion-audit {border-left:1px solid var(--cp-line);padding-left:20px;}
+#companion-trace {padding-left:18px;margin:0 0 28px;}
+#companion-trace li {padding:0 0 14px 6px;}
+#companion-trace strong {display:block;font-size:12px;}
+#companion-trace span {font-size:12px;}
+#companion-trace [data-state="running"] {color:#097c69;}
+#companion-trace [data-state="rejected"] {color:#ad483d;}
+#companion-gates dt {text-transform:capitalize;font-weight:600;font-size:12px;margin-top:15px;}
+#companion-gates dd {margin:5px 0;color:var(--cp-muted);font-size:12px;}
+.companion-shell dialog {width:min(470px,calc(100vw - 36px));padding:24px;border:1px solid var(--cp-line);border-radius:6px;background:var(--cp-bg);color:var(--cp-text);box-sizing:border-box;max-height:90vh;overflow-y:auto;}
+.companion-shell dialog::backdrop {background:#07160fcc;}
+.companion-shell dialog label {display:block;font-size:13px;margin:14px 0 7px;}
+.companion-shell fieldset {border:1px solid var(--cp-line);margin-top:18px;}
+html[data-theme="dark"] .companion-shell {--cp-bg:#101a16;--cp-line:#35463d;--cp-text:#e6f1eb;--cp-muted:#a6b9ac;}
+html[data-theme="dark"] .companion-tabs {background:#14221b;border-color:#35463d;}
+html[data-theme="dark"] .companion-tabs button {color:#d7e9dd;}
+html[data-theme="dark"] .companion-message {background:#203c30;}
+html[data-theme="dark"] .companion-message[data-error="true"] {background:#432723;}
+html[data-theme="dark"] .companion-sources a {color:#85dec0;}
+html[data-theme="dark"] .companion-environment a {color:#85dec0;}
+@media(max-width:1200px) {.companion-layout {grid-template-columns:210px minmax(0,1fr);gap:20px;}.companion-audit{grid-column:1/-1;border-left:0;border-top:1px solid var(--cp-line);padding:20px 0;}}
+@media(max-width:700px) {.companion-shell{padding:16px;}.companion-heading{display:block;}.companion-heading>div:last-child{margin-top:16px;}.companion-layout{display:block;}.companion-profile{border-right:0;padding:0 0 20px;margin-bottom:20px;border-bottom:1px solid var(--cp-line);}.companion-heading h2{font-size:23px;}.companion-band-heading{display:block;}.companion-band-heading select{max-width:100%;width:100%;}.companion-tabs{padding:8px 12px;}.companion-shell td:first-child{min-width:120px;}}
+
+/* The challenge path keeps movement observation separate from episodic research tools. */
+.companion-tabs { gap: 8px; }
+.companion-tabs button { min-width: 0; }
+.health-overview, .health-controls-heading { display: none; }
+body.health-active .workspace {
+  grid-template-areas: "overview overview" "simulation controls" !important;
+  grid-template-columns: minmax(0, 1.45fr) minmax(350px, .85fr) !important;
+  grid-template-rows: auto auto !important;
+  align-items: start;
+}
+body.health-active .workspace > :not(.health-overview):not(.simulation-shell):not(.controls) { display: none !important; }
+body.health-active .health-overview {
+  grid-area: overview;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  padding: 7px 4px 20px;
+  border-bottom: 1px solid var(--v5-border-soft, #c9d6cf);
+}
+.health-overview h2 { margin: 5px 0 8px; font-size: 1.55rem; line-height: 1.2; }
+.health-overview p { max-width: 790px; margin: 0; font-size: .88rem; line-height: 1.5; color: var(--v5-text-muted, #526c60); }
+.health-overview-actions { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+#health-capture-status { max-width: 190px; font-size: .78rem; line-height: 1.35; color: var(--v5-text-muted, #526c60); }
+#health-open-review { min-height: 40px; white-space: nowrap; }
+body.health-active .health-controls-heading { display: block; padding: 4px 0 18px; }
+.health-controls-heading h2 { margin: 5px 0; font-size: 1.2rem; line-height: 1.25; }
+.health-controls-heading p { margin: 0; color: var(--v5-text-muted, #526c60); font-size: .8rem; line-height: 1.45; }
+body.health-active .controls {
+  position: static !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+body.health-active .controls > :not(.health-controls-heading):not(#stage-evidence) { display: none !important; }
+body.health-active .controls > #stage-evidence {
+  display: block !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+body.health-active #stage-evidence > :not(.functional-panel) { display: none !important; }
+body.health-active .functional-panel { padding: 0 !important; border: 0 !important; background: transparent !important; }
+body.health-active .functional-panel .safety-monitor { display: none !important; }
+body.health-active .simulation-shell .scene-hud,
+body.health-active .simulation-shell .timeline,
+body.health-active .simulation-shell .motion-switch { display: none !important; }
+body.health-active .simulation-shell .twin-view-grid { height: clamp(410px, 44vw, 560px) !important; }
+body.health-active #copilot-launcher, body.health-active #copilot-panel { display: none !important; }
+
+@media (max-width: 1050px) {
+  body.health-active .workspace {
+    grid-template-areas: "overview" "simulation" "controls" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto !important;
+  }
+  body.health-active .health-overview { align-items: start; }
+}
+@media (max-width: 700px) {
+  .companion-tabs { overflow-x: auto; }
+  .companion-tabs button { flex: 1 0 110px; padding: 9px 8px; }
+  body.health-active .health-overview { display: block; padding-bottom: 16px; }
+  .health-overview h2 { font-size: 1.25rem; }
+  .health-overview-actions { justify-content: space-between; margin-top: 14px; }
+  body.health-active .simulation-shell .twin-view-grid { height: auto !important; }
+}

@@ -1,0 +1,390 @@
+{
+  "schema": "astrobone-mission-research-v1",
+  "scope": "External research cohorts, never personal astronaut measurements",
+  "cardiovascular": {
+    "accession": "OSD-575",
+    "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-575",
+    "title": "Inspiration4 cardiovascular serum panel",
+    "population": "Human / short-duration flight",
+    "license": "CC0-1.0",
+    "sources": [
+      {
+        "file": "LSDS-8_Multiplex_serum_cardiovascular_EvePanel_TRANSFORMED.csv",
+        "url": "https://osdr.nasa.gov/geode-py/ws/studies/OSD-575/download?source=datamanager&file=LSDS-8_Multiplex_serum_cardiovascular_EvePanel_TRANSFORMED.csv",
+        "sha256": "fdba6c3ce45401c12ca9b699fa375303793959aa0391e2f3c722f354d9cfc75c",
+        "bytes": 6207,
+        "restricted": false
+      }
+    ],
+    "records": 28,
+    "participants": 4,
+    "metric": "CRP",
+    "unit": "mg/L",
+    "points": [
+      {
+        "visit": "L-92",
+        "n": 4,
+        "median": 19.8815
+      },
+      {
+        "visit": "L-44",
+        "n": 4,
+        "median": 1.8798
+      },
+      {
+        "visit": "L-3",
+        "n": 4,
+        "median": 12.8545
+      },
+      {
+        "visit": "R+1",
+        "n": 4,
+        "median": 14.1693
+      },
+      {
+        "visit": "R+45",
+        "n": 4,
+        "median": 14.5604
+      },
+      {
+        "visit": "R+82",
+        "n": 4,
+        "median": 10.6568
+      },
+      {
+        "visit": "R+194",
+        "n": 4,
+        "median": 18.4385
+      }
+    ],
+    "method": "Median of available raw CRP concentrations at each visit; pg/mL divided by 1,000,000 to mg/L. No imputation or clinical thresholds. L = before launch; R = after return, not mission day.",
+    "boundary": "Four people on a three-day Inspiration4 flight. This serum assay is neither a wearable heart-rate measurement nor a cardiovascular-event predictor. No long-duration extrapolation."
+  },
+  "radiation": {
+    "accession": "OSD-435",
+    "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-435",
+    "title": "Radiation and cardiac function",
+    "population": "Mouse / ground irradiation",
+    "sources": [
+      {
+        "file": "LSDS-22_Echocardiography_heart_TRANSFORMED.csv",
+        "url": "https://osdr.nasa.gov/geode-py/ws/studies/OSD-435/download?source=datamanager&file=LSDS-22_Echocardiography_heart_TRANSFORMED.csv",
+        "sha256": "9bb2ba552f085fedcc1b7727d3a12c145aa506202496a95f906121ba35f9745c",
+        "bytes": 186172,
+        "restricted": false
+      },
+      {
+        "file": "OSD-435_metadata_OSD-435-ISA.zip",
+        "url": "https://osdr.nasa.gov/geode-py/ws/studies/OSD-435/download?source=datamanager&file=OSD-435_metadata_OSD-435-ISA.zip",
+        "sha256": "6ef035e773e266bf9a08e93b182a32c1ba80f3e653144fd51ff1c96c86618c48",
+        "bytes": 2642443,
+        "restricted": false
+      }
+    ],
+    "records": 1152,
+    "subjects": 305,
+    "excludedMissing": 256,
+    "exclusions": {
+      "nonScalarDose": 256,
+      "invalidTimeOrMetric": 0
+    },
+    "exclusionReason": "Non-scalar dose metadata is not pooled with single-dose groups. Missing or nonfinite values are counted, never imputed.",
+    "metric": "Ejection fraction",
+    "unit": "%",
+    "groups": [
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 0.5,
+        "month": 0.0,
+        "n": 25,
+        "median": 55.714
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 0.5,
+        "month": 5.0,
+        "n": 15,
+        "median": 50.497
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 0.5,
+        "month": 7.0,
+        "n": 15,
+        "median": 53.754
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 0.5,
+        "month": 9.0,
+        "n": 14,
+        "median": 50.384
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 1.0,
+        "month": 0.0,
+        "n": 25,
+        "median": 56.211
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 1.0,
+        "month": 5.0,
+        "n": 15,
+        "median": 51.984
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 1.0,
+        "month": 7.0,
+        "n": 15,
+        "median": 55.235
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 1.0,
+        "month": 9.0,
+        "n": 15,
+        "median": 52.033
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 3.0,
+        "month": 0.0,
+        "n": 25,
+        "median": 53.93
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 3.0,
+        "month": 5.0,
+        "n": 14,
+        "median": 54.844
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 3.0,
+        "month": 7.0,
+        "n": 14,
+        "median": 52.588
+      },
+      {
+        "radiation": "Cesium-137 gamma radiation",
+        "doseGy": 3.0,
+        "month": 9.0,
+        "n": 14,
+        "median": 52.056
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 0.1,
+        "month": 0.0,
+        "n": 25,
+        "median": 63.958
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 0.1,
+        "month": 3.0,
+        "n": 24,
+        "median": 52.707
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 0.1,
+        "month": 7.0,
+        "n": 14,
+        "median": 51.115
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 0.1,
+        "month": 9.0,
+        "n": 13,
+        "median": 53.208
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 0.25,
+        "month": 0.0,
+        "n": 25,
+        "median": 57.82
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 0.25,
+        "month": 3.0,
+        "n": 24,
+        "median": 47.66
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 0.25,
+        "month": 7.0,
+        "n": 14,
+        "median": 57.122
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 0.25,
+        "month": 9.0,
+        "n": 14,
+        "median": 59.146
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 1.0,
+        "month": 0.0,
+        "n": 25,
+        "median": 53.722
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 1.0,
+        "month": 3.0,
+        "n": 23,
+        "median": 46.85
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 1.0,
+        "month": 7.0,
+        "n": 13,
+        "median": 54.364
+      },
+      {
+        "radiation": "O-16 ion radiation",
+        "doseGy": 1.0,
+        "month": 9.0,
+        "n": 13,
+        "median": 51.909
+      },
+      {
+        "radiation": "proton",
+        "doseGy": 0.5,
+        "month": 0.0,
+        "n": 35,
+        "median": 64.136
+      },
+      {
+        "radiation": "proton",
+        "doseGy": 0.5,
+        "month": 3.0,
+        "n": 24,
+        "median": 57.09
+      },
+      {
+        "radiation": "proton",
+        "doseGy": 0.5,
+        "month": 5.0,
+        "n": 14,
+        "median": 54.471
+      },
+      {
+        "radiation": "proton",
+        "doseGy": 0.5,
+        "month": 7.0,
+        "n": 14,
+        "median": 57.059
+      },
+      {
+        "radiation": "proton",
+        "doseGy": 0.5,
+        "month": 9.0,
+        "n": 14,
+        "median": 55.393
+      },
+      {
+        "radiation": "proton",
+        "doseGy": 1.0,
+        "month": 0.0,
+        "n": 35,
+        "median": 57.76
+      },
+      {
+        "radiation": "proton",
+        "doseGy": 1.0,
+        "month": 3.0,
+        "n": 26,
+        "median": 51.504
+      },
+      {
+        "radiation": "proton",
+        "doseGy": 1.0,
+        "month": 5.0,
+        "n": 16,
+        "median": 54.504
+      },
+      {
+        "radiation": "proton",
+        "doseGy": 1.0,
+        "month": 7.0,
+        "n": 16,
+        "median": 55.442
+      },
+      {
+        "radiation": "proton",
+        "doseGy": 1.0,
+        "month": 9.0,
+        "n": 16,
+        "median": 51.027
+      },
+      {
+        "radiation": "sham-irradiated",
+        "doseGy": 0.0,
+        "month": 0.0,
+        "n": 85,
+        "median": 57.859
+      },
+      {
+        "radiation": "sham-irradiated",
+        "doseGy": 0.0,
+        "month": 3.0,
+        "n": 50,
+        "median": 52.626
+      },
+      {
+        "radiation": "sham-irradiated",
+        "doseGy": 0.0,
+        "month": 5.0,
+        "n": 30,
+        "median": 54.514
+      },
+      {
+        "radiation": "sham-irradiated",
+        "doseGy": 0.0,
+        "month": 7.0,
+        "n": 44,
+        "median": 54.3
+      },
+      {
+        "radiation": "sham-irradiated",
+        "doseGy": 0.0,
+        "month": 9.0,
+        "n": 44,
+        "median": 52.081
+      }
+    ],
+    "method": "Join echocardiography sample_name to ISA Sample Name. Median of finite ejection_fraction_percent grouped by recorded radiation, dose in gray and months post-irradiation. Non-scalar dose records excluded and counted. Repeated observations are not independent animals. Duplicate unused diameter columns are not analyzed.",
+    "boundary": "Ground-based irradiation in male mice, not crew dosimetry or human clinical limits. Group differences cannot set an astronaut alert threshold or establish the cause of a personal change."
+  },
+  "bone": {
+    "accession": "OSD-804",
+    "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-804",
+    "title": "Spaceflight bone microCT",
+    "population": "Mouse / spaceflight",
+    "records": 170,
+    "sources": [
+      {
+        "file": "LSDS-130_microCT_Cahill_microCT_TRANSFORMED.csv",
+        "url": "https://osdr.nasa.gov/geode-py/ws/studies/OSD-804/download?source=datamanager&file=LSDS-130_microCT_Cahill_microCT_TRANSFORMED.csv",
+        "sha256": "499541f23b4c3afcd39762456d98cb3046e1f56467fdf8ec5987f684534ccf0c",
+        "bytes": 13052,
+        "restricted": false
+      }
+    ],
+    "boundary": "Animal microCT evidence supports biological plausibility and site-specific trends. It is not a human fracture-risk calibration and does not set the crew bone-strength slider.",
+    "dataHashVerified": true
+  }
+}

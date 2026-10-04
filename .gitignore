@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.artifacts/
+.venv-companion/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.sqlite3
+*.sqlite3-*
+.env
+.env.local
+android/.gradle/
+android/app/build/
+android/build/
+*.log
+~$*

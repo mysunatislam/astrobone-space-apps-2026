@@ -1,0 +1,39 @@
+.simulation-shell .skeleton-view {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.simulation-shell .skeleton-view .twin-pane-header--model {
+  grid-row: 1;
+  position: relative;
+  inset: auto;
+  padding: 10px;
+  background: #101a19;
+  border-bottom: 1px solid #29413e;
+}
+.simulation-shell .skeleton-view .twin-pane-header--model > div:first-child {
+  background: transparent;
+  backdrop-filter: none;
+  padding: 0 0 0 8px;
+  border-left-color: #75cfbd;
+}
+.simulation-shell .skeleton-view #twin-canvas {
+  grid-row: 2;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0;
+  min-height: 0 !important;
+}
+.simulation-shell .skeleton-view .anatomy-toolbar {
+  grid-row: 3;
+  position: relative;
+  inset: auto;
+  padding: 8px 10px;
+  background: #101a19;
+  border-top: 1px solid #29413e;
+}
+.simulation-shell .skeleton-view .anatomy-layers { border: 0; padding: 0; }
+.simulation-shell .skeleton-view .anatomy-toolbar small { padding: 0; background: transparent; }
+@media (max-width: 820px) {
+  body.health-active .simulation-shell .skeleton-view,
+  .simulation-shell .skeleton-view { height: 500px !important; }
+}

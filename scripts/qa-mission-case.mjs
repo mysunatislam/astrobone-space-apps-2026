@@ -1,0 +1,113 @@
+import assert from "node:assert/strict";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { chromium } from "playwright";
+const output=process.env.ASTROBONE_QA_OUTPUT || ".artifacts/mission-case-qa";
+const baseUrl=process.env.ASTROBONE_QA_BASE_URL || "http://127.0.0.1:5180/";
+await mkdir(output,{recursive:true});
+const browser=await chromium.launch({headless:true,args:["--use-angle=d3d11"]}); const results=[];
+try {
+  for(const viewport of [{width:1440,height:1000},{width:390,height:844}]) {
+    const page=await browser.newPage({viewport}), errors=[];
+    page.on("pageerror",error=>errors.push(error.message));
+    await page.goto(baseUrl,{waitUntil:"networkidle"});
+    assert.equal(await page.locator("vite-error-overlay").count(),0);
+    await page.locator("#case-demo").click();
+    await page.locator("#case-name").getByText("Commander Alex Morgan").waitFor();
+    await page.waitForFunction(()=>document.querySelector("#case-day")?.textContent==="Day 180");
+    assert.match(await page.locator("#case-change").innerText(),/165 to 151 deg/);
+    assert.match(await page.locator("#case-dose").innerText(),/27 mGy.*synthetic/);
+    assert.match(await page.locator("#case-heart-value").innerText(),/76 bpm.*synthetic/);
+    for (const channel of ["cardiovascular", "radiation", "xray"]) {
+      await page.locator(`#channel-${channel}`).click();
+      await page.waitForFunction(() => !/Loading/.test(document.querySelector("#case-research-panel").textContent));
+      assert.equal(await page.locator(`#channel-${channel}`).getAttribute("aria-selected"), "true");
+      const content = await page.locator("#case-research-panel").innerText();
+      if (channel === "cardiovascular") {
+        assert.match(content, /4 crew members.*28 serum observations/);
+        assert.match(content, /R\+194/); assert.match(content, /not mission duration/);
+        assert.match(content, /76 bpm/);
+      } else if (channel === "radiation") {
+        assert.match(content, /1152 source records.*256 non-scalar-dose records/);
+        assert.match(content, /mGy.*not dose equivalent/s);
+        const initial = await page.locator(".research-reference table").innerText();
+        await page.locator("#case-radiation-group").selectOption({ index: 0 });
+        assert.notEqual(await page.locator(".research-reference table").innerText(), initial);
+      } else {
+        await page.waitForFunction(() => document.querySelector(".xray-evidence img")?.naturalWidth === 256);
+        assert.match(content, /NOT CREW IMAGING/); assert.match(content, /0\.9989/); assert.match(content, /0\.40%/);
+        assert.match(content, /OSD-804/);
+      }
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 2), false);
+      await page.locator(".case-channel-tabs").scrollIntoViewIfNeeded();
+      await page.screenshot({ path: `${output}/${channel}-${viewport.width}.png`, fullPage: true });
+    }
+    await page.locator("#channel-cardiovascular").click();
+    await page.locator("#theme-toggle").click();
+    await page.screenshot({ path: `${output}/cardiovascular-dark-${viewport.width}.png`, fullPage: true });
+    await page.locator("#theme-toggle").click();
+    await page.locator("#channel-movement").click();
+    await page.locator('[data-day="1"]').click();
+    assert.equal(await page.locator("#case-decision-title").innerText(),"Personal baseline recorded");
+    assert.match(await page.locator("#case-chart").getAttribute("aria-label"),/Day 1:/);
+    assert.doesNotMatch(await page.locator("#case-chart").getAttribute("aria-label"),/Day 180/);
+    await page.locator('[data-day="180"]').click();
+    await page.locator("#case-action-consent").check();await page.locator("#case-record-action").click();
+    await page.locator("#case-actions li").waitFor();
+    await page.locator('[data-day="182"]').click();
+    assert.equal(await page.locator("#case-decision-title").innerText(),"Comparison withheld");
+    assert.doesNotMatch(await page.locator("#case-change").innerText(),/165 to 135/);
+    assert.equal(await page.locator("#case-action-consent").isChecked(),false);
+    assert.match(await page.locator("#case-heart-value").innerText(), /Withheld/);
+    await page.locator("#channel-cardiovascular").click();
+    assert.match(await page.locator("#case-research-panel").innerText(), /Reading withheld/);
+    assert.doesNotMatch(await page.locator("#case-research-panel").innerText(), /112 bpm/);
+    await page.locator("#channel-movement").click();
+    await page.locator('[data-day="194"]').click();
+    assert.match(await page.locator("#case-followup").innerText(),/Day 180.*closer to baseline/);
+    await page.locator(".case-evidence summary").click();
+    assert.equal(await page.locator("#case-evidence-links a").count(),2);
+    await page.locator(".mission-case details").last().locator("summary").click();
+    const waitDownload=page.waitForEvent("download");await page.locator("#case-export").click();
+    const download=await waitDownload, payload=JSON.parse(await readFile(await download.path(),"utf8"));
+    assert.equal(payload.synthetic,true);assert.equal(payload.day,194);assert.equal(payload.followups.length,1);
+    assert.equal(payload.astronaut_id,payload.profile.astronaut_id);
+    assert.equal(payload.cardiovascular.length, 6);
+    assert.equal(payload.externalEvidence.xray.patientLinked, false);
+    assert.equal(payload.externalEvidence.research.cardiovascular.participants, 4);
+    await page.locator(".review-advanced > summary").click();
+    await page.locator("#companion-run").click();
+    await page.locator("#companion-result").getByText("change observed",{exact:true}).waitFor();
+    assert.match(await page.locator("#companion-result").innerText(),/Day 1 to Day 194/);
+    await page.locator("#companion-red-flag").check();
+    assert.equal(await page.locator("#case-decision-title").innerText(),"Human review now");
+    assert.match(await page.locator("#companion-result").innerText(),/Previous review invalidated/);
+    assert.equal(await page.locator("#companion-sources a").count(),0);
+    assert.equal(await page.locator("#companion-export").isDisabled(),true);
+    await page.locator("#case-action-consent").check();
+    assert.equal(await page.locator("#case-record-action").isDisabled(),true);
+    await page.locator("#companion-red-flag").uncheck();
+    await page.locator("#case-action-consent").uncheck();
+    await page.locator("#companion-run").click();
+    await page.locator("#companion-result").getByText("change observed",{exact:true}).waitFor();
+    await page.locator('[data-day="180"]').click();
+    assert.match(await page.locator("#companion-result").innerText(),/Selected observation changed/);
+    assert.equal(await page.locator("#companion-sources a").count(),0);
+    assert.equal(await page.locator("#crew-comparison tr").count(),0);
+    assert.equal(await page.locator("#companion-export").isDisabled(),true);
+    await page.locator(".review-advanced > summary").click();
+    await page.locator(".mission-case details").last().locator("summary").click();
+    await page.locator(".case-evidence summary").click();
+    await page.locator('[data-day="180"]').click();
+    await page.evaluate(()=>window.scrollTo(0,0));
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2),false);
+    await page.screenshot({path:`${output}/mission-${viewport.width}.png`,fullPage:true});
+    await page.locator("#twin-tab").click();
+    assert.match(await page.locator("#active-crew-strip").innerText(),/Commander Alex Morgan.*SYNTHETIC/);
+    assert.equal(await page.locator("#upload-video").isVisible(),true);
+    await page.locator("#companion-tab").click();
+    assert.equal(await page.locator("#case-day").innerText(),"Day 180");
+    assert.deepEqual(errors,[]);
+    results.push({viewport,passed:true,checks:["baseline","current","cardiovascular quality refusal","radiation exposure selector","NASA cohorts","real X-ray overlay","follow-up","consent","shared identity","as-of-day report","evidence links","export","red flag","responsive layout","dark theme"]});
+    console.log(`[qa] mission case ${viewport.width}: passed`); await page.close();
+  }
+} finally {await browser.close();await writeFile(`${output}/report.json`,JSON.stringify(results,null,2));}
