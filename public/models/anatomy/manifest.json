@@ -1,0 +1,6758 @@
+{
+  "source": "https://github.com/LluisV/Z-Anatomy",
+  "revision": "6c7f9016bd5899ac8edafd31b9900c151df42ed6",
+  "generatedAt": "2026-09-29T19:02:05.292Z",
+  "license": "CC-BY-SA-4.0",
+  "attribution": "Z-Anatomy; BodyParts3D, The Database Center for Life Science (CC-BY-SA 2.1 Japan)",
+  "limitations": "Static reference atlas. Not subject-specific. No pose registration or validated deformation. No organs, nerves or vessels included.",
+  "systems": [
+    {
+      "system": "bones",
+      "sourceFile": "SkeletalSystem100.fbx",
+      "url": "https://raw.githubusercontent.com/LluisV/Z-Anatomy/6c7f9016bd5899ac8edafd31b9900c151df42ed6/Resources/Models/FBX/SkeletalSystem100.fbx",
+      "sha256": "294a649765cd060a62a4095da52b9c8ef2d97769aa447e196448aa5f7d596dea",
+      "structures": 277,
+      "vertices": 2105997,
+      "triangles": 701999
+    },
+    {
+      "system": "muscles",
+      "sourceFile": "MuscularSystem100.fbx",
+      "url": "https://raw.githubusercontent.com/LluisV/Z-Anatomy/6c7f9016bd5899ac8edafd31b9900c151df42ed6/Resources/Models/FBX/MuscularSystem100.fbx",
+      "sha256": "4c19df534d5d84aabbce08604306aa0485b43e8a2483c72a95b569e1dfea2279",
+      "structures": 683,
+      "vertices": 6970773,
+      "triangles": 2323591
+    }
+  ],
+  "structures": [
+    {
+      "id": "bones-0",
+      "name": "Tibia.r",
+      "system": "bones",
+      "sourceTriangles": 1670,
+      "triangles": 654
+    },
+    {
+      "id": "bones-1",
+      "name": "Patella.l",
+      "system": "bones",
+      "sourceTriangles": 276,
+      "triangles": 262
+    },
+    {
+      "id": "bones-2",
+      "name": "Tibia.l",
+      "system": "bones",
+      "sourceTriangles": 1670,
+      "triangles": 662
+    },
+    {
+      "id": "bones-3",
+      "name": "Sesamoid bones of foot.l",
+      "system": "bones",
+      "sourceTriangles": 290,
+      "triangles": 234
+    },
+    {
+      "id": "bones-4",
+      "name": "Sesamoid bones of foot.r",
+      "system": "bones",
+      "sourceTriangles": 290,
+      "triangles": 234
+    },
+    {
+      "id": "bones-5",
+      "name": "Proximal phalanx of third finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 460,
+      "triangles": 394
+    },
+    {
+      "id": "bones-6",
+      "name": "Proximal phalanx of fourth finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 460,
+      "triangles": 426
+    },
+    {
+      "id": "bones-7",
+      "name": "Distal phalanx of third finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 318,
+      "triangles": 258
+    },
+    {
+      "id": "bones-8",
+      "name": "Middle phalanx of third finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 400,
+      "triangles": 290
+    },
+    {
+      "id": "bones-9",
+      "name": "Middle phalanx of fifth finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 216,
+      "triangles": 136
+    },
+    {
+      "id": "bones-10",
+      "name": "Proximal phalanx of first finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 532,
+      "triangles": 394
+    },
+    {
+      "id": "bones-11",
+      "name": "Middle phalanx of third finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 400,
+      "triangles": 290
+    },
+    {
+      "id": "bones-12",
+      "name": "Proximal phalanx of second finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 426,
+      "triangles": 388
+    },
+    {
+      "id": "bones-13",
+      "name": "Distal phalanx of second finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 236,
+      "triangles": 200
+    },
+    {
+      "id": "bones-14",
+      "name": "Middle phalanx of fifth finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 216,
+      "triangles": 136
+    },
+    {
+      "id": "bones-15",
+      "name": "Distal phalanx of first finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 466,
+      "triangles": 408
+    },
+    {
+      "id": "bones-16",
+      "name": "Proximal phalanx of fifth finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 516,
+      "triangles": 376
+    },
+    {
+      "id": "bones-17",
+      "name": "Distal phalanx of fifth finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 236,
+      "triangles": 194
+    },
+    {
+      "id": "bones-18",
+      "name": "Middle phalanx of fourth finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 448,
+      "triangles": 342
+    },
+    {
+      "id": "bones-19",
+      "name": "Distal phalanx of fourth finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 278,
+      "triangles": 242
+    },
+    {
+      "id": "bones-20",
+      "name": "Distal phalanx of second finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 236,
+      "triangles": 200
+    },
+    {
+      "id": "bones-21",
+      "name": "Proximal phalanx of third finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 460,
+      "triangles": 394
+    },
+    {
+      "id": "bones-22",
+      "name": "Distal phalanx of fifth finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 236,
+      "triangles": 194
+    },
+    {
+      "id": "bones-23",
+      "name": "Distal phalanx of fourth finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 278,
+      "triangles": 242
+    },
+    {
+      "id": "bones-24",
+      "name": "Distal phalanx of third finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 318,
+      "triangles": 258
+    },
+    {
+      "id": "bones-25",
+      "name": "Proximal phalanx of fifth finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 516,
+      "triangles": 376
+    },
+    {
+      "id": "bones-26",
+      "name": "Proximal phalanx of first finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 532,
+      "triangles": 394
+    },
+    {
+      "id": "bones-27",
+      "name": "Middle phalanx of second finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 382,
+      "triangles": 254
+    },
+    {
+      "id": "bones-28",
+      "name": "Middle phalanx of second finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 382,
+      "triangles": 254
+    },
+    {
+      "id": "bones-29",
+      "name": "Proximal phalanx of fourth finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 460,
+      "triangles": 426
+    },
+    {
+      "id": "bones-30",
+      "name": "Distal phalanx of first finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 466,
+      "triangles": 408
+    },
+    {
+      "id": "bones-31",
+      "name": "Proximal phalanx of second finger of foot.r",
+      "system": "bones",
+      "sourceTriangles": 426,
+      "triangles": 390
+    },
+    {
+      "id": "bones-32",
+      "name": "Middle phalanx of fourth finger of foot.l",
+      "system": "bones",
+      "sourceTriangles": 448,
+      "triangles": 342
+    },
+    {
+      "id": "bones-33",
+      "name": "Fourth metatarsal bone.l",
+      "system": "bones",
+      "sourceTriangles": 834,
+      "triangles": 442
+    },
+    {
+      "id": "bones-34",
+      "name": "Fifth metatarsal bone.r",
+      "system": "bones",
+      "sourceTriangles": 894,
+      "triangles": 552
+    },
+    {
+      "id": "bones-35",
+      "name": "First metatarsal bone.r",
+      "system": "bones",
+      "sourceTriangles": 1088,
+      "triangles": 818
+    },
+    {
+      "id": "bones-36",
+      "name": "Second metatarsal bone.l",
+      "system": "bones",
+      "sourceTriangles": 690,
+      "triangles": 510
+    },
+    {
+      "id": "bones-37",
+      "name": "Third metatarsal bone.r",
+      "system": "bones",
+      "sourceTriangles": 814,
+      "triangles": 514
+    },
+    {
+      "id": "bones-38",
+      "name": "Third metatarsal bone.l",
+      "system": "bones",
+      "sourceTriangles": 814,
+      "triangles": 512
+    },
+    {
+      "id": "bones-39",
+      "name": "First metatarsal bone.l",
+      "system": "bones",
+      "sourceTriangles": 1088,
+      "triangles": 818
+    },
+    {
+      "id": "bones-40",
+      "name": "Fourth metatarsal bone.r",
+      "system": "bones",
+      "sourceTriangles": 834,
+      "triangles": 444
+    },
+    {
+      "id": "bones-41",
+      "name": "Second metatarsal bone.r",
+      "system": "bones",
+      "sourceTriangles": 690,
+      "triangles": 510
+    },
+    {
+      "id": "bones-42",
+      "name": "Fifth metatarsal bone.l",
+      "system": "bones",
+      "sourceTriangles": 894,
+      "triangles": 554
+    },
+    {
+      "id": "bones-43",
+      "name": "Intermediate cuneiform bone.l",
+      "system": "bones",
+      "sourceTriangles": 444,
+      "triangles": 416
+    },
+    {
+      "id": "bones-44",
+      "name": "Talus.r",
+      "system": "bones",
+      "sourceTriangles": 1350,
+      "triangles": 1110
+    },
+    {
+      "id": "bones-45",
+      "name": "Lateral cuneiform bone.l",
+      "system": "bones",
+      "sourceTriangles": 638,
+      "triangles": 558
+    },
+    {
+      "id": "bones-46",
+      "name": "Intermediate cuneiform bone.r",
+      "system": "bones",
+      "sourceTriangles": 444,
+      "triangles": 416
+    },
+    {
+      "id": "bones-47",
+      "name": "Cuboid bone.l",
+      "system": "bones",
+      "sourceTriangles": 998,
+      "triangles": 804
+    },
+    {
+      "id": "bones-48",
+      "name": "Calcaneus.l",
+      "system": "bones",
+      "sourceTriangles": 1448,
+      "triangles": 956
+    },
+    {
+      "id": "bones-49",
+      "name": "Medial cuneiform bone.l",
+      "system": "bones",
+      "sourceTriangles": 992,
+      "triangles": 764
+    },
+    {
+      "id": "bones-50",
+      "name": "Cuboid bone.r",
+      "system": "bones",
+      "sourceTriangles": 998,
+      "triangles": 800
+    },
+    {
+      "id": "bones-51",
+      "name": "Navicular bone.r",
+      "system": "bones",
+      "sourceTriangles": 732,
+      "triangles": 618
+    },
+    {
+      "id": "bones-52",
+      "name": "Medial cuneiform bone.r",
+      "system": "bones",
+      "sourceTriangles": 992,
+      "triangles": 766
+    },
+    {
+      "id": "bones-53",
+      "name": "Talus.l",
+      "system": "bones",
+      "sourceTriangles": 1350,
+      "triangles": 1108
+    },
+    {
+      "id": "bones-54",
+      "name": "Navicular bone.l",
+      "system": "bones",
+      "sourceTriangles": 732,
+      "triangles": 618
+    },
+    {
+      "id": "bones-55",
+      "name": "Calcaneus.r",
+      "system": "bones",
+      "sourceTriangles": 1448,
+      "triangles": 960
+    },
+    {
+      "id": "bones-56",
+      "name": "Lateral cuneiform bone.r",
+      "system": "bones",
+      "sourceTriangles": 638,
+      "triangles": 558
+    },
+    {
+      "id": "bones-57",
+      "name": "Patella.r",
+      "system": "bones",
+      "sourceTriangles": 276,
+      "triangles": 262
+    },
+    {
+      "id": "bones-58",
+      "name": "Femur.l",
+      "system": "bones",
+      "sourceTriangles": 3794,
+      "triangles": 1326
+    },
+    {
+      "id": "bones-59",
+      "name": "Fibula.l",
+      "system": "bones",
+      "sourceTriangles": 1264,
+      "triangles": 442
+    },
+    {
+      "id": "bones-60",
+      "name": "Fibula.r",
+      "system": "bones",
+      "sourceTriangles": 1264,
+      "triangles": 442
+    },
+    {
+      "id": "bones-61",
+      "name": "Femur.r",
+      "system": "bones",
+      "sourceTriangles": 3794,
+      "triangles": 1326
+    },
+    {
+      "id": "bones-62",
+      "name": "Hip bone.r",
+      "system": "bones",
+      "sourceTriangles": 3788,
+      "triangles": 1442
+    },
+    {
+      "id": "bones-63",
+      "name": "Hip bone.l",
+      "system": "bones",
+      "sourceTriangles": 3788,
+      "triangles": 1456
+    },
+    {
+      "id": "bones-64",
+      "name": "Lower medial incisor.r",
+      "system": "bones",
+      "sourceTriangles": 984,
+      "triangles": 620
+    },
+    {
+      "id": "bones-65",
+      "name": "Upper lateral incisor.r",
+      "system": "bones",
+      "sourceTriangles": 1448,
+      "triangles": 706
+    },
+    {
+      "id": "bones-66",
+      "name": "Lower lateral incisor.l",
+      "system": "bones",
+      "sourceTriangles": 1040,
+      "triangles": 592
+    },
+    {
+      "id": "bones-67",
+      "name": "Upper medial incisor.l",
+      "system": "bones",
+      "sourceTriangles": 1368,
+      "triangles": 758
+    },
+    {
+      "id": "bones-68",
+      "name": "Lower canine.l",
+      "system": "bones",
+      "sourceTriangles": 1276,
+      "triangles": 666
+    },
+    {
+      "id": "bones-69",
+      "name": "Lower lateral incisor.r",
+      "system": "bones",
+      "sourceTriangles": 1040,
+      "triangles": 592
+    },
+    {
+      "id": "bones-70",
+      "name": "Lower medial incisor.l",
+      "system": "bones",
+      "sourceTriangles": 984,
+      "triangles": 618
+    },
+    {
+      "id": "bones-71",
+      "name": "Upper canine.l",
+      "system": "bones",
+      "sourceTriangles": 1470,
+      "triangles": 734
+    },
+    {
+      "id": "bones-72",
+      "name": "Upper medial incisor.r",
+      "system": "bones",
+      "sourceTriangles": 1368,
+      "triangles": 758
+    },
+    {
+      "id": "bones-73",
+      "name": "Lower canine.r",
+      "system": "bones",
+      "sourceTriangles": 1276,
+      "triangles": 676
+    },
+    {
+      "id": "bones-74",
+      "name": "Upper lateral incisor.l",
+      "system": "bones",
+      "sourceTriangles": 1448,
+      "triangles": 708
+    },
+    {
+      "id": "bones-75",
+      "name": "Upper canine.r",
+      "system": "bones",
+      "sourceTriangles": 1470,
+      "triangles": 732
+    },
+    {
+      "id": "bones-76",
+      "name": "Lower second molar tooth.l",
+      "system": "bones",
+      "sourceTriangles": 1676,
+      "triangles": 1448
+    },
+    {
+      "id": "bones-77",
+      "name": "Lower second premolar.r",
+      "system": "bones",
+      "sourceTriangles": 1180,
+      "triangles": 870
+    },
+    {
+      "id": "bones-78",
+      "name": "Lower second premolar.l",
+      "system": "bones",
+      "sourceTriangles": 1180,
+      "triangles": 870
+    },
+    {
+      "id": "bones-79",
+      "name": "Lower first molar tooth.r",
+      "system": "bones",
+      "sourceTriangles": 4508,
+      "triangles": 3242
+    },
+    {
+      "id": "bones-80",
+      "name": "Lower first premolar.r",
+      "system": "bones",
+      "sourceTriangles": 1222,
+      "triangles": 876
+    },
+    {
+      "id": "bones-81",
+      "name": "Upper second molar tooth.r",
+      "system": "bones",
+      "sourceTriangles": 1844,
+      "triangles": 1590
+    },
+    {
+      "id": "bones-82",
+      "name": "Lower first molar tooth.l",
+      "system": "bones",
+      "sourceTriangles": 4508,
+      "triangles": 3242
+    },
+    {
+      "id": "bones-83",
+      "name": "Upper first premolar.l",
+      "system": "bones",
+      "sourceTriangles": 1684,
+      "triangles": 1064
+    },
+    {
+      "id": "bones-84",
+      "name": "Upper first premolar.r",
+      "system": "bones",
+      "sourceTriangles": 1684,
+      "triangles": 1062
+    },
+    {
+      "id": "bones-85",
+      "name": "Upper second premolar.r",
+      "system": "bones",
+      "sourceTriangles": 1554,
+      "triangles": 1076
+    },
+    {
+      "id": "bones-86",
+      "name": "Upper first molar tooth.l",
+      "system": "bones",
+      "sourceTriangles": 2176,
+      "triangles": 1746
+    },
+    {
+      "id": "bones-87",
+      "name": "Lower first premolar.l",
+      "system": "bones",
+      "sourceTriangles": 1222,
+      "triangles": 884
+    },
+    {
+      "id": "bones-88",
+      "name": "Upper first molar tooth.r",
+      "system": "bones",
+      "sourceTriangles": 2176,
+      "triangles": 1744
+    },
+    {
+      "id": "bones-89",
+      "name": "Lower second molar tooth.r",
+      "system": "bones",
+      "sourceTriangles": 1676,
+      "triangles": 1448
+    },
+    {
+      "id": "bones-90",
+      "name": "Upper second premolar.l",
+      "system": "bones",
+      "sourceTriangles": 1554,
+      "triangles": 1076
+    },
+    {
+      "id": "bones-91",
+      "name": "Upper second molar tooth.l",
+      "system": "bones",
+      "sourceTriangles": 1844,
+      "triangles": 1592
+    },
+    {
+      "id": "bones-92",
+      "name": "Sacrum",
+      "system": "bones",
+      "sourceTriangles": 11676,
+      "triangles": 6162
+    },
+    {
+      "id": "bones-93",
+      "name": "Vertebra C6",
+      "system": "bones",
+      "sourceTriangles": 2304,
+      "triangles": 1706
+    },
+    {
+      "id": "bones-94",
+      "name": "Vertebra C3",
+      "system": "bones",
+      "sourceTriangles": 2440,
+      "triangles": 1928
+    },
+    {
+      "id": "bones-95",
+      "name": "Axis (C2)",
+      "system": "bones",
+      "sourceTriangles": 2334,
+      "triangles": 1960
+    },
+    {
+      "id": "bones-96",
+      "name": "Vertebra C7",
+      "system": "bones",
+      "sourceTriangles": 2164,
+      "triangles": 1646
+    },
+    {
+      "id": "bones-97",
+      "name": "Vertebra C4",
+      "system": "bones",
+      "sourceTriangles": 1940,
+      "triangles": 1598
+    },
+    {
+      "id": "bones-98",
+      "name": "Atlas (C1)",
+      "system": "bones",
+      "sourceTriangles": 2194,
+      "triangles": 1486
+    },
+    {
+      "id": "bones-99",
+      "name": "Vertebra C5",
+      "system": "bones",
+      "sourceTriangles": 2336,
+      "triangles": 1860
+    },
+    {
+      "id": "bones-100",
+      "name": "Vertebra L5",
+      "system": "bones",
+      "sourceTriangles": 4032,
+      "triangles": 2526
+    },
+    {
+      "id": "bones-101",
+      "name": "Vertebra L3",
+      "system": "bones",
+      "sourceTriangles": 3160,
+      "triangles": 2194
+    },
+    {
+      "id": "bones-102",
+      "name": "Vertebra L4",
+      "system": "bones",
+      "sourceTriangles": 3804,
+      "triangles": 2688
+    },
+    {
+      "id": "bones-103",
+      "name": "Vertebra L2",
+      "system": "bones",
+      "sourceTriangles": 2688,
+      "triangles": 1940
+    },
+    {
+      "id": "bones-104",
+      "name": "Vertebra L1",
+      "system": "bones",
+      "sourceTriangles": 3162,
+      "triangles": 2296
+    },
+    {
+      "id": "bones-105",
+      "name": "Vertebra T5",
+      "system": "bones",
+      "sourceTriangles": 2152,
+      "triangles": 1606
+    },
+    {
+      "id": "bones-106",
+      "name": "Vertebra T11",
+      "system": "bones",
+      "sourceTriangles": 1798,
+      "triangles": 1376
+    },
+    {
+      "id": "bones-107",
+      "name": "Vertebra T1",
+      "system": "bones",
+      "sourceTriangles": 1946,
+      "triangles": 1404
+    },
+    {
+      "id": "bones-108",
+      "name": "Vertebra T6",
+      "system": "bones",
+      "sourceTriangles": 1780,
+      "triangles": 1404
+    },
+    {
+      "id": "bones-109",
+      "name": "Vertebra T3",
+      "system": "bones",
+      "sourceTriangles": 2344,
+      "triangles": 1584
+    },
+    {
+      "id": "bones-110",
+      "name": "Vertebra T4",
+      "system": "bones",
+      "sourceTriangles": 2216,
+      "triangles": 1638
+    },
+    {
+      "id": "bones-111",
+      "name": "Vertebra T12",
+      "system": "bones",
+      "sourceTriangles": 2586,
+      "triangles": 1932
+    },
+    {
+      "id": "bones-112",
+      "name": "Vertebra T7",
+      "system": "bones",
+      "sourceTriangles": 2794,
+      "triangles": 1890
+    },
+    {
+      "id": "bones-113",
+      "name": "Vertebra T8",
+      "system": "bones",
+      "sourceTriangles": 1733,
+      "triangles": 1213
+    },
+    {
+      "id": "bones-114",
+      "name": "Vertebra T9",
+      "system": "bones",
+      "sourceTriangles": 2978,
+      "triangles": 2100
+    },
+    {
+      "id": "bones-115",
+      "name": "Vertebra T10",
+      "system": "bones",
+      "sourceTriangles": 3058,
+      "triangles": 2254
+    },
+    {
+      "id": "bones-116",
+      "name": "Vertebra T2",
+      "system": "bones",
+      "sourceTriangles": 2142,
+      "triangles": 1506
+    },
+    {
+      "id": "bones-117",
+      "name": "Coccyx",
+      "system": "bones",
+      "sourceTriangles": 1166,
+      "triangles": 1048
+    },
+    {
+      "id": "bones-118",
+      "name": "Hyoid bone",
+      "system": "bones",
+      "sourceTriangles": 1324,
+      "triangles": 980
+    },
+    {
+      "id": "bones-119",
+      "name": "Mandible",
+      "system": "bones",
+      "sourceTriangles": 18838,
+      "triangles": 6591
+    },
+    {
+      "id": "bones-120",
+      "name": "Major alar cartilage.l",
+      "system": "bones",
+      "sourceTriangles": 344,
+      "triangles": 344
+    },
+    {
+      "id": "bones-121",
+      "name": "Nasal septal cartilage",
+      "system": "bones",
+      "sourceTriangles": 360,
+      "triangles": 284
+    },
+    {
+      "id": "bones-122",
+      "name": "Lateral process of nasal septal cartilage.r",
+      "system": "bones",
+      "sourceTriangles": 347,
+      "triangles": 301
+    },
+    {
+      "id": "bones-123",
+      "name": "Lateral process of nasal septal cartilage.l",
+      "system": "bones",
+      "sourceTriangles": 347,
+      "triangles": 301
+    },
+    {
+      "id": "bones-124",
+      "name": "Major alar cartilage.r",
+      "system": "bones",
+      "sourceTriangles": 344,
+      "triangles": 344
+    },
+    {
+      "id": "bones-125",
+      "name": "Incus.r",
+      "system": "bones",
+      "sourceTriangles": 2532,
+      "triangles": 1440
+    },
+    {
+      "id": "bones-126",
+      "name": "Stapes.l",
+      "system": "bones",
+      "sourceTriangles": 4342,
+      "triangles": 1688
+    },
+    {
+      "id": "bones-127",
+      "name": "Malleus.l",
+      "system": "bones",
+      "sourceTriangles": 3982,
+      "triangles": 1392
+    },
+    {
+      "id": "bones-128",
+      "name": "Incus.l",
+      "system": "bones",
+      "sourceTriangles": 2532,
+      "triangles": 1440
+    },
+    {
+      "id": "bones-129",
+      "name": "Malleus.r",
+      "system": "bones",
+      "sourceTriangles": 3982,
+      "triangles": 1392
+    },
+    {
+      "id": "bones-130",
+      "name": "Stapes.r",
+      "system": "bones",
+      "sourceTriangles": 4342,
+      "triangles": 1714
+    },
+    {
+      "id": "bones-131",
+      "name": "Parietal bone.l",
+      "system": "bones",
+      "sourceTriangles": 6886,
+      "triangles": 3084
+    },
+    {
+      "id": "bones-132",
+      "name": "Palatine bone.l",
+      "system": "bones",
+      "sourceTriangles": 1460,
+      "triangles": 1290
+    },
+    {
+      "id": "bones-133",
+      "name": "Lacrimal bone.l",
+      "system": "bones",
+      "sourceTriangles": 588,
+      "triangles": 550
+    },
+    {
+      "id": "bones-134",
+      "name": "Nasal bone.r",
+      "system": "bones",
+      "sourceTriangles": 292,
+      "triangles": 240
+    },
+    {
+      "id": "bones-135",
+      "name": "Temporal bone.l",
+      "system": "bones",
+      "sourceTriangles": 14094,
+      "triangles": 5024
+    },
+    {
+      "id": "bones-136",
+      "name": "Ethmoid bone",
+      "system": "bones",
+      "sourceTriangles": 10130,
+      "triangles": 6539
+    },
+    {
+      "id": "bones-137",
+      "name": "Middle cells of ethmoid bone.l",
+      "system": "bones",
+      "sourceTriangles": 960,
+      "triangles": 866
+    },
+    {
+      "id": "bones-138",
+      "name": "Posterior cells of ethmoid bone.r",
+      "system": "bones",
+      "sourceTriangles": 1216,
+      "triangles": 1080
+    },
+    {
+      "id": "bones-139",
+      "name": "Posterior cells of ethmoid bone.l",
+      "system": "bones",
+      "sourceTriangles": 1216,
+      "triangles": 1082
+    },
+    {
+      "id": "bones-140",
+      "name": "Anterior cells of ethmoid bone.l",
+      "system": "bones",
+      "sourceTriangles": 736,
+      "triangles": 640
+    },
+    {
+      "id": "bones-141",
+      "name": "Middle cells of ethmoid bone.r",
+      "system": "bones",
+      "sourceTriangles": 960,
+      "triangles": 866
+    },
+    {
+      "id": "bones-142",
+      "name": "Anterior cells of ethmoid bone.r",
+      "system": "bones",
+      "sourceTriangles": 736,
+      "triangles": 640
+    },
+    {
+      "id": "bones-143",
+      "name": "Maxilla.r",
+      "system": "bones",
+      "sourceTriangles": 4798,
+      "triangles": 3132
+    },
+    {
+      "id": "bones-144",
+      "name": "Zygomatic bone.l",
+      "system": "bones",
+      "sourceTriangles": 1328,
+      "triangles": 992
+    },
+    {
+      "id": "bones-145",
+      "name": "Occipital bone",
+      "system": "bones",
+      "sourceTriangles": 7531,
+      "triangles": 3953
+    },
+    {
+      "id": "bones-146",
+      "name": "Inferior nasal concha bone.l",
+      "system": "bones",
+      "sourceTriangles": 476,
+      "triangles": 440
+    },
+    {
+      "id": "bones-147",
+      "name": "Lacrimal bone.r",
+      "system": "bones",
+      "sourceTriangles": 588,
+      "triangles": 550
+    },
+    {
+      "id": "bones-148",
+      "name": "Vomer",
+      "system": "bones",
+      "sourceTriangles": 1022,
+      "triangles": 626
+    },
+    {
+      "id": "bones-149",
+      "name": "Maxilla.l",
+      "system": "bones",
+      "sourceTriangles": 4798,
+      "triangles": 3128
+    },
+    {
+      "id": "bones-150",
+      "name": "Parietal bone.r",
+      "system": "bones",
+      "sourceTriangles": 6780,
+      "triangles": 3148
+    },
+    {
+      "id": "bones-151",
+      "name": "Nasal bone.l",
+      "system": "bones",
+      "sourceTriangles": 292,
+      "triangles": 240
+    },
+    {
+      "id": "bones-152",
+      "name": "Frontal bone",
+      "system": "bones",
+      "sourceTriangles": 7776,
+      "triangles": 4187
+    },
+    {
+      "id": "bones-153",
+      "name": "Sinus of frontal bone",
+      "system": "bones",
+      "sourceTriangles": 1504,
+      "triangles": 788
+    },
+    {
+      "id": "bones-154",
+      "name": "Palatine bone.r",
+      "system": "bones",
+      "sourceTriangles": 1460,
+      "triangles": 1286
+    },
+    {
+      "id": "bones-155",
+      "name": "Sphenoid bone",
+      "system": "bones",
+      "sourceTriangles": 7308,
+      "triangles": 3878
+    },
+    {
+      "id": "bones-156",
+      "name": "Sinus of sphenoid bone",
+      "system": "bones",
+      "sourceTriangles": 384,
+      "triangles": 356
+    },
+    {
+      "id": "bones-157",
+      "name": "Zygomatic bone.r",
+      "system": "bones",
+      "sourceTriangles": 1328,
+      "triangles": 1002
+    },
+    {
+      "id": "bones-158",
+      "name": "Temporal bone.r",
+      "system": "bones",
+      "sourceTriangles": 14094,
+      "triangles": 5034
+    },
+    {
+      "id": "bones-159",
+      "name": "Inferior nasal concha bone.r",
+      "system": "bones",
+      "sourceTriangles": 476,
+      "triangles": 440
+    },
+    {
+      "id": "bones-160",
+      "name": "Arytenoid cartilage.l",
+      "system": "bones",
+      "sourceTriangles": 3780,
+      "triangles": 1390
+    },
+    {
+      "id": "bones-161",
+      "name": "Arytenoid cartilage.r",
+      "system": "bones",
+      "sourceTriangles": 3780,
+      "triangles": 1388
+    },
+    {
+      "id": "bones-162",
+      "name": "Thyroid cartilage",
+      "system": "bones",
+      "sourceTriangles": 4488,
+      "triangles": 2254
+    },
+    {
+      "id": "bones-163",
+      "name": "Corniculate cartilage.r",
+      "system": "bones",
+      "sourceTriangles": 136,
+      "triangles": 136
+    },
+    {
+      "id": "bones-164",
+      "name": "Corniculate cartilage.l",
+      "system": "bones",
+      "sourceTriangles": 136,
+      "triangles": 136
+    },
+    {
+      "id": "bones-165",
+      "name": "Cricoid cartilage",
+      "system": "bones",
+      "sourceTriangles": 1882,
+      "triangles": 1560
+    },
+    {
+      "id": "bones-166",
+      "name": "Costal cartilage of sixth rib.l",
+      "system": "bones",
+      "sourceTriangles": 8120,
+      "triangles": 2840
+    },
+    {
+      "id": "bones-167",
+      "name": "Costal cartilage of fifth rib.r",
+      "system": "bones",
+      "sourceTriangles": 6492,
+      "triangles": 2272
+    },
+    {
+      "id": "bones-168",
+      "name": "Costal cartilage of ninth rib.r",
+      "system": "bones",
+      "sourceTriangles": 1964,
+      "triangles": 686
+    },
+    {
+      "id": "bones-169",
+      "name": "Costal cartilage of sixth rib.r",
+      "system": "bones",
+      "sourceTriangles": 8120,
+      "triangles": 2842
+    },
+    {
+      "id": "bones-170",
+      "name": "Costal cartilage of second rib.l",
+      "system": "bones",
+      "sourceTriangles": 3408,
+      "triangles": 1192
+    },
+    {
+      "id": "bones-171",
+      "name": "Costal cartilage of fourth rib.l",
+      "system": "bones",
+      "sourceTriangles": 4472,
+      "triangles": 1564
+    },
+    {
+      "id": "bones-172",
+      "name": "Costal cartilage of fifth rib.l",
+      "system": "bones",
+      "sourceTriangles": 6492,
+      "triangles": 2272
+    },
+    {
+      "id": "bones-173",
+      "name": "Costal cartilage of seventh rib.l",
+      "system": "bones",
+      "sourceTriangles": 13764,
+      "triangles": 4816
+    },
+    {
+      "id": "bones-174",
+      "name": "Costal cartilage of ninth rib.l",
+      "system": "bones",
+      "sourceTriangles": 1964,
+      "triangles": 692
+    },
+    {
+      "id": "bones-175",
+      "name": "Costal cartilage of fourth rib.r",
+      "system": "bones",
+      "sourceTriangles": 4472,
+      "triangles": 1564
+    },
+    {
+      "id": "bones-176",
+      "name": "Costal cartilage of second rib.r",
+      "system": "bones",
+      "sourceTriangles": 3408,
+      "triangles": 1192
+    },
+    {
+      "id": "bones-177",
+      "name": "Costal cartilage of tenth rib.r",
+      "system": "bones",
+      "sourceTriangles": 1524,
+      "triangles": 532
+    },
+    {
+      "id": "bones-178",
+      "name": "Costal cartilage of first rib.r",
+      "system": "bones",
+      "sourceTriangles": 2771,
+      "triangles": 968
+    },
+    {
+      "id": "bones-179",
+      "name": "Costal cartilage of eighth rib.r",
+      "system": "bones",
+      "sourceTriangles": 2624,
+      "triangles": 918
+    },
+    {
+      "id": "bones-180",
+      "name": "Costal cartilage of third rib.r",
+      "system": "bones",
+      "sourceTriangles": 3600,
+      "triangles": 1258
+    },
+    {
+      "id": "bones-181",
+      "name": "Costal cartilage of seventh rib.r",
+      "system": "bones",
+      "sourceTriangles": 13764,
+      "triangles": 4816
+    },
+    {
+      "id": "bones-182",
+      "name": "Costal cartilage of third rib.l",
+      "system": "bones",
+      "sourceTriangles": 3600,
+      "triangles": 1258
+    },
+    {
+      "id": "bones-183",
+      "name": "Costal cartilage of first rib.l",
+      "system": "bones",
+      "sourceTriangles": 2771,
+      "triangles": 968
+    },
+    {
+      "id": "bones-184",
+      "name": "Costal cartilage of tenth rib.l",
+      "system": "bones",
+      "sourceTriangles": 1524,
+      "triangles": 532
+    },
+    {
+      "id": "bones-185",
+      "name": "Costal cartilage of eighth rib.l",
+      "system": "bones",
+      "sourceTriangles": 2624,
+      "triangles": 918
+    },
+    {
+      "id": "bones-186",
+      "name": "Fourth rib.l",
+      "system": "bones",
+      "sourceTriangles": 8646,
+      "triangles": 3026
+    },
+    {
+      "id": "bones-187",
+      "name": "First rib.l",
+      "system": "bones",
+      "sourceTriangles": 3210,
+      "triangles": 1122
+    },
+    {
+      "id": "bones-188",
+      "name": "Fifth rib.l",
+      "system": "bones",
+      "sourceTriangles": 9376,
+      "triangles": 3280
+    },
+    {
+      "id": "bones-189",
+      "name": "Fifth rib.r",
+      "system": "bones",
+      "sourceTriangles": 9376,
+      "triangles": 3280
+    },
+    {
+      "id": "bones-190",
+      "name": "First rib.r",
+      "system": "bones",
+      "sourceTriangles": 3210,
+      "triangles": 1122
+    },
+    {
+      "id": "bones-191",
+      "name": "Third rib.l",
+      "system": "bones",
+      "sourceTriangles": 6980,
+      "triangles": 2442
+    },
+    {
+      "id": "bones-192",
+      "name": "Third rib.r",
+      "system": "bones",
+      "sourceTriangles": 6980,
+      "triangles": 2442
+    },
+    {
+      "id": "bones-193",
+      "name": "Seventh rib.r",
+      "system": "bones",
+      "sourceTriangles": 9776,
+      "triangles": 3420
+    },
+    {
+      "id": "bones-194",
+      "name": "Fourth rib.r",
+      "system": "bones",
+      "sourceTriangles": 8646,
+      "triangles": 3026
+    },
+    {
+      "id": "bones-195",
+      "name": "Seventh rib.l",
+      "system": "bones",
+      "sourceTriangles": 9776,
+      "triangles": 3420
+    },
+    {
+      "id": "bones-196",
+      "name": "Second rib.l",
+      "system": "bones",
+      "sourceTriangles": 5364,
+      "triangles": 1876
+    },
+    {
+      "id": "bones-197",
+      "name": "Sixth rib.l",
+      "system": "bones",
+      "sourceTriangles": 10132,
+      "triangles": 3546
+    },
+    {
+      "id": "bones-198",
+      "name": "Second rib.r",
+      "system": "bones",
+      "sourceTriangles": 5364,
+      "triangles": 1876
+    },
+    {
+      "id": "bones-199",
+      "name": "Sixth rib.r",
+      "system": "bones",
+      "sourceTriangles": 10132,
+      "triangles": 3546
+    },
+    {
+      "id": "bones-200",
+      "name": "Eighth rib.l",
+      "system": "bones",
+      "sourceTriangles": 8270,
+      "triangles": 2894
+    },
+    {
+      "id": "bones-201",
+      "name": "Tenth rib.r",
+      "system": "bones",
+      "sourceTriangles": 7026,
+      "triangles": 2458
+    },
+    {
+      "id": "bones-202",
+      "name": "Ninth rib.l",
+      "system": "bones",
+      "sourceTriangles": 7778,
+      "triangles": 2722
+    },
+    {
+      "id": "bones-203",
+      "name": "Ninth rib.r",
+      "system": "bones",
+      "sourceTriangles": 7778,
+      "triangles": 2722
+    },
+    {
+      "id": "bones-204",
+      "name": "Eighth rib.r",
+      "system": "bones",
+      "sourceTriangles": 8270,
+      "triangles": 2894
+    },
+    {
+      "id": "bones-205",
+      "name": "Twelfth rib.l",
+      "system": "bones",
+      "sourceTriangles": 3002,
+      "triangles": 1050
+    },
+    {
+      "id": "bones-206",
+      "name": "Twelfth rib.r",
+      "system": "bones",
+      "sourceTriangles": 3002,
+      "triangles": 1050
+    },
+    {
+      "id": "bones-207",
+      "name": "Eleventh rib.l",
+      "system": "bones",
+      "sourceTriangles": 5034,
+      "triangles": 1760
+    },
+    {
+      "id": "bones-208",
+      "name": "Eleventh rib.r",
+      "system": "bones",
+      "sourceTriangles": 5034,
+      "triangles": 1760
+    },
+    {
+      "id": "bones-209",
+      "name": "Tenth rib.l",
+      "system": "bones",
+      "sourceTriangles": 7026,
+      "triangles": 2458
+    },
+    {
+      "id": "bones-210",
+      "name": "Manubrium of sternum",
+      "system": "bones",
+      "sourceTriangles": 2662,
+      "triangles": 1970
+    },
+    {
+      "id": "bones-211",
+      "name": "Body of sternum",
+      "system": "bones",
+      "sourceTriangles": 4466,
+      "triangles": 2026
+    },
+    {
+      "id": "bones-212",
+      "name": "Xiphoid process",
+      "system": "bones",
+      "sourceTriangles": 913,
+      "triangles": 835
+    },
+    {
+      "id": "bones-213",
+      "name": "Ulna.l",
+      "system": "bones",
+      "sourceTriangles": 904,
+      "triangles": 404
+    },
+    {
+      "id": "bones-214",
+      "name": "Proximal phalanx of fifth finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 560,
+      "triangles": 302
+    },
+    {
+      "id": "bones-215",
+      "name": "Proximal phalanx of second finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 414,
+      "triangles": 346
+    },
+    {
+      "id": "bones-216",
+      "name": "Distal phalanx of fifth finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 192,
+      "triangles": 172
+    },
+    {
+      "id": "bones-217",
+      "name": "Proximal phalanx of first finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 328,
+      "triangles": 266
+    },
+    {
+      "id": "bones-218",
+      "name": "Proximal phalanx of second finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 414,
+      "triangles": 348
+    },
+    {
+      "id": "bones-219",
+      "name": "Fifth metacarpal bone.l",
+      "system": "bones",
+      "sourceTriangles": 512,
+      "triangles": 348
+    },
+    {
+      "id": "bones-220",
+      "name": "Scaphoid bone.l",
+      "system": "bones",
+      "sourceTriangles": 390,
+      "triangles": 310
+    },
+    {
+      "id": "bones-221",
+      "name": "Proximal phalanx of third finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 440,
+      "triangles": 370
+    },
+    {
+      "id": "bones-222",
+      "name": "Middle phalanx of fourth finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 446,
+      "triangles": 344
+    },
+    {
+      "id": "bones-223",
+      "name": "Humerus.r",
+      "system": "bones",
+      "sourceTriangles": 4280,
+      "triangles": 1497
+    },
+    {
+      "id": "bones-224",
+      "name": "Distal phalanx of fourth finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 134,
+      "triangles": 110
+    },
+    {
+      "id": "bones-225",
+      "name": "Middle phalanx of second finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 314,
+      "triangles": 226
+    },
+    {
+      "id": "bones-226",
+      "name": "Trapezium bone.l",
+      "system": "bones",
+      "sourceTriangles": 500,
+      "triangles": 424
+    },
+    {
+      "id": "bones-227",
+      "name": "Third metacarpal bone.l",
+      "system": "bones",
+      "sourceTriangles": 708,
+      "triangles": 482
+    },
+    {
+      "id": "bones-228",
+      "name": "Fourth metacarpal bone.r",
+      "system": "bones",
+      "sourceTriangles": 642,
+      "triangles": 418
+    },
+    {
+      "id": "bones-229",
+      "name": "Second metacarpal bone.r",
+      "system": "bones",
+      "sourceTriangles": 764,
+      "triangles": 530
+    },
+    {
+      "id": "bones-230",
+      "name": "Fourth metacarpal bone.l",
+      "system": "bones",
+      "sourceTriangles": 642,
+      "triangles": 416
+    },
+    {
+      "id": "bones-231",
+      "name": "Lunate bone.r",
+      "system": "bones",
+      "sourceTriangles": 2088,
+      "triangles": 1112
+    },
+    {
+      "id": "bones-232",
+      "name": "Middle phalanx of fifth finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 292,
+      "triangles": 198
+    },
+    {
+      "id": "bones-233",
+      "name": "Triquetrum bone.r",
+      "system": "bones",
+      "sourceTriangles": 176,
+      "triangles": 168
+    },
+    {
+      "id": "bones-234",
+      "name": "Scaphoid bone.r",
+      "system": "bones",
+      "sourceTriangles": 390,
+      "triangles": 310
+    },
+    {
+      "id": "bones-235",
+      "name": "First metacarpal bone.r",
+      "system": "bones",
+      "sourceTriangles": 682,
+      "triangles": 508
+    },
+    {
+      "id": "bones-236",
+      "name": "Middle phalanx of third finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 360,
+      "triangles": 282
+    },
+    {
+      "id": "bones-237",
+      "name": "Capitate bone.l",
+      "system": "bones",
+      "sourceTriangles": 472,
+      "triangles": 408
+    },
+    {
+      "id": "bones-238",
+      "name": "Middle phalanx of fourth finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 446,
+      "triangles": 342
+    },
+    {
+      "id": "bones-239",
+      "name": "Proximal phalanx of fourth finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 368,
+      "triangles": 318
+    },
+    {
+      "id": "bones-240",
+      "name": "Trapezoid bone.l",
+      "system": "bones",
+      "sourceTriangles": 364,
+      "triangles": 342
+    },
+    {
+      "id": "bones-241",
+      "name": "Lunate bone.l",
+      "system": "bones",
+      "sourceTriangles": 2088,
+      "triangles": 1122
+    },
+    {
+      "id": "bones-242",
+      "name": "Distal phalanx of fourth finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 134,
+      "triangles": 110
+    },
+    {
+      "id": "bones-243",
+      "name": "Distal phalanx of first finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 222,
+      "triangles": 174
+    },
+    {
+      "id": "bones-244",
+      "name": "Hamate bone.l",
+      "system": "bones",
+      "sourceTriangles": 536,
+      "triangles": 498
+    },
+    {
+      "id": "bones-245",
+      "name": "Ulna.r",
+      "system": "bones",
+      "sourceTriangles": 904,
+      "triangles": 404
+    },
+    {
+      "id": "bones-246",
+      "name": "Distal phalanx of third finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 192,
+      "triangles": 172
+    },
+    {
+      "id": "bones-247",
+      "name": "Middle phalanx of second finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 314,
+      "triangles": 226
+    },
+    {
+      "id": "bones-248",
+      "name": "Radius.l",
+      "system": "bones",
+      "sourceTriangles": 784,
+      "triangles": 372
+    },
+    {
+      "id": "bones-249",
+      "name": "Capitate bone.r",
+      "system": "bones",
+      "sourceTriangles": 472,
+      "triangles": 408
+    },
+    {
+      "id": "bones-250",
+      "name": "Fifth metacarpal bone.r",
+      "system": "bones",
+      "sourceTriangles": 512,
+      "triangles": 348
+    },
+    {
+      "id": "bones-251",
+      "name": "Proximal phalanx of first finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 328,
+      "triangles": 266
+    },
+    {
+      "id": "bones-252",
+      "name": "Pisiform bone.r",
+      "system": "bones",
+      "sourceTriangles": 1668,
+      "triangles": 960
+    },
+    {
+      "id": "bones-253",
+      "name": "First metacarpal bone.l",
+      "system": "bones",
+      "sourceTriangles": 682,
+      "triangles": 504
+    },
+    {
+      "id": "bones-254",
+      "name": "Pisiform bone.l",
+      "system": "bones",
+      "sourceTriangles": 1668,
+      "triangles": 970
+    },
+    {
+      "id": "bones-255",
+      "name": "Proximal phalanx of fifth finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 560,
+      "triangles": 302
+    },
+    {
+      "id": "bones-256",
+      "name": "Second metacarpal bone.l",
+      "system": "bones",
+      "sourceTriangles": 764,
+      "triangles": 530
+    },
+    {
+      "id": "bones-257",
+      "name": "Distal phalanx of first finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 222,
+      "triangles": 174
+    },
+    {
+      "id": "bones-258",
+      "name": "Humerus.l",
+      "system": "bones",
+      "sourceTriangles": 4280,
+      "triangles": 1497
+    },
+    {
+      "id": "bones-259",
+      "name": "Triquetrum bone.l",
+      "system": "bones",
+      "sourceTriangles": 176,
+      "triangles": 168
+    },
+    {
+      "id": "bones-260",
+      "name": "Third metacarpal bone.r",
+      "system": "bones",
+      "sourceTriangles": 708,
+      "triangles": 482
+    },
+    {
+      "id": "bones-261",
+      "name": "Distal phalanx of fifth finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 192,
+      "triangles": 172
+    },
+    {
+      "id": "bones-262",
+      "name": "Distal phalanx of second finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 250,
+      "triangles": 208
+    },
+    {
+      "id": "bones-263",
+      "name": "Proximal phalanx of fourth finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 368,
+      "triangles": 318
+    },
+    {
+      "id": "bones-264",
+      "name": "Hamate bone.r",
+      "system": "bones",
+      "sourceTriangles": 536,
+      "triangles": 498
+    },
+    {
+      "id": "bones-265",
+      "name": "Trapezoid bone.r",
+      "system": "bones",
+      "sourceTriangles": 364,
+      "triangles": 342
+    },
+    {
+      "id": "bones-266",
+      "name": "Distal phalanx of third finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 192,
+      "triangles": 172
+    },
+    {
+      "id": "bones-267",
+      "name": "Distal phalanx of second finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 250,
+      "triangles": 208
+    },
+    {
+      "id": "bones-268",
+      "name": "Trapezium bone.r",
+      "system": "bones",
+      "sourceTriangles": 500,
+      "triangles": 424
+    },
+    {
+      "id": "bones-269",
+      "name": "Proximal phalanx of third finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 440,
+      "triangles": 370
+    },
+    {
+      "id": "bones-270",
+      "name": "Middle phalanx of fifth finger of hand.l",
+      "system": "bones",
+      "sourceTriangles": 292,
+      "triangles": 198
+    },
+    {
+      "id": "bones-271",
+      "name": "Radius.r",
+      "system": "bones",
+      "sourceTriangles": 784,
+      "triangles": 372
+    },
+    {
+      "id": "bones-272",
+      "name": "Middle phalanx of third finger of hand.r",
+      "system": "bones",
+      "sourceTriangles": 360,
+      "triangles": 282
+    },
+    {
+      "id": "bones-273",
+      "name": "Scapula.r",
+      "system": "bones",
+      "sourceTriangles": 25325,
+      "triangles": 8862
+    },
+    {
+      "id": "bones-274",
+      "name": "Scapula.l",
+      "system": "bones",
+      "sourceTriangles": 25325,
+      "triangles": 8862
+    },
+    {
+      "id": "bones-275",
+      "name": "Clavicle.r",
+      "system": "bones",
+      "sourceTriangles": 1550,
+      "triangles": 782
+    },
+    {
+      "id": "bones-276",
+      "name": "Clavicle.l",
+      "system": "bones",
+      "sourceTriangles": 1550,
+      "triangles": 788
+    },
+    {
+      "id": "muscles-0",
+      "name": "Common tendon sheath of fibularis muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 1536,
+      "triangles": 592
+    },
+    {
+      "id": "muscles-1",
+      "name": "Plantar tendon sheath of fibularis longus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 640,
+      "triangles": 508
+    },
+    {
+      "id": "muscles-2",
+      "name": "Common tendon sheath of fibularis muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 1536,
+      "triangles": 606
+    },
+    {
+      "id": "muscles-3",
+      "name": "Plantar tendon sheath of fibularis longus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 640,
+      "triangles": 508
+    },
+    {
+      "id": "muscles-4",
+      "name": "Tendon sheath of tibialis posterior muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 286,
+      "triangles": 260
+    },
+    {
+      "id": "muscles-5",
+      "name": "Tendon sheath of flexor hallucis longus.r",
+      "system": "muscles",
+      "sourceTriangles": 1728,
+      "triangles": 622
+    },
+    {
+      "id": "muscles-6",
+      "name": "Tendon sheath of tibialis posterior muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 286,
+      "triangles": 260
+    },
+    {
+      "id": "muscles-7",
+      "name": "Tendon sheath of flexor digitorum longus.r",
+      "system": "muscles",
+      "sourceTriangles": 256,
+      "triangles": 238
+    },
+    {
+      "id": "muscles-8",
+      "name": "Tendon sheath of flexor hallucis longus.l",
+      "system": "muscles",
+      "sourceTriangles": 1728,
+      "triangles": 614
+    },
+    {
+      "id": "muscles-9",
+      "name": "Tendon sheath of flexor digitorum longus.l",
+      "system": "muscles",
+      "sourceTriangles": 256,
+      "triangles": 238
+    },
+    {
+      "id": "muscles-10",
+      "name": "Tendon sheath of extensor digitorum longus.l",
+      "system": "muscles",
+      "sourceTriangles": 2064,
+      "triangles": 722
+    },
+    {
+      "id": "muscles-11",
+      "name": "Tendon sheath of extensor digitorum longus.r",
+      "system": "muscles",
+      "sourceTriangles": 2064,
+      "triangles": 722
+    },
+    {
+      "id": "muscles-12",
+      "name": "Tendon sheath of extensor hallucis longus.r",
+      "system": "muscles",
+      "sourceTriangles": 592,
+      "triangles": 206
+    },
+    {
+      "id": "muscles-13",
+      "name": "Tendon sheath of extensor hallucis longus.l",
+      "system": "muscles",
+      "sourceTriangles": 592,
+      "triangles": 206
+    },
+    {
+      "id": "muscles-14",
+      "name": "Tendon sheath of tibialis anterior.l",
+      "system": "muscles",
+      "sourceTriangles": 240,
+      "triangles": 198
+    },
+    {
+      "id": "muscles-15",
+      "name": "Tendon sheath of tibialis anterior.r",
+      "system": "muscles",
+      "sourceTriangles": 240,
+      "triangles": 198
+    },
+    {
+      "id": "muscles-16",
+      "name": "Subcutaneous bursa of tuberosity of tibia.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 722
+    },
+    {
+      "id": "muscles-17",
+      "name": "Superior bursa of biceps femoris muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 868
+    },
+    {
+      "id": "muscles-18",
+      "name": "Subtendinous bursa of iliacus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 352,
+      "triangles": 330
+    },
+    {
+      "id": "muscles-19",
+      "name": "Sciatic bursa of obturator internus.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 838
+    },
+    {
+      "id": "muscles-20",
+      "name": "Lateral subtendinous bursa of gastrocnemius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 644
+    },
+    {
+      "id": "muscles-21",
+      "name": "Suprapatellar bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 1296,
+      "triangles": 452
+    },
+    {
+      "id": "muscles-22",
+      "name": "Subtendinous bursa of tibialis anterior.r",
+      "system": "muscles",
+      "sourceTriangles": 704,
+      "triangles": 570
+    },
+    {
+      "id": "muscles-23",
+      "name": "Sciatic bursa of obturator internus.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 840
+    },
+    {
+      "id": "muscles-24",
+      "name": "Trochanteric bursa of gluteus medius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 888
+    },
+    {
+      "id": "muscles-25",
+      "name": "Subcutaneous prepatellar bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 552
+    },
+    {
+      "id": "muscles-26",
+      "name": "Subcutaneous prepatellar bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 558
+    },
+    {
+      "id": "muscles-27",
+      "name": "Trochanteric bursa of gluteus maximus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 616
+    },
+    {
+      "id": "muscles-28",
+      "name": "Subcutaneous calcaneal bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 544,
+      "triangles": 402
+    },
+    {
+      "id": "muscles-29",
+      "name": "Subtendinous prepatellar bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 476
+    },
+    {
+      "id": "muscles-30",
+      "name": "Bursa of piriformis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 936
+    },
+    {
+      "id": "muscles-31",
+      "name": "(Iliopectineal bursa).r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 752
+    },
+    {
+      "id": "muscles-32",
+      "name": "Anserine bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 1216,
+      "triangles": 468
+    },
+    {
+      "id": "muscles-33",
+      "name": "Subcutaneous infrapatellar bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 776
+    },
+    {
+      "id": "muscles-34",
+      "name": "Lateral subtendinous bursa of gastrocnemius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 638
+    },
+    {
+      "id": "muscles-35",
+      "name": "Sciatic bursa of gluteus maximus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 960
+    },
+    {
+      "id": "muscles-36",
+      "name": "Subfacial prepatellar bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 494
+    },
+    {
+      "id": "muscles-37",
+      "name": "Subfacial prepatellar bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 496
+    },
+    {
+      "id": "muscles-38",
+      "name": "Suprapatellar bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 1296,
+      "triangles": 452
+    },
+    {
+      "id": "muscles-39",
+      "name": "Trochanteric bursa of gluteus medius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 884
+    },
+    {
+      "id": "muscles-40",
+      "name": "Medial subtendinous bursa of gastrocnemius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 864,
+      "triangles": 544
+    },
+    {
+      "id": "muscles-41",
+      "name": "Subcutaneous bursa of medial malleolus.l",
+      "system": "muscles",
+      "sourceTriangles": 656,
+      "triangles": 586
+    },
+    {
+      "id": "muscles-42",
+      "name": "Subtendinous calcaneal bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 544,
+      "triangles": 480
+    },
+    {
+      "id": "muscles-43",
+      "name": "Semimembranosus bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 564
+    },
+    {
+      "id": "muscles-44",
+      "name": "(Iliopectineal bursa).l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 754
+    },
+    {
+      "id": "muscles-45",
+      "name": "Subtendinous bursa of tibialis anterior.l",
+      "system": "muscles",
+      "sourceTriangles": 704,
+      "triangles": 572
+    },
+    {
+      "id": "muscles-46",
+      "name": "Intermuscular gluteal bursae.l",
+      "system": "muscles",
+      "sourceTriangles": 1240,
+      "triangles": 682
+    },
+    {
+      "id": "muscles-47",
+      "name": "Superior bursa of biceps femoris muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 864
+    },
+    {
+      "id": "muscles-48",
+      "name": "Sciatic bursa of gluteus maximus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 952
+    },
+    {
+      "id": "muscles-49",
+      "name": "Subcutaneous infrapatellar bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 774
+    },
+    {
+      "id": "muscles-50",
+      "name": "Subcutaneous bursa of lateral malleolus.l",
+      "system": "muscles",
+      "sourceTriangles": 656,
+      "triangles": 528
+    },
+    {
+      "id": "muscles-51",
+      "name": "Subcutaneous bursa of tuberosity of tibia.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 724
+    },
+    {
+      "id": "muscles-52",
+      "name": "Trochanteric bursa of gluteus minimus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 954
+    },
+    {
+      "id": "muscles-53",
+      "name": "Subcutaneous bursa of medial malleolus.r",
+      "system": "muscles",
+      "sourceTriangles": 656,
+      "triangles": 586
+    },
+    {
+      "id": "muscles-54",
+      "name": "Anserine bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 1216,
+      "triangles": 476
+    },
+    {
+      "id": "muscles-55",
+      "name": "Subcutaneous calcaneal bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 544,
+      "triangles": 402
+    },
+    {
+      "id": "muscles-56",
+      "name": "Subtendinous bursa of sartorius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1296,
+      "triangles": 452
+    },
+    {
+      "id": "muscles-57",
+      "name": "Subcutaneous trochanteric bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 834
+    },
+    {
+      "id": "muscles-58",
+      "name": "Subtendinous bursa of iliacus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 352,
+      "triangles": 330
+    },
+    {
+      "id": "muscles-59",
+      "name": "Inferior subtendinous bursa of biceps femoris muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 660
+    },
+    {
+      "id": "muscles-60",
+      "name": "Inferior subtendinous bursa of biceps femoris muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 658
+    },
+    {
+      "id": "muscles-61",
+      "name": "Subtendinous bursa of obturator internus.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 876
+    },
+    {
+      "id": "muscles-62",
+      "name": "Trochanteric bursa of gluteus minimus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 954
+    },
+    {
+      "id": "muscles-63",
+      "name": "Bursa of piriformis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 930
+    },
+    {
+      "id": "muscles-64",
+      "name": "Subtendinous prepatellar bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 476
+    },
+    {
+      "id": "muscles-65",
+      "name": "Deep infrapatellar bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 658
+    },
+    {
+      "id": "muscles-66",
+      "name": "Subtendinous calcaneal bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 544,
+      "triangles": 476
+    },
+    {
+      "id": "muscles-67",
+      "name": "Subcutaneous bursa of lateral malleolus.r",
+      "system": "muscles",
+      "sourceTriangles": 656,
+      "triangles": 526
+    },
+    {
+      "id": "muscles-68",
+      "name": "Subcutaneous trochanteric bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 828
+    },
+    {
+      "id": "muscles-69",
+      "name": "Subtendinous bursa of sartorius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1296,
+      "triangles": 452
+    },
+    {
+      "id": "muscles-70",
+      "name": "Deep infrapatellar bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 656
+    },
+    {
+      "id": "muscles-71",
+      "name": "Medial subtendinous bursa of gastrocnemius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 864,
+      "triangles": 548
+    },
+    {
+      "id": "muscles-72",
+      "name": "Subtendinous bursa of obturator internus.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 886
+    },
+    {
+      "id": "muscles-73",
+      "name": "Semimembranosus bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 992,
+      "triangles": 572
+    },
+    {
+      "id": "muscles-74",
+      "name": "Trochanteric bursa of gluteus maximus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 616
+    },
+    {
+      "id": "muscles-75",
+      "name": "Intermuscular gluteal bursae.r",
+      "system": "muscles",
+      "sourceTriangles": 4960,
+      "triangles": 1736
+    },
+    {
+      "id": "muscles-76",
+      "name": "Gluteus medius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 5176,
+      "triangles": 2604
+    },
+    {
+      "id": "muscles-77",
+      "name": "Tensor fasciae latae.l",
+      "system": "muscles",
+      "sourceTriangles": 1862,
+      "triangles": 1010
+    },
+    {
+      "id": "muscles-78",
+      "name": "Iliotibial tract.l",
+      "system": "muscles",
+      "sourceTriangles": 48612,
+      "triangles": 17012
+    },
+    {
+      "id": "muscles-79",
+      "name": "Gluteus medius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 5176,
+      "triangles": 2598
+    },
+    {
+      "id": "muscles-80",
+      "name": "Gluteus maximus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 3326,
+      "triangles": 1950
+    },
+    {
+      "id": "muscles-81",
+      "name": "Gluteus minimus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 6250,
+      "triangles": 2438
+    },
+    {
+      "id": "muscles-82",
+      "name": "Tensor fasciae latae.r",
+      "system": "muscles",
+      "sourceTriangles": 1862,
+      "triangles": 1012
+    },
+    {
+      "id": "muscles-83",
+      "name": "Iliotibial tract.r",
+      "system": "muscles",
+      "sourceTriangles": 48612,
+      "triangles": 17010
+    },
+    {
+      "id": "muscles-84",
+      "name": "Gluteus maximus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 3326,
+      "triangles": 1954
+    },
+    {
+      "id": "muscles-85",
+      "name": "Gluteus minimus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 6250,
+      "triangles": 2434
+    },
+    {
+      "id": "muscles-86",
+      "name": "Fibularis tertius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 586,
+      "triangles": 306
+    },
+    {
+      "id": "muscles-87",
+      "name": "Extensor digitorum longus.r",
+      "system": "muscles",
+      "sourceTriangles": 3176,
+      "triangles": 1105
+    },
+    {
+      "id": "muscles-88",
+      "name": "Tendon of extensor digitorum longus.r",
+      "system": "muscles",
+      "sourceTriangles": 5184,
+      "triangles": 1814
+    },
+    {
+      "id": "muscles-89",
+      "name": "Extensor hallucis longus.r",
+      "system": "muscles",
+      "sourceTriangles": 2362,
+      "triangles": 826
+    },
+    {
+      "id": "muscles-90",
+      "name": "Tibialis anterior muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 3526,
+      "triangles": 1232
+    },
+    {
+      "id": "muscles-91",
+      "name": "Tibialis anterior muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 3526,
+      "triangles": 1230
+    },
+    {
+      "id": "muscles-92",
+      "name": "Extensor digitorum longus.l",
+      "system": "muscles",
+      "sourceTriangles": 3176,
+      "triangles": 1109
+    },
+    {
+      "id": "muscles-93",
+      "name": "Tendon of extensor digitorum longus.l",
+      "system": "muscles",
+      "sourceTriangles": 5184,
+      "triangles": 1814
+    },
+    {
+      "id": "muscles-94",
+      "name": "Extensor hallucis longus.l",
+      "system": "muscles",
+      "sourceTriangles": 2362,
+      "triangles": 826
+    },
+    {
+      "id": "muscles-95",
+      "name": "Fibularis tertius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 586,
+      "triangles": 306
+    },
+    {
+      "id": "muscles-96",
+      "name": "Flexor digitorum brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 3224,
+      "triangles": 1124
+    },
+    {
+      "id": "muscles-97",
+      "name": "Plantar interossei muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 1242,
+      "triangles": 984
+    },
+    {
+      "id": "muscles-98",
+      "name": "Medial head of flexor hallucis brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 514,
+      "triangles": 470
+    },
+    {
+      "id": "muscles-99",
+      "name": "Medial head of flexor hallucis brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 514,
+      "triangles": 468
+    },
+    {
+      "id": "muscles-100",
+      "name": "Lateral head of flexor hallucis brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 966,
+      "triangles": 812
+    },
+    {
+      "id": "muscles-101",
+      "name": "Lateral head of flexor hallucis brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 966,
+      "triangles": 810
+    },
+    {
+      "id": "muscles-102",
+      "name": "Flexor digiti minimi of foot.l",
+      "system": "muscles",
+      "sourceTriangles": 464,
+      "triangles": 404
+    },
+    {
+      "id": "muscles-103",
+      "name": "Flexor digiti minimi of foot.r",
+      "system": "muscles",
+      "sourceTriangles": 464,
+      "triangles": 404
+    },
+    {
+      "id": "muscles-104",
+      "name": "Abductor digiti minimi of foot.r",
+      "system": "muscles",
+      "sourceTriangles": 1280,
+      "triangles": 618
+    },
+    {
+      "id": "muscles-105",
+      "name": "Abductor hallucis.r",
+      "system": "muscles",
+      "sourceTriangles": 1688,
+      "triangles": 676
+    },
+    {
+      "id": "muscles-106",
+      "name": "Extensor hallucis brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 1118,
+      "triangles": 664
+    },
+    {
+      "id": "muscles-107",
+      "name": "Abductor digiti minimi of foot.l",
+      "system": "muscles",
+      "sourceTriangles": 1280,
+      "triangles": 618
+    },
+    {
+      "id": "muscles-108",
+      "name": "Dorsal interossei muscles of foot.l",
+      "system": "muscles",
+      "sourceTriangles": 1946,
+      "triangles": 1708
+    },
+    {
+      "id": "muscles-109",
+      "name": "Flexor digitorum brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 3224,
+      "triangles": 1124
+    },
+    {
+      "id": "muscles-110",
+      "name": "Transverse head of adductor hallucis.l",
+      "system": "muscles",
+      "sourceTriangles": 366,
+      "triangles": 340
+    },
+    {
+      "id": "muscles-111",
+      "name": "Oblique head of adductor hallucis.l",
+      "system": "muscles",
+      "sourceTriangles": 904,
+      "triangles": 840
+    },
+    {
+      "id": "muscles-112",
+      "name": "Transverse head of adductor hallucis.r",
+      "system": "muscles",
+      "sourceTriangles": 366,
+      "triangles": 340
+    },
+    {
+      "id": "muscles-113",
+      "name": "Oblique head of adductor hallucis.r",
+      "system": "muscles",
+      "sourceTriangles": 904,
+      "triangles": 840
+    },
+    {
+      "id": "muscles-114",
+      "name": "Dorsal interossei muscles of foot.r",
+      "system": "muscles",
+      "sourceTriangles": 1946,
+      "triangles": 1708
+    },
+    {
+      "id": "muscles-115",
+      "name": "Quadratus plantae muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1176,
+      "triangles": 924
+    },
+    {
+      "id": "muscles-116",
+      "name": "(Opponens digiti minimi muscle of foot).r",
+      "system": "muscles",
+      "sourceTriangles": 236,
+      "triangles": 226
+    },
+    {
+      "id": "muscles-117",
+      "name": "Lumbrical muscles of foot.l",
+      "system": "muscles",
+      "sourceTriangles": 418,
+      "triangles": 272
+    },
+    {
+      "id": "muscles-118",
+      "name": "Abductor hallucis.l",
+      "system": "muscles",
+      "sourceTriangles": 1688,
+      "triangles": 674
+    },
+    {
+      "id": "muscles-119",
+      "name": "Extensor hallucis brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 1118,
+      "triangles": 666
+    },
+    {
+      "id": "muscles-120",
+      "name": "Extensor digitorum brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 3184,
+      "triangles": 1332
+    },
+    {
+      "id": "muscles-121",
+      "name": "(Opponens digiti minimi muscle of foot).l",
+      "system": "muscles",
+      "sourceTriangles": 236,
+      "triangles": 226
+    },
+    {
+      "id": "muscles-122",
+      "name": "Plantar interossei muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 1242,
+      "triangles": 996
+    },
+    {
+      "id": "muscles-123",
+      "name": "Lumbrical muscles of foot.r",
+      "system": "muscles",
+      "sourceTriangles": 418,
+      "triangles": 272
+    },
+    {
+      "id": "muscles-124",
+      "name": "Extensor digitorum brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 3184,
+      "triangles": 1294
+    },
+    {
+      "id": "muscles-125",
+      "name": "Quadratus plantae muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1176,
+      "triangles": 924
+    },
+    {
+      "id": "muscles-126",
+      "name": "Adductor brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 2132,
+      "triangles": 1050
+    },
+    {
+      "id": "muscles-127",
+      "name": "Adductor longus.l",
+      "system": "muscles",
+      "sourceTriangles": 3714,
+      "triangles": 1296
+    },
+    {
+      "id": "muscles-128",
+      "name": "Adductor brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 2132,
+      "triangles": 1050
+    },
+    {
+      "id": "muscles-129",
+      "name": "Gracilis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4812,
+      "triangles": 1682
+    },
+    {
+      "id": "muscles-130",
+      "name": "Pectineus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1952,
+      "triangles": 1238
+    },
+    {
+      "id": "muscles-131",
+      "name": "Adductor magnus.l",
+      "system": "muscles",
+      "sourceTriangles": 8192,
+      "triangles": 2866
+    },
+    {
+      "id": "muscles-132",
+      "name": "(Adductor minimus).l",
+      "system": "muscles",
+      "sourceTriangles": 948,
+      "triangles": 760
+    },
+    {
+      "id": "muscles-133",
+      "name": "Obturator externus.r",
+      "system": "muscles",
+      "sourceTriangles": 1156,
+      "triangles": 966
+    },
+    {
+      "id": "muscles-134",
+      "name": "Obturator externus.l",
+      "system": "muscles",
+      "sourceTriangles": 1156,
+      "triangles": 966
+    },
+    {
+      "id": "muscles-135",
+      "name": "Gracilis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4812,
+      "triangles": 1682
+    },
+    {
+      "id": "muscles-136",
+      "name": "Adductor longus.r",
+      "system": "muscles",
+      "sourceTriangles": 3714,
+      "triangles": 1296
+    },
+    {
+      "id": "muscles-137",
+      "name": "Pectineus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1952,
+      "triangles": 1242
+    },
+    {
+      "id": "muscles-138",
+      "name": "Adductor magnus.r",
+      "system": "muscles",
+      "sourceTriangles": 8192,
+      "triangles": 2864
+    },
+    {
+      "id": "muscles-139",
+      "name": "(Adductor minimus).r",
+      "system": "muscles",
+      "sourceTriangles": 948,
+      "triangles": 754
+    },
+    {
+      "id": "muscles-140",
+      "name": "Fibularis longus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 5522,
+      "triangles": 1920
+    },
+    {
+      "id": "muscles-141",
+      "name": "Fibularis brevis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 3446,
+      "triangles": 1204
+    },
+    {
+      "id": "muscles-142",
+      "name": "Fibularis longus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 5522,
+      "triangles": 1918
+    },
+    {
+      "id": "muscles-143",
+      "name": "Fibularis brevis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 3446,
+      "triangles": 1204
+    },
+    {
+      "id": "muscles-144",
+      "name": "Short head of biceps femoris.l",
+      "system": "muscles",
+      "sourceTriangles": 2476,
+      "triangles": 866
+    },
+    {
+      "id": "muscles-145",
+      "name": "Semitendinosus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4316,
+      "triangles": 1510
+    },
+    {
+      "id": "muscles-146",
+      "name": "Short head of biceps femoris.r",
+      "system": "muscles",
+      "sourceTriangles": 2476,
+      "triangles": 866
+    },
+    {
+      "id": "muscles-147",
+      "name": "Semimembranosus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 7442,
+      "triangles": 2602
+    },
+    {
+      "id": "muscles-148",
+      "name": "Long head of biceps femoris.l",
+      "system": "muscles",
+      "sourceTriangles": 7258,
+      "triangles": 2536
+    },
+    {
+      "id": "muscles-149",
+      "name": "Semitendinosus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4316,
+      "triangles": 1510
+    },
+    {
+      "id": "muscles-150",
+      "name": "Semimembranosus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 7442,
+      "triangles": 2602
+    },
+    {
+      "id": "muscles-151",
+      "name": "Long head of biceps femoris.r",
+      "system": "muscles",
+      "sourceTriangles": 7258,
+      "triangles": 2536
+    },
+    {
+      "id": "muscles-152",
+      "name": "Lateral head of gastrocnemius.l",
+      "system": "muscles",
+      "sourceTriangles": 4908,
+      "triangles": 1716
+    },
+    {
+      "id": "muscles-153",
+      "name": "Soleus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 6774,
+      "triangles": 2360
+    },
+    {
+      "id": "muscles-154",
+      "name": "Plantaris muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4698,
+      "triangles": 1644
+    },
+    {
+      "id": "muscles-155",
+      "name": "Lateral head of gastrocnemius.r",
+      "system": "muscles",
+      "sourceTriangles": 4908,
+      "triangles": 1714
+    },
+    {
+      "id": "muscles-156",
+      "name": "Medial head of gastrocnemius.l",
+      "system": "muscles",
+      "sourceTriangles": 6462,
+      "triangles": 2258
+    },
+    {
+      "id": "muscles-157",
+      "name": "Calcaneal tendon.r",
+      "system": "muscles",
+      "sourceTriangles": 4376,
+      "triangles": 1529
+    },
+    {
+      "id": "muscles-158",
+      "name": "Medial head of gastrocnemius.r",
+      "system": "muscles",
+      "sourceTriangles": 6462,
+      "triangles": 2256
+    },
+    {
+      "id": "muscles-159",
+      "name": "Soleus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 6774,
+      "triangles": 2358
+    },
+    {
+      "id": "muscles-160",
+      "name": "Calcaneal tendon.l",
+      "system": "muscles",
+      "sourceTriangles": 4376,
+      "triangles": 1529
+    },
+    {
+      "id": "muscles-161",
+      "name": "Plantaris muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4698,
+      "triangles": 1644
+    },
+    {
+      "id": "muscles-162",
+      "name": "Popliteus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1132,
+      "triangles": 892
+    },
+    {
+      "id": "muscles-163",
+      "name": "Popliteus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1132,
+      "triangles": 892
+    },
+    {
+      "id": "muscles-164",
+      "name": "Tibialis posterior muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 5526,
+      "triangles": 1916
+    },
+    {
+      "id": "muscles-165",
+      "name": "Flexor digitorum longus.r",
+      "system": "muscles",
+      "sourceTriangles": 6836,
+      "triangles": 2392
+    },
+    {
+      "id": "muscles-166",
+      "name": "Flexor hallucis longus.r",
+      "system": "muscles",
+      "sourceTriangles": 5878,
+      "triangles": 2054
+    },
+    {
+      "id": "muscles-167",
+      "name": "Flexor hallucis longus.l",
+      "system": "muscles",
+      "sourceTriangles": 5878,
+      "triangles": 2054
+    },
+    {
+      "id": "muscles-168",
+      "name": "Flexor digitorum longus.l",
+      "system": "muscles",
+      "sourceTriangles": 6836,
+      "triangles": 2392
+    },
+    {
+      "id": "muscles-169",
+      "name": "Tibialis posterior muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 5526,
+      "triangles": 1916
+    },
+    {
+      "id": "muscles-170",
+      "name": "Superior gemellus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 404,
+      "triangles": 376
+    },
+    {
+      "id": "muscles-171",
+      "name": "Inferior gemellus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 976,
+      "triangles": 748
+    },
+    {
+      "id": "muscles-172",
+      "name": "Obturator internus.l",
+      "system": "muscles",
+      "sourceTriangles": 3760,
+      "triangles": 2298
+    },
+    {
+      "id": "muscles-173",
+      "name": "Quadratus femoris muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1646,
+      "triangles": 1330
+    },
+    {
+      "id": "muscles-174",
+      "name": "Inferior gemellus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 976,
+      "triangles": 742
+    },
+    {
+      "id": "muscles-175",
+      "name": "Obturator internus.r",
+      "system": "muscles",
+      "sourceTriangles": 3760,
+      "triangles": 2306
+    },
+    {
+      "id": "muscles-176",
+      "name": "Superior gemellus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 404,
+      "triangles": 376
+    },
+    {
+      "id": "muscles-177",
+      "name": "Piriformis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1500,
+      "triangles": 1186
+    },
+    {
+      "id": "muscles-178",
+      "name": "Piriformis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1500,
+      "triangles": 1184
+    },
+    {
+      "id": "muscles-179",
+      "name": "Quadratus femoris muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1646,
+      "triangles": 1330
+    },
+    {
+      "id": "muscles-180",
+      "name": "Vastus medialis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 6460,
+      "triangles": 2260
+    },
+    {
+      "id": "muscles-181",
+      "name": "Vastus lateralis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 9356,
+      "triangles": 3272
+    },
+    {
+      "id": "muscles-182",
+      "name": "Medial patellar retinaculum.r",
+      "system": "muscles",
+      "sourceTriangles": 184,
+      "triangles": 142
+    },
+    {
+      "id": "muscles-183",
+      "name": "Lateral patellar retinaculum.l",
+      "system": "muscles",
+      "sourceTriangles": 148,
+      "triangles": 126
+    },
+    {
+      "id": "muscles-184",
+      "name": "Lateral patellar retinaculum.r",
+      "system": "muscles",
+      "sourceTriangles": 148,
+      "triangles": 126
+    },
+    {
+      "id": "muscles-185",
+      "name": "Vastus medialis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 6460,
+      "triangles": 2260
+    },
+    {
+      "id": "muscles-186",
+      "name": "Sartorius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4966,
+      "triangles": 1738
+    },
+    {
+      "id": "muscles-187",
+      "name": "Rectus femoris muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 8276,
+      "triangles": 2894
+    },
+    {
+      "id": "muscles-188",
+      "name": "Vastus intermedius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 6164,
+      "triangles": 2152
+    },
+    {
+      "id": "muscles-189",
+      "name": "Sartorius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4966,
+      "triangles": 1738
+    },
+    {
+      "id": "muscles-190",
+      "name": "Vastus intermedius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 6164,
+      "triangles": 2152
+    },
+    {
+      "id": "muscles-191",
+      "name": "Medial patellar retinaculum.l",
+      "system": "muscles",
+      "sourceTriangles": 184,
+      "triangles": 142
+    },
+    {
+      "id": "muscles-192",
+      "name": "Rectus femoris muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 8276,
+      "triangles": 2894
+    },
+    {
+      "id": "muscles-193",
+      "name": "Vastus lateralis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 9356,
+      "triangles": 3272
+    },
+    {
+      "id": "muscles-194",
+      "name": "Psoas major.r",
+      "system": "muscles",
+      "sourceTriangles": 5474,
+      "triangles": 1912
+    },
+    {
+      "id": "muscles-195",
+      "name": "Psoas major.l",
+      "system": "muscles",
+      "sourceTriangles": 5474,
+      "triangles": 1912
+    },
+    {
+      "id": "muscles-196",
+      "name": "Iliacus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4354,
+      "triangles": 1522
+    },
+    {
+      "id": "muscles-197",
+      "name": "Iliacus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4354,
+      "triangles": 1522
+    },
+    {
+      "id": "muscles-198",
+      "name": "Hyoglossus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1424,
+      "triangles": 1144
+    },
+    {
+      "id": "muscles-199",
+      "name": "Genioglossus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 3746,
+      "triangles": 2078
+    },
+    {
+      "id": "muscles-200",
+      "name": "Genioglossus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 3746,
+      "triangles": 2082
+    },
+    {
+      "id": "muscles-201",
+      "name": "Hyoglossus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1424,
+      "triangles": 1148
+    },
+    {
+      "id": "muscles-202",
+      "name": "Palatopharyngeus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 15282,
+      "triangles": 5348
+    },
+    {
+      "id": "muscles-203",
+      "name": "Palatopharyngeus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 15282,
+      "triangles": 5348
+    },
+    {
+      "id": "muscles-204",
+      "name": "Epicranial aponeurosis.r",
+      "system": "muscles",
+      "sourceTriangles": 20118,
+      "triangles": 7034
+    },
+    {
+      "id": "muscles-205",
+      "name": "Frontalis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 5874,
+      "triangles": 3648
+    },
+    {
+      "id": "muscles-206",
+      "name": "Occipitalis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2602,
+      "triangles": 2248
+    },
+    {
+      "id": "muscles-207",
+      "name": "Temporoparietalis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 11972,
+      "triangles": 4652
+    },
+    {
+      "id": "muscles-208",
+      "name": "Occipitalis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2602,
+      "triangles": 2248
+    },
+    {
+      "id": "muscles-209",
+      "name": "Frontalis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 5874,
+      "triangles": 3644
+    },
+    {
+      "id": "muscles-210",
+      "name": "Temporoparietalis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 11972,
+      "triangles": 4654
+    },
+    {
+      "id": "muscles-211",
+      "name": "Epicranial aponeurosis.l",
+      "system": "muscles",
+      "sourceTriangles": 20118,
+      "triangles": 7036
+    },
+    {
+      "id": "muscles-212",
+      "name": "Corrugator supercilii.r",
+      "system": "muscles",
+      "sourceTriangles": 278,
+      "triangles": 268
+    },
+    {
+      "id": "muscles-213",
+      "name": "Orbital part of orbicularis oculi.r",
+      "system": "muscles",
+      "sourceTriangles": 2390,
+      "triangles": 2064
+    },
+    {
+      "id": "muscles-214",
+      "name": "Procerus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 546,
+      "triangles": 522
+    },
+    {
+      "id": "muscles-215",
+      "name": "Palpebral part of orbicularis oculi.r",
+      "system": "muscles",
+      "sourceTriangles": 830,
+      "triangles": 810
+    },
+    {
+      "id": "muscles-216",
+      "name": "Zygomaticus major muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 798,
+      "triangles": 714
+    },
+    {
+      "id": "muscles-217",
+      "name": "Palpebral part of orbicularis oculi.l",
+      "system": "muscles",
+      "sourceTriangles": 830,
+      "triangles": 810
+    },
+    {
+      "id": "muscles-218",
+      "name": "Nasalis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 704,
+      "triangles": 634
+    },
+    {
+      "id": "muscles-219",
+      "name": "Zygomaticus major muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 798,
+      "triangles": 710
+    },
+    {
+      "id": "muscles-220",
+      "name": "Zygomaticus minor muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 432,
+      "triangles": 412
+    },
+    {
+      "id": "muscles-221",
+      "name": "Levator labii superioris.r",
+      "system": "muscles",
+      "sourceTriangles": 540,
+      "triangles": 526
+    },
+    {
+      "id": "muscles-222",
+      "name": "Depressor anguli oris.l",
+      "system": "muscles",
+      "sourceTriangles": 594,
+      "triangles": 570
+    },
+    {
+      "id": "muscles-223",
+      "name": "Depressor septi nasi.l",
+      "system": "muscles",
+      "sourceTriangles": 276,
+      "triangles": 276
+    },
+    {
+      "id": "muscles-224",
+      "name": "Orbicularis oris muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1880,
+      "triangles": 1788
+    },
+    {
+      "id": "muscles-225",
+      "name": "Bucinator.r",
+      "system": "muscles",
+      "sourceTriangles": 884,
+      "triangles": 852
+    },
+    {
+      "id": "muscles-226",
+      "name": "Risorius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 592,
+      "triangles": 578
+    },
+    {
+      "id": "muscles-227",
+      "name": "Zygomaticus minor muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 432,
+      "triangles": 412
+    },
+    {
+      "id": "muscles-228",
+      "name": "Levator nasolabialis.r",
+      "system": "muscles",
+      "sourceTriangles": 172,
+      "triangles": 166
+    },
+    {
+      "id": "muscles-229",
+      "name": "Mentalis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 166,
+      "triangles": 166
+    },
+    {
+      "id": "muscles-230",
+      "name": "Orbital part of orbicularis oculi.l",
+      "system": "muscles",
+      "sourceTriangles": 2390,
+      "triangles": 2060
+    },
+    {
+      "id": "muscles-231",
+      "name": "Corrugator supercilii.l",
+      "system": "muscles",
+      "sourceTriangles": 278,
+      "triangles": 268
+    },
+    {
+      "id": "muscles-232",
+      "name": "Depressor anguli oris.r",
+      "system": "muscles",
+      "sourceTriangles": 594,
+      "triangles": 570
+    },
+    {
+      "id": "muscles-233",
+      "name": "Depressor labii inferioris.l",
+      "system": "muscles",
+      "sourceTriangles": 832,
+      "triangles": 814
+    },
+    {
+      "id": "muscles-234",
+      "name": "Orbicularis oris muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1880,
+      "triangles": 1792
+    },
+    {
+      "id": "muscles-235",
+      "name": "Depressor septi nasi.r",
+      "system": "muscles",
+      "sourceTriangles": 276,
+      "triangles": 276
+    },
+    {
+      "id": "muscles-236",
+      "name": "Mentalis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 166,
+      "triangles": 166
+    },
+    {
+      "id": "muscles-237",
+      "name": "Levator anguli oris.l",
+      "system": "muscles",
+      "sourceTriangles": 330,
+      "triangles": 326
+    },
+    {
+      "id": "muscles-238",
+      "name": "Levator nasolabialis.l",
+      "system": "muscles",
+      "sourceTriangles": 172,
+      "triangles": 166
+    },
+    {
+      "id": "muscles-239",
+      "name": "Levator labii superioris.l",
+      "system": "muscles",
+      "sourceTriangles": 540,
+      "triangles": 526
+    },
+    {
+      "id": "muscles-240",
+      "name": "Nasalis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 704,
+      "triangles": 634
+    },
+    {
+      "id": "muscles-241",
+      "name": "Procerus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 546,
+      "triangles": 522
+    },
+    {
+      "id": "muscles-242",
+      "name": "Levator anguli oris.r",
+      "system": "muscles",
+      "sourceTriangles": 330,
+      "triangles": 326
+    },
+    {
+      "id": "muscles-243",
+      "name": "Bucinator.l",
+      "system": "muscles",
+      "sourceTriangles": 884,
+      "triangles": 852
+    },
+    {
+      "id": "muscles-244",
+      "name": "Depressor labii inferioris.r",
+      "system": "muscles",
+      "sourceTriangles": 832,
+      "triangles": 812
+    },
+    {
+      "id": "muscles-245",
+      "name": "Risorius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 592,
+      "triangles": 578
+    },
+    {
+      "id": "muscles-246",
+      "name": "Temporalis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 10260,
+      "triangles": 3588
+    },
+    {
+      "id": "muscles-247",
+      "name": "Superficial part of masseter.l",
+      "system": "muscles",
+      "sourceTriangles": 1404,
+      "triangles": 1180
+    },
+    {
+      "id": "muscles-248",
+      "name": "Inferior head of lateral pterygoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 326,
+      "triangles": 320
+    },
+    {
+      "id": "muscles-249",
+      "name": "Deep part of masseter.r",
+      "system": "muscles",
+      "sourceTriangles": 994,
+      "triangles": 812
+    },
+    {
+      "id": "muscles-250",
+      "name": "Superior head of lateral pterygoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 226,
+      "triangles": 224
+    },
+    {
+      "id": "muscles-251",
+      "name": "Deep part of masseter.l",
+      "system": "muscles",
+      "sourceTriangles": 994,
+      "triangles": 800
+    },
+    {
+      "id": "muscles-252",
+      "name": "Superficial part of masseter.r",
+      "system": "muscles",
+      "sourceTriangles": 1404,
+      "triangles": 1176
+    },
+    {
+      "id": "muscles-253",
+      "name": "Superior head of lateral pterygoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 226,
+      "triangles": 224
+    },
+    {
+      "id": "muscles-254",
+      "name": "Medial pterygoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 496,
+      "triangles": 472
+    },
+    {
+      "id": "muscles-255",
+      "name": "Medial pterygoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 496,
+      "triangles": 472
+    },
+    {
+      "id": "muscles-256",
+      "name": "Inferior head of lateral pterygoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 326,
+      "triangles": 320
+    },
+    {
+      "id": "muscles-257",
+      "name": "Temporalis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 10260,
+      "triangles": 3588
+    },
+    {
+      "id": "muscles-258",
+      "name": "Trochlea of superior oblique muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 192,
+      "triangles": 192
+    },
+    {
+      "id": "muscles-259",
+      "name": "Inferior rectus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1736,
+      "triangles": 666
+    },
+    {
+      "id": "muscles-260",
+      "name": "Inferior tarsus.r",
+      "system": "muscles",
+      "sourceTriangles": 108,
+      "triangles": 108
+    },
+    {
+      "id": "muscles-261",
+      "name": "Levator palpebrae superioris.r",
+      "system": "muscles",
+      "sourceTriangles": 2152,
+      "triangles": 1104
+    },
+    {
+      "id": "muscles-262",
+      "name": "Superior tarsus.l",
+      "system": "muscles",
+      "sourceTriangles": 178,
+      "triangles": 174
+    },
+    {
+      "id": "muscles-263",
+      "name": "Medial rectus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1252,
+      "triangles": 510
+    },
+    {
+      "id": "muscles-264",
+      "name": "Common tendinous ring.l",
+      "system": "muscles",
+      "sourceTriangles": 362,
+      "triangles": 362
+    },
+    {
+      "id": "muscles-265",
+      "name": "Inferior rectus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1736,
+      "triangles": 638
+    },
+    {
+      "id": "muscles-266",
+      "name": "Superior tarsus.r",
+      "system": "muscles",
+      "sourceTriangles": 178,
+      "triangles": 174
+    },
+    {
+      "id": "muscles-267",
+      "name": "Superior rectus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1284,
+      "triangles": 502
+    },
+    {
+      "id": "muscles-268",
+      "name": "Inferior tarsus.l",
+      "system": "muscles",
+      "sourceTriangles": 108,
+      "triangles": 108
+    },
+    {
+      "id": "muscles-269",
+      "name": "Superior oblique muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1750,
+      "triangles": 776
+    },
+    {
+      "id": "muscles-270",
+      "name": "Medial rectus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1252,
+      "triangles": 516
+    },
+    {
+      "id": "muscles-271",
+      "name": "Trochlea of superior oblique muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 192,
+      "triangles": 192
+    },
+    {
+      "id": "muscles-272",
+      "name": "Inferior oblique muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1148,
+      "triangles": 862
+    },
+    {
+      "id": "muscles-273",
+      "name": "Inferior oblique muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1148,
+      "triangles": 862
+    },
+    {
+      "id": "muscles-274",
+      "name": "Common tendinous ring.r",
+      "system": "muscles",
+      "sourceTriangles": 362,
+      "triangles": 362
+    },
+    {
+      "id": "muscles-275",
+      "name": "Levator palpebrae superioris.l",
+      "system": "muscles",
+      "sourceTriangles": 2152,
+      "triangles": 1108
+    },
+    {
+      "id": "muscles-276",
+      "name": "Superior oblique muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1750,
+      "triangles": 780
+    },
+    {
+      "id": "muscles-277",
+      "name": "Lateral rectus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1600,
+      "triangles": 632
+    },
+    {
+      "id": "muscles-278",
+      "name": "Superior rectus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1284,
+      "triangles": 502
+    },
+    {
+      "id": "muscles-279",
+      "name": "Lateral rectus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1600,
+      "triangles": 636
+    },
+    {
+      "id": "muscles-280",
+      "name": "External anal sphincter.r",
+      "system": "muscles",
+      "sourceTriangles": 202,
+      "triangles": 202
+    },
+    {
+      "id": "muscles-281",
+      "name": "External anal sphincter.l",
+      "system": "muscles",
+      "sourceTriangles": 202,
+      "triangles": 202
+    },
+    {
+      "id": "muscles-282",
+      "name": "Pubo-analis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1440,
+      "triangles": 972
+    },
+    {
+      "id": "muscles-283",
+      "name": "Pubococcygeus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2512,
+      "triangles": 1566
+    },
+    {
+      "id": "muscles-284",
+      "name": "Tendinous arch of levator ani.r",
+      "system": "muscles",
+      "sourceTriangles": 750,
+      "triangles": 376
+    },
+    {
+      "id": "muscles-285",
+      "name": "Iliococcygeus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1962,
+      "triangles": 1570
+    },
+    {
+      "id": "muscles-286",
+      "name": "Pubo-analis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1440,
+      "triangles": 972
+    },
+    {
+      "id": "muscles-287",
+      "name": "Tendinous arch of levator ani.l",
+      "system": "muscles",
+      "sourceTriangles": 750,
+      "triangles": 376
+    },
+    {
+      "id": "muscles-288",
+      "name": "Pubococcygeus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2512,
+      "triangles": 1562
+    },
+    {
+      "id": "muscles-289",
+      "name": "Iliococcygeus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1962,
+      "triangles": 1584
+    },
+    {
+      "id": "muscles-290",
+      "name": "Coccygeus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1034,
+      "triangles": 964
+    },
+    {
+      "id": "muscles-291",
+      "name": "Coccygeus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1034,
+      "triangles": 964
+    },
+    {
+      "id": "muscles-292",
+      "name": "Rectus posterior major capitis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 788,
+      "triangles": 726
+    },
+    {
+      "id": "muscles-293",
+      "name": "Obliquus superior capitis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 654,
+      "triangles": 472
+    },
+    {
+      "id": "muscles-294",
+      "name": "Rectus posterior minor capitis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 432,
+      "triangles": 420
+    },
+    {
+      "id": "muscles-295",
+      "name": "Obliquus inferior capitis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 540,
+      "triangles": 522
+    },
+    {
+      "id": "muscles-296",
+      "name": "Rectus posterior major capitis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 788,
+      "triangles": 722
+    },
+    {
+      "id": "muscles-297",
+      "name": "Rectus posterior minor capitis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 432,
+      "triangles": 420
+    },
+    {
+      "id": "muscles-298",
+      "name": "Obliquus inferior capitis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 540,
+      "triangles": 522
+    },
+    {
+      "id": "muscles-299",
+      "name": "Obliquus superior capitis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 654,
+      "triangles": 472
+    },
+    {
+      "id": "muscles-300",
+      "name": "Iliocostalis thoracis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 5772,
+      "triangles": 2018
+    },
+    {
+      "id": "muscles-301",
+      "name": "Iliocostalis lumborum muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 10038,
+      "triangles": 3510
+    },
+    {
+      "id": "muscles-302",
+      "name": "Iliocostalis thoracis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 5772,
+      "triangles": 2020
+    },
+    {
+      "id": "muscles-303",
+      "name": "Iliocostalis colli muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2050,
+      "triangles": 718
+    },
+    {
+      "id": "muscles-304",
+      "name": "Iliocostalis lumborum muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 10038,
+      "triangles": 3508
+    },
+    {
+      "id": "muscles-305",
+      "name": "Iliocostalis colli muscle",
+      "system": "muscles",
+      "sourceTriangles": 2050,
+      "triangles": 716
+    },
+    {
+      "id": "muscles-306",
+      "name": "Spinalis capitis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2560,
+      "triangles": 1024
+    },
+    {
+      "id": "muscles-307",
+      "name": "Spinalis thoracis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 5532,
+      "triangles": 1936
+    },
+    {
+      "id": "muscles-308",
+      "name": "Spinalis thoracis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 5532,
+      "triangles": 1934
+    },
+    {
+      "id": "muscles-309",
+      "name": "Spinalis colli muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 596,
+      "triangles": 488
+    },
+    {
+      "id": "muscles-310",
+      "name": "Spinalis colli muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 596,
+      "triangles": 488
+    },
+    {
+      "id": "muscles-311",
+      "name": "Spinalis capitis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2560,
+      "triangles": 1014
+    },
+    {
+      "id": "muscles-312",
+      "name": "Longissimus colli muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1826,
+      "triangles": 660
+    },
+    {
+      "id": "muscles-313",
+      "name": "Longissimus capitis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1574,
+      "triangles": 726
+    },
+    {
+      "id": "muscles-314",
+      "name": "Longissimus capitis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1574,
+      "triangles": 726
+    },
+    {
+      "id": "muscles-315",
+      "name": "Longissimus thoracis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 9652,
+      "triangles": 3374
+    },
+    {
+      "id": "muscles-316",
+      "name": "Longissimus colli muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1826,
+      "triangles": 664
+    },
+    {
+      "id": "muscles-317",
+      "name": "Longissimus thoracis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 9652,
+      "triangles": 3372
+    },
+    {
+      "id": "muscles-318",
+      "name": "Rotatores.r",
+      "system": "muscles",
+      "sourceTriangles": 6518,
+      "triangles": 2274
+    },
+    {
+      "id": "muscles-319",
+      "name": "Rotatores.l",
+      "system": "muscles",
+      "sourceTriangles": 6518,
+      "triangles": 2272
+    },
+    {
+      "id": "muscles-320",
+      "name": "Semispinalis colli muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2584,
+      "triangles": 1212
+    },
+    {
+      "id": "muscles-321",
+      "name": "Semispinalis thoracis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4972,
+      "triangles": 1732
+    },
+    {
+      "id": "muscles-322",
+      "name": "Semispinalis thoracis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4972,
+      "triangles": 1732
+    },
+    {
+      "id": "muscles-323",
+      "name": "Semispinalis colli muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2584,
+      "triangles": 1216
+    },
+    {
+      "id": "muscles-324",
+      "name": "Multifidus thoracis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 3902,
+      "triangles": 3902
+    },
+    {
+      "id": "muscles-325",
+      "name": "Multifidus lumborum muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2820,
+      "triangles": 1364
+    },
+    {
+      "id": "muscles-326",
+      "name": "Multifidus colli muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1390,
+      "triangles": 1074
+    },
+    {
+      "id": "muscles-327",
+      "name": "Multifidus lumborum muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2820,
+      "triangles": 1360
+    },
+    {
+      "id": "muscles-328",
+      "name": "Multifidus thoracis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 3902,
+      "triangles": 3902
+    },
+    {
+      "id": "muscles-329",
+      "name": "Multifidus colli muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1390,
+      "triangles": 1072
+    },
+    {
+      "id": "muscles-330",
+      "name": "Interspinales colli muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 444,
+      "triangles": 386
+    },
+    {
+      "id": "muscles-331",
+      "name": "Interspinales thoracis muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 198,
+      "triangles": 192
+    },
+    {
+      "id": "muscles-332",
+      "name": "Interspinales thoracis muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 198,
+      "triangles": 192
+    },
+    {
+      "id": "muscles-333",
+      "name": "Interspinales lumborum muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 562,
+      "triangles": 330
+    },
+    {
+      "id": "muscles-334",
+      "name": "Interspinales lumborum muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 562,
+      "triangles": 326
+    },
+    {
+      "id": "muscles-335",
+      "name": "Interspinales colli muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 444,
+      "triangles": 386
+    },
+    {
+      "id": "muscles-336",
+      "name": "Splenius capitis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 5262,
+      "triangles": 1836
+    },
+    {
+      "id": "muscles-337",
+      "name": "Splenius colli muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4314,
+      "triangles": 1502
+    },
+    {
+      "id": "muscles-338",
+      "name": "Splenius colli muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4314,
+      "triangles": 1502
+    },
+    {
+      "id": "muscles-339",
+      "name": "Splenius capitis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 5262,
+      "triangles": 1838
+    },
+    {
+      "id": "muscles-340",
+      "name": "Ventral parts of lateral intertransversarii lumborum muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 996,
+      "triangles": 628
+    },
+    {
+      "id": "muscles-341",
+      "name": "Levator scapulae.r",
+      "system": "muscles",
+      "sourceTriangles": 3082,
+      "triangles": 1160
+    },
+    {
+      "id": "muscles-342",
+      "name": "Latissimus dorsi muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 21580,
+      "triangles": 7552
+    },
+    {
+      "id": "muscles-343",
+      "name": "Levator scapulae.l",
+      "system": "muscles",
+      "sourceTriangles": 3082,
+      "triangles": 1166
+    },
+    {
+      "id": "muscles-344",
+      "name": "Rhomboid minor muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1494,
+      "triangles": 894
+    },
+    {
+      "id": "muscles-345",
+      "name": "Serratus posterior superior muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 5518,
+      "triangles": 2820
+    },
+    {
+      "id": "muscles-346",
+      "name": "Rhomboid minor muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1494,
+      "triangles": 894
+    },
+    {
+      "id": "muscles-347",
+      "name": "Transverse part of trapezius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2992,
+      "triangles": 1726
+    },
+    {
+      "id": "muscles-348",
+      "name": "Ascending part of trapezius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4596,
+      "triangles": 2702
+    },
+    {
+      "id": "muscles-349",
+      "name": "Ascending part of trapezius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4596,
+      "triangles": 2718
+    },
+    {
+      "id": "muscles-350",
+      "name": "Transverse part of trapezius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2992,
+      "triangles": 1732
+    },
+    {
+      "id": "muscles-351",
+      "name": "Descending part of trapezius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 6760,
+      "triangles": 2364
+    },
+    {
+      "id": "muscles-352",
+      "name": "Descending part of trapezius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 6760,
+      "triangles": 2364
+    },
+    {
+      "id": "muscles-353",
+      "name": "Serratus posterior inferior muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 8958,
+      "triangles": 3518
+    },
+    {
+      "id": "muscles-354",
+      "name": "Latissimus dorsi muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 21580,
+      "triangles": 7552
+    },
+    {
+      "id": "muscles-355",
+      "name": "Rhomboid major muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4800,
+      "triangles": 1678
+    },
+    {
+      "id": "muscles-356",
+      "name": "Dorsal parts of lateral intertransversarii lumborum muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 720,
+      "triangles": 516
+    },
+    {
+      "id": "muscles-357",
+      "name": "Ventral parts of lateral intertransversarii lumborum muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 996,
+      "triangles": 626
+    },
+    {
+      "id": "muscles-358",
+      "name": "Dorsal parts of lateral intertransversarii lumborum muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 720,
+      "triangles": 516
+    },
+    {
+      "id": "muscles-359",
+      "name": "Serratus posterior superior muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 5518,
+      "triangles": 2796
+    },
+    {
+      "id": "muscles-360",
+      "name": "Serratus posterior inferior muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 8958,
+      "triangles": 3510
+    },
+    {
+      "id": "muscles-361",
+      "name": "Rhomboid major muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4800,
+      "triangles": 1678
+    },
+    {
+      "id": "muscles-362",
+      "name": "Brachialis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 3478,
+      "triangles": 1216
+    },
+    {
+      "id": "muscles-363",
+      "name": "Brachialis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 3478,
+      "triangles": 1216
+    },
+    {
+      "id": "muscles-364",
+      "name": "Short head of biceps brachii.r",
+      "system": "muscles",
+      "sourceTriangles": 2696,
+      "triangles": 938
+    },
+    {
+      "id": "muscles-365",
+      "name": "Long head of biceps brachii.r",
+      "system": "muscles",
+      "sourceTriangles": 3218,
+      "triangles": 1126
+    },
+    {
+      "id": "muscles-366",
+      "name": "Long head of biceps brachii.l",
+      "system": "muscles",
+      "sourceTriangles": 3218,
+      "triangles": 1126
+    },
+    {
+      "id": "muscles-367",
+      "name": "Short head of biceps brachii.l",
+      "system": "muscles",
+      "sourceTriangles": 2696,
+      "triangles": 938
+    },
+    {
+      "id": "muscles-368",
+      "name": "Coracobrachialis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1160,
+      "triangles": 506
+    },
+    {
+      "id": "muscles-369",
+      "name": "Coracobrachialis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1160,
+      "triangles": 512
+    },
+    {
+      "id": "muscles-370",
+      "name": "Flexor digitorum profundus.l",
+      "system": "muscles",
+      "sourceTriangles": 7110,
+      "triangles": 2488
+    },
+    {
+      "id": "muscles-371",
+      "name": "Pronator quadratus.r",
+      "system": "muscles",
+      "sourceTriangles": 1020,
+      "triangles": 970
+    },
+    {
+      "id": "muscles-372",
+      "name": "Flexor digitorum profundus.r",
+      "system": "muscles",
+      "sourceTriangles": 7110,
+      "triangles": 2486
+    },
+    {
+      "id": "muscles-373",
+      "name": "Flexor pollicis longus.r",
+      "system": "muscles",
+      "sourceTriangles": 1666,
+      "triangles": 576
+    },
+    {
+      "id": "muscles-374",
+      "name": "Pronator quadratus.l",
+      "system": "muscles",
+      "sourceTriangles": 1020,
+      "triangles": 970
+    },
+    {
+      "id": "muscles-375",
+      "name": "Flexor pollicis longus.l",
+      "system": "muscles",
+      "sourceTriangles": 1666,
+      "triangles": 576
+    },
+    {
+      "id": "muscles-376",
+      "name": "Humeral head of flexor carpi ulnaris.r",
+      "system": "muscles",
+      "sourceTriangles": 3912,
+      "triangles": 1366
+    },
+    {
+      "id": "muscles-377",
+      "name": "Humero-ulnar head of flexor digitorum superficialis.r",
+      "system": "muscles",
+      "sourceTriangles": 12798,
+      "triangles": 4478
+    },
+    {
+      "id": "muscles-378",
+      "name": "Superficial head of pronator teres.l",
+      "system": "muscles",
+      "sourceTriangles": 2546,
+      "triangles": 960
+    },
+    {
+      "id": "muscles-379",
+      "name": "Radial head of flexor digitorum superficialis.r",
+      "system": "muscles",
+      "sourceTriangles": 1276,
+      "triangles": 618
+    },
+    {
+      "id": "muscles-380",
+      "name": "Deep head of pronator teres.l",
+      "system": "muscles",
+      "sourceTriangles": 1114,
+      "triangles": 786
+    },
+    {
+      "id": "muscles-381",
+      "name": "Palmaris longus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4374,
+      "triangles": 1526
+    },
+    {
+      "id": "muscles-382",
+      "name": "Humeral head of flexor carpi ulnaris.l",
+      "system": "muscles",
+      "sourceTriangles": 3912,
+      "triangles": 1366
+    },
+    {
+      "id": "muscles-383",
+      "name": "Flexor carpi radialis.l",
+      "system": "muscles",
+      "sourceTriangles": 1666,
+      "triangles": 582
+    },
+    {
+      "id": "muscles-384",
+      "name": "Palmaris longus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4374,
+      "triangles": 1526
+    },
+    {
+      "id": "muscles-385",
+      "name": "Superficial head of pronator teres.r",
+      "system": "muscles",
+      "sourceTriangles": 2546,
+      "triangles": 952
+    },
+    {
+      "id": "muscles-386",
+      "name": "Ulnar head of flexor carpi ulnaris.r",
+      "system": "muscles",
+      "sourceTriangles": 1466,
+      "triangles": 532
+    },
+    {
+      "id": "muscles-387",
+      "name": "Flexor carpi radialis.r",
+      "system": "muscles",
+      "sourceTriangles": 1666,
+      "triangles": 582
+    },
+    {
+      "id": "muscles-388",
+      "name": "Radial head of flexor digitorum superficialis.l",
+      "system": "muscles",
+      "sourceTriangles": 1276,
+      "triangles": 620
+    },
+    {
+      "id": "muscles-389",
+      "name": "Ulnar head of flexor carpi ulnaris.l",
+      "system": "muscles",
+      "sourceTriangles": 1466,
+      "triangles": 536
+    },
+    {
+      "id": "muscles-390",
+      "name": "Humero-ulnar head of flexor digitorum superficialis.l",
+      "system": "muscles",
+      "sourceTriangles": 12798,
+      "triangles": 4478
+    },
+    {
+      "id": "muscles-391",
+      "name": "Deep head of pronator teres.r",
+      "system": "muscles",
+      "sourceTriangles": 1114,
+      "triangles": 786
+    },
+    {
+      "id": "muscles-392",
+      "name": "Anconeus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1442,
+      "triangles": 952
+    },
+    {
+      "id": "muscles-393",
+      "name": "Extensor carpi radialis brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 3142,
+      "triangles": 1098
+    },
+    {
+      "id": "muscles-394",
+      "name": "Humeral head of extensor carpi ulnaris.l",
+      "system": "muscles",
+      "sourceTriangles": 830,
+      "triangles": 288
+    },
+    {
+      "id": "muscles-395",
+      "name": "Anconeus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1442,
+      "triangles": 950
+    },
+    {
+      "id": "muscles-396",
+      "name": "Extensor carpi radialis longus.l",
+      "system": "muscles",
+      "sourceTriangles": 3706,
+      "triangles": 1296
+    },
+    {
+      "id": "muscles-397",
+      "name": "Extensor digiti minimi.l",
+      "system": "muscles",
+      "sourceTriangles": 2152,
+      "triangles": 752
+    },
+    {
+      "id": "muscles-398",
+      "name": "Extensor digiti minimi.r",
+      "system": "muscles",
+      "sourceTriangles": 2152,
+      "triangles": 752
+    },
+    {
+      "id": "muscles-399",
+      "name": "Extensor carpi radialis brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 3142,
+      "triangles": 1098
+    },
+    {
+      "id": "muscles-400",
+      "name": "Ulnar head of extensor carpi ulnaris.l",
+      "system": "muscles",
+      "sourceTriangles": 582,
+      "triangles": 202
+    },
+    {
+      "id": "muscles-401",
+      "name": "Brachioradialis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 7312,
+      "triangles": 2558
+    },
+    {
+      "id": "muscles-402",
+      "name": "Extensor carpi radialis longus.r",
+      "system": "muscles",
+      "sourceTriangles": 3706,
+      "triangles": 1296
+    },
+    {
+      "id": "muscles-403",
+      "name": "Extensor digitorum.r",
+      "system": "muscles",
+      "sourceTriangles": 6410,
+      "triangles": 2238
+    },
+    {
+      "id": "muscles-404",
+      "name": "Extensor digitorum.l",
+      "system": "muscles",
+      "sourceTriangles": 6410,
+      "triangles": 2238
+    },
+    {
+      "id": "muscles-405",
+      "name": "Brachioradialis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 7312,
+      "triangles": 2558
+    },
+    {
+      "id": "muscles-406",
+      "name": "Ulnar head of extensor carpi ulnaris.r",
+      "system": "muscles",
+      "sourceTriangles": 582,
+      "triangles": 202
+    },
+    {
+      "id": "muscles-407",
+      "name": "Humeral head of extensor carpi ulnaris.r",
+      "system": "muscles",
+      "sourceTriangles": 830,
+      "triangles": 288
+    },
+    {
+      "id": "muscles-408",
+      "name": "Extensor pollicis longus.r",
+      "system": "muscles",
+      "sourceTriangles": 1602,
+      "triangles": 558
+    },
+    {
+      "id": "muscles-409",
+      "name": "Extensor indicis.l",
+      "system": "muscles",
+      "sourceTriangles": 1142,
+      "triangles": 398
+    },
+    {
+      "id": "muscles-410",
+      "name": "Extensor pollicis brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 1176,
+      "triangles": 506
+    },
+    {
+      "id": "muscles-411",
+      "name": "Abductor pollicis longus.r",
+      "system": "muscles",
+      "sourceTriangles": 2462,
+      "triangles": 860
+    },
+    {
+      "id": "muscles-412",
+      "name": "Abductor pollicis longus.l",
+      "system": "muscles",
+      "sourceTriangles": 2462,
+      "triangles": 860
+    },
+    {
+      "id": "muscles-413",
+      "name": "Extensor pollicis longus.l",
+      "system": "muscles",
+      "sourceTriangles": 1602,
+      "triangles": 558
+    },
+    {
+      "id": "muscles-414",
+      "name": "Extensor indicis.r",
+      "system": "muscles",
+      "sourceTriangles": 1142,
+      "triangles": 398
+    },
+    {
+      "id": "muscles-415",
+      "name": "Supinator.r",
+      "system": "muscles",
+      "sourceTriangles": 2754,
+      "triangles": 1540
+    },
+    {
+      "id": "muscles-416",
+      "name": "Supinator.l",
+      "system": "muscles",
+      "sourceTriangles": 2754,
+      "triangles": 1538
+    },
+    {
+      "id": "muscles-417",
+      "name": "Extensor pollicis brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 1176,
+      "triangles": 502
+    },
+    {
+      "id": "muscles-418",
+      "name": "Supraspinatus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1430,
+      "triangles": 1018
+    },
+    {
+      "id": "muscles-419",
+      "name": "Subscapularis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2954,
+      "triangles": 1596
+    },
+    {
+      "id": "muscles-420",
+      "name": "Teres minor muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1522,
+      "triangles": 1154
+    },
+    {
+      "id": "muscles-421",
+      "name": "Subscapularis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2954,
+      "triangles": 1580
+    },
+    {
+      "id": "muscles-422",
+      "name": "Infraspinatus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 3166,
+      "triangles": 1720
+    },
+    {
+      "id": "muscles-423",
+      "name": "Infraspinatus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 3166,
+      "triangles": 1714
+    },
+    {
+      "id": "muscles-424",
+      "name": "Teres minor muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1522,
+      "triangles": 1146
+    },
+    {
+      "id": "muscles-425",
+      "name": "Supraspinatus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1430,
+      "triangles": 1018
+    },
+    {
+      "id": "muscles-426",
+      "name": "Clavicular part of deltoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2902,
+      "triangles": 1726
+    },
+    {
+      "id": "muscles-427",
+      "name": "Scapular spinal part of deltoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4378,
+      "triangles": 2260
+    },
+    {
+      "id": "muscles-428",
+      "name": "Scapular spinal part of deltoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4378,
+      "triangles": 2272
+    },
+    {
+      "id": "muscles-429",
+      "name": "Clavicular part of deltoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2902,
+      "triangles": 1726
+    },
+    {
+      "id": "muscles-430",
+      "name": "Acromial part of deltoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2964,
+      "triangles": 1862
+    },
+    {
+      "id": "muscles-431",
+      "name": "Acromial part of deltoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2964,
+      "triangles": 1868
+    },
+    {
+      "id": "muscles-432",
+      "name": "Teres major muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1154,
+      "triangles": 974
+    },
+    {
+      "id": "muscles-433",
+      "name": "Teres major muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1154,
+      "triangles": 960
+    },
+    {
+      "id": "muscles-434",
+      "name": "Palmar interossei muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 174,
+      "triangles": 160
+    },
+    {
+      "id": "muscles-435",
+      "name": "Abductor digiti minimi of hand.l",
+      "system": "muscles",
+      "sourceTriangles": 672,
+      "triangles": 522
+    },
+    {
+      "id": "muscles-436",
+      "name": "Superficial head of flexor pollicis brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 276,
+      "triangles": 256
+    },
+    {
+      "id": "muscles-437",
+      "name": "Flexor digiti minimi of hand.l",
+      "system": "muscles",
+      "sourceTriangles": 308,
+      "triangles": 270
+    },
+    {
+      "id": "muscles-438",
+      "name": "Opponens pollicis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 384,
+      "triangles": 360
+    },
+    {
+      "id": "muscles-439",
+      "name": "Lumbrical muscles of hand.r",
+      "system": "muscles",
+      "sourceTriangles": 1368,
+      "triangles": 1050
+    },
+    {
+      "id": "muscles-440",
+      "name": "Deep head of flexor pollicis brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 746,
+      "triangles": 680
+    },
+    {
+      "id": "muscles-441",
+      "name": "Oblique head of adductor pollicis.l",
+      "system": "muscles",
+      "sourceTriangles": 450,
+      "triangles": 434
+    },
+    {
+      "id": "muscles-442",
+      "name": "Palmar interossei muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 174,
+      "triangles": 160
+    },
+    {
+      "id": "muscles-443",
+      "name": "Lumbrical muscles of hand.l",
+      "system": "muscles",
+      "sourceTriangles": 1368,
+      "triangles": 1046
+    },
+    {
+      "id": "muscles-444",
+      "name": "Transverse head of adductor pollicis.r",
+      "system": "muscles",
+      "sourceTriangles": 1014,
+      "triangles": 986
+    },
+    {
+      "id": "muscles-445",
+      "name": "Opponens digiti minimi muscle of hand.l",
+      "system": "muscles",
+      "sourceTriangles": 420,
+      "triangles": 374
+    },
+    {
+      "id": "muscles-446",
+      "name": "Abductor pollicis brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 624,
+      "triangles": 592
+    },
+    {
+      "id": "muscles-447",
+      "name": "Oblique head of adductor pollicis.r",
+      "system": "muscles",
+      "sourceTriangles": 450,
+      "triangles": 434
+    },
+    {
+      "id": "muscles-448",
+      "name": "Opponens digiti minimi muscle of hand.r",
+      "system": "muscles",
+      "sourceTriangles": 420,
+      "triangles": 374
+    },
+    {
+      "id": "muscles-449",
+      "name": "Flexor digiti minimi of hand.r",
+      "system": "muscles",
+      "sourceTriangles": 308,
+      "triangles": 270
+    },
+    {
+      "id": "muscles-450",
+      "name": "Opponens pollicis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 384,
+      "triangles": 360
+    },
+    {
+      "id": "muscles-451",
+      "name": "Deep head of flexor pollicis brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 746,
+      "triangles": 678
+    },
+    {
+      "id": "muscles-452",
+      "name": "Dorsal interossei muscles of hand.r",
+      "system": "muscles",
+      "sourceTriangles": 1364,
+      "triangles": 1196
+    },
+    {
+      "id": "muscles-453",
+      "name": "Superficial head of flexor pollicis brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 276,
+      "triangles": 256
+    },
+    {
+      "id": "muscles-454",
+      "name": "Abductor pollicis brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 624,
+      "triangles": 596
+    },
+    {
+      "id": "muscles-455",
+      "name": "Abductor digiti minimi of hand.r",
+      "system": "muscles",
+      "sourceTriangles": 672,
+      "triangles": 526
+    },
+    {
+      "id": "muscles-456",
+      "name": "Transverse head of adductor pollicis.l",
+      "system": "muscles",
+      "sourceTriangles": 1014,
+      "triangles": 988
+    },
+    {
+      "id": "muscles-457",
+      "name": "Dorsal interossei muscles of hand.l",
+      "system": "muscles",
+      "sourceTriangles": 1364,
+      "triangles": 1196
+    },
+    {
+      "id": "muscles-458",
+      "name": "Medial head of triceps brachii.l",
+      "system": "muscles",
+      "sourceTriangles": 2686,
+      "triangles": 940
+    },
+    {
+      "id": "muscles-459",
+      "name": "Lateral head of triceps brachii.l",
+      "system": "muscles",
+      "sourceTriangles": 3628,
+      "triangles": 1268
+    },
+    {
+      "id": "muscles-460",
+      "name": "Long head of triceps brachii.r",
+      "system": "muscles",
+      "sourceTriangles": 3950,
+      "triangles": 1382
+    },
+    {
+      "id": "muscles-461",
+      "name": "Lateral head of triceps brachii.r",
+      "system": "muscles",
+      "sourceTriangles": 3628,
+      "triangles": 1268
+    },
+    {
+      "id": "muscles-462",
+      "name": "Long head of triceps brachii.l",
+      "system": "muscles",
+      "sourceTriangles": 3950,
+      "triangles": 1382
+    },
+    {
+      "id": "muscles-463",
+      "name": "Medial head of triceps brachii.r",
+      "system": "muscles",
+      "sourceTriangles": 2686,
+      "triangles": 940
+    },
+    {
+      "id": "muscles-464",
+      "name": "Tendon sheath of flexor carpi radialis.r",
+      "system": "muscles",
+      "sourceTriangles": 1088,
+      "triangles": 410
+    },
+    {
+      "id": "muscles-465",
+      "name": "Common flexor tendon sheath.r",
+      "system": "muscles",
+      "sourceTriangles": 13968,
+      "triangles": 4887
+    },
+    {
+      "id": "muscles-466",
+      "name": "Common flexor tendon sheath.l",
+      "system": "muscles",
+      "sourceTriangles": 864,
+      "triangles": 623
+    },
+    {
+      "id": "muscles-467",
+      "name": "Tendon sheath of flexor carpi radialis.l",
+      "system": "muscles",
+      "sourceTriangles": 1088,
+      "triangles": 412
+    },
+    {
+      "id": "muscles-468",
+      "name": "Tendon sheath of flexor pollicis longus.l",
+      "system": "muscles",
+      "sourceTriangles": 3136,
+      "triangles": 1096
+    },
+    {
+      "id": "muscles-469",
+      "name": "Tendon sheath of flexor pollicis longus.r",
+      "system": "muscles",
+      "sourceTriangles": 3136,
+      "triangles": 1096
+    },
+    {
+      "id": "muscles-470",
+      "name": "Tendon sheath of extensor pollicis longus.r",
+      "system": "muscles",
+      "sourceTriangles": 432,
+      "triangles": 150
+    },
+    {
+      "id": "muscles-471",
+      "name": "Tendon sheath - abd. pollicis longus - ext. pollicis brevis.l",
+      "system": "muscles",
+      "sourceTriangles": 680,
+      "triangles": 318
+    },
+    {
+      "id": "muscles-472",
+      "name": "Tendon sheath of extensors carpi radialis.l",
+      "system": "muscles",
+      "sourceTriangles": 2304,
+      "triangles": 806
+    },
+    {
+      "id": "muscles-473",
+      "name": "Tendon sheath of extensor digitorum and extensor indicis.r",
+      "system": "muscles",
+      "sourceTriangles": 2368,
+      "triangles": 930
+    },
+    {
+      "id": "muscles-474",
+      "name": "Tendon sheath of extensor digiti minimi manus.l",
+      "system": "muscles",
+      "sourceTriangles": 592,
+      "triangles": 206
+    },
+    {
+      "id": "muscles-475",
+      "name": "Tendon sheath of extensor pollicis longus.l",
+      "system": "muscles",
+      "sourceTriangles": 432,
+      "triangles": 154
+    },
+    {
+      "id": "muscles-476",
+      "name": "Tendon sheath of extensor digitorum and extensor indicis.l",
+      "system": "muscles",
+      "sourceTriangles": 2368,
+      "triangles": 928
+    },
+    {
+      "id": "muscles-477",
+      "name": "Tendon sheath of extensor digiti minimi manus.r",
+      "system": "muscles",
+      "sourceTriangles": 592,
+      "triangles": 206
+    },
+    {
+      "id": "muscles-478",
+      "name": "Tendon sheath of extensor carpi ulnaris.l",
+      "system": "muscles",
+      "sourceTriangles": 960,
+      "triangles": 422
+    },
+    {
+      "id": "muscles-479",
+      "name": "Tendon sheath of extensor carpi ulnaris.r",
+      "system": "muscles",
+      "sourceTriangles": 960,
+      "triangles": 430
+    },
+    {
+      "id": "muscles-480",
+      "name": "Tendon sheath - abd. pollicis longus - ext. pollicis brevis.r",
+      "system": "muscles",
+      "sourceTriangles": 680,
+      "triangles": 322
+    },
+    {
+      "id": "muscles-481",
+      "name": "Tendon sheath of extensors carpi radialis.r",
+      "system": "muscles",
+      "sourceTriangles": 2304,
+      "triangles": 806
+    },
+    {
+      "id": "muscles-482",
+      "name": "Cruciform part of fibrous sheath of digit of hand.r",
+      "system": "muscles",
+      "sourceTriangles": 4728,
+      "triangles": 1654
+    },
+    {
+      "id": "muscles-483",
+      "name": "Synovial sheaths of digits of hand.l",
+      "system": "muscles",
+      "sourceTriangles": 6976,
+      "triangles": 2440
+    },
+    {
+      "id": "muscles-484",
+      "name": "Cruciform part of fibrous sheath of digit of hand.l",
+      "system": "muscles",
+      "sourceTriangles": 4728,
+      "triangles": 1654
+    },
+    {
+      "id": "muscles-485",
+      "name": "Synovial sheaths of digits of hand.r",
+      "system": "muscles",
+      "sourceTriangles": 6976,
+      "triangles": 2440
+    },
+    {
+      "id": "muscles-486",
+      "name": "Intertubercular tendon sheath.r",
+      "system": "muscles",
+      "sourceTriangles": 832,
+      "triangles": 544
+    },
+    {
+      "id": "muscles-487",
+      "name": "Intertubercular tendon sheath.l",
+      "system": "muscles",
+      "sourceTriangles": 832,
+      "triangles": 540
+    },
+    {
+      "id": "muscles-488",
+      "name": "Coracobrachial bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 866
+    },
+    {
+      "id": "muscles-489",
+      "name": "Subtendinous bursa of infraspinatus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 868
+    },
+    {
+      "id": "muscles-490",
+      "name": "Bicipitoradial bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 916
+    },
+    {
+      "id": "muscles-491",
+      "name": "Subdeltoid bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 830
+    },
+    {
+      "id": "muscles-492",
+      "name": "Subtendinous bursa of trapezius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 680
+    },
+    {
+      "id": "muscles-493",
+      "name": "Subacromial bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 1004
+    },
+    {
+      "id": "muscles-494",
+      "name": "Subtendinous bursa of teres major muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 740
+    },
+    {
+      "id": "muscles-495",
+      "name": "Coracobrachial bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 866
+    },
+    {
+      "id": "muscles-496",
+      "name": "Subtendinous bursa of triceps brachii muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 926
+    },
+    {
+      "id": "muscles-497",
+      "name": "Subtendinous bursa of teres major muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 746
+    },
+    {
+      "id": "muscles-498",
+      "name": "Subcutaneous acromial bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 676
+    },
+    {
+      "id": "muscles-499",
+      "name": "Subcutaneous acromial bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 664
+    },
+    {
+      "id": "muscles-500",
+      "name": "Subacromial bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 1006
+    },
+    {
+      "id": "muscles-501",
+      "name": "Subtendinous bursa of infraspinatus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 876
+    },
+    {
+      "id": "muscles-502",
+      "name": "Subdeltoid bursa.l",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 808
+    },
+    {
+      "id": "muscles-503",
+      "name": "Bicipitoradial bursa.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 920
+    },
+    {
+      "id": "muscles-504",
+      "name": "Subtendinous bursa of trapezius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 5888,
+      "triangles": 2060
+    },
+    {
+      "id": "muscles-505",
+      "name": "Subtendinous bursa of triceps brachii muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1472,
+      "triangles": 932
+    },
+    {
+      "id": "muscles-506",
+      "name": "Lateral intermuscular septum of arm.r",
+      "system": "muscles",
+      "sourceTriangles": 160,
+      "triangles": 128
+    },
+    {
+      "id": "muscles-507",
+      "name": "Deltoid fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 3541,
+      "triangles": 1238
+    },
+    {
+      "id": "muscles-508",
+      "name": "Antebrachial fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 4460,
+      "triangles": 1560
+    },
+    {
+      "id": "muscles-509",
+      "name": "Extensor retinaculum of wrist.l",
+      "system": "muscles",
+      "sourceTriangles": 368,
+      "triangles": 296
+    },
+    {
+      "id": "muscles-510",
+      "name": "Brachial fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 3018,
+      "triangles": 1055
+    },
+    {
+      "id": "muscles-511",
+      "name": "Medial intermuscular septum of arm.r",
+      "system": "muscles",
+      "sourceTriangles": 312,
+      "triangles": 108
+    },
+    {
+      "id": "muscles-512",
+      "name": "Antebrachial fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 4460,
+      "triangles": 1560
+    },
+    {
+      "id": "muscles-513",
+      "name": "Extensor retinaculum of wrist.r",
+      "system": "muscles",
+      "sourceTriangles": 368,
+      "triangles": 296
+    },
+    {
+      "id": "muscles-514",
+      "name": "Flexor retinaculum of wrist.r",
+      "system": "muscles",
+      "sourceTriangles": 524,
+      "triangles": 424
+    },
+    {
+      "id": "muscles-515",
+      "name": "Palmar aponeurosis.r",
+      "system": "muscles",
+      "sourceTriangles": 1284,
+      "triangles": 919
+    },
+    {
+      "id": "muscles-516",
+      "name": "Dorsal fascia of hand.r",
+      "system": "muscles",
+      "sourceTriangles": 1445,
+      "triangles": 850
+    },
+    {
+      "id": "muscles-517",
+      "name": "Palmar aponeurosis.l",
+      "system": "muscles",
+      "sourceTriangles": 1284,
+      "triangles": 915
+    },
+    {
+      "id": "muscles-518",
+      "name": "Flexor retinaculum of wrist.l",
+      "system": "muscles",
+      "sourceTriangles": 524,
+      "triangles": 432
+    },
+    {
+      "id": "muscles-519",
+      "name": "Deltoid fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 3541,
+      "triangles": 1238
+    },
+    {
+      "id": "muscles-520",
+      "name": "Medial intermuscular septum of arm.l",
+      "system": "muscles",
+      "sourceTriangles": 312,
+      "triangles": 109
+    },
+    {
+      "id": "muscles-521",
+      "name": "Superficial transverse metacarpal ligament.l",
+      "system": "muscles",
+      "sourceTriangles": 192,
+      "triangles": 140
+    },
+    {
+      "id": "muscles-522",
+      "name": "Brachial fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 3018,
+      "triangles": 1056
+    },
+    {
+      "id": "muscles-523",
+      "name": "Lateral intermuscular septum of arm.l",
+      "system": "muscles",
+      "sourceTriangles": 160,
+      "triangles": 128
+    },
+    {
+      "id": "muscles-524",
+      "name": "Dorsal fascia of hand.l",
+      "system": "muscles",
+      "sourceTriangles": 1445,
+      "triangles": 857
+    },
+    {
+      "id": "muscles-525",
+      "name": "Superficial transverse metacarpal ligament.r",
+      "system": "muscles",
+      "sourceTriangles": 192,
+      "triangles": 140
+    },
+    {
+      "id": "muscles-526",
+      "name": "Masseteric fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 398,
+      "triangles": 298
+    },
+    {
+      "id": "muscles-527",
+      "name": "Masseteric fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 398,
+      "triangles": 298
+    },
+    {
+      "id": "muscles-528",
+      "name": "Superficial layer of temporal fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 685,
+      "triangles": 350
+    },
+    {
+      "id": "muscles-529",
+      "name": "Superficial layer of temporal fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 685,
+      "triangles": 350
+    },
+    {
+      "id": "muscles-530",
+      "name": "Clavipectoral fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 1280,
+      "triangles": 776
+    },
+    {
+      "id": "muscles-531",
+      "name": "Pectoral fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 2709,
+      "triangles": 948
+    },
+    {
+      "id": "muscles-532",
+      "name": "Pectoral fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 2709,
+      "triangles": 947
+    },
+    {
+      "id": "muscles-533",
+      "name": "Clavipectoral fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 1280,
+      "triangles": 788
+    },
+    {
+      "id": "muscles-534",
+      "name": "Transverse intermuscular septum of leg.l",
+      "system": "muscles",
+      "sourceTriangles": 495,
+      "triangles": 173
+    },
+    {
+      "id": "muscles-535",
+      "name": "Crural fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 10875,
+      "triangles": 3805
+    },
+    {
+      "id": "muscles-536",
+      "name": "Anterior intermuscular septum of leg.l",
+      "system": "muscles",
+      "sourceTriangles": 208,
+      "triangles": 207
+    },
+    {
+      "id": "muscles-537",
+      "name": "Superior fibular retinaculum.l",
+      "system": "muscles",
+      "sourceTriangles": 652,
+      "triangles": 490
+    },
+    {
+      "id": "muscles-538",
+      "name": "Fascia lata.r",
+      "system": "muscles",
+      "sourceTriangles": 12907,
+      "triangles": 4516
+    },
+    {
+      "id": "muscles-539",
+      "name": "Superior extensor retinaculum of ankle.l",
+      "system": "muscles",
+      "sourceTriangles": 260,
+      "triangles": 248
+    },
+    {
+      "id": "muscles-540",
+      "name": "Medial femoral intermuscular septum.r",
+      "system": "muscles",
+      "sourceTriangles": 7713,
+      "triangles": 2698
+    },
+    {
+      "id": "muscles-541",
+      "name": "Superior extensor retinaculum of ankle.r",
+      "system": "muscles",
+      "sourceTriangles": 260,
+      "triangles": 248
+    },
+    {
+      "id": "muscles-542",
+      "name": "Inferior extensor retinaculum of ankle.l",
+      "system": "muscles",
+      "sourceTriangles": 316,
+      "triangles": 258
+    },
+    {
+      "id": "muscles-543",
+      "name": "Inferior fibular retinaculum.l",
+      "system": "muscles",
+      "sourceTriangles": 35,
+      "triangles": 35
+    },
+    {
+      "id": "muscles-544",
+      "name": "Inferior extensor retinaculum of ankle.r",
+      "system": "muscles",
+      "sourceTriangles": 316,
+      "triangles": 258
+    },
+    {
+      "id": "muscles-545",
+      "name": "Plantar aponeurosis.l",
+      "system": "muscles",
+      "sourceTriangles": 406,
+      "triangles": 142
+    },
+    {
+      "id": "muscles-546",
+      "name": "Popliteal fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 488,
+      "triangles": 234
+    },
+    {
+      "id": "muscles-547",
+      "name": "Piriformis fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 925,
+      "triangles": 601
+    },
+    {
+      "id": "muscles-548",
+      "name": "Medial femoral intermuscular septum.l",
+      "system": "muscles",
+      "sourceTriangles": 7713,
+      "triangles": 2698
+    },
+    {
+      "id": "muscles-549",
+      "name": "Lateral femoral intermuscular septum.r",
+      "system": "muscles",
+      "sourceTriangles": 588,
+      "triangles": 205
+    },
+    {
+      "id": "muscles-550",
+      "name": "Inferior fibular retinaculum.r",
+      "system": "muscles",
+      "sourceTriangles": 35,
+      "triangles": 35
+    },
+    {
+      "id": "muscles-551",
+      "name": "Anterior intermuscular septum of leg.r",
+      "system": "muscles",
+      "sourceTriangles": 208,
+      "triangles": 207
+    },
+    {
+      "id": "muscles-552",
+      "name": "Superficial transverse metatarsal ligament.r",
+      "system": "muscles",
+      "sourceTriangles": 99,
+      "triangles": 68
+    },
+    {
+      "id": "muscles-553",
+      "name": "Piriformis fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 925,
+      "triangles": 603
+    },
+    {
+      "id": "muscles-554",
+      "name": "Superior fibular retinaculum.r",
+      "system": "muscles",
+      "sourceTriangles": 652,
+      "triangles": 490
+    },
+    {
+      "id": "muscles-555",
+      "name": "Fascia lata.l",
+      "system": "muscles",
+      "sourceTriangles": 12907,
+      "triangles": 4517
+    },
+    {
+      "id": "muscles-556",
+      "name": "Superficial transverse metatarsal ligament.l",
+      "system": "muscles",
+      "sourceTriangles": 99,
+      "triangles": 68
+    },
+    {
+      "id": "muscles-557",
+      "name": "Lateral femoral intermuscular septum.l",
+      "system": "muscles",
+      "sourceTriangles": 588,
+      "triangles": 205
+    },
+    {
+      "id": "muscles-558",
+      "name": "Transverse intermuscular septum of leg.r",
+      "system": "muscles",
+      "sourceTriangles": 495,
+      "triangles": 173
+    },
+    {
+      "id": "muscles-559",
+      "name": "Popliteal fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 488,
+      "triangles": 234
+    },
+    {
+      "id": "muscles-560",
+      "name": "Plantar aponeurosis.r",
+      "system": "muscles",
+      "sourceTriangles": 406,
+      "triangles": 142
+    },
+    {
+      "id": "muscles-561",
+      "name": "Crural fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 10875,
+      "triangles": 3805
+    },
+    {
+      "id": "muscles-562",
+      "name": "Flexor retinaculum of ankle.r",
+      "system": "muscles",
+      "sourceTriangles": 696,
+      "triangles": 432
+    },
+    {
+      "id": "muscles-563",
+      "name": "Posterior intermuscular septum of leg.r",
+      "system": "muscles",
+      "sourceTriangles": 265,
+      "triangles": 99
+    },
+    {
+      "id": "muscles-564",
+      "name": "Iliopectineal arch.l",
+      "system": "muscles",
+      "sourceTriangles": 26,
+      "triangles": 25
+    },
+    {
+      "id": "muscles-565",
+      "name": "Iliopectineal arch.r",
+      "system": "muscles",
+      "sourceTriangles": 280,
+      "triangles": 166
+    },
+    {
+      "id": "muscles-566",
+      "name": "Flexor retinaculum of ankle.l",
+      "system": "muscles",
+      "sourceTriangles": 696,
+      "triangles": 436
+    },
+    {
+      "id": "muscles-567",
+      "name": "Posterior intermuscular septum of leg.l",
+      "system": "muscles",
+      "sourceTriangles": 265,
+      "triangles": 99
+    },
+    {
+      "id": "muscles-568",
+      "name": "Middle layer of thoracolumbar fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 160,
+      "triangles": 107
+    },
+    {
+      "id": "muscles-569",
+      "name": "Middle layer of thoracolumbar fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 160,
+      "triangles": 107
+    },
+    {
+      "id": "muscles-570",
+      "name": "Anterior layer of thoracolumbar fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 176,
+      "triangles": 124
+    },
+    {
+      "id": "muscles-571",
+      "name": "Posterior layer of thoracolumbar fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 313,
+      "triangles": 224
+    },
+    {
+      "id": "muscles-572",
+      "name": "Posterior layer of thoracolumbar fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 313,
+      "triangles": 228
+    },
+    {
+      "id": "muscles-573",
+      "name": "Anterior layer of thoracolumbar fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 176,
+      "triangles": 123
+    },
+    {
+      "id": "muscles-574",
+      "name": "Investing abdominal fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 11106,
+      "triangles": 3886
+    },
+    {
+      "id": "muscles-575",
+      "name": "Investing abdominal fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 11106,
+      "triangles": 3886
+    },
+    {
+      "id": "muscles-576",
+      "name": "Diaphragmatic fascia",
+      "system": "muscles",
+      "sourceTriangles": 4708,
+      "triangles": 1680
+    },
+    {
+      "id": "muscles-577",
+      "name": "Iliopsoas fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 1602,
+      "triangles": 675
+    },
+    {
+      "id": "muscles-578",
+      "name": "Iliopsoas fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 1602,
+      "triangles": 676
+    },
+    {
+      "id": "muscles-579",
+      "name": "Transversalis fascia",
+      "system": "muscles",
+      "sourceTriangles": 4207,
+      "triangles": 1471
+    },
+    {
+      "id": "muscles-580",
+      "name": "Superficial investing cervical fascia.l",
+      "system": "muscles",
+      "sourceTriangles": 3336,
+      "triangles": 1166
+    },
+    {
+      "id": "muscles-581",
+      "name": "Superficial investing cervical fascia.r",
+      "system": "muscles",
+      "sourceTriangles": 3336,
+      "triangles": 1166
+    },
+    {
+      "id": "muscles-582",
+      "name": "Diaphragm",
+      "system": "muscles",
+      "sourceTriangles": 38868,
+      "triangles": 13602
+    },
+    {
+      "id": "muscles-583",
+      "name": "Subclavius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 794,
+      "triangles": 654
+    },
+    {
+      "id": "muscles-584",
+      "name": "Pectoralis minor muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4142,
+      "triangles": 1924
+    },
+    {
+      "id": "muscles-585",
+      "name": "External intercostal muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 41409,
+      "triangles": 14441
+    },
+    {
+      "id": "muscles-586",
+      "name": "Serratus anterior muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 25240,
+      "triangles": 8832
+    },
+    {
+      "id": "muscles-587",
+      "name": "Clavicular head of pectoralis major muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 850,
+      "triangles": 666
+    },
+    {
+      "id": "muscles-588",
+      "name": "Sternocostal head of pectoralis major muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 3222,
+      "triangles": 2520
+    },
+    {
+      "id": "muscles-589",
+      "name": "(Abdominal part of pectoralis major muscle).l",
+      "system": "muscles",
+      "sourceTriangles": 1508,
+      "triangles": 778
+    },
+    {
+      "id": "muscles-590",
+      "name": "Clavicular head of pectoralis major muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 850,
+      "triangles": 668
+    },
+    {
+      "id": "muscles-591",
+      "name": "Sternocostal head of pectoralis major muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 3222,
+      "triangles": 2518
+    },
+    {
+      "id": "muscles-592",
+      "name": "(Abdominal part of pectoralis major muscle).r",
+      "system": "muscles",
+      "sourceTriangles": 1508,
+      "triangles": 772
+    },
+    {
+      "id": "muscles-593",
+      "name": "Pectoralis minor muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4142,
+      "triangles": 1910
+    },
+    {
+      "id": "muscles-594",
+      "name": "Innermost intercostal muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 38254,
+      "triangles": 13350
+    },
+    {
+      "id": "muscles-595",
+      "name": "External intercostal muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 41409,
+      "triangles": 14441
+    },
+    {
+      "id": "muscles-596",
+      "name": "Subclavius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 794,
+      "triangles": 646
+    },
+    {
+      "id": "muscles-597",
+      "name": "Levatores breves costarum.l",
+      "system": "muscles",
+      "sourceTriangles": 2690,
+      "triangles": 932
+    },
+    {
+      "id": "muscles-598",
+      "name": "Levatores longi costarum.r",
+      "system": "muscles",
+      "sourceTriangles": 5930,
+      "triangles": 2072
+    },
+    {
+      "id": "muscles-599",
+      "name": "Levatores longi costarum.l",
+      "system": "muscles",
+      "sourceTriangles": 5930,
+      "triangles": 2074
+    },
+    {
+      "id": "muscles-600",
+      "name": "Levatores breves costarum.r",
+      "system": "muscles",
+      "sourceTriangles": 2690,
+      "triangles": 930
+    },
+    {
+      "id": "muscles-601",
+      "name": "Internal intercostal muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 40184,
+      "triangles": 14014
+    },
+    {
+      "id": "muscles-602",
+      "name": "Innermost intercostal muscles.r",
+      "system": "muscles",
+      "sourceTriangles": 38254,
+      "triangles": 13348
+    },
+    {
+      "id": "muscles-603",
+      "name": "Transversus thoracis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1670,
+      "triangles": 1174
+    },
+    {
+      "id": "muscles-604",
+      "name": "Internal intercostal muscles.l",
+      "system": "muscles",
+      "sourceTriangles": 40184,
+      "triangles": 14018
+    },
+    {
+      "id": "muscles-605",
+      "name": "Transversus thoracis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1670,
+      "triangles": 1184
+    },
+    {
+      "id": "muscles-606",
+      "name": "Serratus anterior muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 25240,
+      "triangles": 8830
+    },
+    {
+      "id": "muscles-607",
+      "name": "Rectus lateralis capitis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 360,
+      "triangles": 356
+    },
+    {
+      "id": "muscles-608",
+      "name": "Scalenus anterior muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1386,
+      "triangles": 761
+    },
+    {
+      "id": "muscles-609",
+      "name": "Sternocleidomastoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 4952,
+      "triangles": 1724
+    },
+    {
+      "id": "muscles-610",
+      "name": "Platysma.l",
+      "system": "muscles",
+      "sourceTriangles": 6548,
+      "triangles": 3756
+    },
+    {
+      "id": "muscles-611",
+      "name": "Longus colli muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 6294,
+      "triangles": 2190
+    },
+    {
+      "id": "muscles-612",
+      "name": "Inferior pharyngeal constrictor.l",
+      "system": "muscles",
+      "sourceTriangles": 3696,
+      "triangles": 1872
+    },
+    {
+      "id": "muscles-613",
+      "name": "Middle pharyngeal constrictor.l",
+      "system": "muscles",
+      "sourceTriangles": 2948,
+      "triangles": 2114
+    },
+    {
+      "id": "muscles-614",
+      "name": "Stylopharyngeus muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 9478,
+      "triangles": 3314
+    },
+    {
+      "id": "muscles-615",
+      "name": "Stylopharyngeus muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 9478,
+      "triangles": 3316
+    },
+    {
+      "id": "muscles-616",
+      "name": "Superior pharyngeal constrictor.l",
+      "system": "muscles",
+      "sourceTriangles": 5334,
+      "triangles": 3086
+    },
+    {
+      "id": "muscles-617",
+      "name": "Superior pharyngeal constrictor.r",
+      "system": "muscles",
+      "sourceTriangles": 5334,
+      "triangles": 3064
+    },
+    {
+      "id": "muscles-618",
+      "name": "Middle pharyngeal constrictor.r",
+      "system": "muscles",
+      "sourceTriangles": 2948,
+      "triangles": 2114
+    },
+    {
+      "id": "muscles-619",
+      "name": "Inferior pharyngeal constrictor.r",
+      "system": "muscles",
+      "sourceTriangles": 3696,
+      "triangles": 1872
+    },
+    {
+      "id": "muscles-620",
+      "name": "Rectus lateralis capitis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 360,
+      "triangles": 356
+    },
+    {
+      "id": "muscles-621",
+      "name": "Scalenus posterior muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1326,
+      "triangles": 1074
+    },
+    {
+      "id": "muscles-622",
+      "name": "Rectus anterior capitis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 396,
+      "triangles": 390
+    },
+    {
+      "id": "muscles-623",
+      "name": "Rectus anterior capitis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 396,
+      "triangles": 390
+    },
+    {
+      "id": "muscles-624",
+      "name": "Scalenus posterior muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1326,
+      "triangles": 1076
+    },
+    {
+      "id": "muscles-625",
+      "name": "Stylohyoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 694,
+      "triangles": 490
+    },
+    {
+      "id": "muscles-626",
+      "name": "Mylohyoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1122,
+      "triangles": 1060
+    },
+    {
+      "id": "muscles-627",
+      "name": "Anterior belly of digastric muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 392,
+      "triangles": 360
+    },
+    {
+      "id": "muscles-628",
+      "name": "Posterior belly of digastric muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1276,
+      "triangles": 840
+    },
+    {
+      "id": "muscles-629",
+      "name": "Posterior belly of digastric muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1276,
+      "triangles": 862
+    },
+    {
+      "id": "muscles-630",
+      "name": "Intermediate tendon of digastric muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 228,
+      "triangles": 228
+    },
+    {
+      "id": "muscles-631",
+      "name": "Anterior belly of digastric muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 392,
+      "triangles": 360
+    },
+    {
+      "id": "muscles-632",
+      "name": "Intermediate tendon of digastric muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 228,
+      "triangles": 228
+    },
+    {
+      "id": "muscles-633",
+      "name": "Stylohyoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 694,
+      "triangles": 494
+    },
+    {
+      "id": "muscles-634",
+      "name": "Geniohyoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 530,
+      "triangles": 512
+    },
+    {
+      "id": "muscles-635",
+      "name": "Geniohyoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 530,
+      "triangles": 512
+    },
+    {
+      "id": "muscles-636",
+      "name": "Mylohyoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1122,
+      "triangles": 1060
+    },
+    {
+      "id": "muscles-637",
+      "name": "Longus colli muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 6294,
+      "triangles": 2180
+    },
+    {
+      "id": "muscles-638",
+      "name": "Longus capitis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1980,
+      "triangles": 780
+    },
+    {
+      "id": "muscles-639",
+      "name": "Sternohyoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1394,
+      "triangles": 752
+    },
+    {
+      "id": "muscles-640",
+      "name": "Sternothyroid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1088,
+      "triangles": 586
+    },
+    {
+      "id": "muscles-641",
+      "name": "Thyrohyoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 700,
+      "triangles": 634
+    },
+    {
+      "id": "muscles-642",
+      "name": "Thyrohyoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 700,
+      "triangles": 634
+    },
+    {
+      "id": "muscles-643",
+      "name": "Sternohyoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1394,
+      "triangles": 752
+    },
+    {
+      "id": "muscles-644",
+      "name": "Sternothyroid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1088,
+      "triangles": 576
+    },
+    {
+      "id": "muscles-645",
+      "name": "Omohyoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2706,
+      "triangles": 1042
+    },
+    {
+      "id": "muscles-646",
+      "name": "Omohyoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2706,
+      "triangles": 1036
+    },
+    {
+      "id": "muscles-647",
+      "name": "Scalenus medius muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2078,
+      "triangles": 1002
+    },
+    {
+      "id": "muscles-648",
+      "name": "Platysma.r",
+      "system": "muscles",
+      "sourceTriangles": 6548,
+      "triangles": 3756
+    },
+    {
+      "id": "muscles-649",
+      "name": "Longus capitis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1980,
+      "triangles": 784
+    },
+    {
+      "id": "muscles-650",
+      "name": "Scalenus medius muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2078,
+      "triangles": 1002
+    },
+    {
+      "id": "muscles-651",
+      "name": "Scalenus anterior muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1386,
+      "triangles": 765
+    },
+    {
+      "id": "muscles-652",
+      "name": "Sternocleidomastoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 4952,
+      "triangles": 1726
+    },
+    {
+      "id": "muscles-653",
+      "name": "External part of thyro-arytenoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2236,
+      "triangles": 1394
+    },
+    {
+      "id": "muscles-654",
+      "name": "Lateral crico-arytenoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1624,
+      "triangles": 1237
+    },
+    {
+      "id": "muscles-655",
+      "name": "Oblique part of cricothyroid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2060,
+      "triangles": 1790
+    },
+    {
+      "id": "muscles-656",
+      "name": "Thyro-epiglottic part of thyro-arytenoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 3110,
+      "triangles": 1720
+    },
+    {
+      "id": "muscles-657",
+      "name": "Ary-epiglottic part of oblique arytenoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1022,
+      "triangles": 402
+    },
+    {
+      "id": "muscles-658",
+      "name": "Oblique part of cricothyroid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2060,
+      "triangles": 1790
+    },
+    {
+      "id": "muscles-659",
+      "name": "Ary-epiglottic part of oblique arytenoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1022,
+      "triangles": 410
+    },
+    {
+      "id": "muscles-660",
+      "name": "Thyro-epiglottic part of thyro-arytenoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 3110,
+      "triangles": 1732
+    },
+    {
+      "id": "muscles-661",
+      "name": "Straight part of cricothyroid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1180,
+      "triangles": 1122
+    },
+    {
+      "id": "muscles-662",
+      "name": "Posterior crico-arytenoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1812,
+      "triangles": 1518
+    },
+    {
+      "id": "muscles-663",
+      "name": "Straight part of cricothyroid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1180,
+      "triangles": 1122
+    },
+    {
+      "id": "muscles-664",
+      "name": "Lateral crico-arytenoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1624,
+      "triangles": 1235
+    },
+    {
+      "id": "muscles-665",
+      "name": "Posterior crico-arytenoid muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1812,
+      "triangles": 1520
+    },
+    {
+      "id": "muscles-666",
+      "name": "External part of thyro-arytenoid muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2236,
+      "triangles": 1390
+    },
+    {
+      "id": "muscles-667",
+      "name": "Transverse arytenoid muscle",
+      "system": "muscles",
+      "sourceTriangles": 1822,
+      "triangles": 1306
+    },
+    {
+      "id": "muscles-668",
+      "name": "External abdominal oblique muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 29622,
+      "triangles": 29622
+    },
+    {
+      "id": "muscles-669",
+      "name": "Inguinal ligament.l",
+      "system": "muscles",
+      "sourceTriangles": 1056,
+      "triangles": 484
+    },
+    {
+      "id": "muscles-670",
+      "name": "Pyramidalis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 1112,
+      "triangles": 806
+    },
+    {
+      "id": "muscles-671",
+      "name": "Quadratus lumborum muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 2832,
+      "triangles": 1122
+    },
+    {
+      "id": "muscles-672",
+      "name": "Internal abdominal oblique muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 28869,
+      "triangles": 10089
+    },
+    {
+      "id": "muscles-673",
+      "name": "Linea alba",
+      "system": "muscles",
+      "sourceTriangles": 338,
+      "triangles": 226
+    },
+    {
+      "id": "muscles-674",
+      "name": "Pyramidalis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 1112,
+      "triangles": 806
+    },
+    {
+      "id": "muscles-675",
+      "name": "Quadratus lumborum muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 2832,
+      "triangles": 1122
+    },
+    {
+      "id": "muscles-676",
+      "name": "Rectus abdominis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 20604,
+      "triangles": 7210
+    },
+    {
+      "id": "muscles-677",
+      "name": "Internal abdominal oblique muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 28869,
+      "triangles": 10083
+    },
+    {
+      "id": "muscles-678",
+      "name": "Transversus abdominis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 34328,
+      "triangles": 12014
+    },
+    {
+      "id": "muscles-679",
+      "name": "Rectus abdominis muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 20604,
+      "triangles": 7210
+    },
+    {
+      "id": "muscles-680",
+      "name": "Transversus abdominis muscle.l",
+      "system": "muscles",
+      "sourceTriangles": 34328,
+      "triangles": 12014
+    },
+    {
+      "id": "muscles-681",
+      "name": "External abdominal oblique muscle.r",
+      "system": "muscles",
+      "sourceTriangles": 29622,
+      "triangles": 29622
+    },
+    {
+      "id": "muscles-682",
+      "name": "Inguinal ligament.r",
+      "system": "muscles",
+      "sourceTriangles": 1056,
+      "triangles": 484
+    }
+  ],
+  "outputBytes": 11647132,
+  "optimization": {
+    "targetRatio": 0.35,
+    "relativeErrorLimit": 0.002,
+    "compression": "EXT_meshopt_compression",
+    "annotationMarkersRemoved": true,
+    "triangles": 1362885
+  }
+}

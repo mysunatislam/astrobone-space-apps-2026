@@ -1,0 +1,7452 @@
+{
+  "schema": "astrobone-cardiovascular-atlas-v1",
+  "revision": "6c7f9016bd5899ac8edafd31b9900c151df42ed6",
+  "sourceUrl": "https://raw.githubusercontent.com/LluisV/Z-Anatomy/6c7f9016bd5899ac8edafd31b9900c151df42ed6/Resources/Models/FBX/CardioVascular41.fbx",
+  "sourceSha256": "ed7d049117cc944a8c47a416b16ade642cbd1392bbcce3c677450d3234dbf680",
+  "sourceBytes": 64889388,
+  "license": "CC-BY-SA-4.0",
+  "attribution": "Z-Anatomy; BodyParts3D / DBCLS (CC-BY-SA 2.1 Japan)",
+  "boundary": "Static anatomical atlas, not patient-specific anatomy or a fluid-mechanics mesh. Vessel colors distinguish named anatomical categories, not measured oxygenation. Renal and pulmonary groups are vessels only; kidney and lung tissue are not in this atlas.",
+  "coordinateFrame": "Same pinned FBX atlas frame as musculoskeletal.glb; copy its normalization, never independently fit vessel bounds.",
+  "structures": [
+    {
+      "name": "Left subclavian artery",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 472,
+      "center": [
+        4.9864707589149475,
+        140.8135528564453,
+        -0.22407199442386627
+      ]
+    },
+    {
+      "name": "Vertebral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2006,
+      "center": [
+        2.063905619084835,
+        149.9752426147461,
+        -1.5523189175873995
+      ]
+    },
+    {
+      "name": "Posterior inferior cerebellar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 15468,
+      "center": [
+        2.8565583527088165,
+        157.60259246826172,
+        -4.402829587459564
+      ]
+    },
+    {
+      "name": "Axillary artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        10.771811962127686,
+        138.88880157470703,
+        -0.718300100415945
+      ]
+    },
+    {
+      "name": "Subscapular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 118,
+      "center": [
+        13.270989894866943,
+        135.8687973022461,
+        -1.2792313694953918
+      ]
+    },
+    {
+      "name": "Circumflex scapular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 471,
+      "center": [
+        13.674998760223389,
+        135.4398651123047,
+        -3.4826489686965942
+      ]
+    },
+    {
+      "name": "Thoracodorsal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        13.381814956665039,
+        131.40531539916992,
+        -2.3994469046592712
+      ]
+    },
+    {
+      "name": "Posterior circumflex humeral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        16.326136112213135,
+        136.6980438232422,
+        -2.252146363258362
+      ]
+    },
+    {
+      "name": "Anterior circumflex humeral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        16.7216477394104,
+        137.58045196533203,
+        -0.909958153963089
+      ]
+    },
+    {
+      "name": "Thoraco-acromial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 118,
+      "center": [
+        9.469715118408203,
+        140.01558685302734,
+        -0.020004719495773315
+      ]
+    },
+    {
+      "name": "Pectoral branches of thoraco-acromial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        11.014409065246582,
+        133.65008926391602,
+        2.6920559853315353
+      ]
+    },
+    {
+      "name": "Lateral thoracic artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        11.930012226104736,
+        129.04672241210938,
+        3.0897007882595062
+      ]
+    },
+    {
+      "name": "Brachial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        17.964024543762207,
+        122.7871322631836,
+        -1.8002649247646332
+      ]
+    },
+    {
+      "name": "Radial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        25.518850326538086,
+        96.73070907592773,
+        0.49154871702194214
+      ]
+    },
+    {
+      "name": "Deep palmar arch.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 944,
+      "center": [
+        26.923670768737793,
+        84.68238067626953,
+        2.145313024520874
+      ]
+    },
+    {
+      "name": "Palmar metacarpal arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1770,
+      "center": [
+        26.91835880279541,
+        81.65083694458008,
+        2.8315508365631104
+      ]
+    },
+    {
+      "name": "Dorsal carpal anastomosis.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 236,
+      "center": [
+        27.459738731384277,
+        84.10041427612305,
+        1.1889909505844116
+      ]
+    },
+    {
+      "name": "Dorsal metacarpal arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2360,
+      "center": [
+        26.613529205322266,
+        81.14440536499023,
+        2.2482084333896637
+      ]
+    },
+    {
+      "name": "Dorsal digital arteries of hand.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 6139,
+      "center": [
+        27.73370933532715,
+        76.27336502075195,
+        5.459979712963104
+      ]
+    },
+    {
+      "name": "Palmar carpal branch of radial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        25.992854118347168,
+        87.71048736572266,
+        2.39008104801178
+      ]
+    },
+    {
+      "name": "Ulnar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        23.692484855651855,
+        97.50387191772461,
+        0.578001081943512
+      ]
+    },
+    {
+      "name": "(Ulnar recurrent artery).l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        21.328170776367188,
+        106.09086227416992,
+        -2.0391008853912354
+      ]
+    },
+    {
+      "name": "Superficial palmar arch.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 1180,
+      "center": [
+        26.197940826416016,
+        84.30046081542969,
+        2.734805941581726
+      ]
+    },
+    {
+      "name": "Common palmar digital arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        27.378918647766113,
+        79.93127822875977,
+        3.9483507871627808
+      ]
+    },
+    {
+      "name": "Proper palmar digital arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 12752,
+      "center": [
+        27.85142707824707,
+        78.82696533203125,
+        5.8372907638549805
+      ]
+    },
+    {
+      "name": "Common interosseous artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 118,
+      "center": [
+        23.202466011047363,
+        103.4705810546875,
+        -0.892318457365036
+      ]
+    },
+    {
+      "name": "Posterior interosseous artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        24.198711395263672,
+        96.90556335449219,
+        0.12643200159072876
+      ]
+    },
+    {
+      "name": "Recurrent interosseous artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        23.375535011291504,
+        107.82030487060547,
+        -3.1158409118652344
+      ]
+    },
+    {
+      "name": "Dorsal carpal branch of ulnar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        25.024544715881348,
+        84.82831192016602,
+        1.7832800149917603
+      ]
+    },
+    {
+      "name": "Deep brachial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        18.804232597351074,
+        122.3673095703125,
+        -3.488338589668274
+      ]
+    },
+    {
+      "name": "Radial collateral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        22.832788467407227,
+        112.16011810302734,
+        -2.9902754426002502
+      ]
+    },
+    {
+      "name": "Middle collateral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        21.62031650543213,
+        115.54508972167969,
+        -4.9515111446380615
+      ]
+    },
+    {
+      "name": "Inferior ulnar collateral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        20.25704574584961,
+        111.33496475219727,
+        -2.3734676241874695
+      ]
+    },
+    {
+      "name": "Superior ulnar collateral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        19.236390113830566,
+        113.2568473815918,
+        -3.4231348037719727
+      ]
+    },
+    {
+      "name": "Thyrocervical trunk.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 118,
+      "center": [
+        4.13368558883667,
+        142.64539337158203,
+        0.03387732058763504
+      ]
+    },
+    {
+      "name": "Suprascapular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        9.257686138153076,
+        139.86730194091797,
+        -4.378823056817055
+      ]
+    },
+    {
+      "name": "Transverse cervical artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        5.142096042633057,
+        145.3919219970703,
+        -0.630890816450119
+      ]
+    },
+    {
+      "name": "(Superficial branch of transverse cervical artery).l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        6.6395263671875,
+        135.56612396240234,
+        -8.826424598693848
+      ]
+    },
+    {
+      "name": "(Deep branch of transverse cervical artery).l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3541,
+      "center": [
+        8.089558124542236,
+        134.70415115356445,
+        -5.125298600643873
+      ]
+    },
+    {
+      "name": "Inferior thyroid artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        3.60792875289917,
+        144.84368896484375,
+        0.38319165084976703
+      ]
+    },
+    {
+      "name": "Internal thoracic artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        2.8401140570640564,
+        133.5444221496582,
+        5.006484001874924
+      ]
+    },
+    {
+      "name": "Musculophrenic artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1416,
+      "center": [
+        6.417979896068573,
+        116.0470085144043,
+        5.16001184284687
+      ]
+    },
+    {
+      "name": "Superior epigastric artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        1.74234077334404,
+        116.85022735595703,
+        10.071872234344482
+      ]
+    },
+    {
+      "name": "Costocervical trunk.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 118,
+      "center": [
+        4.790815591812134,
+        142.15750885009766,
+        -0.5726314038038254
+      ]
+    },
+    {
+      "name": "Supreme intercostal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        4.803061008453369,
+        142.04501342773438,
+        -1.465456783771515
+      ]
+    },
+    {
+      "name": "Second posterior intercostal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2006,
+      "center": [
+        5.324331998825073,
+        138.20248413085938,
+        1.3355293273925781
+      ]
+    },
+    {
+      "name": "First posterior intercostal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        4.204900562763214,
+        139.2961654663086,
+        1.4208216071128845
+      ]
+    },
+    {
+      "name": "Deep cervical artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        4.089219927787781,
+        145.99163818359375,
+        -2.9005321860313416
+      ]
+    },
+    {
+      "name": "Femoral artery.r",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 1770,
+      "center": [
+        -6.13527250289917,
+        72.88861846923828,
+        1.6355533003807068
+      ]
+    },
+    {
+      "name": "Deep external pudendal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -4.63496196269989,
+        83.00100326538086,
+        4.776623010635376
+      ]
+    },
+    {
+      "name": "Superficial external pudendal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1535,
+      "center": [
+        -2.9083387553691864,
+        79.58731079101562,
+        5.642877817153931
+      ]
+    },
+    {
+      "name": "Deep femoral artery.r",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 943,
+      "center": [
+        -7.341151475906372,
+        72.08924102783203,
+        0.9169957637786865
+      ]
+    },
+    {
+      "name": "Medial circumflex femoral artery.r",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 1298,
+      "center": [
+        -8.962156295776367,
+        84.11827087402344,
+        0.05111551284790039
+      ]
+    },
+    {
+      "name": "Perforating femoral arteries.r",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 944,
+      "center": [
+        -10.131591081619263,
+        70.35912704467773,
+        0.40491095185279846
+      ]
+    },
+    {
+      "name": "Lateral circumflex femoral artery.r",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 1180,
+      "center": [
+        -10.720964670181274,
+        83.81521224975586,
+        -0.38996970653533936
+      ]
+    },
+    {
+      "name": "Descending branch of lateral circumflex femoral artery",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 944,
+      "center": [
+        -10.229479551315308,
+        66.67301177978516,
+        0.9482110738754272
+      ]
+    },
+    {
+      "name": "Popliteal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        -7.811084508895874,
+        46.96466064453125,
+        -3.9757534861564636
+      ]
+    },
+    {
+      "name": "Superior lateral genicular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        -9.580957889556885,
+        50.3590087890625,
+        -1.557460606098175
+      ]
+    },
+    {
+      "name": "Anterior tibial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1770,
+      "center": [
+        -8.911551713943481,
+        23.618136405944824,
+        -3.138425499200821
+      ]
+    },
+    {
+      "name": "Dorsalis pedis artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        -7.699992895126343,
+        6.8430914878845215,
+        1.6601364612579346
+      ]
+    },
+    {
+      "name": "Lateral tarsal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -8.996819972991943,
+        6.143180966377258,
+        -1.7889167070388794
+      ]
+    },
+    {
+      "name": "Arcuate artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        -9.495348930358887,
+        5.197376251220703,
+        0.3587157130241394
+      ]
+    },
+    {
+      "name": "Dorsal metatarsal arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1652,
+      "center": [
+        -10.105620384216309,
+        4.067796289920807,
+        3.8684375286102295
+      ]
+    },
+    {
+      "name": "Dorsal digital arteries of foot.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 7792,
+      "center": [
+        -11.48518705368042,
+        2.495385229587555,
+        5.844976544380188
+      ]
+    },
+    {
+      "name": "Deep plantar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -8.384326934814453,
+        4.867423057556152,
+        2.6742828488349915
+      ]
+    },
+    {
+      "name": "Inferior medial genicular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        -5.5348604917526245,
+        42.69841003417969,
+        -2.8684842586517334
+      ]
+    },
+    {
+      "name": "Posterior tibial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1652,
+      "center": [
+        -7.456511497497559,
+        20.684232592582703,
+        -4.603778004646301
+      ]
+    },
+    {
+      "name": "Medial plantar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        -6.352670431137085,
+        4.015883445739746,
+        -1.0367040038108826
+      ]
+    },
+    {
+      "name": "Superficial branch of medial plantar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        -6.106457471847534,
+        2.928368091583252,
+        4.160589009523392
+      ]
+    },
+    {
+      "name": "Lateral plantar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 353,
+      "center": [
+        -8.345962047576904,
+        3.0237518548965454,
+        -2.0885550379753113
+      ]
+    },
+    {
+      "name": "Plantar arch.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 944,
+      "center": [
+        -8.192055225372314,
+        3.14111191034317,
+        0.31483280658721924
+      ]
+    },
+    {
+      "name": "Plantar metatarsal arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2360,
+      "center": [
+        -9.917489051818848,
+        2.9189929366111755,
+        3.1335367634892464
+      ]
+    },
+    {
+      "name": "Perforating branches of plantar metatarsal arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -10.098392486572266,
+        2.958999216556549,
+        3.8845845758914948
+      ]
+    },
+    {
+      "name": "Common plantar digital arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -10.313137531280518,
+        1.8905471563339233,
+        6.2655930519104
+      ]
+    },
+    {
+      "name": "Proper plantar digital arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 7084,
+      "center": [
+        -11.347632884979248,
+        1.4690164923667908,
+        6.008158206939697
+      ]
+    },
+    {
+      "name": "Fibular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2597,
+      "center": [
+        -10.146355152130127,
+        21.486724376678467,
+        -6.222445011138916
+      ]
+    },
+    {
+      "name": "Calcaneal branches of fibular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        -8.1273353099823,
+        4.952583074569702,
+        -6.9157140254974365
+      ]
+    },
+    {
+      "name": "Calcaneal branches of posterior tibial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 353,
+      "center": [
+        -5.879833698272705,
+        4.444610595703125,
+        -6.450467109680176
+      ]
+    },
+    {
+      "name": "Patellar anastomosis.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 3896,
+      "center": [
+        -8.618175029754639,
+        43.7625789642334,
+        -0.6075118780136108
+      ]
+    },
+    {
+      "name": "Superior medial genicular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2007,
+      "center": [
+        -5.9544665813446045,
+        49.7624568939209,
+        -1.181308627128601
+      ]
+    },
+    {
+      "name": "Middle genicular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2007,
+      "center": [
+        -7.629067897796631,
+        47.60993957519531,
+        -5.274179458618164
+      ]
+    },
+    {
+      "name": "Inferior lateral genicular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 943,
+      "center": [
+        -9.629449844360352,
+        44.23466491699219,
+        -3.148143485188484
+      ]
+    },
+    {
+      "name": "Superficial epigastric artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1653,
+      "center": [
+        -6.025647878646851,
+        95.75403213500977,
+        7.2601478099823
+      ]
+    },
+    {
+      "name": "Right common carotid artery",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 354,
+      "center": [
+        -2.29265958070755,
+        144.82049560546875,
+        0.851446270942688
+      ]
+    },
+    {
+      "name": "External carotid artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        -3.688161253929138,
+        152.33324432373047,
+        0.16652178764343262
+      ]
+    },
+    {
+      "name": "Superficial temporal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 10744,
+      "center": [
+        -5.781405210494995,
+        162.22181701660156,
+        -0.11493754386901855
+      ]
+    },
+    {
+      "name": "Frontal branch of superficial temporal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1888,
+      "center": [
+        -4.130270481109619,
+        163.4920654296875,
+        6.408245325088501
+      ]
+    },
+    {
+      "name": "Transverse facial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1652,
+      "center": [
+        -4.310628294944763,
+        157.06338500976562,
+        3.7886462807655334
+      ]
+    },
+    {
+      "name": "Occipital artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 5548,
+      "center": [
+        -4.707019805908203,
+        161.6102066040039,
+        -4.96659442782402
+      ]
+    },
+    {
+      "name": "Ascending pharyngeal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2479,
+      "center": [
+        -2.6997422575950623,
+        153.6567153930664,
+        2.7065847516059875
+      ]
+    },
+    {
+      "name": "Facial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        -3.4793206453323364,
+        153.09667205810547,
+        3.6894504725933075
+      ]
+    },
+    {
+      "name": "Superior labial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -2.27440345287323,
+        154.32312774658203,
+        7.67013692855835
+      ]
+    },
+    {
+      "name": "Submental artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1770,
+      "center": [
+        -1.7053093165159225,
+        150.49539184570312,
+        5.427187561988831
+      ]
+    },
+    {
+      "name": "Inferior labial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 944,
+      "center": [
+        -1.8444758653640747,
+        152.38973999023438,
+        7.098280429840088
+      ]
+    },
+    {
+      "name": "Angular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 4841,
+      "center": [
+        -1.5398067999631166,
+        160.8802261352539,
+        7.777437686920166
+      ]
+    },
+    {
+      "name": "Maxillary artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3895,
+      "center": [
+        -3.5229029655456543,
+        156.12030792236328,
+        3.134864717721939
+      ]
+    },
+    {
+      "name": "Infra-orbital artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -2.65725839138031,
+        156.75122833251953,
+        5.90700101852417
+      ]
+    },
+    {
+      "name": "Posterior superior alveolar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        -2.9560219049453735,
+        156.56764221191406,
+        3.849082827568054
+      ]
+    },
+    {
+      "name": "Artery of pterygoid canal.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        -2.1264822483062744,
+        157.34423065185547,
+        3.535619020462036
+      ]
+    },
+    {
+      "name": "?x.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 1534,
+      "center": [
+        -0.3178868256509304,
+        157.07625579833984,
+        5.692288279533386
+      ]
+    },
+    {
+      "name": "Posterior lateral nasal branches of sphenopalatine artery..r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 6376,
+      "center": [
+        -0.8953870795667171,
+        157.85774993896484,
+        5.981810808181763
+      ]
+    },
+    {
+      "name": "Anterior deep temporal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1653,
+      "center": [
+        -4.439377427101135,
+        159.40786743164062,
+        3.3924986124038696
+      ]
+    },
+    {
+      "name": "Buccal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        -3.202504873275757,
+        155.7924575805664,
+        4.775226831436157
+      ]
+    },
+    {
+      "name": "Inferior alveolar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2124,
+      "center": [
+        -2.683817148208618,
+        153.6133270263672,
+        4.115388363599777
+      ]
+    },
+    {
+      "name": "Mental branch of inferior alveolar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -1.171966940164566,
+        151.11048126220703,
+        7.61110782623291
+      ]
+    },
+    {
+      "name": "Mylohyoid branch of inferior alveolar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        -3.3678852319717407,
+        153.4814453125,
+        2.0029585361480713
+      ]
+    },
+    {
+      "name": "Posterior deep temporal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1535,
+      "center": [
+        -4.921092510223389,
+        159.6008529663086,
+        2.2757933139801025
+      ]
+    },
+    {
+      "name": "Middle meningeal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        -3.116503596305847,
+        157.79344177246094,
+        0.9683199226856232
+      ]
+    },
+    {
+      "name": "Accessory branch of middle meningeal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 589,
+      "center": [
+        -2.934085488319397,
+        157.86933135986328,
+        1.2845726609230042
+      ]
+    },
+    {
+      "name": "Posterior septal branches of sphenopalatine artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1652,
+      "center": [
+        -0.4485021806322038,
+        155.73140716552734,
+        5.994180202484131
+      ]
+    },
+    {
+      "name": "Descending palatine artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1416,
+      "center": [
+        -2.348817467689514,
+        156.4215545654297,
+        3.914162755012512
+      ]
+    },
+    {
+      "name": "Greater palatine artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        -0.9304521083831787,
+        155.04530334472656,
+        6.159685373306274
+      ]
+    },
+    {
+      "name": "Internal carotid artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -2.2951762974262238,
+        154.47872924804688,
+        1.1207940876483917
+      ]
+    },
+    {
+      "name": "Middle cerebral artery (M1-segment).r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        -2.369515746831894,
+        160.99340057373047,
+        2.1686413288116455
+      ]
+    },
+    {
+      "name": "Proximal lateral striate branches.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 3187,
+      "center": [
+        -1.2643458545207977,
+        161.5486297607422,
+        2.262931227684021
+      ]
+    },
+    {
+      "name": "Distal lateral striate branches.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 3778,
+      "center": [
+        -2.236311674118042,
+        161.63764190673828,
+        2.5803122520446777
+      ]
+    },
+    {
+      "name": "Insular branches of middle cerebral artery (M2).r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        -4.2631436586380005,
+        162.11994171142578,
+        1.7881203293800354
+      ]
+    },
+    {
+      "name": "Anterior temporal branch.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 4249,
+      "center": [
+        -5.715785264968872,
+        160.93885040283203,
+        0.7206022143363953
+      ]
+    },
+    {
+      "name": "Artery of precentral sulcus.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 5077,
+      "center": [
+        -4.21783173084259,
+        166.01578521728516,
+        1.630530372262001
+      ]
+    },
+    {
+      "name": "Middle cerebral artery (M3-segment).r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1534,
+      "center": [
+        -5.34333872795105,
+        162.9815216064453,
+        -1.895909607410431
+      ]
+    },
+    {
+      "name": "Artery of central sulcus.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1888,
+      "center": [
+        -3.9653597474098206,
+        165.85527801513672,
+        -0.9139919281005859
+      ]
+    },
+    {
+      "name": "Temporal branches of middle cerebral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2124,
+      "center": [
+        -6.1905906200408936,
+        161.54044342041016,
+        -1.9639653861522675
+      ]
+    },
+    {
+      "name": "Temporo-occipital branch.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 3424,
+      "center": [
+        -3.7676472067832947,
+        161.81256866455078,
+        -7.54365348815918
+      ]
+    },
+    {
+      "name": "Branch to angular gyrus.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 353,
+      "center": [
+        -6.021223783493042,
+        162.78225708007812,
+        -6.197940111160278
+      ]
+    },
+    {
+      "name": "Posterior parietal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3777,
+      "center": [
+        -5.151701927185059,
+        165.1564712524414,
+        -5.306299805641174
+      ]
+    },
+    {
+      "name": "Parietal branches of middle cerebral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1653,
+      "center": [
+        -5.429509162902832,
+        165.68366241455078,
+        -3.734544038772583
+      ]
+    },
+    {
+      "name": "Postcentral arterial branch.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2006,
+      "center": [
+        -4.5070565938949585,
+        165.99197387695312,
+        -2.555689964443445
+      ]
+    },
+    {
+      "name": "Posterior temporal branch.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 1771,
+      "center": [
+        -5.914024591445923,
+        161.56668853759766,
+        -5.032218813896179
+      ]
+    },
+    {
+      "name": "Prefrontal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2597,
+      "center": [
+        -4.660368204116821,
+        165.3052520751953,
+        3.427343189716339
+      ]
+    },
+    {
+      "name": "Lateral frontobasal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2361,
+      "center": [
+        -3.3122745156288147,
+        163.57813262939453,
+        4.726966083049774
+      ]
+    },
+    {
+      "name": "Anterior cerebral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        0.7982197105884552,
+        161.22016143798828,
+        2.906050443649292
+      ]
+    },
+    {
+      "name": "Callosomarginal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 6139,
+      "center": [
+        1.0693976014154032,
+        165.7451171875,
+        4.0573455691337585
+      ]
+    },
+    {
+      "name": "Frontal branches of callosomarginal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        0.7582439482212067,
+        167.01547241210938,
+        5.056352138519287
+      ]
+    },
+    {
+      "name": "Orbitofrontal branches of anterior cerebral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1888,
+      "center": [
+        0.8110418654978275,
+        161.81217193603516,
+        5.655613303184509
+      ]
+    },
+    {
+      "name": "Pericallosal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 13223,
+      "center": [
+        1.465683326125145,
+        165.83807373046875,
+        -1.1771392822265625
+      ]
+    },
+    {
+      "name": "Ophthalmic artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        -1.4795416593551636,
+        160.05360412597656,
+        3.817498207092285
+      ]
+    },
+    {
+      "name": "Long posterior ciliary arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1771,
+      "center": [
+        -2.121728777885437,
+        160.31197357177734,
+        4.495272517204285
+      ]
+    },
+    {
+      "name": "Anterior ethmoidal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1534,
+      "center": [
+        -0.7413238286972046,
+        159.25149536132812,
+        6.546209096908569
+      ]
+    },
+    {
+      "name": "Anterior septal branches of anterior ethmoidal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -0.21864085644483566,
+        158.4873504638672,
+        5.365885257720947
+      ]
+    },
+    {
+      "name": "Short posterior ciliary arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        -1.9369806051254272,
+        159.93524169921875,
+        3.824106216430664
+      ]
+    },
+    {
+      "name": "Supratrochlear artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2361,
+      "center": [
+        -1.2582922279834747,
+        160.9340057373047,
+        6.024905562400818
+      ]
+    },
+    {
+      "name": "Lacrimal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1770,
+      "center": [
+        -2.81328809261322,
+        160.34955596923828,
+        4.965100407600403
+      ]
+    },
+    {
+      "name": "Posterior ethmoidal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        -1.3812582790851593,
+        159.719970703125,
+        4.463648080825806
+      ]
+    },
+    {
+      "name": "Septal branches of posterior ethmoidal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -0.5371084026992321,
+        158.38297271728516,
+        3.9164119958877563
+      ]
+    },
+    {
+      "name": "Supra-orbital artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3424,
+      "center": [
+        -2.65293687582016,
+        162.27660369873047,
+        6.587635517120361
+      ]
+    },
+    {
+      "name": "Central retinal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 85016,
+      "center": [
+        -2.8329904079437256,
+        159.05716705322266,
+        5.0871723890304565
+      ]
+    },
+    {
+      "name": "Anterior cerebral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        -0.7982223778963089,
+        161.22016143798828,
+        2.9060505628585815
+      ]
+    },
+    {
+      "name": "Orbitofrontal branches of anterior cerebral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1888,
+      "center": [
+        -0.8110445216298103,
+        161.81217193603516,
+        5.655613422393799
+      ]
+    },
+    {
+      "name": "Callosomarginal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 6139,
+      "center": [
+        -1.0694002564123366,
+        165.7451171875,
+        4.057344973087311
+      ]
+    },
+    {
+      "name": "Frontal branches of callosomarginal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        -0.7582466043531895,
+        167.01547241210938,
+        5.056351900100708
+      ]
+    },
+    {
+      "name": "Pericallosal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 13223,
+      "center": [
+        -1.4656861014664173,
+        165.83807373046875,
+        -1.1771397590637207
+      ]
+    },
+    {
+      "name": "Anterior spinal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        -0.6918222066015005,
+        155.1718292236328,
+        -1.9579824805259705
+      ]
+    },
+    {
+      "name": "Anterior spinal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        0.6918213162571192,
+        155.1718292236328,
+        -1.9579826593399048
+      ]
+    },
+    {
+      "name": "Right subclavian artery",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 354,
+      "center": [
+        -4.5941386222839355,
+        141.58502197265625,
+        0.6766276657581329
+      ]
+    },
+    {
+      "name": "Vertebral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2006,
+      "center": [
+        -2.0639080926775932,
+        149.97525024414062,
+        -1.5523194521665573
+      ]
+    },
+    {
+      "name": "Basilar artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        0.00004575774073600769,
+        159.01795196533203,
+        0.29924553632736206
+      ]
+    },
+    {
+      "name": "Anterior inferior cerebellar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1888,
+      "center": [
+        1.7337530506774783,
+        158.00897216796875,
+        -1.2835263684391975
+      ]
+    },
+    {
+      "name": "Superior cerebellar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 4487,
+      "center": [
+        -2.2246288545429707,
+        159.84383392333984,
+        -2.8223304748535156
+      ]
+    },
+    {
+      "name": "Lateral pontine branches of basilar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1416,
+      "center": [
+        1.1421680003404617,
+        158.60879516601562,
+        -0.44876161217689514
+      ]
+    },
+    {
+      "name": "Superior cerebellar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 4487,
+      "center": [
+        2.224627908319235,
+        159.84383392333984,
+        -2.8223302364349365
+      ]
+    },
+    {
+      "name": "Medial pontine branches of basilar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 943,
+      "center": [
+        -0.47023798525333405,
+        159.19915008544922,
+        0.49685533344745636
+      ]
+    },
+    {
+      "name": "Posterior cerebral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 13815,
+      "center": [
+        2.7228840067982674,
+        161.50899505615234,
+        -2.7120983004570007
+      ]
+    },
+    {
+      "name": "Parieto-occipital artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3423,
+      "center": [
+        0.9196739755570889,
+        163.34760284423828,
+        -5.649133324623108
+      ]
+    },
+    {
+      "name": "Medial occipital artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2125,
+      "center": [
+        0.5803366359323263,
+        161.35598754882812,
+        -6.061169505119324
+      ]
+    },
+    {
+      "name": "Lateral occipital artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1771,
+      "center": [
+        2.977505385875702,
+        160.68270111083984,
+        -5.795919179916382
+      ]
+    },
+    {
+      "name": "Medial pontine branches of basilar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 943,
+      "center": [
+        0.4702372197061777,
+        159.19915008544922,
+        0.49685534089803696
+      ]
+    },
+    {
+      "name": "Lateral pontine branches of basilar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1416,
+      "center": [
+        -1.1421687360852957,
+        158.60879516601562,
+        -0.44876161217689514
+      ]
+    },
+    {
+      "name": "Anterior inferior cerebellar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1888,
+      "center": [
+        -1.7337539987638593,
+        158.00897216796875,
+        -1.2835263647139072
+      ]
+    },
+    {
+      "name": "Posterior cerebral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 13815,
+      "center": [
+        -2.722884953022003,
+        161.50899505615234,
+        -2.712098181247711
+      ]
+    },
+    {
+      "name": "Parieto-occipital artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3423,
+      "center": [
+        -0.9196748659014702,
+        163.34760284423828,
+        -5.649133324623108
+      ]
+    },
+    {
+      "name": "Medial occipital artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2125,
+      "center": [
+        -0.5803375840187073,
+        161.35598754882812,
+        -6.061169505119324
+      ]
+    },
+    {
+      "name": "Lateral occipital artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1771,
+      "center": [
+        -2.9775063395500183,
+        160.68270111083984,
+        -5.795919179916382
+      ]
+    },
+    {
+      "name": "Posterior inferior cerebellar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 15468,
+      "center": [
+        -2.8565608263015747,
+        157.60259246826172,
+        -4.402829229831696
+      ]
+    },
+    {
+      "name": "Costocervical trunk.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 118,
+      "center": [
+        -4.790818452835083,
+        142.15750885009766,
+        -0.572631511837244
+      ]
+    },
+    {
+      "name": "Supreme intercostal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        -4.803063631057739,
+        142.0450210571289,
+        -1.4654568433761597
+      ]
+    },
+    {
+      "name": "Second posterior intercostal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2006,
+      "center": [
+        -5.515488684177399,
+        138.4056854248047,
+        1.4472780227661133
+      ]
+    },
+    {
+      "name": "First posterior intercostal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        -4.419788360595703,
+        139.36319732666016,
+        1.5101498365402222
+      ]
+    },
+    {
+      "name": "Deep cervical artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        -4.089222550392151,
+        145.99163818359375,
+        -2.9005317091941833
+      ]
+    },
+    {
+      "name": "Thyrocervical trunk.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 118,
+      "center": [
+        -4.13368821144104,
+        142.64540100097656,
+        0.03387720137834549
+      ]
+    },
+    {
+      "name": "Transverse cervical artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        -5.142098426818848,
+        145.3919219970703,
+        -0.6308906078338623
+      ]
+    },
+    {
+      "name": "(Superficial branch of transverse cervical artery).r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        -6.639529228210449,
+        135.56613159179688,
+        -8.826425075531006
+      ]
+    },
+    {
+      "name": "(Deep branch of transverse cervical artery).r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3541,
+      "center": [
+        -8.089560508728027,
+        134.70415496826172,
+        -5.125299580395222
+      ]
+    },
+    {
+      "name": "Suprascapular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        -9.257688999176025,
+        139.8673095703125,
+        -4.3788235783576965
+      ]
+    },
+    {
+      "name": "Inferior thyroid artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        -3.6079312562942505,
+        144.84369659423828,
+        0.38319174584466964
+      ]
+    },
+    {
+      "name": "Internal thoracic artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        -2.840116560459137,
+        133.54443359375,
+        5.006483793258667
+      ]
+    },
+    {
+      "name": "Musculophrenic artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1416,
+      "center": [
+        -6.417982578277588,
+        116.04701614379883,
+        5.160009630024433
+      ]
+    },
+    {
+      "name": "Superior epigastric artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -1.7423433661460876,
+        116.85023498535156,
+        10.071870803833008
+      ]
+    },
+    {
+      "name": "Axillary artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -10.771814823150635,
+        138.88880920410156,
+        -0.7183001358062029
+      ]
+    },
+    {
+      "name": "Lateral thoracic artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -11.930014610290527,
+        129.04672622680664,
+        3.089700073003769
+      ]
+    },
+    {
+      "name": "Brachial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -17.964026927947998,
+        122.78713607788086,
+        -1.80026575922966
+      ]
+    },
+    {
+      "name": "Radial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        -25.51885223388672,
+        96.73071670532227,
+        0.4915451407432556
+      ]
+    },
+    {
+      "name": "Deep palmar arch.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 944,
+      "center": [
+        -26.923673629760742,
+        84.68238830566406,
+        2.1453081369400024
+      ]
+    },
+    {
+      "name": "Palmar metacarpal arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1770,
+      "center": [
+        -26.918360710144043,
+        81.65084457397461,
+        2.8315457105636597
+      ]
+    },
+    {
+      "name": "Palmar carpal branch of radial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        -25.9928560256958,
+        87.71049499511719,
+        2.390076518058777
+      ]
+    },
+    {
+      "name": "Dorsal carpal anastomosis.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 236,
+      "center": [
+        -27.45974063873291,
+        84.10042190551758,
+        1.18898606300354
+      ]
+    },
+    {
+      "name": "Dorsal metacarpal arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2360,
+      "center": [
+        -26.6135311126709,
+        81.14441299438477,
+        2.24820339679718
+      ]
+    },
+    {
+      "name": "Dorsal digital arteries of hand.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 6139,
+      "center": [
+        -27.733712196350098,
+        76.27336883544922,
+        5.45997428894043
+      ]
+    },
+    {
+      "name": "Deep brachial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        -18.804235458374023,
+        122.36731338500977,
+        -3.488339900970459
+      ]
+    },
+    {
+      "name": "Middle collateral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        -21.62031841278076,
+        115.54509735107422,
+        -4.951513290405273
+      ]
+    },
+    {
+      "name": "Radial collateral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        -22.83279037475586,
+        112.16012573242188,
+        -2.990277886390686
+      ]
+    },
+    {
+      "name": "Superior ulnar collateral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        -19.236392974853516,
+        113.25685501098633,
+        -3.423136830329895
+      ]
+    },
+    {
+      "name": "Inferior ulnar collateral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        -20.25704860687256,
+        111.33496856689453,
+        -2.3734700083732605
+      ]
+    },
+    {
+      "name": "Ulnar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        -23.69248676300049,
+        97.50387573242188,
+        0.5779973864555359
+      ]
+    },
+    {
+      "name": "Dorsal carpal branch of ulnar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        -25.02454662322998,
+        84.82831954956055,
+        1.7832752168178558
+      ]
+    },
+    {
+      "name": "(Ulnar recurrent artery).r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        -21.328173637390137,
+        106.09086990356445,
+        -2.0391038060188293
+      ]
+    },
+    {
+      "name": "Common interosseous artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 118,
+      "center": [
+        -23.202468872070312,
+        103.4705810546875,
+        -0.8923215568065643
+      ]
+    },
+    {
+      "name": "Recurrent interosseous artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        -23.375537872314453,
+        107.8203125,
+        -3.115843653678894
+      ]
+    },
+    {
+      "name": "Posterior interosseous artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -24.19871425628662,
+        96.90557098388672,
+        0.1264282464981079
+      ]
+    },
+    {
+      "name": "Superficial palmar arch.r",
+      "system": "other",
+      "group": "other",
+      "triangles": 1180,
+      "center": [
+        -26.197943687438965,
+        84.30046463012695,
+        2.734801173210144
+      ]
+    },
+    {
+      "name": "Common palmar digital arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        -27.378920555114746,
+        79.9312858581543,
+        3.94834566116333
+      ]
+    },
+    {
+      "name": "Proper palmar digital arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 12752,
+      "center": [
+        -27.851428031921387,
+        78.82697296142578,
+        5.83728551864624
+      ]
+    },
+    {
+      "name": "Subscapular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 118,
+      "center": [
+        -13.270991802215576,
+        135.8687973022461,
+        -1.2792316675186157
+      ]
+    },
+    {
+      "name": "Thoracodorsal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        -13.381817817687988,
+        131.40532684326172,
+        -2.3994475603103638
+      ]
+    },
+    {
+      "name": "Circumflex scapular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 471,
+      "center": [
+        -13.67500114440918,
+        135.4398651123047,
+        -3.4826493859291077
+      ]
+    },
+    {
+      "name": "Thoraco-acromial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 118,
+      "center": [
+        -9.469717979431152,
+        140.01559448242188,
+        -0.020004630088806152
+      ]
+    },
+    {
+      "name": "Pectoral branches of thoraco-acromial artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        -11.014411926269531,
+        133.65008926391602,
+        2.692055508494377
+      ]
+    },
+    {
+      "name": "Anterior circumflex humeral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        -16.721651077270508,
+        137.58045959472656,
+        -0.9099583029747009
+      ]
+    },
+    {
+      "name": "Posterior circumflex humeral artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -16.326139450073242,
+        136.69805908203125,
+        -2.252146601676941
+      ]
+    },
+    {
+      "name": "Aortic arch",
+      "system": "other",
+      "group": "major",
+      "triangles": 236,
+      "center": [
+        1.1918836832046509,
+        137.61260986328125,
+        -0.04488682746887207
+      ]
+    },
+    {
+      "name": "Brachiocephalic trunk",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 236,
+      "center": [
+        -0.09971243143081665,
+        139.84922790527344,
+        1.453151136636734
+      ]
+    },
+    {
+      "name": "Abdominal aorta",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 826,
+      "center": [
+        0.7680502831935883,
+        111.96051788330078,
+        1.0627515316009521
+      ]
+    },
+    {
+      "name": "Inferior phrenic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1653,
+      "center": [
+        -3.9582899510860443,
+        120.97307205200195,
+        2.7038313150405884
+      ]
+    },
+    {
+      "name": "Coeliac trunk",
+      "system": "other",
+      "group": "major",
+      "triangles": 236,
+      "center": [
+        0.8376274853944778,
+        114.76431655883789,
+        2.335828125476837
+      ]
+    },
+    {
+      "name": "Left gastric artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        1.257575199007988,
+        116.60765838623047,
+        4.309845566749573
+      ]
+    },
+    {
+      "name": "Common hepatic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 235,
+      "center": [
+        -0.6294742822647095,
+        115.1891098022461,
+        4.577926158905029
+      ]
+    },
+    {
+      "name": "Gastroduodenal artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 353,
+      "center": [
+        -2.7502381801605225,
+        113.87623977661133,
+        7.372380971908569
+      ]
+    },
+    {
+      "name": "Proper hepatic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1771,
+      "center": [
+        -6.640989422798157,
+        115.858642578125,
+        6.003327131271362
+      ]
+    },
+    {
+      "name": "Splenic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3542,
+      "center": [
+        5.159196823835373,
+        115.65578079223633,
+        0.9152051210403442
+      ]
+    },
+    {
+      "name": "Left testicular artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3660,
+      "center": [
+        3.9552475214004517,
+        90.65766143798828,
+        1.6564283967018127
+      ]
+    },
+    {
+      "name": "Inferior mesenteric artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        1.1448774933815002,
+        101.77737808227539,
+        2.685335397720337
+      ]
+    },
+    {
+      "name": "Sigmoid arteries",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3660,
+      "center": [
+        3.7558965384960175,
+        99.4816780090332,
+        2.531925618648529
+      ]
+    },
+    {
+      "name": "Left colic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        2.2712165117263794,
+        105.0323715209961,
+        3.392020344734192
+      ]
+    },
+    {
+      "name": "Ascending branch of left colic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        4.272211194038391,
+        107.79907608032227,
+        2.4021332263946533
+      ]
+    },
+    {
+      "name": "Descending branch of left colic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        4.885397553443909,
+        103.17519760131836,
+        2.212271571159363
+      ]
+    },
+    {
+      "name": "Superior anorectal artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 944,
+      "center": [
+        -0.9338393807411194,
+        90.20138168334961,
+        -1.8500096201896667
+      ]
+    },
+    {
+      "name": "Right renal artery",
+      "system": "arteries",
+      "group": "renal",
+      "triangles": 354,
+      "center": [
+        -1.1144277155399323,
+        111.3561019897461,
+        1.1388282999396324
+      ]
+    },
+    {
+      "name": "Intrarenal arteries of right kidney",
+      "system": "arteries",
+      "group": "renal",
+      "triangles": 8382,
+      "center": [
+        -5.319547057151794,
+        109.45271682739258,
+        -0.9728337544947863
+      ]
+    },
+    {
+      "name": "Anterior branch of renal artery.r",
+      "system": "arteries",
+      "group": "renal",
+      "triangles": 472,
+      "center": [
+        -4.150560021400452,
+        110.6699104309082,
+        0.08036735653877258
+      ]
+    },
+    {
+      "name": "Posterior branch of renal artery.r",
+      "system": "arteries",
+      "group": "renal",
+      "triangles": 708,
+      "center": [
+        -5.100432276725769,
+        110.2421875,
+        -0.6849763989448547
+      ]
+    },
+    {
+      "name": "Inferior suprarenal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1652,
+      "center": [
+        -4.299196720123291,
+        113.2421875,
+        -0.6796203851699829
+      ]
+    },
+    {
+      "name": "Lumbar arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 4841,
+      "center": [
+        -4.123428761959076,
+        107.31169128417969,
+        -1.3351606130599976
+      ]
+    },
+    {
+      "name": "Lumbar arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 4367,
+      "center": [
+        4.692974165081978,
+        107.3087158203125,
+        -1.6141712665557861
+      ]
+    },
+    {
+      "name": "Left renal artery",
+      "system": "arteries",
+      "group": "renal",
+      "triangles": 118,
+      "center": [
+        1.874996542930603,
+        111.65576934814453,
+        1.387353554368019
+      ]
+    },
+    {
+      "name": "Intrarenal arteries of left kidney",
+      "system": "arteries",
+      "group": "renal",
+      "triangles": 6729,
+      "center": [
+        6.175720691680908,
+        111.03601455688477,
+        -1.7613125443458557
+      ]
+    },
+    {
+      "name": "Anterior branch of renal artery.l",
+      "system": "arteries",
+      "group": "renal",
+      "triangles": 353,
+      "center": [
+        4.491055250167847,
+        111.99844360351562,
+        -0.3900432884693146
+      ]
+    },
+    {
+      "name": "Inferior suprarenal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2006,
+      "center": [
+        4.678267121315002,
+        114.64830017089844,
+        -1.135227918624878
+      ]
+    },
+    {
+      "name": "Posterior branch of renal artery.l",
+      "system": "arteries",
+      "group": "renal",
+      "triangles": 354,
+      "center": [
+        4.27230966091156,
+        111.5531234741211,
+        -1.0291197001934052
+      ]
+    },
+    {
+      "name": "Superior mesenteric artery",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 5076,
+      "center": [
+        -0.21363472938537598,
+        105.68109893798828,
+        3.8900147676467896
+      ]
+    },
+    {
+      "name": "Ileocolic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        -1.8710215091705322,
+        104.31195068359375,
+        3.905436873435974
+      ]
+    },
+    {
+      "name": "Appendicular artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2006,
+      "center": [
+        -3.8835201263427734,
+        98.02534866333008,
+        0.7436988353729248
+      ]
+    },
+    {
+      "name": "Colic branch of ileocolic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -5.016390681266785,
+        104.89369201660156,
+        2.556017756462097
+      ]
+    },
+    {
+      "name": "Ileal branch of ileocolic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        -4.121220111846924,
+        102.11876678466797,
+        2.9435229301452637
+      ]
+    },
+    {
+      "name": "Right colic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        -3.7980765104293823,
+        107.53157806396484,
+        3.614069700241089
+      ]
+    },
+    {
+      "name": "Middle colic artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 944,
+      "center": [
+        -3.6547240018844604,
+        109.81700134277344,
+        3.6638031005859375
+      ]
+    },
+    {
+      "name": "Inferior pancreaticoduodenal artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        -0.463274821639061,
+        110.62908935546875,
+        4.045935869216919
+      ]
+    },
+    {
+      "name": "Anterior inferior pancreaticoduodenal artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3660,
+      "center": [
+        -0.2902557849884033,
+        111.89851760864258,
+        5.163167953491211
+      ]
+    },
+    {
+      "name": "Marginal artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3896,
+      "center": [
+        -0.32036709785461426,
+        107.33935546875,
+        1.5543819665908813
+      ]
+    },
+    {
+      "name": "Right testicular artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 4132,
+      "center": [
+        -3.095203399658203,
+        91.44913482666016,
+        1.656217873096466
+      ]
+    },
+    {
+      "name": "Common iliac artery.l",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 118,
+      "center": [
+        1.5235247164964676,
+        100.56526565551758,
+        2.3035528659820557
+      ]
+    },
+    {
+      "name": "External iliac artery.l",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 354,
+      "center": [
+        4.139251232147217,
+        93.92716979980469,
+        1.4041355848312378
+      ]
+    },
+    {
+      "name": "Inferior epigastric artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        3.972617506980896,
+        99.69803237915039,
+        5.238789409399033
+      ]
+    },
+    {
+      "name": "Internal iliac artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        3.081634998321533,
+        96.30633926391602,
+        0.18038499355316162
+      ]
+    },
+    {
+      "name": "Anterior division of internal iliac artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        3.206229329109192,
+        93.33611297607422,
+        -1.3585096895694733
+      ]
+    },
+    {
+      "name": "Inferior gluteal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1535,
+      "center": [
+        5.023991823196411,
+        86.81209945678711,
+        -4.07057398557663
+      ]
+    },
+    {
+      "name": "Internal pudendal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3306,
+      "center": [
+        3.9879873991012573,
+        87.0034408569336,
+        -3.5670257210731506
+      ]
+    },
+    {
+      "name": "Dorsal artery of penis.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 4722,
+      "center": [
+        2.0168638080358505,
+        80.35514068603516,
+        3.099645972251892
+      ]
+    },
+    {
+      "name": "Deep artery of penis.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        0.534650444984436,
+        80.02328109741211,
+        6.617306232452393
+      ]
+    },
+    {
+      "name": "Posterior division of internal iliac artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        3.2062171697616577,
+        93.84260177612305,
+        -1.3104083836078644
+      ]
+    },
+    {
+      "name": "Superior gluteal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 7084,
+      "center": [
+        5.385324239730835,
+        93.29865264892578,
+        -4.427342772483826
+      ]
+    },
+    {
+      "name": "Iliolumbar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        3.4540672302246094,
+        95.05897521972656,
+        -2.1254647970199585
+      ]
+    },
+    {
+      "name": "Lumbar branch of iliolumbar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1061,
+      "center": [
+        4.841820240020752,
+        96.53079223632812,
+        -0.45169222354888916
+      ]
+    },
+    {
+      "name": "Iliacus branch of iliolumbar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1297,
+      "center": [
+        7.978798151016235,
+        98.26382446289062,
+        0.4284641742706299
+      ]
+    },
+    {
+      "name": "Spinal branch of iliolumbar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 118,
+      "center": [
+        2.705954611301422,
+        96.45408630371094,
+        -3.097995400428772
+      ]
+    },
+    {
+      "name": "Median sacral artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -0.0006498321890830994,
+        94.85359954833984,
+        -2.762295365333557
+      ]
+    },
+    {
+      "name": "Common iliac artery.r",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 236,
+      "center": [
+        -0.9817784428596497,
+        100.563232421875,
+        2.301846355199814
+      ]
+    },
+    {
+      "name": "Internal iliac artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        -3.0816372632980347,
+        96.30633926391602,
+        0.18038493394851685
+      ]
+    },
+    {
+      "name": "Anterior division of internal iliac artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -3.2062315940856934,
+        93.33611297607422,
+        -1.358509510755539
+      ]
+    },
+    {
+      "name": "Obturator artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 707,
+      "center": [
+        4.677543044090271,
+        87.4750862121582,
+        -1.2583678364753723
+      ]
+    },
+    {
+      "name": "Obturator artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 707,
+      "center": [
+        -4.67754590511322,
+        87.4750862121582,
+        -1.258367896080017
+      ]
+    },
+    {
+      "name": "Internal pudendal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3306,
+      "center": [
+        -3.9879897832870483,
+        87.00343704223633,
+        -3.567025125026703
+      ]
+    },
+    {
+      "name": "Deep artery of penis.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        -0.5346527099609375,
+        80.02328109741211,
+        6.617307662963867
+      ]
+    },
+    {
+      "name": "Dorsal artery of penis.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 4722,
+      "center": [
+        -2.016866013407707,
+        80.35514450073242,
+        3.0996475219726562
+      ]
+    },
+    {
+      "name": "Inferior gluteal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1535,
+      "center": [
+        -5.023994088172913,
+        86.81209945678711,
+        -4.070573389530182
+      ]
+    },
+    {
+      "name": "Posterior division of internal iliac artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        -3.206219434738159,
+        93.84259796142578,
+        -1.3104082643985748
+      ]
+    },
+    {
+      "name": "Iliolumbar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        -3.454069495201111,
+        95.05897521972656,
+        -2.1254647374153137
+      ]
+    },
+    {
+      "name": "Lumbar branch of iliolumbar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1061,
+      "center": [
+        -4.841822981834412,
+        96.53079223632812,
+        -0.45169228315353394
+      ]
+    },
+    {
+      "name": "Spinal branch of iliolumbar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 118,
+      "center": [
+        -2.705956816673279,
+        96.45408630371094,
+        -3.097995638847351
+      ]
+    },
+    {
+      "name": "Iliacus branch of iliolumbar artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1297,
+      "center": [
+        -7.978800296783447,
+        98.26382446289062,
+        0.4284639358520508
+      ]
+    },
+    {
+      "name": "Superior gluteal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 7084,
+      "center": [
+        -5.385326623916626,
+        93.29865264892578,
+        -4.427342712879181
+      ]
+    },
+    {
+      "name": "External iliac artery.r",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 354,
+      "center": [
+        -4.139253258705139,
+        93.92716979980469,
+        1.404135674238205
+      ]
+    },
+    {
+      "name": "Inferior epigastric artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        -3.9726195335388184,
+        99.69803237915039,
+        5.238788574934006
+      ]
+    },
+    {
+      "name": "Ascending aorta",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 236,
+      "center": [
+        1.1185626685619354,
+        133.57828521728516,
+        2.4256444424390793
+      ]
+    },
+    {
+      "name": "Thoracic aorta",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 354,
+      "center": [
+        1.5249868743121624,
+        128.52932357788086,
+        -2.5282131507992744
+      ]
+    },
+    {
+      "name": "Subcostal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2006,
+      "center": [
+        3.5492818355560303,
+        111.16867446899414,
+        -2.686862885951996
+      ]
+    },
+    {
+      "name": "Posterior intercostal arteries.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 20426,
+      "center": [
+        -5.77972674369812,
+        123.4741325378418,
+        0.7555665969848633
+      ]
+    },
+    {
+      "name": "Subcostal artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2006,
+      "center": [
+        -3.4641315639019012,
+        111.18309783935547,
+        -2.856448531150818
+      ]
+    },
+    {
+      "name": "Posterior intercostal arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 17829,
+      "center": [
+        7.347529292106628,
+        123.47369003295898,
+        0.7557830810546875
+      ]
+    },
+    {
+      "name": "Superior phrenic arteries",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 5784,
+      "center": [
+        -7.016088604927063,
+        119.19795227050781,
+        0.41624903678894043
+      ]
+    },
+    {
+      "name": "Femoral artery.l",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 1770,
+      "center": [
+        6.135272979736328,
+        72.88861846923828,
+        1.635553240776062
+      ]
+    },
+    {
+      "name": "Superficial external pudendal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1535,
+      "center": [
+        2.9083392918109894,
+        79.58731079101562,
+        5.64287805557251
+      ]
+    },
+    {
+      "name": "Superficial epigastric artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1653,
+      "center": [
+        6.025648593902588,
+        95.75403213500977,
+        7.260148525238037
+      ]
+    },
+    {
+      "name": "Popliteal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        7.811085224151611,
+        46.96466064453125,
+        -3.9757542610168457
+      ]
+    },
+    {
+      "name": "Inferior lateral genicular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 943,
+      "center": [
+        9.629450559616089,
+        44.23466491699219,
+        -3.1481444388628006
+      ]
+    },
+    {
+      "name": "Inferior medial genicular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        5.534861326217651,
+        42.69841003417969,
+        -2.8684852719306946
+      ]
+    },
+    {
+      "name": "Anterior tibial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1770,
+      "center": [
+        8.91155195236206,
+        23.618136405944824,
+        -3.138426899909973
+      ]
+    },
+    {
+      "name": "Dorsalis pedis artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        7.699993848800659,
+        6.8430914878845215,
+        1.6601344347000122
+      ]
+    },
+    {
+      "name": "Lateral tarsal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        8.99682092666626,
+        6.143181085586548,
+        -1.788918912410736
+      ]
+    },
+    {
+      "name": "Arcuate artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        9.495349884033203,
+        5.197376251220703,
+        0.35871338844299316
+      ]
+    },
+    {
+      "name": "Dorsal metatarsal arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1652,
+      "center": [
+        10.105620384216309,
+        4.067796230316162,
+        3.868434965610504
+      ]
+    },
+    {
+      "name": "Dorsal digital arteries of foot.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 7792,
+      "center": [
+        11.485188007354736,
+        2.49538516998291,
+        5.844974458217621
+      ]
+    },
+    {
+      "name": "Deep plantar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        8.38432788848877,
+        4.867423176765442,
+        2.6742806434631348
+      ]
+    },
+    {
+      "name": "Superior lateral genicular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        9.580958604812622,
+        50.3590087890625,
+        -1.5574613958597183
+      ]
+    },
+    {
+      "name": "Posterior tibial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1652,
+      "center": [
+        7.456512451171875,
+        20.684232711791992,
+        -4.603780150413513
+      ]
+    },
+    {
+      "name": "Lateral plantar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 353,
+      "center": [
+        8.34596300125122,
+        3.023751974105835,
+        -2.088557243347168
+      ]
+    },
+    {
+      "name": "Plantar arch.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 944,
+      "center": [
+        8.19205617904663,
+        3.141111969947815,
+        0.3148305416107178
+      ]
+    },
+    {
+      "name": "Plantar metatarsal arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2360,
+      "center": [
+        9.917490005493164,
+        2.9189928770065308,
+        3.1335346549749374
+      ]
+    },
+    {
+      "name": "Common plantar digital arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        10.313138484954834,
+        1.8905470371246338,
+        6.2655909061431885
+      ]
+    },
+    {
+      "name": "Proper plantar digital arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 7084,
+      "center": [
+        11.347633838653564,
+        1.4690165519714355,
+        6.008156061172485
+      ]
+    },
+    {
+      "name": "Perforating branches of plantar metatarsal arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        10.098392486572266,
+        2.958999216556549,
+        3.8845822513103485
+      ]
+    },
+    {
+      "name": "Fibular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2597,
+      "center": [
+        10.146356105804443,
+        21.486724615097046,
+        -6.22244668006897
+      ]
+    },
+    {
+      "name": "Calcaneal branches of fibular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        8.127336025238037,
+        4.95258355140686,
+        -6.9157164096832275
+      ]
+    },
+    {
+      "name": "Calcaneal branches of posterior tibial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 353,
+      "center": [
+        5.8798346519470215,
+        4.4446107149124146,
+        -6.450469255447388
+      ]
+    },
+    {
+      "name": "Medial plantar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        6.352671384811401,
+        4.015883684158325,
+        -1.0367063283920288
+      ]
+    },
+    {
+      "name": "Superficial branch of medial plantar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        6.106458425521851,
+        2.928368091583252,
+        4.1605866849422455
+      ]
+    },
+    {
+      "name": "Superior medial genicular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2007,
+      "center": [
+        5.954467535018921,
+        49.7624568939209,
+        -1.1813093423843384
+      ]
+    },
+    {
+      "name": "Middle genicular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2007,
+      "center": [
+        7.629068851470947,
+        47.60993957519531,
+        -5.274180173873901
+      ]
+    },
+    {
+      "name": "Patellar anastomosis.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 3896,
+      "center": [
+        8.618175983428955,
+        43.7625789642334,
+        -0.6075129508972168
+      ]
+    },
+    {
+      "name": "Deep external pudendal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        4.63496196269989,
+        83.00100326538086,
+        4.776623487472534
+      ]
+    },
+    {
+      "name": "Deep femoral artery.l",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 943,
+      "center": [
+        7.341152191162109,
+        72.08924102783203,
+        0.9169957637786865
+      ]
+    },
+    {
+      "name": "Lateral circumflex femoral artery.l",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 1180,
+      "center": [
+        10.720964908599854,
+        83.81521224975586,
+        -0.38996946811676025
+      ]
+    },
+    {
+      "name": "Descending branch of lateral circumflex femoral artery.l",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 944,
+      "center": [
+        10.229480504989624,
+        66.67301368713379,
+        0.9482108354568481
+      ]
+    },
+    {
+      "name": "Perforating femoral arteries.l",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 944,
+      "center": [
+        10.131593704223633,
+        70.35912704467773,
+        0.4049108028411865
+      ]
+    },
+    {
+      "name": "Medial circumflex femoral artery.l",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 1298,
+      "center": [
+        8.962157249450684,
+        84.11827087402344,
+        0.05111575126647949
+      ]
+    },
+    {
+      "name": "Left common carotid artery",
+      "system": "arteries",
+      "group": "major",
+      "triangles": 472,
+      "center": [
+        2.37743079662323,
+        144.08863830566406,
+        0.28464825451374054
+      ]
+    },
+    {
+      "name": "Internal carotid artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        2.2951753735542297,
+        154.47872924804688,
+        1.1207940727472305
+      ]
+    },
+    {
+      "name": "Ophthalmic artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        1.4795408248901367,
+        160.05360412597656,
+        3.8174976110458374
+      ]
+    },
+    {
+      "name": "Supratrochlear artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2361,
+      "center": [
+        1.2582913041114807,
+        160.9340057373047,
+        6.024904847145081
+      ]
+    },
+    {
+      "name": "Posterior ethmoidal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        1.38125741481781,
+        159.719970703125,
+        4.4636476039886475
+      ]
+    },
+    {
+      "name": "Septal branches of posterior ethmoidal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        0.5371075123548508,
+        158.38297271728516,
+        3.9164116382598877
+      ]
+    },
+    {
+      "name": "Lacrimal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1770,
+      "center": [
+        2.813287138938904,
+        160.34955596923828,
+        4.965099930763245
+      ]
+    },
+    {
+      "name": "Long posterior ciliary arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1771,
+      "center": [
+        2.1217278838157654,
+        160.31197357177734,
+        4.495271682739258
+      ]
+    },
+    {
+      "name": "Anterior ethmoidal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1534,
+      "center": [
+        0.7413229718804359,
+        159.25149536132812,
+        6.546208620071411
+      ]
+    },
+    {
+      "name": "Anterior septal branches of anterior ethmoidal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1180,
+      "center": [
+        0.21863996982574463,
+        158.4873504638672,
+        5.365884780883789
+      ]
+    },
+    {
+      "name": "Supra-orbital artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3424,
+      "center": [
+        2.652936100959778,
+        162.27660369873047,
+        6.587634801864624
+      ]
+    },
+    {
+      "name": "Short posterior ciliary arteries.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        1.9369797706604004,
+        159.93524169921875,
+        3.824105739593506
+      ]
+    },
+    {
+      "name": "Central retinal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 85016,
+      "center": [
+        2.832989454269409,
+        159.05716705322266,
+        5.087171912193298
+      ]
+    },
+    {
+      "name": "Middle cerebral artery (M1-segment).l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        2.3695148229599,
+        160.99340057373047,
+        2.168640673160553
+      ]
+    },
+    {
+      "name": "Proximal lateral striate branches.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 3187,
+      "center": [
+        1.2643449306488037,
+        161.5486297607422,
+        2.2629305124282837
+      ]
+    },
+    {
+      "name": "Insular branches of middle cerebral artery (M2-segment).l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        4.263142704963684,
+        162.11994171142578,
+        1.788119614124298
+      ]
+    },
+    {
+      "name": "Middle cerebral artery (M3 segment).l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1534,
+      "center": [
+        5.343337774276733,
+        162.9815216064453,
+        -1.8959102034568787
+      ]
+    },
+    {
+      "name": "Posterior parietal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3777,
+      "center": [
+        5.151700973510742,
+        165.1564712524414,
+        -5.306300640106201
+      ]
+    },
+    {
+      "name": "Postcentral arterial branch.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2006,
+      "center": [
+        4.507055759429932,
+        165.99197387695312,
+        -2.555691085755825
+      ]
+    },
+    {
+      "name": "Posterior temporal branch.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 1771,
+      "center": [
+        5.9140236377716064,
+        161.56668853759766,
+        -5.032219648361206
+      ]
+    },
+    {
+      "name": "Parietal branches of middle cerebral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1653,
+      "center": [
+        5.429508209228516,
+        165.68364715576172,
+        -3.7345449924468994
+      ]
+    },
+    {
+      "name": "Temporo-occipital branch.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 3424,
+      "center": [
+        3.7676462531089783,
+        161.81256866455078,
+        -7.543654203414917
+      ]
+    },
+    {
+      "name": "Branch to angular gyrus.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 353,
+      "center": [
+        6.021222829818726,
+        162.78225708007812,
+        -6.197940826416016
+      ]
+    },
+    {
+      "name": "Temporal branches of middle cerebral artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2124,
+      "center": [
+        6.190589666366577,
+        161.54044342041016,
+        -1.9639660120010376
+      ]
+    },
+    {
+      "name": "Artery of central sulcus.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1888,
+      "center": [
+        3.965358793735504,
+        165.85527801513672,
+        -0.9139928817749023
+      ]
+    },
+    {
+      "name": "Prefrontal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2597,
+      "center": [
+        4.660367369651794,
+        165.3052520751953,
+        3.4273423552513123
+      ]
+    },
+    {
+      "name": "Lateral frontobasal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2361,
+      "center": [
+        3.312273621559143,
+        163.57813262939453,
+        4.726965248584747
+      ]
+    },
+    {
+      "name": "Artery of precentral sulcus.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 5077,
+      "center": [
+        4.2178308963775635,
+        166.01578521728516,
+        1.630529247224331
+      ]
+    },
+    {
+      "name": "Anterior temporal branch.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 4249,
+      "center": [
+        5.715784549713135,
+        160.93885040283203,
+        0.7206015586853027
+      ]
+    },
+    {
+      "name": "Distal lateral striate branches.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 3778,
+      "center": [
+        2.236310839653015,
+        161.63764190673828,
+        2.5803115367889404
+      ]
+    },
+    {
+      "name": "External carotid artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 708,
+      "center": [
+        3.6881603002548218,
+        152.33324432373047,
+        0.1665218025445938
+      ]
+    },
+    {
+      "name": "Superficial temporal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 10744,
+      "center": [
+        5.781404256820679,
+        162.22181701660156,
+        -0.11493849754333496
+      ]
+    },
+    {
+      "name": "Transverse facial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1652,
+      "center": [
+        4.310626745223999,
+        157.0633773803711,
+        3.7886457070708275
+      ]
+    },
+    {
+      "name": "Frontal branch of superficial temporal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1888,
+      "center": [
+        4.130269527435303,
+        163.4920654296875,
+        6.408244371414185
+      ]
+    },
+    {
+      "name": "Occipital artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 5548,
+      "center": [
+        4.707018852233887,
+        161.6102066040039,
+        -4.9665951281785965
+      ]
+    },
+    {
+      "name": "Facial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        3.47931969165802,
+        153.09667205810547,
+        3.689449727535248
+      ]
+    },
+    {
+      "name": "Inferior labial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 944,
+      "center": [
+        1.8444749414920807,
+        152.38973999023438,
+        7.098280191421509
+      ]
+    },
+    {
+      "name": "Submental artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1770,
+      "center": [
+        1.705308511853218,
+        150.49539184570312,
+        5.427187085151672
+      ]
+    },
+    {
+      "name": "Angular artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 4841,
+      "center": [
+        1.5398059990257025,
+        160.8802261352539,
+        7.777436971664429
+      ]
+    },
+    {
+      "name": "Superior labial artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        2.2744024991989136,
+        154.32312774658203,
+        7.670135974884033
+      ]
+    },
+    {
+      "name": "Ascending pharyngeal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2479,
+      "center": [
+        2.699741303920746,
+        153.6567153930664,
+        2.7065843641757965
+      ]
+    },
+    {
+      "name": "Maxillary artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 3895,
+      "center": [
+        3.522902011871338,
+        156.1203155517578,
+        3.134863793849945
+      ]
+    },
+    {
+      "name": "Inferior alveolar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2124,
+      "center": [
+        2.6838163137435913,
+        153.6133270263672,
+        4.115387678146362
+      ]
+    },
+    {
+      "name": "Mylohyoid branch of inferior alveolar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1298,
+      "center": [
+        3.367884397506714,
+        153.4814453125,
+        2.0029578804969788
+      ]
+    },
+    {
+      "name": "Mental branch of inferior alveolar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        1.1719660758972168,
+        151.11048126220703,
+        7.611107349395752
+      ]
+    },
+    {
+      "name": "Posterior lateral nasal branches of sphenopalatine artery..l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 6376,
+      "center": [
+        0.8953862190246582,
+        157.85774993896484,
+        5.981809854507446
+      ]
+    },
+    {
+      "name": "Middle meningeal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        3.1165027618408203,
+        157.79344177246094,
+        0.9683188498020172
+      ]
+    },
+    {
+      "name": "Accessory branch of middle meningeal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 589,
+      "center": [
+        2.93408465385437,
+        157.86933135986328,
+        1.284571647644043
+      ]
+    },
+    {
+      "name": "Descending palatine artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1416,
+      "center": [
+        2.3488165736198425,
+        156.4215545654297,
+        3.9141616821289062
+      ]
+    },
+    {
+      "name": "Greater palatine artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 826,
+      "center": [
+        0.9304512441158295,
+        155.04530334472656,
+        6.159684658050537
+      ]
+    },
+    {
+      "name": "Anterior deep temporal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1653,
+      "center": [
+        4.439376473426819,
+        159.40786743164062,
+        3.3924973011016846
+      ]
+    },
+    {
+      "name": "Artery of pterygoid canal.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        2.1264813244342804,
+        157.34423065185547,
+        3.53561794757843
+      ]
+    },
+    {
+      "name": "?x.l",
+      "system": "other",
+      "group": "other",
+      "triangles": 1534,
+      "center": [
+        0.3178859353065491,
+        157.07625579833984,
+        5.69228732585907
+      ]
+    },
+    {
+      "name": "Infra-orbital artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 472,
+      "center": [
+        2.6572574377059937,
+        156.75121307373047,
+        5.9070000648498535
+      ]
+    },
+    {
+      "name": "Posterior deep temporal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1535,
+      "center": [
+        4.921091556549072,
+        159.6008529663086,
+        2.275792121887207
+      ]
+    },
+    {
+      "name": "Buccal artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 590,
+      "center": [
+        3.2025039196014404,
+        155.7924575805664,
+        4.77522611618042
+      ]
+    },
+    {
+      "name": "Posterior septal branches of sphenopalatine artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1652,
+      "center": [
+        0.4485013200901449,
+        155.7314224243164,
+        5.994178891181946
+      ]
+    },
+    {
+      "name": "Posterior superior alveolar artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 1062,
+      "center": [
+        2.9560210704803467,
+        156.56764221191406,
+        3.849082112312317
+      ]
+    },
+    {
+      "name": "Posterior communicating artery.r",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        -0.8117537200450897,
+        160.52713012695312,
+        1.5177737176418304
+      ]
+    },
+    {
+      "name": "Posterior communicating artery.l",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 354,
+      "center": [
+        0.8117551803588867,
+        160.52713012695312,
+        1.5177737176418304
+      ]
+    },
+    {
+      "name": "Anterior communicating artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 42,
+      "center": [
+        0.018012747168540955,
+        160.98397064208984,
+        2.3200318813323975
+      ]
+    },
+    {
+      "name": "Pulmonary trunk",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 93,
+      "center": [
+        2.7716113924980164,
+        134.0633316040039,
+        4.429516673088074
+      ]
+    },
+    {
+      "name": "Bifurcation of pulmonary trunk",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 472,
+      "center": [
+        2.5374093651771545,
+        134.5196762084961,
+        1.3592449724674225
+      ]
+    },
+    {
+      "name": "Right pulmonary artery",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 236,
+      "center": [
+        -1.1921234130859375,
+        133.78412628173828,
+        -0.14109313488006592
+      ]
+    },
+    {
+      "name": "Superior lobar artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 118,
+      "center": [
+        -0.5373753905296326,
+        134.29307556152344,
+        0.13374269008636475
+      ]
+    },
+    {
+      "name": "Anterior segmental artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 2360,
+      "center": [
+        -4.8850871324539185,
+        135.1361846923828,
+        2.5638180673122406
+      ]
+    },
+    {
+      "name": "Posterior segmental artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 1062,
+      "center": [
+        -6.405729532241821,
+        133.77845764160156,
+        -3.490831509232521
+      ]
+    },
+    {
+      "name": "Apical segmental artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 3778,
+      "center": [
+        -4.503522574901581,
+        138.57965850830078,
+        -1.986863613128662
+      ]
+    },
+    {
+      "name": "Middle lobar artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 118,
+      "center": [
+        -4.195807337760925,
+        132.46202087402344,
+        -1.1093968972563744
+      ]
+    },
+    {
+      "name": "Medial segmental artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 1416,
+      "center": [
+        -5.449474573135376,
+        129.30894470214844,
+        3.9695699512958527
+      ]
+    },
+    {
+      "name": "Lateral segmental artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 1416,
+      "center": [
+        -7.960001468658447,
+        129.55410385131836,
+        1.4458982348442078
+      ]
+    },
+    {
+      "name": "Inferior lobar artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 236,
+      "center": [
+        -5.195607662200928,
+        130.16078186035156,
+        -2.517570197582245
+      ]
+    },
+    {
+      "name": "Medial basal segmental artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 590,
+      "center": [
+        -4.778656005859375,
+        123.30549621582031,
+        -5.3911964893341064
+      ]
+    },
+    {
+      "name": "Anterior basal segmental artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 1298,
+      "center": [
+        -8.78540587425232,
+        124.17550277709961,
+        -3.4214154481887817
+      ]
+    },
+    {
+      "name": "Posterior basal segmental artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 826,
+      "center": [
+        -6.175101280212402,
+        123.7808609008789,
+        -5.369446396827698
+      ]
+    },
+    {
+      "name": "Superior segmental artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 3306,
+      "center": [
+        -6.906015872955322,
+        130.5309066772461,
+        -4.6780166029930115
+      ]
+    },
+    {
+      "name": "Lateral basal segmental artery of right lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 1180,
+      "center": [
+        -8.959837913513184,
+        126.83380508422852,
+        -0.5094977021217346
+      ]
+    },
+    {
+      "name": "Left pulmonary artery",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 826,
+      "center": [
+        5.615524649620056,
+        131.28843688964844,
+        -1.989629246527329
+      ]
+    },
+    {
+      "name": "Apical segmental artery of left lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 1534,
+      "center": [
+        4.289698600769043,
+        138.3675994873047,
+        -1.9472508002072573
+      ]
+    },
+    {
+      "name": "Inferior lingular artery of left lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 1298,
+      "center": [
+        8.01618504524231,
+        128.83718872070312,
+        2.3926154375076294
+      ]
+    },
+    {
+      "name": "Anterior segmental artery of left lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 2832,
+      "center": [
+        6.220359802246094,
+        134.2883758544922,
+        1.556174397468567
+      ]
+    },
+    {
+      "name": "Posterior segmental artery of left lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 1888,
+      "center": [
+        6.172336459159851,
+        136.76215362548828,
+        -3.9600692987442017
+      ]
+    },
+    {
+      "name": "Superior lingular artery of left lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 1652,
+      "center": [
+        8.420959234237671,
+        131.15515899658203,
+        1.9811139106750488
+      ]
+    },
+    {
+      "name": "Lateral basal segmental artery of left lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 2360,
+      "center": [
+        9.283234596252441,
+        125.97695922851562,
+        1.1853196620941162
+      ]
+    },
+    {
+      "name": "Superior segmental artery of left lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 1652,
+      "center": [
+        6.822566390037537,
+        132.34921264648438,
+        -4.653120279312134
+      ]
+    },
+    {
+      "name": "Anterior basal segmental artery of left lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 2242,
+      "center": [
+        10.300912380218506,
+        123.15153121948242,
+        -3.7671915367245674
+      ]
+    },
+    {
+      "name": "Posterior basal segmental artery of left lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 2478,
+      "center": [
+        5.013831853866577,
+        125.42984771728516,
+        -5.2371591329574585
+      ]
+    },
+    {
+      "name": "Medial basal segmental artery of left lung",
+      "system": "arteries",
+      "group": "pulmonary",
+      "triangles": 826,
+      "center": [
+        6.140074253082275,
+        128.76598739624023,
+        -4.717161297798157
+      ]
+    },
+    {
+      "name": "Left ventricle",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 9122,
+      "center": [
+        4.240015476942062,
+        128.15399932861328,
+        2.8136016726493835
+      ]
+    },
+    {
+      "name": "Inferior papillary muscle of left ventricle",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 638,
+      "center": [
+        6.32897162437439,
+        126.66514587402344,
+        2.889425575733185
+      ]
+    },
+    {
+      "name": "Anterior semilunar leaflet of pulmonary valve",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 1042,
+      "center": [
+        3.3720556497573853,
+        131.81989288330078,
+        5.333804368972778
+      ]
+    },
+    {
+      "name": "Left semilunar leaflet of pulmonary valve",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 816,
+      "center": [
+        3.3677921295166016,
+        131.85292053222656,
+        3.8259406089782715
+      ]
+    },
+    {
+      "name": "Right semilunar leaflet of pulmonary valve",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 1121,
+      "center": [
+        1.938882738351822,
+        132.18473052978516,
+        4.8549416065216064
+      ]
+    },
+    {
+      "name": "Posterior leaflet of left atrioventricular valve",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 3132,
+      "center": [
+        4.007124602794647,
+        127.95827865600586,
+        0.6656599044799805
+      ]
+    },
+    {
+      "name": "Inferior leaflet of right atrioventricular valve",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 4038,
+      "center": [
+        -0.06480878591537476,
+        126.58811569213867,
+        3.265299081802368
+      ]
+    },
+    {
+      "name": "Septal leaflet of right atrioventricular valve",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 3706,
+      "center": [
+        1.2519906759262085,
+        128.89888381958008,
+        2.8691600561141968
+      ]
+    },
+    {
+      "name": "Left coronary leaflet",
+      "system": "other",
+      "group": "other",
+      "triangles": 374,
+      "center": [
+        2.0617225766181946,
+        131.7496337890625,
+        2.1922853589057922
+      ]
+    },
+    {
+      "name": "Non-coronary leaflet",
+      "system": "other",
+      "group": "other",
+      "triangles": 128,
+      "center": [
+        0.9846977479755878,
+        131.43006896972656,
+        1.9609662294387817
+      ]
+    },
+    {
+      "name": "Right coronary leaflet",
+      "system": "other",
+      "group": "other",
+      "triangles": 376,
+      "center": [
+        1.206384040415287,
+        131.50200653076172,
+        3.1354111433029175
+      ]
+    },
+    {
+      "name": "Left atrium",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 2092,
+      "center": [
+        2.0959402322769165,
+        130.05348587036133,
+        1.1348769664764404
+      ]
+    },
+    {
+      "name": "Right atrium",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 9298,
+      "center": [
+        -1.446181058883667,
+        129.54742431640625,
+        2.9133718609809875
+      ]
+    },
+    {
+      "name": "Right ventricle",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 9152,
+      "center": [
+        1.9729946851730347,
+        128.51541900634766,
+        4.769143283367157
+      ]
+    },
+    {
+      "name": "Inferior papillary muscle of right ventricle",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 446,
+      "center": [
+        2.326133131980896,
+        124.86151123046875,
+        4.984004378318787
+      ]
+    },
+    {
+      "name": "Anterior papillary muscle of right ventricle",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 632,
+      "center": [
+        3.121419847011566,
+        125.74675750732422,
+        6.614245176315308
+      ]
+    },
+    {
+      "name": "Septal papillary muscle of right ventricle",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 346,
+      "center": [
+        2.3995317816734314,
+        129.11835861206055,
+        3.9296423196792603
+      ]
+    },
+    {
+      "name": "Left coronary artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 236,
+      "center": [
+        2.8630234003067017,
+        132.7411651611328,
+        2.276217222213745
+      ]
+    },
+    {
+      "name": "Anterior interventricular artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 4722,
+      "center": [
+        5.4678157567977905,
+        128.44029235839844,
+        5.098790526390076
+      ]
+    },
+    {
+      "name": "Septal branches of anterior interventricular artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 2832,
+      "center": [
+        5.00335693359375,
+        128.83692932128906,
+        5.776555776596069
+      ]
+    },
+    {
+      "name": "Circumflex artery of heart",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 6730,
+      "center": [
+        5.761880159378052,
+        128.7950782775879,
+        1.7490432858467102
+      ]
+    },
+    {
+      "name": "Right coronary artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 11098,
+      "center": [
+        1.7706100940704346,
+        128.70961380004883,
+        3.8374550342559814
+      ]
+    },
+    {
+      "name": "Right inferolateral branch of right coronary artery",
+      "system": "arteries",
+      "group": "arteries",
+      "triangles": 7556,
+      "center": [
+        4.887725114822388,
+        124.80180358886719,
+        1.6438609659671783
+      ]
+    },
+    {
+      "name": "Coronary sinus",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 590,
+      "center": [
+        2.1785075068473816,
+        127.24590682983398,
+        0.015089988708496094
+      ]
+    },
+    {
+      "name": "Inferior vein of left ventricle",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 4840,
+      "center": [
+        6.183908462524414,
+        126.32599639892578,
+        1.5610131621360779
+      ]
+    },
+    {
+      "name": "Middle cardiac vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 13106,
+      "center": [
+        3.777721621096134,
+        125.3503646850586,
+        3.544923424720764
+      ]
+    },
+    {
+      "name": "????????",
+      "system": "other",
+      "group": "other",
+      "triangles": 8500,
+      "center": [
+        1.8268004655838013,
+        127.45339584350586,
+        4.909487247467041
+      ]
+    },
+    {
+      "name": "Inferior vein of left ventricle (//Posterior '')",
+      "system": "heart",
+      "group": "heart",
+      "triangles": 9092,
+      "center": [
+        4.798683166503906,
+        125.07354736328125,
+        1.8500497341156006
+      ]
+    },
+    {
+      "name": "Great cardiac vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 6021,
+      "center": [
+        5.88311243057251,
+        128.07487106323242,
+        3.072157919406891
+      ]
+    },
+    {
+      "name": "Left superior pulmonary vein",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 354,
+      "center": [
+        4.689354181289673,
+        131.76299285888672,
+        -0.8194649815559387
+      ]
+    },
+    {
+      "name": "Lingular vein of left lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 236,
+      "center": [
+        5.561225175857544,
+        131.3321990966797,
+        -0.6969039365649223
+      ]
+    },
+    {
+      "name": "Inferior lingular vein of left lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 1062,
+      "center": [
+        7.890882968902588,
+        128.12107849121094,
+        2.699879765510559
+      ]
+    },
+    {
+      "name": "Superior lingular vein of left lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 826,
+      "center": [
+        7.730407953262329,
+        130.19657135009766,
+        2.3113342821598053
+      ]
+    },
+    {
+      "name": "Anterior vein of left lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 1180,
+      "center": [
+        6.937626838684082,
+        132.20633697509766,
+        1.2418479919433594
+      ]
+    },
+    {
+      "name": "Apicoposterior vein of left lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 5784,
+      "center": [
+        6.219843149185181,
+        136.90493774414062,
+        -0.34956228733062744
+      ]
+    },
+    {
+      "name": "Left inferior pulmonary vein",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 354,
+      "center": [
+        4.431651473045349,
+        129.29989624023438,
+        -2.2130756974220276
+      ]
+    },
+    {
+      "name": "Inferior basal vein of left lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 2006,
+      "center": [
+        6.085368871688843,
+        124.8395881652832,
+        -4.542087078094482
+      ]
+    },
+    {
+      "name": "Superior vein of left lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 3542,
+      "center": [
+        8.59367036819458,
+        126.0850715637207,
+        -1.6941391229629517
+      ]
+    },
+    {
+      "name": "Superior basal vein of left lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 1888,
+      "center": [
+        8.55911898612976,
+        124.1721076965332,
+        -2.3711728155612946
+      ]
+    },
+    {
+      "name": "Right superior pulmonary vein",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 708,
+      "center": [
+        -2.9003084897994995,
+        132.25473022460938,
+        -0.6026982218027115
+      ]
+    },
+    {
+      "name": "Apical vein of right lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 2360,
+      "center": [
+        -3.3958553671836853,
+        136.9315643310547,
+        0.5837273895740509
+      ]
+    },
+    {
+      "name": "Posterior vein of right lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 2952,
+      "center": [
+        -6.287330865859985,
+        136.71512603759766,
+        -2.4894241094589233
+      ]
+    },
+    {
+      "name": "Lateral vein of right lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 1888,
+      "center": [
+        -6.263818621635437,
+        129.10714721679688,
+        2.6014482975006104
+      ]
+    },
+    {
+      "name": "Medial vein of right lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 1298,
+      "center": [
+        -3.7069010734558105,
+        129.00580215454102,
+        2.429266631603241
+      ]
+    },
+    {
+      "name": "Anterior vein of right lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 944,
+      "center": [
+        -3.968832492828369,
+        134.3297119140625,
+        1.8322648163884878
+      ]
+    },
+    {
+      "name": "Right inferior pulmonary vein",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 236,
+      "center": [
+        -1.3434483632445335,
+        129.43772888183594,
+        -2.3583239316940308
+      ]
+    },
+    {
+      "name": "Inferior basal vein of right lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 3660,
+      "center": [
+        -5.914770424365997,
+        125.0500259399414,
+        -4.478920817375183
+      ]
+    },
+    {
+      "name": "Superior basal vein of right lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 2832,
+      "center": [
+        -6.08958625793457,
+        126.8575553894043,
+        -4.281125962734222
+      ]
+    },
+    {
+      "name": "Superior vein of right lung",
+      "system": "veins",
+      "group": "pulmonary",
+      "triangles": 2952,
+      "center": [
+        -6.168889880180359,
+        130.53126525878906,
+        -4.916360974311829
+      ]
+    },
+    {
+      "name": "Left subclavian vein",
+      "system": "veins",
+      "group": "major",
+      "triangles": 472,
+      "center": [
+        5.9092676639556885,
+        140.72509002685547,
+        1.1314588859677315
+      ]
+    },
+    {
+      "name": "External jugular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        4.06542694568634,
+        147.21976470947266,
+        0.7959315180778503
+      ]
+    },
+    {
+      "name": "Suprascapular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1061,
+      "center": [
+        9.405928373336792,
+        139.23924255371094,
+        -2.08960622549057
+      ]
+    },
+    {
+      "name": "Posterior auricular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        6.262458324432373,
+        159.0400161743164,
+        -1.2253561317920685
+      ]
+    },
+    {
+      "name": "Anterior jugular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 707,
+      "center": [
+        2.0313864201307297,
+        143.75716400146484,
+        2.1443833112716675
+      ]
+    },
+    {
+      "name": "Posterior division of retromandibular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        4.574201583862305,
+        154.2571563720703,
+        0.2445671260356903
+      ]
+    },
+    {
+      "name": "Axillary vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        12.417486667633057,
+        135.61129760742188,
+        -0.05491524934768677
+      ]
+    },
+    {
+      "name": "Anterior circumflex humeral vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1535,
+      "center": [
+        16.733834266662598,
+        137.28545379638672,
+        -0.9757045209407806
+      ]
+    },
+    {
+      "name": "Subscapular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        13.150655746459961,
+        132.0804328918457,
+        -1.5921970941126347
+      ]
+    },
+    {
+      "name": "Circumflex scapular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 589,
+      "center": [
+        14.004961967468262,
+        135.65142059326172,
+        -2.811976209282875
+      ]
+    },
+    {
+      "name": "Thoracodorsal vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        12.562519073486328,
+        132.78933715820312,
+        0.8721209168434143
+      ]
+    },
+    {
+      "name": "Basilic vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1770,
+      "center": [
+        19.69914197921753,
+        107.65309143066406,
+        -0.858884334564209
+      ]
+    },
+    {
+      "name": "Median cubital vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        21.82237148284912,
+        106.84912109375,
+        -0.23212039470672607
+      ]
+    },
+    {
+      "name": "Median antebrachial vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2124,
+      "center": [
+        23.13052749633789,
+        97.15020370483398,
+        0.936532199382782
+      ]
+    },
+    {
+      "name": "Brachial veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        19.160358905792236,
+        119.23179244995117,
+        -1.3624921590089798
+      ]
+    },
+    {
+      "name": "Radial veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        25.584912300109863,
+        97.06869888305664,
+        0.5241574048995972
+      ]
+    },
+    {
+      "name": "Deep venous palmar arch.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2006,
+      "center": [
+        26.829737663269043,
+        84.74143981933594,
+        2.4778682589530945
+      ]
+    },
+    {
+      "name": "Ulnar veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1062,
+      "center": [
+        24.287324905395508,
+        97.12831497192383,
+        0.5636093616485596
+      ]
+    },
+    {
+      "name": "Superficial venous palmar arch.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1770,
+      "center": [
+        26.201342582702637,
+        83.80970764160156,
+        2.7180843353271484
+      ]
+    },
+    {
+      "name": "Palmar digital veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 11688,
+      "center": [
+        27.579978942871094,
+        76.88542175292969,
+        5.820427417755127
+      ]
+    },
+    {
+      "name": "Cephalic vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2832,
+      "center": [
+        19.587865829467773,
+        111.09376525878906,
+        0.26863938570022583
+      ]
+    },
+    {
+      "name": "Dorsal venous network of hand.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1062,
+      "center": [
+        26.511295318603516,
+        80.80167007446289,
+        2.065505266189575
+      ]
+    },
+    {
+      "name": "Dorsal digital veins of hand.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 7557,
+      "center": [
+        27.83274269104004,
+        78.8090934753418,
+        5.563638925552368
+      ]
+    },
+    {
+      "name": "Posterior circumflex humeral vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        16.323084831237793,
+        136.4281234741211,
+        -1.7678625155240297
+      ]
+    },
+    {
+      "name": "Lateral thoracic vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 4132,
+      "center": [
+        10.1042001247406,
+        121.60600662231445,
+        5.946077406406403
+      ]
+    },
+    {
+      "name": "Superior vena cava",
+      "system": "veins",
+      "group": "major",
+      "triangles": 118,
+      "center": [
+        -1.6321933418512344,
+        135.8846893310547,
+        1.9073376059532166
+      ]
+    },
+    {
+      "name": "Right brachiocephalic vein",
+      "system": "veins",
+      "group": "major",
+      "triangles": 236,
+      "center": [
+        -1.681073859333992,
+        139.17916107177734,
+        2.264083206653595
+      ]
+    },
+    {
+      "name": "Internal thoracic veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        -1.8780810832977295,
+        133.26497268676758,
+        6.296771287918091
+      ]
+    },
+    {
+      "name": "Musculophrenic veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1062,
+      "center": [
+        -5.864530265331268,
+        118.02499008178711,
+        7.827927350997925
+      ]
+    },
+    {
+      "name": "Superior epigastric veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        -1.5711091756820679,
+        118.29568099975586,
+        10.037049293518066
+      ]
+    },
+    {
+      "name": "Vertebral vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        -3.6105222702026367,
+        148.92141723632812,
+        -1.1377738118171692
+      ]
+    },
+    {
+      "name": "Occipital vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2124,
+      "center": [
+        -3.2155622243881226,
+        158.98461151123047,
+        -5.205969724804163
+      ]
+    },
+    {
+      "name": "Azygos vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2242,
+      "center": [
+        -1.1812357008457184,
+        125.85700988769531,
+        -1.1900375485420227
+      ]
+    },
+    {
+      "name": "Accessory hemi-azygos vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2242,
+      "center": [
+        0.9231261014938354,
+        133.8133544921875,
+        -1.608234167098999
+      ]
+    },
+    {
+      "name": "Right subcostal vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1770,
+      "center": [
+        -4.235908210277557,
+        111.12215042114258,
+        -3.1531893871724606
+      ]
+    },
+    {
+      "name": "Right superior phrenic vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 4367,
+      "center": [
+        -8.417436122894287,
+        118.34179306030273,
+        0.09750008583068848
+      ]
+    },
+    {
+      "name": "Right superior intercostal vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 25741,
+      "center": [
+        -6.8538892567157745,
+        124.7704086303711,
+        0.7699356079101562
+      ]
+    },
+    {
+      "name": "Hemi-azygos vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        0.4025377631187439,
+        119.78601837158203,
+        -3.2639671564102173
+      ]
+    },
+    {
+      "name": "Left subcostal vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1534,
+      "center": [
+        4.704880952835083,
+        110.3875732421875,
+        -4.255489945411682
+      ]
+    },
+    {
+      "name": "Left ascending lumbar vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2006,
+      "center": [
+        1.9982165098190308,
+        105.9220085144043,
+        -1.0451126396656036
+      ]
+    },
+    {
+      "name": "Right ascending lumbar vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3424,
+      "center": [
+        -0.23169291019439697,
+        107.44496154785156,
+        0.9155268371105194
+      ]
+    },
+    {
+      "name": "Left brachiocephalic vein",
+      "system": "veins",
+      "group": "major",
+      "triangles": 354,
+      "center": [
+        0.2759225368499756,
+        139.27130889892578,
+        2.425319254398346
+      ]
+    },
+    {
+      "name": "Left superior intercostal vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 20900,
+      "center": [
+        5.779757380485535,
+        124.97244262695312,
+        0.7547774314880371
+      ]
+    },
+    {
+      "name": "Internal thoracic veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        1.8780800700187683,
+        133.26497268676758,
+        6.29677152633667
+      ]
+    },
+    {
+      "name": "Superior epigastric veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        1.5711082220077515,
+        118.29568099975586,
+        10.037050724029541
+      ]
+    },
+    {
+      "name": "Musculophrenic veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1062,
+      "center": [
+        5.864529252052307,
+        118.02499008178711,
+        7.8279290199279785
+      ]
+    },
+    {
+      "name": "Vertebral vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        3.6105212569236755,
+        148.92141723632812,
+        -1.1377736330032349
+      ]
+    },
+    {
+      "name": "Occipital vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2124,
+      "center": [
+        3.2155612111091614,
+        158.98461151123047,
+        -5.205970335751772
+      ]
+    },
+    {
+      "name": "Hepatic portal vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        -0.5685910731554031,
+        117.31915664672852,
+        3.0427321195602417
+      ]
+    },
+    {
+      "name": "Internal jugular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        2.9746005535125732,
+        149.2847137451172,
+        0.19220513105392456
+      ]
+    },
+    {
+      "name": "Superior thyroid vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 471,
+      "center": [
+        3.1975420713424683,
+        148.5686798095703,
+        0.7586106806993484
+      ]
+    },
+    {
+      "name": "Lingual vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 472,
+      "center": [
+        2.3825181126594543,
+        153.3431396484375,
+        2.941245436668396
+      ]
+    },
+    {
+      "name": "Common facial vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        3.088778257369995,
+        152.6200714111328,
+        0.5936650559306145
+      ]
+    },
+    {
+      "name": "Anterior division of retromandibular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        3.719177007675171,
+        153.9070587158203,
+        0.8144011795520782
+      ]
+    },
+    {
+      "name": "Retromandibular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        4.495628595352173,
+        155.58961486816406,
+        0.6563919484615326
+      ]
+    },
+    {
+      "name": "Superficial temporal veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        6.357287168502808,
+        161.68730926513672,
+        0.05390787124633789
+      ]
+    },
+    {
+      "name": "Maxillary veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1180,
+      "center": [
+        3.629407048225403,
+        154.9937286376953,
+        3.6568815112113953
+      ]
+    },
+    {
+      "name": "Facial vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        3.2801648378372192,
+        153.03417205810547,
+        3.975927621126175
+      ]
+    },
+    {
+      "name": "Angular vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1770,
+      "center": [
+        1.8569693863391876,
+        158.75680541992188,
+        7.7131667137146
+      ]
+    },
+    {
+      "name": "Superior labial vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 471,
+      "center": [
+        2.2820308804512024,
+        154.1113510131836,
+        7.693492889404297
+      ]
+    },
+    {
+      "name": "Inferior labial veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2478,
+      "center": [
+        1.9322801232337952,
+        151.36083984375,
+        6.516815423965454
+      ]
+    },
+    {
+      "name": "Submental vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        1.7263373136520386,
+        150.31388092041016,
+        6.081894397735596
+      ]
+    },
+    {
+      "name": "Internal jugular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        -2.974598228931427,
+        149.2847137451172,
+        0.19220519065856934
+      ]
+    },
+    {
+      "name": "Superior thyroid vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 471,
+      "center": [
+        -3.197539746761322,
+        148.5686798095703,
+        0.7586107030510902
+      ]
+    },
+    {
+      "name": "Common facial vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        -3.0887759923934937,
+        152.6200714111328,
+        0.5936651676893234
+      ]
+    },
+    {
+      "name": "Anterior division of retromandibular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        -3.719174861907959,
+        153.9070587158203,
+        0.8144013285636902
+      ]
+    },
+    {
+      "name": "Retromandibular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        -4.495626211166382,
+        155.58961486816406,
+        0.6563921272754669
+      ]
+    },
+    {
+      "name": "Maxillary veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1180,
+      "center": [
+        -3.629404664039612,
+        154.9937286376953,
+        3.6568816006183624
+      ]
+    },
+    {
+      "name": "Superficial temporal veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        -6.357284784317017,
+        161.68730926513672,
+        0.053908467292785645
+      ]
+    },
+    {
+      "name": "Facial vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        -3.2801626920700073,
+        153.03417205810547,
+        3.975927919149399
+      ]
+    },
+    {
+      "name": "Submental vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        -1.7263349890708923,
+        150.31388092041016,
+        6.081894397735596
+      ]
+    },
+    {
+      "name": "Angular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1770,
+      "center": [
+        -1.8569670617580414,
+        158.75680541992188,
+        7.7131667137146
+      ]
+    },
+    {
+      "name": "Inferior labial veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2478,
+      "center": [
+        -1.9322779178619385,
+        151.36083984375,
+        6.516815423965454
+      ]
+    },
+    {
+      "name": "Superior labial vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 471,
+      "center": [
+        -2.2820286750793457,
+        154.1113510131836,
+        7.693493127822876
+      ]
+    },
+    {
+      "name": "Lingual vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 472,
+      "center": [
+        -2.3825159072875977,
+        153.3431396484375,
+        2.9412454962730408
+      ]
+    },
+    {
+      "name": "Femoral vein.r",
+      "system": "veins",
+      "group": "major",
+      "triangles": 1652,
+      "center": [
+        -5.5316784381866455,
+        72.52117729187012,
+        1.6119338870048523
+      ]
+    },
+    {
+      "name": "Popliteal vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        -7.9741127490997314,
+        48.96718788146973,
+        -4.09234082698822
+      ]
+    },
+    {
+      "name": "Small saphenous vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2360,
+      "center": [
+        -9.069405317306519,
+        26.230308294296265,
+        -6.643808722496033
+      ]
+    },
+    {
+      "name": "Dorsal venous arch of foot.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        -8.994547843933105,
+        5.3933656215667725,
+        0.2176305055618286
+      ]
+    },
+    {
+      "name": "Intercapitular veins of foot.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3188,
+      "center": [
+        -10.278761386871338,
+        2.868672251701355,
+        3.677762418985367
+      ]
+    },
+    {
+      "name": "Dorsal metatarsal veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2124,
+      "center": [
+        -10.79507327079773,
+        4.1576449275016785,
+        4.10734973475337
+      ]
+    },
+    {
+      "name": "Dorsal digital veins of foot.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 6848,
+      "center": [
+        -11.485143184661865,
+        2.1917814016342163,
+        9.312695980072021
+      ]
+    },
+    {
+      "name": "Genicular veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 4132,
+      "center": [
+        -7.877951383590698,
+        45.01552391052246,
+        -2.6735487580299377
+      ]
+    },
+    {
+      "name": "Posterior tibial veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2006,
+      "center": [
+        -7.514653205871582,
+        20.475271344184875,
+        -4.682173132896423
+      ]
+    },
+    {
+      "name": "Fibular veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1180,
+      "center": [
+        -9.55180835723877,
+        19.3690288066864,
+        -5.688586711883545
+      ]
+    },
+    {
+      "name": "Medial plantar veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        -6.327941179275513,
+        2.8660927414894104,
+        1.8897044658660889
+      ]
+    },
+    {
+      "name": "Lateral plantar veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 472,
+      "center": [
+        -8.292864322662354,
+        2.5505003929138184,
+        -2.0657867193222046
+      ]
+    },
+    {
+      "name": "Plantar venous arch.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        -8.103388786315918,
+        2.6862504482269287,
+        0.3375905156135559
+      ]
+    },
+    {
+      "name": "Plantar metatarsal veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3542,
+      "center": [
+        -10.295219898223877,
+        2.417250335216522,
+        4.083942145109177
+      ]
+    },
+    {
+      "name": "Plantar digital veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 10390,
+      "center": [
+        -10.255154848098755,
+        1.1455195397138596,
+        6.231869339942932
+      ]
+    },
+    {
+      "name": "Anterior tibial veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1888,
+      "center": [
+        -10.15380859375,
+        26.485036373138428,
+        -3.6608299612998962
+      ]
+    },
+    {
+      "name": "Deep femoral vein.r",
+      "system": "veins",
+      "group": "major",
+      "triangles": 1298,
+      "center": [
+        -6.966472625732422,
+        71.97420310974121,
+        2.7911723852157593
+      ]
+    },
+    {
+      "name": "Perforating veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 943,
+      "center": [
+        -10.10300898551941,
+        70.14194107055664,
+        1.4612775295972824
+      ]
+    },
+    {
+      "name": "Great saphenous vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3423,
+      "center": [
+        -4.559305131435394,
+        45.672584533691406,
+        -0.20496559143066406
+      ]
+    },
+    {
+      "name": "External pudendal veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1297,
+      "center": [
+        -1.776112925261259,
+        78.96136093139648,
+        5.612951755523682
+      ]
+    },
+    {
+      "name": "Superficial dorsal veins of penis",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        0.000001039355993270874,
+        79.30765914916992,
+        7.357046842575073
+      ]
+    },
+    {
+      "name": "Superficial epigastric vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2952,
+      "center": [
+        -4.8915711641311646,
+        95.91308212280273,
+        7.770348310470581
+      ]
+    },
+    {
+      "name": "Lateral circumflex femoral veins.r",
+      "system": "veins",
+      "group": "major",
+      "triangles": 1298,
+      "center": [
+        -9.29914379119873,
+        84.17834854125977,
+        0.5716534852981567
+      ]
+    },
+    {
+      "name": "Medial circumflex femoral veins.r",
+      "system": "veins",
+      "group": "major",
+      "triangles": 1416,
+      "center": [
+        -7.727361440658569,
+        84.96104431152344,
+        0.9856610298156738
+      ]
+    },
+    {
+      "name": "Splenic vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3896,
+      "center": [
+        4.717742502689362,
+        115.66871643066406,
+        1.5291346311569214
+      ]
+    },
+    {
+      "name": "Left gastro-omental vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1062,
+      "center": [
+        6.058212757110596,
+        113.8536605834961,
+        3.643809050321579
+      ]
+    },
+    {
+      "name": "Inferior mesenteric vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        1.9109748750925064,
+        106.13486862182617,
+        2.5565038919448853
+      ]
+    },
+    {
+      "name": "Sigmoid veins",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3660,
+      "center": [
+        3.768427327275276,
+        99.46901321411133,
+        2.4521800875663757
+      ]
+    },
+    {
+      "name": "Superior mesenteric vein",
+      "system": "veins",
+      "group": "major",
+      "triangles": 2360,
+      "center": [
+        -3.0008317679166794,
+        106.67103576660156,
+        3.3151658177375793
+      ]
+    },
+    {
+      "name": "Middle colic vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2242,
+      "center": [
+        -4.019948482513428,
+        108.70877075195312,
+        3.2782045006752014
+      ]
+    },
+    {
+      "name": "Right colic vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2360,
+      "center": [
+        -5.020349621772766,
+        103.98825073242188,
+        2.274875521659851
+      ]
+    },
+    {
+      "name": "Right gastro-omental vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2714,
+      "center": [
+        -1.5185242891311646,
+        111.26195907592773,
+        5.060459852218628
+      ]
+    },
+    {
+      "name": "Inferior petrosal sinus.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        2.730366498231888,
+        157.8337631225586,
+        -0.7248732149600983
+      ]
+    },
+    {
+      "name": "Inferior petrosal sinus.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        -2.730373740196228,
+        157.8337631225586,
+        -0.7248730063438416
+      ]
+    },
+    {
+      "name": "Basilar venous plexus",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 23038,
+      "center": [
+        -0.000003069639205932617,
+        159.3967742919922,
+        0.5771725997328758
+      ]
+    },
+    {
+      "name": "Posterior intercavernous sinus",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 590,
+      "center": [
+        -0.00016060471534729004,
+        160.35448455810547,
+        1.3509993255138397
+      ]
+    },
+    {
+      "name": "Anterior intercavernous sinus",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        -0.00005932152271270752,
+        160.62037658691406,
+        1.8078076243400574
+      ]
+    },
+    {
+      "name": "Cavernous sinus.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3988,
+      "center": [
+        -1.1676724553108215,
+        159.54254150390625,
+        1.4342356324195862
+      ]
+    },
+    {
+      "name": "Cavernous sinus.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3988,
+      "center": [
+        1.167665183544159,
+        159.54254150390625,
+        1.4342356324195862
+      ]
+    },
+    {
+      "name": "Sigmoid sinus.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 354,
+      "center": [
+        -5.292679071426392,
+        158.0334930419922,
+        -3.0914556980133057
+      ]
+    },
+    {
+      "name": "Transverse sinus.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        -3.0071870628744364,
+        158.73614501953125,
+        -5.9809547662734985
+      ]
+    },
+    {
+      "name": "Superior petrosal sinus.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 707,
+      "center": [
+        -3.701336443424225,
+        159.27983856201172,
+        -1.686364620923996
+      ]
+    },
+    {
+      "name": "Superior sagittal sinus",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2596,
+      "center": [
+        -0.000003807246685028076,
+        164.0984649658203,
+        -0.9499144554138184
+      ]
+    },
+    {
+      "name": "Straight sinus",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        -0.000004179775714874268,
+        159.7311782836914,
+        -0.8228304386138916
+      ]
+    },
+    {
+      "name": "Inferior sagittal sinus",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        -0.000004071742296218872,
+        163.08078002929688,
+        -0.23400819301605225
+      ]
+    },
+    {
+      "name": "Occipital sinus",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 472,
+      "center": [
+        -0.0000040531158447265625,
+        157.24510955810547,
+        -1.7461358606815338
+      ]
+    },
+    {
+      "name": "Sigmoid sinus.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 354,
+      "center": [
+        5.29267430305481,
+        158.0334930419922,
+        -3.0914556980133057
+      ]
+    },
+    {
+      "name": "Transverse sinus.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        3.0071818940341473,
+        158.73614501953125,
+        -5.980955123901367
+      ]
+    },
+    {
+      "name": "Superior petrosal sinus.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 707,
+      "center": [
+        3.701332151889801,
+        159.2798614501953,
+        -1.686366319656372
+      ]
+    },
+    {
+      "name": "Inferior ophthalmic vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 353,
+      "center": [
+        -1.7864122986793518,
+        159.09938049316406,
+        3.7310932874679565
+      ]
+    },
+    {
+      "name": "Inferior ophthalmic vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 353,
+      "center": [
+        1.7864075303077698,
+        159.09938049316406,
+        3.7310930490493774
+      ]
+    },
+    {
+      "name": "Superior ophthalmic vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 472,
+      "center": [
+        -1.967751383781433,
+        160.45838165283203,
+        5.271703124046326
+      ]
+    },
+    {
+      "name": "Superior ophthalmic vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 472,
+      "center": [
+        1.9677405953407288,
+        160.45838165283203,
+        5.271703124046326
+      ]
+    },
+    {
+      "name": "Right subclavian vein",
+      "system": "veins",
+      "group": "major",
+      "triangles": 354,
+      "center": [
+        -5.723939418792725,
+        140.6814193725586,
+        1.0874158665537834
+      ]
+    },
+    {
+      "name": "Axillary vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        -12.417487621307373,
+        135.61128997802734,
+        -0.05491524934768677
+      ]
+    },
+    {
+      "name": "Subscapular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        -13.150656700134277,
+        132.08042526245117,
+        -1.5921974033117294
+      ]
+    },
+    {
+      "name": "Circumflex scapular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 589,
+      "center": [
+        -14.004963397979736,
+        135.65140533447266,
+        -2.811976157128811
+      ]
+    },
+    {
+      "name": "Thoracodorsal vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        -12.562520980834961,
+        132.78932571411133,
+        0.8721206933259964
+      ]
+    },
+    {
+      "name": "Cephalic vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2832,
+      "center": [
+        -19.587867259979248,
+        111.09375381469727,
+        0.2686384916305542
+      ]
+    },
+    {
+      "name": "Dorsal venous network of hand.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1062,
+      "center": [
+        -26.511295318603516,
+        80.80166244506836,
+        2.0655004382133484
+      ]
+    },
+    {
+      "name": "Dorsal digital veins of hand.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 7557,
+      "center": [
+        -27.83274269104004,
+        78.80908966064453,
+        5.563633739948273
+      ]
+    },
+    {
+      "name": "Posterior circumflex humeral vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        -16.323086261749268,
+        136.4281234741211,
+        -1.767862480133772
+      ]
+    },
+    {
+      "name": "Brachial veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        -19.16036033630371,
+        119.2317886352539,
+        -1.362492948770523
+      ]
+    },
+    {
+      "name": "Radial veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        -25.58491325378418,
+        97.06869125366211,
+        0.524154007434845
+      ]
+    },
+    {
+      "name": "Deep venous palmar arch.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2006,
+      "center": [
+        -26.82973861694336,
+        84.74143600463867,
+        2.4778637290000916
+      ]
+    },
+    {
+      "name": "Ulnar veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1062,
+      "center": [
+        -24.287325859069824,
+        97.12831115722656,
+        0.5636059045791626
+      ]
+    },
+    {
+      "name": "Superficial venous palmar arch.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1770,
+      "center": [
+        -26.201343536376953,
+        83.8097038269043,
+        2.718079686164856
+      ]
+    },
+    {
+      "name": "Palmar digital veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 11688,
+      "center": [
+        -27.579978942871094,
+        76.88541793823242,
+        5.820422172546387
+      ]
+    },
+    {
+      "name": "Lateral thoracic vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 4132,
+      "center": [
+        -10.104201078414917,
+        121.60600280761719,
+        5.946076571941376
+      ]
+    },
+    {
+      "name": "Basilic vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1770,
+      "center": [
+        -19.699142932891846,
+        107.65307998657227,
+        -0.858887255191803
+      ]
+    },
+    {
+      "name": "Median cubital vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        -21.822372436523438,
+        106.84911346435547,
+        -0.23212283849716187
+      ]
+    },
+    {
+      "name": "Median antebrachial vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2124,
+      "center": [
+        -23.130528450012207,
+        97.15019989013672,
+        0.9365286231040955
+      ]
+    },
+    {
+      "name": "Anterior circumflex humeral vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1535,
+      "center": [
+        -16.733834743499756,
+        137.28545379638672,
+        -0.9757042527198792
+      ]
+    },
+    {
+      "name": "External jugular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        -4.065428018569946,
+        147.21975708007812,
+        0.7959309816360474
+      ]
+    },
+    {
+      "name": "Suprascapular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1061,
+      "center": [
+        -9.405929565429688,
+        139.23924255371094,
+        -2.0896074771881104
+      ]
+    },
+    {
+      "name": "Anterior jugular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 707,
+      "center": [
+        -2.0313874930143356,
+        143.7571563720703,
+        2.1443822979927063
+      ]
+    },
+    {
+      "name": "Posterior division of retromandibular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        -4.5742027759552,
+        154.25714874267578,
+        0.24456720054149628
+      ]
+    },
+    {
+      "name": "Posterior auricular vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        -6.2624592781066895,
+        159.04000854492188,
+        -1.2253556549549103
+      ]
+    },
+    {
+      "name": "Inferior vena cava (thoracic part)",
+      "system": "veins",
+      "group": "major",
+      "triangles": 354,
+      "center": [
+        -1.3543678689748049,
+        121.68680953979492,
+        1.6793903480283916
+      ]
+    },
+    {
+      "name": "Inferior vena cava (abdominal part)",
+      "system": "veins",
+      "group": "major",
+      "triangles": 236,
+      "center": [
+        -0.946580451913178,
+        110.21854782104492,
+        2.0100580751895905
+      ]
+    },
+    {
+      "name": "Common iliac vein.r",
+      "system": "veins",
+      "group": "major",
+      "triangles": 118,
+      "center": [
+        -1.2142060166224837,
+        100.44268035888672,
+        1.9972335696220398
+      ]
+    },
+    {
+      "name": "Internal iliac vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        -2.0903207659721375,
+        96.22538757324219,
+        0.10556018352508545
+      ]
+    },
+    {
+      "name": "Internal pudendal vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        -2.682557839900255,
+        85.37931060791016,
+        -1.0063849687576294
+      ]
+    },
+    {
+      "name": "Inferior gluteal veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1771,
+      "center": [
+        -4.472613096237183,
+        87.75263595581055,
+        -3.919181704521179
+      ]
+    },
+    {
+      "name": "Lateral sacral veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 590,
+      "center": [
+        -1.7943211793899536,
+        91.20484161376953,
+        -4.611585259437561
+      ]
+    },
+    {
+      "name": "Deep dorsal vein of penis",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1770,
+      "center": [
+        0.00022971630096435547,
+        79.50463485717773,
+        6.4432008266448975
+      ]
+    },
+    {
+      "name": "Superior gluteal veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1770,
+      "center": [
+        -4.956941485404968,
+        93.10077285766602,
+        -4.259551644325256
+      ]
+    },
+    {
+      "name": "Iliolumbar vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        -7.532577157020569,
+        98.24277877807617,
+        0.34042978286743164
+      ]
+    },
+    {
+      "name": "External iliac vein.r",
+      "system": "veins",
+      "group": "major",
+      "triangles": 236,
+      "center": [
+        -3.067342758178711,
+        93.28230667114258,
+        2.1680287197232246
+      ]
+    },
+    {
+      "name": "Inferior epigastric vein.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1180,
+      "center": [
+        -3.2784359455108643,
+        100.50246047973633,
+        5.93677818775177
+      ]
+    },
+    {
+      "name": "Right renal vein",
+      "system": "veins",
+      "group": "renal",
+      "triangles": 354,
+      "center": [
+        -1.8957417607307434,
+        110.2690658569336,
+        1.031774789094925
+      ]
+    },
+    {
+      "name": "Intrarenal veins of right kidney",
+      "system": "veins",
+      "group": "renal",
+      "triangles": 11688,
+      "center": [
+        -4.939589262008667,
+        109.44220733642578,
+        -0.9978447621688247
+      ]
+    },
+    {
+      "name": "Lumbar veins.r",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 6022,
+      "center": [
+        -5.034238636493683,
+        107.54607772827148,
+        -2.059693455696106
+      ]
+    },
+    {
+      "name": "Common iliac vein.l",
+      "system": "veins",
+      "group": "major",
+      "triangles": 236,
+      "center": [
+        0.3496416211128235,
+        100.44615936279297,
+        1.9906415343284607
+      ]
+    },
+    {
+      "name": "Iliolumbar vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        7.532580852508545,
+        98.24277877807617,
+        0.34043002128601074
+      ]
+    },
+    {
+      "name": "Internal iliac vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        2.0903242230415344,
+        96.22538757324219,
+        0.10556083917617798
+      ]
+    },
+    {
+      "name": "Superior gluteal veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1770,
+      "center": [
+        4.956945180892944,
+        93.10077285766602,
+        -4.259550750255585
+      ]
+    },
+    {
+      "name": "Lateral sacral veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 590,
+      "center": [
+        1.7943246066570282,
+        91.20484161376953,
+        -4.611584186553955
+      ]
+    },
+    {
+      "name": "Internal pudendal vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1416,
+      "center": [
+        2.68256127089262,
+        85.37931060791016,
+        -1.0063832998275757
+      ]
+    },
+    {
+      "name": "Inferior gluteal veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1771,
+      "center": [
+        4.472616791725159,
+        87.75263214111328,
+        -3.9191806316375732
+      ]
+    },
+    {
+      "name": "External iliac vein.l",
+      "system": "veins",
+      "group": "major",
+      "triangles": 236,
+      "center": [
+        3.067346215248108,
+        93.28230667114258,
+        2.1680294647812843
+      ]
+    },
+    {
+      "name": "Inferior epigastric vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1180,
+      "center": [
+        3.2784396409988403,
+        100.50246047973633,
+        5.93677818775177
+      ]
+    },
+    {
+      "name": "Left renal vein",
+      "system": "veins",
+      "group": "renal",
+      "triangles": 590,
+      "center": [
+        0.7534332275390625,
+        110.60850143432617,
+        1.7006560415029526
+      ]
+    },
+    {
+      "name": "Intrarenal veins of left kidney",
+      "system": "veins",
+      "group": "renal",
+      "triangles": 9327,
+      "center": [
+        5.214225769042969,
+        111.0877799987793,
+        -1.5286890002898872
+      ]
+    },
+    {
+      "name": "Left testicular vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 4013,
+      "center": [
+        3.9555028080940247,
+        91.63745498657227,
+        1.6314770579338074
+      ]
+    },
+    {
+      "name": "Lumbar veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2361,
+      "center": [
+        5.52811336517334,
+        107.54672241210938,
+        -2.4337507635354996
+      ]
+    },
+    {
+      "name": "Right testicular vein",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 4013,
+      "center": [
+        -3.9599419832229614,
+        91.16484451293945,
+        1.6312878131866455
+      ]
+    },
+    {
+      "name": "Hepatic veins",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 236,
+      "center": [
+        -0.9586271420121193,
+        123.98395919799805,
+        2.4920035004615784
+      ]
+    },
+    {
+      "name": "Femoral vein.l",
+      "system": "veins",
+      "group": "major",
+      "triangles": 1652,
+      "center": [
+        5.531678915023804,
+        72.52117729187012,
+        1.6119338870048523
+      ]
+    },
+    {
+      "name": "Lateral circumflex femoral veins.l",
+      "system": "veins",
+      "group": "major",
+      "triangles": 1298,
+      "center": [
+        9.29914379119873,
+        84.17834854125977,
+        0.5716538429260254
+      ]
+    },
+    {
+      "name": "Deep femoral vein.l",
+      "system": "veins",
+      "group": "major",
+      "triangles": 1298,
+      "center": [
+        6.966473340988159,
+        71.97420310974121,
+        2.7911724150180817
+      ]
+    },
+    {
+      "name": "Perforating veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 943,
+      "center": [
+        10.103009223937988,
+        70.14194107055664,
+        1.4612774103879929
+      ]
+    },
+    {
+      "name": "Popliteal vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 826,
+      "center": [
+        7.9741129875183105,
+        48.96718788146973,
+        -4.0923415422439575
+      ]
+    },
+    {
+      "name": "Genicular veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 4132,
+      "center": [
+        7.8779520988464355,
+        45.01552391052246,
+        -2.673549771308899
+      ]
+    },
+    {
+      "name": "Anterior tibial veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1888,
+      "center": [
+        10.153809070587158,
+        26.485036849975586,
+        -3.660831093788147
+      ]
+    },
+    {
+      "name": "Small saphenous vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2360,
+      "center": [
+        9.069406032562256,
+        26.230308413505554,
+        -6.643810272216797
+      ]
+    },
+    {
+      "name": "Dorsal venous arch of foot.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        8.994548559188843,
+        5.3933656215667725,
+        0.2176283597946167
+      ]
+    },
+    {
+      "name": "Intercapitular veins of foot.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3188,
+      "center": [
+        10.278761863708496,
+        2.868672251701355,
+        3.6777603402733803
+      ]
+    },
+    {
+      "name": "Dorsal metatarsal veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2124,
+      "center": [
+        10.795073986053467,
+        4.1576449275016785,
+        4.107347697019577
+      ]
+    },
+    {
+      "name": "Dorsal digital veins of foot.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 6848,
+      "center": [
+        11.485144138336182,
+        2.191781163215637,
+        9.312693357467651
+      ]
+    },
+    {
+      "name": "Posterior tibial veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2006,
+      "center": [
+        7.514653921127319,
+        20.475271463394165,
+        -4.682175159454346
+      ]
+    },
+    {
+      "name": "Lateral plantar veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 472,
+      "center": [
+        8.292864561080933,
+        2.5505005717277527,
+        -2.065788984298706
+      ]
+    },
+    {
+      "name": "Plantar venous arch.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 708,
+      "center": [
+        8.103389024734497,
+        2.6862505674362183,
+        0.33758825063705444
+      ]
+    },
+    {
+      "name": "Plantar metatarsal veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3542,
+      "center": [
+        10.295219898223877,
+        2.4172503054142,
+        4.083940073847771
+      ]
+    },
+    {
+      "name": "Plantar digital veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 10390,
+      "center": [
+        10.255155563354492,
+        1.1455194056034088,
+        6.231866776943207
+      ]
+    },
+    {
+      "name": "Medial plantar veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 944,
+      "center": [
+        6.327941656112671,
+        2.866092801094055,
+        1.8897022008895874
+      ]
+    },
+    {
+      "name": "Fibular veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1180,
+      "center": [
+        9.551808834075928,
+        19.36902904510498,
+        -5.688588619232178
+      ]
+    },
+    {
+      "name": "Medial circumflex femoral veins.l",
+      "system": "veins",
+      "group": "major",
+      "triangles": 1416,
+      "center": [
+        7.727361440658569,
+        84.96104431152344,
+        0.985661506652832
+      ]
+    },
+    {
+      "name": "Great saphenous vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 3423,
+      "center": [
+        4.5593056082725525,
+        45.672584533691406,
+        -0.20496630668640137
+      ]
+    },
+    {
+      "name": "Superficial epigastric vein.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 2952,
+      "center": [
+        4.891571402549744,
+        95.91308212280273,
+        7.770349025726318
+      ]
+    },
+    {
+      "name": "External pudendal veins.l",
+      "system": "veins",
+      "group": "veins",
+      "triangles": 1297,
+      "center": [
+        1.776113372296095,
+        78.96136093139648,
+        5.612951755523682
+      ]
+    }
+  ],
+  "bytes": 2329836,
+  "outputSha256": "4bcd630bccb2ab29d552d8668334271ee5be3af31c98c777d79eff99e8cceba9",
+  "outputTriangles": 360017
+}
