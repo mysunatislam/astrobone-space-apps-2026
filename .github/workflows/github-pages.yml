@@ -37,8 +37,9 @@ jobs:
       - name: Test
         run: npm test
 
+      # Pages serves the site under /<repository name>/, so the base path follows the repository.
       - name: Build full app for GitHub Pages
-        run: npm run build:github
+        run: npx vite build --base=/${{ github.event.repository.name }}/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
