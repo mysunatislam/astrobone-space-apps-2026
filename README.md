@@ -1,6 +1,6 @@
 # AstroBone
 
-**NASA Space Apps 2026 · Create Health Monitoring Software for Astronauts on Space Missions.** On long missions astronauts must spot health changes in themselves. AstroBone's **Daily Self-Check** (in [`twin.html`](https://mysunatislam.github.io/astrobone/twin.html)) does the three things the brief asks for:
+**NASA Space Apps 2026 · Create Health Monitoring Software for Astronauts on Space Missions.** On long missions astronauts must spot health changes in themselves. AstroBone's **Daily Self-Check** (in [`twin.html`](https://mysunatislam.github.io/astrobone-space-apps-2026/twin.html)) does the three things the brief asks for:
 
 - **Gather:** camera knee extension, a 3-minute reaction test (PVT-B), sleep, fatigue, mood, stress, immune symptoms, resting heart rate and dosimeter context.
 - **Evaluate:** quality gates first, then a comparison with the astronaut's own baseline across bone & muscle, cardiovascular, behavioral health and immune.
@@ -20,9 +20,9 @@ The cardiovascular view now uses an anatomical Z-Anatomy heart/vessel GLB. **Ins
 
 See the [October 3 implementation audit, evidence limits, and competition assessment](docs/competition-audit-2026-10-03.md) and [exact demo script](docs/competition-demo-2026-10-03.md). These supersede older maturity and presentation claims below. Public deployments have not been updated by this local work.
 
-- Live app: https://mysunatislam.github.io/astrobone/
-- Digital twin: https://mysunatislam.github.io/astrobone/twin.html
-- Public repository: https://github.com/mysunatislam/astrobone
+- Live app: https://mysunatislam.github.io/astrobone-space-apps-2026/
+- Digital twin: https://mysunatislam.github.io/astrobone-space-apps-2026/twin.html
+- Public repository: https://github.com/mysunatislam/astrobone-space-apps-2026
 - Project owner: Mysunat Islam / [@mysunatislam](https://github.com/mysunatislam)
 
 AstroBone is not a diagnostic system, medical device, or validated astronaut fracture predictor.
