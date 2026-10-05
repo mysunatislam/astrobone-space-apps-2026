@@ -12,7 +12,7 @@ export function initResearchWorkspace({ controller, video }) {
   };
   $("#video-speed").onchange = event => { video.playbackRate = Number(event.target.value); };
   $("#video-scrub").oninput = event => {
-    controller.assessment = null; controller.worldFilter.reset(); controller.imageFilter.reset(); controller.lastTrackTime = -1;
+    controller.assessment = null; controller.worldFilter.reset(); controller.imageFilter.reset();
     controller.onPose(null); video.currentTime = Math.max(0, Math.min(Number(event.target.value), controller.videoWindow?.endSeconds ?? video.duration));
     controller.onStatus({ key: "ready", label: "Video seek / assessment reset" });
   };

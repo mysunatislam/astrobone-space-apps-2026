@@ -420,6 +420,8 @@ const poseController = new PoseAssessmentController({
   onDetails: updateDetailObservations,
   onObjects: updateLiveObjects,
   onAssessment: completeFunctionalAssessment,
+  // Each presented frame of an uploaded video, with its face mesh, feeds the camera pulse.
+  onVideoFrame: frame => healthLayers.videoFrame(frame),
 });
 
 const scene = new THREE.Scene();
@@ -1382,8 +1384,14 @@ function updateMotionGuardTwinTelemetry(snapshot) {
   drawMotionGuardTrace();
 }
 
+let lastMotionGuardUi = 0, lastMotionGuardState = null;
 function updateMotionGuardUi(snapshot) {
   const live = snapshot.status === "tracking";
+  // Analysis runs on every frame; the readouts refresh about 12 times a second, and at once on a
+  // state change or a completed repetition.
+  const now = performance.now(), state = `${snapshot.status}/${snapshot.mode}/${snapshot.reviewCue}`;
+  if (live && state === lastMotionGuardState && !snapshot.repetitionCompleted && now - lastMotionGuardUi < 80) return;
+  lastMotionGuardUi = now; lastMotionGuardState = state;
   const selectedJoint = getSelectedMotionGuardJoint();
   const jointMeta = MOTION_GUARD_JOINTS[selectedJoint];
   const degrees = (value) => Number.isFinite(value) ? `${value.toFixed(1)} deg` : "--";
@@ -1716,6 +1724,11 @@ function updateCameraStatus(status) {
   if (document.querySelector("#mission-review-dialog").open) updateMissionReview();
 }
 
+// Text that changes on every video frame is written only when it differs (fewer layout passes).
+function setText(element, text) {
+  if (element.textContent !== text) element.textContent = text;
+}
+
 function updateLivePose(frame) {
   if (frame && functionalState.currentDetails
     && Math.abs(frame.timestamp - functionalState.currentDetails.timestamp) < 900) {
@@ -1733,30 +1746,30 @@ function updateLivePose(frame) {
   const rigLinked = Boolean(hasLiveSegments(frame, performance.now()) && externalSkeleton.loaded);
   refs.cameraMotion.disabled = !poseController.active || !externalSkeleton.loaded;
   refs.centerPose.disabled = !rigLinked;
-  refs.trackingQuality.textContent = frame
+  setText(refs.trackingQuality, frame
     ? `${Math.round(frame.visibility * 100)}%`
-    : "--";
-  refs.rigCoverage.textContent = frame
+    : "--");
+  setText(refs.rigCoverage, frame
     ? `${frame.trackedSegmentCount}/${frame.totalSegmentCount}`
-    : "--";
-  refs.poseLatency.textContent = frame?.cached ? "Cached / 12 Hz source" : Number.isFinite(frame?.pipelineLatencyMs ?? frame?.inferenceMs)
+    : "--");
+  setText(refs.poseLatency, frame?.synced ? `In sync with video / ${Math.round(poseController.syncRate())} poses/s` : Number.isFinite(frame?.pipelineLatencyMs ?? frame?.inferenceMs)
     ? `${Math.round(frame.pipelineLatencyMs ?? frame.inferenceMs)} ms`
-    : "--";
-  refs.poseLiveFps.textContent = Number.isFinite(frame?.frameRate)
+    : "--");
+  setText(refs.poseLiveFps, Number.isFinite(frame?.frameRate)
     ? `${Math.round(frame.frameRate)} fps`
-    : "-- fps";
+    : "-- fps");
 
   if (rigLinked) {
     refs.poseLinkState.dataset.state = "linked";
-    refs.poseLinkState.textContent = `${frame.usable ? "Live pose" : "Partial body"} - ${frame.trackedSegmentCount}/${frame.totalSegmentCount} segments`;
+    setText(refs.poseLinkState, `${frame.usable ? "Live pose" : "Partial body"} - ${frame.trackedSegmentCount}/${frame.totalSegmentCount} segments`);
   } else if (frame) {
     refs.poseLinkState.dataset.state = "partial";
-    refs.poseLinkState.textContent = "Tracking lost - holding last pose";
+    setText(refs.poseLinkState, "Tracking lost - holding last pose");
   } else {
     refs.poseLinkState.dataset.state = "waiting";
-    refs.poseLinkState.textContent = poseController.active
+    setText(refs.poseLinkState, poseController.active
       ? "Searching for body - pose held"
-      : "Camera off";
+      : "Camera off");
   }
 
   if (rigLinked && !functionalState.calibration) {
@@ -1865,8 +1878,13 @@ async function analyzeExerciseVideo(file) {
   if (mirrorBeforeVideo === null) mirrorBeforeVideo = refs.mirrorPreview.checked;
   refs.mirrorPreview.checked = false;
   refs.poseViewport.dataset.mirrored = "false";
+  // A recorded face is analysed for the camera pulse, so face and hand tracking turns on for uploads.
+  if (!refs.detailTracking.checked) {
+    refs.detailTracking.checked = true;
+    poseController.setDetailDetectionEnabled(true);
+  }
   try {
-    const started = await poseController.startVideo(file, { precompute: document.querySelector("#video-precompute").checked });
+    const started = await poseController.startVideo(file, { synchronized: document.querySelector("#video-precompute").checked });
     if (!started) return;
     updateCameraSourceLabel();
     refs.functionalWarning.textContent = poseController.videoWindow?.assessmentEligible === false
@@ -2221,13 +2239,15 @@ function updateLinkedMotion(elapsed) {
         centerCameraPose({ announce: false });
       }
       const motion = getCameraRootMotion(frame);
-      if (motion) liveRootOffset.lerp(motion, 0.35);
+      if (motion) liveRootOffset.lerp(motion, frame.synced ? 0.85 : 0.35);
     }
     externalSkeleton.group.position.set(-0.1, 0.45, -0.1).add(liveRootOffset);
+    liveRetargeter.timeConstant = frame?.synced ? 0.004 : 0.032;
     const tracking = liveRetargeter.update(frame, now);
     fitTrackedRigInView(camera, controls.target, externalSkeleton.boundsBones);
     refs.canvas.dataset.tracking = pausedPose && tracking.state !== "lost" ? "paused" : tracking.state;
     refs.canvas.dataset.trackedBones = String(tracking.trackedBones);
+    refs.canvas.dataset.poseMediaTime = Number.isFinite(frame?.mediaTime) ? frame.mediaTime.toFixed(3) : "";
     refs.canvas.dataset.bodyHeadingYaw = Number.isFinite(tracking.bodyHeadingRadians)
       ? THREE.MathUtils.radToDeg(tracking.bodyHeadingRadians).toFixed(1) : "";
     for (const side of ["left", "right"]) {
@@ -3329,6 +3349,7 @@ function getSimulationReplayFrame(phase) {
 }
 
 let lastTwinFrame = 0;
+let lastTwinPoseStamp = null;
 let twinInView = true;
 if (globalThis.IntersectionObserver) {
   new IntersectionObserver(([entry]) => { twinInView = entry.isIntersecting; }, {
@@ -3340,8 +3361,14 @@ function animate(now) {
   requestAnimationFrame(animate);
   const frameInterval = poseController.starting ? 100
     : window.innerWidth <= 700 ? 50 : 33;
-  if (document.hidden || !twinInView || now - lastTwinFrame < frameInterval) return;
+  // Synchronized video: the twin draws once per new video frame, on the frame its pose arrives
+  // (and slowly while paused), instead of on a fixed timer.
+  const syncedPose = functionalState.currentPose?.synced ? functionalState.currentPose : null;
+  const freshPose = Boolean(syncedPose && syncedPose.timestamp !== lastTwinPoseStamp);
+  const due = syncedPose ? freshPose || now - lastTwinFrame >= 100 : now - lastTwinFrame >= frameInterval;
+  if (document.hidden || !twinInView || !due) return;
   lastTwinFrame = now;
+  if (syncedPose) lastTwinPoseStamp = syncedPose.timestamp;
   const elapsed = (now - animationStart) / 1000;
   const phase = (elapsed % 5) / 5;
   const replayFrame = getSimulationReplayFrame(phase);
@@ -3600,6 +3627,7 @@ function bindEvents() {
 
 bindEvents();
 const healthLayers = initHealthLayers({ scene, rig: externalSkeleton, video: refs.poseVideo,
+  onCameraMeasuring: on => poseController.setDetailFaceFocus(on),
   getFace: () => functionalState.currentDetails,
   isLiveCamera: () => poseController.active && poseController.sourceKind === "camera",
 });
@@ -3612,6 +3640,16 @@ const localMesh = initLocalMesh({ scene, rig: externalSkeleton, video: refs.pose
   isActive: () => poseController.active, getMirror: () => refs.mirrorPreview.checked, camera, controls, renderCanvas: refs.canvas,
 });
 initCompanion({ getAssessment: () => functionalState.latestResult, getPulse: healthLayers.getPulse });
+const warmPoseModel = () => { if (!poseController.active && !poseController.starting) poseController.prepare().catch(() => {}); };
+if ("requestIdleCallback" in window) requestIdleCallback(warmPoseModel, { timeout: 4000 });
+else setTimeout(warmPoseModel, 2000);
+// Read-only hook for the automated sync and vital-sign checks (scripts/qa-video-sync.mjs).
+window.__astroboneLab = {
+  poseController,
+  get frame() { return functionalState.currentPose; },
+  get details() { return functionalState.currentDetails; },
+  get pulse() { return healthLayers.getVitals(); },
+};
 updateCameraFacingUi(selectedCameraFacing);
 void refreshCameraDevices({ preferActiveDevice: false });
 poseController.setObjectDetectionEnabled(refs.objectAwareness.checked);

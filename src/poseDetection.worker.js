@@ -54,13 +54,15 @@ async function initializeLandmarker({ modelUrl, wasmUrl, delegate = "AUTO" }) {
       createCanvas: () => typeof OffscreenCanvas === "function" ? new OffscreenCanvas(640, 640) : null,
       onProgress: label => self.postMessage({ type: "progress", label }),
     });
+    self.postMessage({ type: "progress", label: "warming up pose model" });
+    warmUp();
     self.postMessage({ type: "ready", runtime: runtime.info });
   } catch (error) {
     postError(error);
   }
 }
 
-async function detectFrame({ bitmap, timestamp, cameraSessionId, mediaTime }) {
+async function detectFrame({ bitmap, timestamp, cameraSessionId, mediaTime, analysis = false }) {
   if (!runtime) {
     bitmap?.close?.();
     postError(new Error("Pose landmarker is not ready."));
@@ -90,12 +92,24 @@ async function detectFrame({ bitmap, timestamp, cameraSessionId, mediaTime }) {
       timestamp,
       mediaTime,
       cameraSessionId,
+      analysis,
     });
   } catch (error) {
     postError(error);
   } finally {
     bitmap?.close?.();
   }
+}
+
+// One inference on a blank frame compiles the detector's GPU programs before the first real frame.
+// Later frames use larger page-clock timestamps, so the model's timestamp order is kept.
+function warmUp() {
+  if (typeof OffscreenCanvas !== "function") return;
+  try {
+    const canvas = new OffscreenCanvas(256, 256), context = canvas.getContext("2d");
+    context.fillStyle = "#808080"; context.fillRect(0, 0, 256, 256);
+    runtime.landmarker.detectForVideo(canvas, 1);
+  } catch { /* A failed warm-up only means the first real frame is slower. */ }
 }
 
 function serializePoses(poses) {

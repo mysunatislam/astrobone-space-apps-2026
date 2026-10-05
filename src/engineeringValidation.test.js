@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { beamCase, runEngineeringChecks, evaluateReferencePairs } from "./engineeringValidation.js";
-import { videoPoseAt, seekVideoFrame, isPausedVideoPose } from "./videoPoseTrack.js";
+import { isPausedVideoPose } from "./videoPoseTrack.js";
 
 test("paused video holds only its matched pose without refreshing the observation", () => {
   const frame = {detected:true,mediaTime:7.25,timestamp:1000};
@@ -37,12 +37,4 @@ test("subjects with entirely failed estimates remain in the reference report",()
   const input=reference(); input.pairs[2].subject_id="C";
   const result=evaluateReferencePairs(input);
   assert.equal(result.subjects,3); assert.equal(result.evaluatedSubjects,2); assert.equal(result.fullyFailedSubjects,1);
-});
-test("cached video sample follows media time, supports seeking, rejects large gaps", () => {
-  const track = [{ mediaTime: 0 }, { mediaTime: .1 }, { mediaTime: .2 }];
-  assert.equal(videoPoseAt(track, .15), track[1]); assert.equal(videoPoseAt(track, .04), track[0]);
-  assert.equal(videoPoseAt(track, 4), null); assert.equal(videoPoseAt(track, NaN), null);
-});
-test("cancelled video preparation cannot wait on decoded frames", async () => {
-  const abort = new AbortController(); abort.abort(); await assert.rejects(seekVideoFrame({}, 0, abort.signal), /cancelled/);
 });

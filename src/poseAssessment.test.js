@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { PoseAssessmentController } from "./poseAssessment.js";
+import { PoseTrack } from "./videoPoseTrack.js";
 import { bodyPose } from "../scripts/fixtures/bodyPose.mjs";
 
 function cameraFixture(t, { media, play } = {}) {
@@ -35,14 +36,19 @@ const deferred = () => {
   return { promise, resolve, reject };
 };
 
-test("video preparation results resolve the cache request without posing the live avatar", t => {
+test("look-ahead pose results fill the video track without posing the live avatar", t => {
   const { controller, stream } = cameraFixture(t); controller.stream = stream;
-  let resolved = null, emitted = false;
-  controller.pendingVideoFrame = { resolve: value => resolved = value };
+  controller.videoTrack = new PoseTrack(); controller.poseWorkerBusy = true;
+  let emitted = false;
   controller.onPose = () => emitted = true;
-  const message = { type: "result", cameraSessionId: controller.cameraSessionId, mediaTime: 2 };
-  controller.handlePoseWorkerMessage(message);
-  assert.equal(resolved, message); assert.equal(emitted, false); assert.equal(controller.poseWorkerBusy, false);
+  const pose = [bodyPose()];
+  controller.handlePoseWorkerMessage({ type: "result", analysis: true, cameraSessionId: controller.cameraSessionId, mediaTime: 2, landmarks: pose, worldLandmarks: pose, inferenceMs: 18 });
+  assert.equal(controller.videoTrack.size, 1); assert.equal(controller.videoTrack.samples[0].mediaTime, 2);
+  assert.equal(emitted, false); assert.equal(controller.poseWorkerBusy, false);
+  assert.equal(controller.analysisInferenceMs, 18);
+  controller.detailTrack = new PoseTrack();
+  controller.handleDetailWorkerMessage({ type: "result", analysis: true, cameraSessionId: controller.cameraSessionId, mediaTime: 2, face: { landmarks: [] }, hands: [] });
+  assert.equal(controller.detailTrack.size, 1, "face results from the look-ahead go to the detail track");
 });
 
 test("video assessment duration follows media time even during a slow or occluded frame", t => {
@@ -55,14 +61,14 @@ test("video assessment duration follows media time even during a slow or occlude
 test("seeking after video end restarts pose updates without restarting an assessment", t => {
   const {controller} = cameraFixture(t);
   controller.sourceKind = "video"; controller.videoObjectUrl = "blob:fixture";
-  controller.lastVideoTime = 13; controller.lastTrackTime = 12.9;
+  controller.lastVideoTime = 13;
   controller.assessment = null;
   let scheduled = false, cleared = false;
   controller.scheduleNextFrame = () => {scheduled = true;};
   controller.onPose = value => {cleared = value === null;};
   controller.handleVideoSeeked();
   assert.equal(scheduled, true); assert.equal(cleared, true);
-  assert.equal(controller.lastVideoTime, -1); assert.equal(controller.lastTrackTime, -1);
+  assert.equal(controller.lastVideoTime, -1);
   assert.equal(controller.assessment, null);
   const replayAssessment = {samples:[]}; controller.assessment = replayAssessment;
   controller.handleVideoSeeked();
@@ -70,6 +76,17 @@ test("seeking after video end restarts pose updates without restarting an assess
   scheduled = false; controller.starting = true;
   controller.handleVideoSeeked();
   assert.equal(scheduled, false, "preparation seeks must not start playback inference");
+});
+
+test("a pose read from the synchronized track is published as synced, with its frame's media time", (t) => {
+  const { controller } = cameraFixture(t);
+  let frame;
+  controller.drawLandmarks = () => {};
+  controller.onPose = (result) => { frame = result; };
+  controller.handlePoseResult({ landmarks: [bodyPose()], worldLandmarks: [bodyPose()], timestamp: 1000, mediaTime: 4.2, cached: true, synced: true, inferenceMs: 20 });
+  assert.equal(frame.synced, true); assert.equal(frame.mediaTime, 4.2); assert.equal(frame.cached, true);
+  controller.handlePoseResult({ landmarks: [bodyPose()], worldLandmarks: [bodyPose()], timestamp: 1100, inferenceMs: 20 });
+  assert.equal(frame.synced, false, "live inference is not synchronized");
 });
 
 test("image visibility prevents inferred offscreen legs from driving the human rig", (t) => {
@@ -97,9 +114,10 @@ test("seeking to the terminal video frame renders once without restarting an ass
   controller.videoWindow={endSeconds:7.32,autoTrimmed:false};
   controller.videoWindowComplete=true;
   Object.assign(video,{currentTime:7.32,ended:true,paused:true,readyState:2});
-  const sample={mediaTime:7.25,landmarks:[],worldLandmarks:[]};
-  controller.videoTrack=[sample];
-  controller.lastVideoTime=7.32; controller.lastTrackTime=7.25;
+  const pose=[bodyPose()];
+  controller.videoTrack=new PoseTrack(); controller.detailTrack=new PoseTrack();
+  controller.videoTrack.add({mediaTime:7.25,landmarks:pose,worldLandmarks:pose});
+  controller.lastVideoTime=7.32;
   let scheduled=0,emitted=null;
   controller.scheduleNextFrame=() => scheduled++;
   controller.resizeCanvas=() => {};
@@ -107,7 +125,10 @@ test("seeking to the terminal video frame renders once without restarting an ass
   controller.handleVideoSeeked();
   assert.equal(scheduled,1,"seek schedules the final still even when media is ended");
   controller.processFrame(1000);
-  assert.equal(emitted.mediaTime,7.25); assert.equal(emitted.cached,true);
+  assert.equal(emitted,null,"synchronized video is posed by its presented frames, not by polling");
+  controller.presentVideoFrame(7.32);
+  assert.equal(emitted.mediaTime,7.32,"the pose is reported at the presented frame's time");
+  assert.equal(emitted.cached,true); assert.equal(emitted.synced,true);
   assert.equal(scheduled,1,"terminal still does not restart a polling loop");
   assert.equal(controller.assessment,null);
   assert.equal(controller.videoWindowComplete,true);
@@ -385,22 +406,43 @@ test("long video stops at the automatic boundary and can seek back or replay", a
   assert.equal(controller.assessment.durationMs, 8000);
 });
 
-test("pose preparation only decodes the selected clip window", async t => {
+test("a paused frame shown before its pose was analysed is posed once the look-ahead reaches it", async t => {
   const {controller,video} = videoFixture(t);
-  video.duration = 300; video.readyState = 2;
   controller.sourceKind = "video"; controller.videoObjectUrl = "blob:exercise-test";
-  controller.videoWindow = {startSeconds:0,endSeconds:.34};
-  controller.starting = true;
-  const times = [];
-  controller.detectPose = () => {
-    times.push(video.currentTime);
-    controller.pendingVideoFrame.resolve({landmarks:[],worldLandmarks:[]});
-    controller.pendingVideoFrame = null;
-  };
-  await controller.prepareVideoTrack(controller.cameraSessionId);
-  assert.ok(times.length >= 4 && times.length <= 5);
-  assert.ok(times.every(time=>time < .34));
-  assert.equal(controller.videoTrack.length, times.length);
+  controller.videoWindow = {startSeconds:0,endSeconds:10};
+  controller.videoTrack = new PoseTrack(); controller.detailTrack = new PoseTrack();
+  controller.resizeCanvas = () => {};
+  const emitted = [], frames = [];
+  controller.handlePoseResult = message => emitted.push(message);
+  controller.onVideoFrame = frame => frames.push(frame.mediaTime);
+  video.paused = true; video.currentTime = 4;
+  controller.presentVideoFrame(4);
+  assert.equal(emitted.length, 0); assert.equal(controller.pendingPresent, 4);
+  assert.deepEqual(frames, [4], "the pulse still receives the frame");
+  const pose = [bodyPose()];
+  for (const mediaTime of [3.95, 4, 4.05]) controller.addAnalysis({ mediaTime, landmarks: pose, worldLandmarks: pose, inferenceMs: 20 });
+  assert.equal(emitted.length, 1); assert.equal(emitted[0].mediaTime, 4); assert.equal(controller.pendingPresent, null);
+});
+
+test("the synchronized video holds rather than show a frame whose pose is unknown", t => {
+  const {controller,video} = videoFixture(t);
+  controller.sourceKind = "video"; controller.videoObjectUrl = "blob:exercise-test";
+  controller.videoWindow = {startSeconds:0,endSeconds:10};
+  controller.videoTrack = new PoseTrack();
+  const seeks = [], steers = [];
+  controller.lookahead = { stopped:false, seekTarget:null, position:2.1, seek: at => { seeks.push(at); }, steer: lead => { steers.push(lead); }, stop() {} };
+  const pose = [bodyPose()];
+  for (let i = 0; i <= 3; i++) controller.videoTrack.add({ mediaTime: 2 + i / 30, landmarks: pose, worldLandmarks: pose });
+  video.currentTime = 2.05; video.paused = false;
+  controller.steerSync();
+  assert.equal(video.paused, true); assert.equal(controller.syncHold, true);
+  for (let i = 4; i <= 24; i++) controller.videoTrack.add({ mediaTime: 2 + i / 30, landmarks: pose, worldLandmarks: pose });
+  controller.lookahead.position = 2.8;
+  controller.steerSync();
+  assert.equal(controller.syncHold, false); assert.equal(video.paused, false, "playback resumes with the analysis ahead");
+  video.currentTime = 7;
+  controller.steerSync();
+  assert.ok(seeks.some(at => Math.abs(at - 7) < 1e-9), "a jump past the analysis moves the look-ahead to it");
 });
 
 test("selecting a video replaces a pending camera permission request", async t => {

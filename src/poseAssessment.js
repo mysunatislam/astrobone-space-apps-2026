@@ -12,7 +12,8 @@ import { PoseLandmarkFilter, buildPoseRetargetFrame } from "./poseRetargeting.js
 import { buildCameraMediaConstraints } from "./cameraDevices.js";
 import { validateExerciseVideo, validateVideoMetadata } from "./videoEvidence.js";
 import { assignHandSides } from "./detailObservations.js";
-import { VIDEO_POSE_HZ, videoPoseAt, seekVideoFrame } from "./videoPoseTrack.js";
+import { PoseTrack } from "./videoPoseTrack.js";
+import { LEAD, VideoLookahead, planPlayback, supportsFrameCallbacks } from "./videoLookahead.js";
 
 const DEFAULT_ASSESSMENT_MS = 8_000;
 
@@ -36,6 +37,7 @@ export class PoseAssessmentController {
     onDetails = () => {},
     onObjects = () => {},
     onAssessment = () => {},
+    onVideoFrame = () => {},
   }) {
     this.video = video;
     this.canvas = canvas;
@@ -55,6 +57,7 @@ export class PoseAssessmentController {
     this.onDetails = onDetails;
     this.onObjects = onObjects;
     this.onAssessment = onAssessment;
+    this.onVideoFrame = onVideoFrame;
     this.context = canvas.getContext("2d");
     this.drawing = new DrawingUtils(this.context);
     this.poseWorker = null;
@@ -85,10 +88,23 @@ export class PoseAssessmentController {
     this.videoObjectUrl = null;
     this.videoWindow = null;
     this.videoWindowComplete = false;
+    // Synchronized uploaded video: a look-ahead copy analyses frames ahead of the visible video;
+    // each presented frame then reads its own pose (and face) from these tracks.
+    this.lookahead = null;
     this.videoTrack = null;
-    this.videoPreparation = null;
-    this.pendingVideoFrame = null;
-    this.lastTrackTime = -1;
+    this.detailTrack = null;
+    this.syncHold = false;
+    this.syncWaiter = null;
+    this.presentToken = 0;
+    this.pendingPresent = null;
+    this.analysisInferenceMs = null;
+    this.recentInferenceMs = [];
+    this.lastAnalysedMediaTime = -Infinity;
+    this.lastDetailMediaTime = -Infinity;
+    this.snapshotCanvases = {};
+    // While a camera pulse is measured, the face mesh runs on every detail call and hands on every third.
+    this.detailFaceFocus = false;
+    this.detailCalls = 0;
     this.mediaLoadAbort = null;
     this.frameRequest = null;
     this.lastVideoTime = -1;
@@ -170,7 +186,7 @@ export class PoseAssessmentController {
     }
   }
 
-  async startVideo(file, { precompute = false } = {}) {
+  async startVideo(file, { synchronized = true } = {}) {
     validateExerciseVideo(file);
     if (this.active || this.starting) this.stopCamera();
     const sessionId = ++this.cameraSessionId;
@@ -195,9 +211,9 @@ export class PoseAssessmentController {
       this.resizeCanvas();
       await this.ensurePoseWorker();
       if (sessionId !== this.cameraSessionId) return false;
-      if (precompute) await this.prepareVideoTrack(sessionId);
-      if (sessionId !== this.cameraSessionId) return false;
       this.video.currentTime = 0;
+      if (synchronized && supportsFrameCallbacks(this.video)) await this.startSynchronizedVideo(sessionId);
+      if (sessionId !== this.cameraSessionId) return false;
       await this.video.play();
       if (sessionId !== this.cameraSessionId) return false;
       this.starting = false;
@@ -233,24 +249,162 @@ export class PoseAssessmentController {
     }
   }
 
-  async prepareVideoTrack(sessionId) {
-    const abort = new AbortController(); this.videoPreparation = abort;
-    const track = []; this.video.pause();
+  // Starts the look-ahead copy and waits until the first moments are analysed, so the visible
+  // video starts with its pose already known.
+  async startSynchronizedVideo(sessionId) {
+    this.videoTrack = new PoseTrack();
+    this.detailTrack = new PoseTrack();
+    this.lookahead = new VideoLookahead({
+      url: this.videoObjectUrl, endSeconds: this.videoWindow.endSeconds,
+      onFrame: (source, mediaTime) => this.analyzeLookaheadFrame(source, mediaTime),
+      host: this.video.parentElement ?? document.body,
+    });
+    // Face and hands load alongside, without the camera start-up delay.
+    if (this.detailDetectionEnabled) this.loadDetailDetector();
+    this.startPresentationLoop();
+    this.onStatus({ key: "loading", label: "Synchronizing motion with the video" });
+    await this.lookahead.seek(this.videoWindow.startSeconds ?? 0);
+    if (sessionId !== this.cameraSessionId) return;
+    let timer;
+    await new Promise(resolve => {
+      this.syncWaiter = resolve;
+      // A device too slow to analyse ahead still plays; poses catch up behind it.
+      timer = setTimeout(resolve, 20_000);
+      this.checkSyncStart();
+    });
+    clearTimeout(timer);
+    this.syncWaiter = null;
+  }
+
+  checkSyncStart() {
+    if (!this.syncWaiter || !this.videoTrack) return;
+    const start = this.videoWindow?.startSeconds ?? 0, end = this.videoWindow?.endSeconds ?? Infinity;
+    if (this.videoTrack.coveredUntil(start) >= Math.min(start + LEAD.start, end - 0.05) || this.lookahead?.finished) this.syncWaiter();
+  }
+
+  // Each frame the look-ahead copy decodes goes to whichever workers are free, tagged with its media time.
+  analyzeLookaheadFrame(source, mediaTime) {
+    if (!this.active || !this.lookahead || !this.videoTrack) return;
+    const cameraSessionId = this.cameraSessionId;
+    // Back-pressure: never decode further ahead of the last analysed frame than a gap the track
+    // tolerates; the next analysis result starts the look-ahead again.
+    if (mediaTime < this.lastAnalysedMediaTime) this.lastAnalysedMediaTime = mediaTime;
+    if (this.poseWorkerBusy && mediaTime - this.lastAnalysedMediaTime > 0.18) this.lookahead.wait();
+    // Every frame is analysed while the GPU has headroom. Where one inference takes longer than
+    // 25 ms, ~15 poses per second of video keep the GPU free for playback; each presented frame
+    // still gets its pose at its own time from the track.
+    const spacing = (this.analysisInferenceMs ?? 0) > 25 ? 1 / 15 - 0.005 : 0;
+    if (this.poseWorkerReady && this.poseWorker && !this.poseWorkerBusy && mediaTime - this.lastAnalysedMediaTime >= spacing) {
+      this.poseWorkerBusy = true;
+      this.lastAnalysedMediaTime = mediaTime;
+      this.postSnapshot(this.poseWorker, source, 640, "pose", { type: "frame", timestamp: performance.now(), mediaTime, cameraSessionId, analysis: true },
+        () => { this.poseWorkerBusy = false; }, error => this.failPoseWorker(error));
+    }
+    if (mediaTime < this.lastDetailMediaTime) this.lastDetailMediaTime = -Infinity;
+    if (this.detailDetectionEnabled && this.detailWorkerReady && this.detailWorker && !this.detailWorkerBusy
+      && mediaTime - this.lastDetailMediaTime >= 1 / 15) {
+      this.detailWorkerBusy = true;
+      this.lastDetailMediaTime = mediaTime;
+      // The face mesh (camera pulse) runs on every call, the hand model on every third.
+      const hands = ++this.detailCalls % 3 === 1;
+      // Near-full resolution keeps small faces detectable for the camera pulse.
+      this.postSnapshot(this.detailWorker, source, 960, "detail", { type: "frame", timestamp: performance.now(), mediaTime, cameraSessionId, analysis: true, hands },
+        () => { this.detailWorkerBusy = false; }, error => this.failDetailWorker(error));
+    }
+  }
+
+  // Copies the current frame synchronously (it must be the frame the callback announced) and posts it.
+  postSnapshot(worker, source, maxSide, key, message, onDrop, onError) {
+    let bitmapPromise;
     try {
-      const endSeconds = this.videoWindow.endSeconds;
-      for (let time = this.videoWindow.startSeconds; time < endSeconds - .02; time += 1 / VIDEO_POSE_HZ) {
-        await seekVideoFrame(this.video, time, abort.signal);
-        if (sessionId !== this.cameraSessionId) throw new Error("Video preparation cancelled");
-        this.onStatus({ key: "preparing-video", label: `Preparing synchronized motion / ${Math.round(time / endSeconds * 100)}%`, progress: time / endSeconds });
-        const result = await new Promise((resolve, reject) => {
-          const timer = setTimeout(() => { this.pendingVideoFrame = null; reject(new Error("Video pose analysis timed out")); }, 15000);
-          this.pendingVideoFrame = { resolve: value => { clearTimeout(timer); resolve(value); }, reject: error => { clearTimeout(timer); reject(error); } };
-          this.detectPose(performance.now());
-        });
-        track.push({ ...result, mediaTime: time });
-      }
-      this.videoTrack = track; this.lastTrackTime = -1;
-    } finally { if (this.videoPreparation === abort) this.videoPreparation = null; }
+      const scale = Math.min(1, maxSide / Math.max(source.videoWidth || maxSide, source.videoHeight || maxSide));
+      const width = Math.max(1, Math.round((source.videoWidth || maxSide) * scale)), height = Math.max(1, Math.round((source.videoHeight || maxSide) * scale));
+      const canvas = this.snapshotCanvases[key] ??= document.createElement("canvas");
+      if (canvas.width !== width) canvas.width = width;
+      if (canvas.height !== height) canvas.height = height;
+      canvas.getContext("2d").drawImage(source, 0, 0, width, height);
+      bitmapPromise = createImageBitmap(canvas);
+    } catch (error) { bitmapPromise = Promise.reject(error); }
+    void bitmapPromise.then(bitmap => {
+      if (!this.active || message.cameraSessionId !== this.cameraSessionId) { bitmap.close(); onDrop(); return; }
+      worker.postMessage({ ...message, bitmap }, [bitmap]);
+    }).catch(error => {
+      onDrop();
+      if (this.active && message.cameraSessionId === this.cameraSessionId) onError(error);
+    });
+  }
+
+  addAnalysis(message) {
+    if (!this.videoTrack) return;
+    this.videoTrack.add({ mediaTime: message.mediaTime, landmarks: message.landmarks, worldLandmarks: message.worldLandmarks });
+    if (Number.isFinite(message.inferenceMs)) {
+      // Median of recent frames: one slow frame (GPU warm-up, a busy tab) must not throttle the rest.
+      this.recentInferenceMs = [...this.recentInferenceMs.slice(-14), message.inferenceMs];
+      this.analysisInferenceMs = [...this.recentInferenceMs].sort((a, b) => a - b)[this.recentInferenceMs.length >> 1];
+    }
+    this.checkSyncStart();
+    this.steerSync();
+    // A paused or seeked frame shown before its pose was ready gets its pose now.
+    if (this.pendingPresent !== null && this.video.paused && !this.syncHold
+      && this.videoTrack.coveredUntil(this.pendingPresent) >= this.pendingPresent) this.presentVideoFrame(this.pendingPresent);
+  }
+
+  startPresentationLoop() {
+    const token = ++this.presentToken;
+    const step = (now, metadata) => {
+      if (token !== this.presentToken || !this.active) return;
+      this.presentVideoFrame(metadata.mediaTime);
+      this.video.requestVideoFrameCallback(step);
+    };
+    this.video.requestVideoFrameCallback(step);
+  }
+
+  // Shows the pose of the frame the visible video is presenting, read from the look-ahead track.
+  presentVideoFrame(mediaTime) {
+    if (!this.videoTrack || this.starting && !this.syncWaiter) return;
+    const now = performance.now();
+    this.resizeCanvas();
+    const pose = this.videoTrack.poseAt(mediaTime);
+    const details = this.detailDetectionEnabled ? this.detailTrack.detailsAt(mediaTime) : null;
+    if (details || this.lastDetails) {
+      this.lastDetails = details ? {
+        hands: assignHandSides(details.hands ?? [], pose?.landmarks?.[0] ?? this.lastPoseLandmarks),
+        face: details.face ?? null, timestamp: now, inferenceMs: null,
+      } : null;
+      this.onDetails(this.lastDetails);
+    }
+    if (pose) {
+      this.pendingPresent = null;
+      this.handlePoseResult({ ...pose, mediaTime, timestamp: now, cached: true, synced: true, inferenceMs: this.analysisInferenceMs });
+    } else this.pendingPresent = mediaTime;
+    this.onVideoFrame({ video: this.video, mediaTime, face: details?.face ?? null, timestamp: now });
+    this.steerSync();
+  }
+
+  // Keeps the look-ahead copy just ahead of the visible video, and the visible video behind the analysis.
+  steerSync() {
+    if (!this.lookahead || !this.videoTrack || !this.videoWindow || this.lookahead.stopped) return;
+    const end = this.videoWindow.endSeconds, t = Math.min(Math.max(this.video.currentTime || 0, this.videoWindow.startSeconds ?? 0), end);
+    const covered = this.videoTrack.coveredUntil(t), frontier = Math.max(t, covered);
+    // A last frame or two that arrived while the model was busy is covered by the track's edge fit.
+    const analysisComplete = this.lookahead.finished && covered >= this.lookahead.position - 0.2;
+    if (analysisComplete || covered >= end - 0.05) this.lookahead.steer(Infinity);
+    else if (this.lookahead.seekTarget !== null) {
+      if (Math.abs(this.lookahead.seekTarget - frontier) > 0.5) void this.lookahead.seek(frontier);
+    } else if (this.lookahead.position < frontier - 0.3 || this.lookahead.position > frontier + 0.6) void this.lookahead.seek(frontier);
+    else {
+      // Never sample sparser than ~0.15 s of video per pose: slow inference means slower look-ahead.
+      const inferenceSeconds = (this.analysisInferenceMs ?? 30) / 1000;
+      this.lookahead.steer(covered - t, Math.max(0.25, 0.15 / inferenceSeconds), this.video.playbackRate || 1);
+    }
+    if (this.starting || this.videoWindowComplete || this.video.ended) return;
+    const plan = planPlayback({ visibleTime: t, coveredUntil: covered, end, held: this.syncHold, analysisComplete });
+    if (plan === "hold" && !this.video.paused) { this.syncHold = true; this.video.pause(); }
+    else if (plan === "play" && this.syncHold) { this.syncHold = false; if (this.video.paused) this.video.play().catch(() => {}); }
+  }
+
+  syncRate() {
+    return this.videoTrack ? this.videoTrack.rateAround(this.video.currentTime || 0) : 0;
   }
 
   handleVideoEnded() {
@@ -272,7 +426,7 @@ export class PoseAssessmentController {
   }
 
   enforceVideoWindow() {
-    if (this.sourceKind !== "video" || !this.active || this.starting || this.videoPreparation || !this.videoWindow) return false;
+    if (this.sourceKind !== "video" || !this.active || this.starting || !this.videoWindow) return false;
     if (this.video.currentTime < this.videoWindow.endSeconds) return false;
     this.video.pause();
     if (this.video.currentTime > this.videoWindow.endSeconds) this.video.currentTime = this.videoWindow.endSeconds;
@@ -292,17 +446,19 @@ export class PoseAssessmentController {
   }
 
   handleVideoSeeked() {
-    if (this.sourceKind !== "video" || !this.active || this.starting || this.videoPreparation) return;
+    if (this.sourceKind !== "video" || !this.active || this.starting) return;
     const atEnd = this.enforceVideoWindow() || this.video.ended;
     if (atEnd) this.handleVideoEnded();
     else this.videoWindowComplete = false;
     // The scrub control invalidates an assessment; a programmatic replay seek
     // must preserve the fresh assessment explicitly started by replayVideo().
     this.worldFilter.reset(); this.imageFilter.reset();
-    this.lastVideoTime = -1; this.lastTrackTime = -1;
+    this.lastVideoTime = -1;
     this.onPose(null);
     if (this.frameRequest) clearTimeout(this.frameRequest);
     this.frameRequest = null;
+    // Synchronized video: point the look-ahead at the new position; the presented frame follows.
+    if (this.videoTrack) this.steerSync();
     this.scheduleNextFrame(0);
   }
 
@@ -314,7 +470,6 @@ export class PoseAssessmentController {
     this.lastInferenceTimestamp = null;
     this.smoothedFps = null;
     this.lastVideoTime = -1;
-    this.lastTrackTime = -1;
     this.lastDetailTimestamp = -Infinity;
     this.lastDetails = null;
     this.onDetails(null);
@@ -327,9 +482,11 @@ export class PoseAssessmentController {
   }
 
   stopCamera() {
-    this.videoPreparation?.abort(); this.videoPreparation = null;
-    this.pendingVideoFrame?.reject(new Error("Video preparation cancelled")); this.pendingVideoFrame = null;
-    this.videoTrack = null; this.lastTrackTime = -1;
+    this.lookahead?.stop(); this.lookahead = null;
+    this.videoTrack = null; this.detailTrack = null;
+    this.presentToken += 1; this.pendingPresent = null; this.syncHold = false;
+    this.syncWaiter?.(); this.syncWaiter = null;
+    this.analysisInferenceMs = null; this.recentInferenceMs = []; this.lastAnalysedMediaTime = -Infinity; this.lastDetailMediaTime = -Infinity;
     this.videoWindow = null; this.videoWindowComplete = false;
     this.cameraSessionId += 1;
     this.starting = false;
@@ -413,6 +570,10 @@ export class PoseAssessmentController {
     }
   }
 
+  setDetailFaceFocus(on) {
+    this.detailFaceFocus = Boolean(on);
+  }
+
   setDetailDetectionEnabled(enabled) {
     this.detailDetectionEnabled = Boolean(enabled);
     if (!this.detailDetectionEnabled) {
@@ -484,6 +645,13 @@ export class PoseAssessmentController {
       });
     } else if (message?.type === "result") {
       this.detailWorkerBusy = false;
+      if (message.analysis) {
+        if (this.active && message.cameraSessionId === this.cameraSessionId && this.detailTrack) {
+          // hands: null when the hand model was skipped for this frame (not "no hands visible").
+          this.detailTrack.add({ mediaTime: message.mediaTime, face: message.face ?? null, hands: message.hands ?? null });
+        }
+        return;
+      }
       if (!this.active || this.video.ended || !this.detailDetectionEnabled || message.cameraSessionId !== this.cameraSessionId) return;
       const age = performance.now() - message.timestamp;
       if (!Number.isFinite(age) || age < -50 || age >= 900) {
@@ -494,7 +662,8 @@ export class PoseAssessmentController {
       }
       this.onDetailStatus({ key: "ready", label: "Face and hands ready" });
       this.lastDetails = {
-        hands: assignHandSides(message.hands ?? [], this.lastPoseLandmarks),
+        // hands: null when the hand model was skipped for this frame; keep the last hands seen.
+        hands: message.hands ? assignHandSides(message.hands, this.lastPoseLandmarks) : this.lastDetails?.hands ?? [],
         face: message.face ?? null,
         timestamp: message.timestamp,
         inferenceMs: message.inferenceMs,
@@ -612,14 +781,11 @@ export class PoseAssessmentController {
       if (!this.active || message.cameraSessionId !== this.cameraSessionId) {
         return;
       }
-      if (this.pendingVideoFrame) {
-        const pending = this.pendingVideoFrame; this.pendingVideoFrame = null; pending.resolve(message); return;
-      }
+      if (message.analysis) { this.addAnalysis(message); return; }
       this.handlePoseResult(message);
       return;
     }
     if (message?.type === "error") {
-      this.pendingVideoFrame?.reject(new Error(message.error || "Video analysis failed")); this.pendingVideoFrame = null;
       this.failPoseWorker(new Error(message.error || "Pose worker failed."));
     }
   }
@@ -647,6 +813,8 @@ export class PoseAssessmentController {
       pipelineLatencyMs: Math.max(0, performance.now() - message.timestamp),
       mediaTime: message.mediaTime,
       cached: Boolean(message.cached),
+      // Read from the look-ahead track at the presented frame's own time (synchronized video).
+      synced: Boolean(message.synced),
       detected: Boolean(worldLandmarks),
     };
     let frame = filteredWorld
@@ -789,20 +957,12 @@ export class PoseAssessmentController {
     const atEnd = this.sourceKind === "video"
       && (this.enforceVideoWindow() || this.video.ended || this.videoWindowComplete);
     this.resizeCanvas();
+    // Synchronized video is driven by its presented frames (presentVideoFrame), not by polling.
+    if (this.videoTrack) return;
 
     if (this.video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
       && this.video.currentTime !== this.lastVideoTime) {
       this.lastVideoTime = this.video.currentTime;
-      if (this.videoTrack) {
-        const sample = videoPoseAt(this.videoTrack, this.video.currentTime);
-        if (sample && sample.mediaTime !== this.lastTrackTime) {
-          if (sample.mediaTime < this.lastTrackTime) { this.worldFilter.reset(); this.imageFilter.reset(); this.assessment = null; this.onPose(null); }
-          this.lastTrackTime = sample.mediaTime;
-          this.handlePoseResult({ ...sample, timestamp, cached: true, inferenceMs: 0 });
-        }
-        if (!atEnd) this.scheduleNextFrame(this.poseIdleMs);
-        return;
-      }
       this.detectPose(timestamp);
       if (!atEnd) {
         this.detectObjects(timestamp);
@@ -864,7 +1024,6 @@ export class PoseAssessmentController {
       })
       .catch((error) => {
         this.poseWorkerBusy = false;
-        this.pendingVideoFrame?.reject(error); this.pendingVideoFrame = null;
         if (this.active && cameraSessionId === this.cameraSessionId) {
           this.failPoseWorker(error);
         }
@@ -885,7 +1044,8 @@ export class PoseAssessmentController {
           this.detailWorkerBusy = false;
           return;
         }
-        this.detailWorker.postMessage({ type: "frame", bitmap, timestamp, cameraSessionId }, [bitmap]);
+        const hands = !this.detailFaceFocus || ++this.detailCalls % 3 === 1;
+        this.detailWorker.postMessage({ type: "frame", bitmap, timestamp, cameraSessionId, hands }, [bitmap]);
       })
       .catch((error) => {
         this.detailWorkerBusy = false;
@@ -1029,7 +1189,8 @@ export class PoseAssessmentController {
     }
     if (details?.face?.landmarks) {
       const face = details.face.landmarks;
-      this.drawing.drawConnectors(face, FaceLandmarker.FACE_LANDMARKS_TESSELATION, {
+      // Synchronized video redraws every frame: the 2,500-line mesh would crowd out frame callbacks.
+      if (!this.videoTrack) this.drawing.drawConnectors(face, FaceLandmarker.FACE_LANDMARKS_TESSELATION, {
         color: "rgba(116, 212, 204, 0.22)", lineWidth: 0.5,
       });
       for (const contour of [

@@ -113,6 +113,10 @@ export class SkeletalRetargeter {
     return result;
   }
 
+  // Seconds for bones to close ~63 % of the gap to the tracked pose. Live camera poses are noisy and
+  // need more; synchronized video poses are already smoothed without lag and need less.
+  timeConstant = 0.032;
+
   begin(viewRotation) {
     this.viewRotation.copy(viewRotation);
     this.active = true;
@@ -189,7 +193,7 @@ export class SkeletalRetargeter {
       : THREE.MathUtils.clamp((now - this.lastTime) / 1000, 0, 0.1);
     this.lastTime = now;
     if (!hasLiveSegments(frame, now)) return { trackedBones: 0, state: "lost" };
-    const alpha = 1 - Math.exp(-dt / 0.032);
+    const alpha = 1 - Math.exp(-dt / this.timeConstant);
     const points = frame.points;
     if (frame.usable && points?.leftHip?.visibility >= 0.56 && points?.rightHip?.visibility >= 0.56
       && frame.segments.spine?.usable) {

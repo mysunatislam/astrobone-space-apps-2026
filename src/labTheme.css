@@ -83,3 +83,13 @@ html[data-theme="dark"] .lab-body .companion-sources a, html[data-theme="dark"] 
   .lab-top > .tw-live { grid-column: 3; grid-row: 1; justify-self: end; }
   .lab-chip { display: none; }
 }
+
+/* Pulse and stress from the face (Live Capture) */
+.pulse-capture .pulse-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.pulse-capture .pulse-heading h4 { margin: 0; }
+.pulse-readouts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 10px 0 4px; }
+.pulse-readouts > div { display: grid; gap: 2px; min-width: 0; }
+.pulse-readouts span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--v5-text-muted); }
+.pulse-capture .pulse-readouts output { margin: 0; font-variant-numeric: tabular-nums; }
+.pulse-readouts small { font-size: 11px; color: var(--v5-text-muted); }
+.pose-live-strip .pose-vitals { flex: 0 1 auto; color: #ff8fa8; font-weight: 600; font-variant-numeric: tabular-nums; }

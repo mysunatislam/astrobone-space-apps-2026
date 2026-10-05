@@ -24,7 +24,7 @@ On a Mars transit a message to Earth can take up to 22 minutes one way, and ther
 | **Evaluate** | A quality check first: a poor camera capture is refused and repeated, never reported as a decline. Each indicator is then compared with the astronaut's own baseline (after 3 usable checks) across four domains: bone & muscle, cardiovascular, behavioral health and immune. Red-flag symptoms override everything. |
 | **Act** | A bounded next step with a due time: contact the medical officer now, repeat a measurement, or re-check in 24 h and log it for medical review. AstroBone never diagnoses or prescribes. |
 
-The **digital twin** (home page) shows the astronaut's systems on 3D anatomy: skeleton, muscles, heart and vessels, across the mission timeline. Affected systems are highlighted after a self-check. **Live Capture** is the camera workspace: real-time pose tracking from a webcam or video, a musculoskeletal model that follows the tracked joints, and knee angle, range of motion and left-right difference with a quality gate.
+The **digital twin** (home page) shows the astronaut's systems on 3D anatomy: skeleton, muscles, heart and vessels, across the mission timeline. Affected systems are highlighted after a self-check. **Live Capture** is the camera workspace: real-time pose tracking from a webcam or video, a musculoskeletal model that follows the tracked joints, and knee angle, range of motion and left-right difference with a quality gate. An uploaded video is analysed just ahead of playback, so the 3D model moves with the frame on screen. When a face is visible, an experimental camera pulse (and, with steady frames, a stress index from beat-to-beat timing) is shown.
 
 ## NASA Data Drives the Checks
 
@@ -43,7 +43,7 @@ The data sets priority and timing only. It never sets a personal threshold: mice
 1. Open the [live app](https://mysunatislam.github.io/astrobone-space-apps-2026/). Mission Control shows Commander Elena Torres, a fictional astronaut on Day 147 of a Mars transit.
 2. Select **Self-Check**. The first step lists today's checks and the NASA evidence behind each. With **Elena · synthetic demo**, step through using the demo capture buttons: a poorly framed capture is refused and the repeat is accepted; then the reaction test, sleep and mood, and body. **Evaluate** shows which domains moved outside her own range and her next step; the twin highlights them.
 3. Select **You · this device** to do the check yourself: the camera measures your knee extension, and the reaction test runs for 3 minutes.
-4. Open **Live Capture** and start your camera or upload a video. The 3D musculoskeletal model follows your movement; joint angles and tracking quality update live.
+4. Open **Live Capture** and start your camera or upload a video. The 3D musculoskeletal model follows your movement; joint angles and tracking quality update live. With a clearly visible, still face, the pulse appears after about 12 s.
 5. **Impact Lab**, **Physiology** and **Evidence** show the impact physics model, the cardiovascular and radiation context, and every NASA source with its hash.
 6. Offline: after one visit, turn on airplane mode and reload. Everything still works.
 
@@ -54,7 +54,7 @@ Requires Node.js 20.19+ or 22.12+.
 ```bash
 npm install
 npm run dev        # http://127.0.0.1:5173/
-npm test           # 262 automated tests
+npm test           # 270 automated tests
 npm run build      # production build in dist/
 ```
 
@@ -81,7 +81,7 @@ Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osd
 
 ## Validation and Limits
 
-- **Tested:** 262 automated tests cover the review rules, quality gates, NASA rules, pose analysis and models. The Monte Carlo reproduces a stored Simulink reference.
+- **Tested:** 270 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
 - **Not yet validated:** camera joint angles have not yet been compared with a reference measurement (motion capture or a goniometer); the [validation protocol](docs/functional-camera-validation-protocol.md) is written and is our next step. No astronaut or analog-crew user study has been run.
 - **Data boundaries:** Elena and all her values are synthetic. The NASA cohorts are mice and a four-person, three-day flight; they inform what to watch, never a diagnosis or a personal threshold.
 - AstroBone is a research prototype, not a medical device.

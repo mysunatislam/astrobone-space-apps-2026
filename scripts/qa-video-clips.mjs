@@ -8,7 +8,7 @@ const browser = await chromium.launch({headless:true,args:["--use-angle=d3d11"]}
 try {
   const page = await browser.newPage({viewport:{width:1440,height:1000}}), errors=[];
   page.on("pageerror",error=>errors.push(error.message));
-  await page.goto("http://127.0.0.1:5180/#movement-capture");
+  await page.goto(`${process.argv[2] ?? "http://127.0.0.1:5180/"}lab.html#movement-capture`);
   await page.waitForFunction(()=>document.querySelector("#twin-canvas")?.dataset.rigReady === "true");
   await page.locator("#detail-tracking").uncheck();
   const upload = async file => {

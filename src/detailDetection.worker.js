@@ -68,7 +68,8 @@ async function fetchModel(url) {
   return new Uint8Array(await response.arrayBuffer());
 }
 
-function detectFrame({ bitmap, timestamp, cameraSessionId }) {
+// hands: false skips the hand model (recorded-video analysis runs it on every third frame only).
+function detectFrame({ bitmap, timestamp, cameraSessionId, mediaTime, analysis = false, hands: withHands = true }) {
   if (!handLandmarker || !faceLandmarker) {
     bitmap?.close?.();
     self.postMessage({ type: "error", error: "Detailed landmark models are not ready." });
@@ -76,19 +77,21 @@ function detectFrame({ bitmap, timestamp, cameraSessionId }) {
   }
   const startedAt = performance.now();
   try {
-    const hands = handLandmarker.detectForVideo(bitmap, timestamp);
+    const hands = withHands ? handLandmarker.detectForVideo(bitmap, timestamp) : null;
     const faces = faceLandmarker.detectForVideo(bitmap, timestamp);
     self.postMessage({
       type: "result",
       timestamp,
+      mediaTime,
+      analysis,
       cameraSessionId,
       inferenceMs: performance.now() - startedAt,
-      hands: (hands.landmarks ?? []).map((landmarks, index) => ({
+      hands: withHands ? (hands.landmarks ?? []).map((landmarks, index) => ({
         landmarks: serializeLandmarks(landmarks),
         worldLandmarks: serializeLandmarks(hands.worldLandmarks?.[index]),
         handedness: hands.handednesses?.[index]?.[0]?.categoryName ?? null,
         confidence: hands.handednesses?.[index]?.[0]?.score ?? null,
-      })),
+      })) : null,
       face: faces.faceLandmarks?.[0] ? {
         landmarks: serializeLandmarks(faces.faceLandmarks[0]),
         blendshapes: Object.fromEntries(
