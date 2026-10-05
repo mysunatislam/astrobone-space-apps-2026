@@ -14,7 +14,7 @@ async function walk(directory) {
 }
 const paths = [
   ...await walk(join(root, "src")), ...await walk(join(root, "public")),
-  join(root, "index.html"), join(root, "lab.html"), join(root, "pitch.html"), join(root, "clip.html"), join(root, "package-lock.json"),
+  join(root, "index.html"), join(root, "lab.html"), join(root, "package-lock.json"),
 ];
 const assets = [];
 for (const path of paths.sort()) {

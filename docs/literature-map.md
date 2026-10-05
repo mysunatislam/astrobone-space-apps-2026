@@ -71,7 +71,7 @@ Why it matters:
 
 How AstroBone uses it:
 
-- Introductory explanation in the app and pitch deck.
+- Introductory explanation in the app.
 - Human-readable source for judges who are not biomechanics specialists.
 
 ## NASA Exploration Medical Operations

@@ -1,8 +1,8 @@
-// AstroBone offline pack. After one online visit, the twin (home), Live Capture, the pitch and their
-// models, NASA summaries and pose runtime are served from this device's cache.
-const CACHE = "astrobone-offline-v4";
+// AstroBone offline pack. After one online visit, the twin (home), Live Capture and their models,
+// NASA summaries and pose runtime are served from this device's cache.
+const CACHE = "astrobone-offline-v5";
 const CORE = [
-  "./", "lab.html", "pitch.html", "clip.html",
+  "./", "lab.html",
   "models/anatomy/musculoskeletal.glb", "models/anatomy/musculoskeletal-rigged.glb", "models/anatomy/cardiovascular.glb", "models/anatomy/SOURCE-LICENSE.txt",
   "models/pose_landmarker_lite.task",
   "mediapipe/vision_wasm_internal.js", "mediapipe/vision_wasm_internal.wasm",
@@ -11,8 +11,6 @@ const CORE = [
   "simulations/astrobone-level-a-v1.json",
   "data/mission-research.json", "data/mission-research-extended.json", "data/osdr-804-summary.json", "data/circulation-reference.json",
   "inference/demo/IMG0001739_prediction.json", "inference/demo/IMG0001739_overlay.png",
-  "pitch/broll-bone-loss.mp4", "pitch/concept-camera-baseline.mp4", "pitch/squat-pexels-4921644.mp4", "pitch/squat-pose.json", "pitch/challenge-details.mp4",
-  "pitch/team-mysunat.webp", "pitch/team-redwan.webp", "pitch/team-borno.jpg",
 ];
 const scope = new URL(self.registration.scope);
 const url = path => new URL(path, scope).href;
@@ -33,7 +31,7 @@ async function discover(cache) {
       }
     } catch { /* offline during install: runtime caching fills in later */ }
   };
-  for (const page of ["./", "lab.html", "pitch.html", "clip.html"]) await scan(url(page), 0);
+  for (const page of ["./", "lab.html"]) await scan(url(page), 0);
 }
 
 self.addEventListener("install", event => {
