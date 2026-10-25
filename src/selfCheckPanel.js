@@ -7,6 +7,7 @@ import { sparklineSvg } from "./trendSpark.js";
 import { HOLD, REFERENCE_TYPES, summarizeHold, agreement, calibratedFloors, pairsToCsv, createAngleCheckStore } from "./angleCheck.js";
 import { ELENA } from "./elenaMissionScenario.js";
 import { loadNasaEvidence, nasaWatchPlan } from "./nasaWatch.js";
+import { loadCrewBlood, replayCrew, crewReplayCard } from "./crewReplay.js";
 
 const STEPS = [["safety", "Safety"], ["movement", "Movement"], ["reaction", "Reaction"], ["mind", "Sleep & mood"], ["body", "Body"], ["result", "Result & action"]];
 const STATUS = {
@@ -47,6 +48,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   // NASA life-science data sets what this check asks for and when (src/nasaWatch.js).
   let evidence = null, evidenceError = null;
   loadNasaEvidence(import.meta.env.BASE_URL).then(data => { evidence = data; render(); }).catch(error => { evidenceError = error.message; render(); });
+  // The rule itself, replayed on the four Inspiration4 crew members' real blood (src/crewReplay.js).
+  let crew = null;
+  loadCrewBlood(import.meta.env.BASE_URL).then(data => { crew = replayCrew(data, { permutations: 500 }); render(); }).catch(() => { /* card is optional */ });
   // Elena reaches Mars (back in gravity) at the end of the transit; "You" has no mission timing.
   const missionContext = () => (state.profile === "elena" ? { missionDay: 147, returnDay: ELENA.identity.duration.value } : {});
   const plan = () => (evidence ? nasaWatchPlan(evidence, missionContext()) : null);
@@ -62,7 +66,25 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
         el("p", { class: "sc-rule-text" }, rule.rule),
         rule.note ? el("p", { class: "sc-rule-when" }, rule.note) : null,
         el("p", { class: "sc-rule-finding" }, rule.finding),
-        el("div", { class: "sc-src" }, rule.sources.map(source => el("span", {}, source))))));
+        el("div", { class: "sc-src" }, rule.sources.map(source => el("span", {}, source))))),
+      crewCard());
+  }
+  function crewCard() {
+    if (!crew) return null;
+    const card = crewReplayCard(crew), wide = card.values.crewWide[0];
+    // One line per crew member for the clearest crew-wide signal: pre-flight draws, then each return visit.
+    const spark = wide ? crew.crew.map(c => {
+      const a = c.analytes.find(x => x.key === wide.key), r = a.results.find(x => x.visit === wide.visit);
+      const node = el("div", { class: "sc-crew-row" }, el("span", {}, c.id), el("span", { class: "sc-crew-v" }, `${fmt(r.value)} vs ${fmt(r.preMean)} ${a.unit}`));
+      node.insertAdjacentHTML("beforeend", sparklineSvg({ series: a.points.slice(0, a.points.findIndex(([v]) => v === wide.visit)).map(([, v]) => v), value: r.value, start: r.preMean, changed: r.status === "changed", label: `${c.id} ${a.label} at ${wide.visit}` }));
+      return node;
+    }) : [];
+    return el("details", { class: "sc-rule sc-rule-tested" },
+      el("summary", { class: "sc-rule-head" }, el("strong", {}, card.check), el("span", { class: "sc-pill" }, "Tested")),
+      el("p", { class: "sc-rule-text" }, card.rule),
+      el("p", { class: "sc-rule-finding" }, card.finding),
+      wide ? el("div", { class: "sc-crew" }, el("small", {}, `${wide.label} at ${wide.visit}, each crew member against their own pre-flight mean`), spark) : null,
+      el("div", { class: "sc-src" }, card.sources.map(source => el("span", {}, source))));
   }
 
   const history = () => (state.profile === "elena" ? [...ELENA_HISTORY, ...(store.load("DEMO-ELENA", false))] : store.load("you", state.persist));

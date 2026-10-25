@@ -91,14 +91,16 @@ export function personalReference(history, key, protocol) {
 // suspiciously tight baseline does not turn noise into alarms.
 export const DRIFT = Object.freeze({ k: 1, h: 6, reset: false });
 
-export function lockedReference(history, key, protocol) {
-  const values = usableValues(history, key, protocol).slice(0, BASELINE_WINDOW);
+export function lockedReference(history, key, protocol, count = BASELINE_WINDOW) {
+  const values = usableValues(history, key, protocol).slice(0, count);
   if (values.length < MIN_BASELINE) return { ready: false, count: values.length, needed: MIN_BASELINE };
   return { ready: true, count: values.length, mean: mean(values), sd: sd(values) };
 }
 
-export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRIFT.h, reset = DRIFT.reset, floor } = {}) {
-  const def = INDICATORS[key], locked = lockedReference(history, key, protocol);
+// `def` lets a caller run the same rule on a measure outside INDICATORS (the Inspiration4 blood
+// replay in crewReplay.js); `baselineCount` locks the baseline to a known pre-mission set.
+export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRIFT.h, reset = DRIFT.reset, floor, def = INDICATORS[key], baselineCount } = {}) {
+  const locked = lockedReference(history, key, protocol, baselineCount);
   if (!locked.ready) return { ready: false };
   const later = usableValues(history, key, protocol).slice(locked.count);
   // The locked mean is itself estimated from a few checks; widen sigma for that uncertainty.
@@ -125,15 +127,14 @@ function usableValues(history, key, protocol) {
     .map(check => check.values[key]);
 }
 
-export function evaluateIndicator(key, value, history, { protocol, usable = true, floor, drift: driftParams } = {}) {
-  const def = INDICATORS[key];
+export function evaluateIndicator(key, value, history, { protocol, usable = true, floor, drift: driftParams, def = INDICATORS[key] } = {}) {
   if (value === null || value === undefined || Number.isNaN(value)) return { key, status: "notChecked", def };
   if (!usable) return { key, value, status: "repeat", def };
   const ref = personalReference(history, key, protocol);
   if (!ref.ready) return { key, value, status: "baseline", ref, def };
   const tolerance = Math.max(2 * ref.sd, floor ?? def.floor), delta = value - ref.mean;
   const worse = def.direction === "down" ? delta < -tolerance : def.direction === "up" ? delta > tolerance : Math.abs(delta) > tolerance;
-  const drift = driftCheck(key, value, history, protocol, { floor, ...driftParams });
+  const drift = driftCheck(key, value, history, protocol, { floor, def, ...driftParams });
   const reason = worse ? "day" : drift.drift ? "drift" : null;
   return { key, value, status: reason ? "changed" : "stable", reason, ref, delta, tolerance, drift, series: usableValues(history, key, protocol), def };
 }

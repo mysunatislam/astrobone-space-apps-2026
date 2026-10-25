@@ -20,6 +20,7 @@ Only unrestricted, publicly visible files are used. Each script downloads its fi
 npm run data:osdr               # OSD-804 → public/data/osdr-804-summary.json
 npm run data:mission            # OSD-575, OSD-435 (+ OSD-804 hash check) → public/data/mission-research.json
 npm run data:mission:extended   # OSD-569, OSD-656 → public/data/mission-research-extended.json
+npm run data:crew               # OSD-569, OSD-575 raw per-crew files + EFLM CVI → public/data/i4-crew-blood.json (see crew-replay.md)
 ```
 
 - `scripts/build_osdr_summary.py`: spaceflight vs ground-control mean and percent difference for each skeletal site and measure (29 comparisons), with SDs, a 95% bootstrap interval for the percent change, Hedges g with a 95% interval, a Welch t-test and Benjamini–Hochberg q-values. Each measure is marked with the direction that means bone loss (Bouxsein et al., J Bone Miner Res 2010). Per site, a loss score (mean loss-signed Hedges g) is tested by 20,000 seeded permutations of whole animals, which keeps the correlation between measures from the same bone, with Holm correction across the 5 sites. A percent change is marked unreliable when control values straddle zero (femoral head pattern factor, shown before as +756 %). The CSV fingerprint is computed on NASA's CRLF form, so a git checkout with LF line endings still matches. The OSD-804 data file is kept in `data/` (CC0); rebuilding it reproduces the shipped summary byte for byte.

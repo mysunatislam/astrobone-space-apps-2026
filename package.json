@@ -8,6 +8,7 @@
   "scripts": {
     "prepare:vision": "node scripts/copy-vision-assets.mjs",
     "data:osdr": "python scripts/build_osdr_summary.py",
+    "data:crew": "python scripts/build_crew_blood.py",
     "data:mission": "python scripts/build_mission_research.py",
     "data:mission:extended": "python scripts/build_extended_nasa_research.py",
     "data:circulation": "python scripts/build_circulation_reference.py",
