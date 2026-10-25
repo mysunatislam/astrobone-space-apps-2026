@@ -23,7 +23,19 @@ Offsets within half a frame (21 ms at 24 fps) are the measurement's own resoluti
 
 Skin colour is averaged over the inner forehead and both cheeks, located by the face mesh (`src/rppg.js`). The pulse uses the POS method (Wang et al., 2017) on up to 30 s of samples: the first estimate comes after 12 s, and it is withheld unless one spectral peak holds at least 60 % of the 0.75-3 Hz power. Uploaded video is timed by each frame's media time, and the live camera by each frame's capture time.
 
-Stress is Baevsky's stress index from beat-to-beat intervals. The pulse wave is band-passed around the pulse rate (zero phase), then each beat is timed with sub-sample peak interpolation. It needs at least 30 s, at least 24 frames per second, few gaps, 20 clean beats and agreement with the pulse rate; otherwise the reason is shown instead of a number. It is never saved as a health record, and a pulse from an uploaded video is never saved as a current reading.
+Beat-to-beat variability is reported as RMSSD, with SDNN and Baevsky's stress index alongside. The pulse wave is band-passed around the pulse rate (zero phase), then each beat is timed with sub-sample peak interpolation. It needs at least 30 s, at least 24 frames per second, few gaps, 20 clean beats and agreement with the pulse rate; otherwise the reason is shown instead of a number.
+
+RMSSD is the headline because it holds on short windows (Munoz et al., *PLOS One* 2015, 10:e0138921). Baevsky's low / elevated / high cut-offs are defined on 5-minute records, and the camera keeps at most 60 s. `node scripts/simulate-hrv-window.mjs` (2,000 synthetic 5-minute records per HRV level) shows why the label is withheld below 300 beats:
+
+| HRV level | Window | Stress label matches the 5-minute label | Stress index / 5-minute value (5th-95th pct) | RMSSD / 5-minute value |
+| --- | --- | --- | --- | --- |
+| High | 35 beats (30 s) | 41.6 % | 1.04-2.26 | 0.84-1.17 |
+| High | 70 beats (60 s) | 73.2 % | 0.99-1.73 | 0.89-1.10 |
+| Medium | 35 beats | 62.5 % | 1.01-2.00 | 0.84-1.15 |
+| Medium | 70 beats | 88.0 % | 0.97-1.63 | 0.89-1.10 |
+| Low | 35 beats | 100 % | 0.85-1.16 | 0.84-1.15 |
+
+A short record misses the extreme beat intervals, so the index reads high and a relaxed person is labelled stressed. RMSSD stays within about ±16 % at 30 s. Short windows overlap the 5-minute record they are compared with, so real-world spread is wider. It is never saved as a health record, and a pulse from an uploaded video is never saved as a current reading.
 
 Validation used a face video with a known injected pulse (`scripts/make-pulse-test-video.py`): a still face, a 72.2 bpm pulse whose beat intervals vary with breathing (true RMSSD 51.6 ms), sensor noise and H.264 compression.
 

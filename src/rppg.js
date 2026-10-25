@@ -95,7 +95,20 @@ export function estimatePulse(samples, { minSeconds = PULSE_WINDOW.minSeconds } 
   return { status: "estimated", reason: "Experimental camera estimate", bpm: Math.round(peak.hz * 60), quality, fps: fs, duration, waveform: signal.slice(-Math.round(4 * fs)) };
 }
 
-// Beat-to-beat variability from the pulse waveform, summarized as Baevsky's stress index
+// Below this many beats Baevsky's index is biased upward (a short record misses the extreme
+// intervals), so its label is withheld. Simulated in scripts/simulate-hrv-window.mjs.
+export const SI_LABEL_MIN_BEATS = 300;
+
+// Baevsky: SI = AMo / (2 x Mo x MxDMn), 50 ms bins; Mo and MxDMn in seconds, AMo in %.
+export function baevskyStressIndex(ms) {
+  const bins = new Map();
+  for (const v of ms) { const bin = Math.round(v / 50) * 50; bins.set(bin, (bins.get(bin) ?? 0) + 1); }
+  const [modeMs, modeCount] = [...bins.entries()].reduce((a, b) => (b[1] > a[1] ? b : a));
+  const range = (Math.max(...ms) - Math.min(...ms)) / 1000;
+  return (modeCount / ms.length * 100) / (2 * (modeMs / 1000) * Math.max(range, 0.05));
+}
+
+// Beat-to-beat variability from the pulse waveform: RMSSD, SDNN and Baevsky's stress index
 // (sympathetic load: a narrow, regular beat-interval distribution scores high). Strict gates: a
 // camera waveform resolves beats far less precisely than an ECG, so most windows are refused.
 export function estimateStress(samples, bpm) {
@@ -129,14 +142,12 @@ export function estimateStress(samples, bpm) {
   const ms = clean.map(v => v * 1000);
   const rmssd = Math.sqrt(mean(ms.slice(1).map((v, i) => (v - ms[i]) ** 2)));
   const sdnn = std(ms);
-  // Baevsky: SI = AMo / (2 x Mo x MxDMn), 50 ms bins; Mo and MxDMn in seconds, AMo in %.
-  const bins = new Map();
-  for (const v of ms) { const bin = Math.round(v / 50) * 50; bins.set(bin, (bins.get(bin) ?? 0) + 1); }
-  const [modeMs, modeCount] = [...bins.entries()].reduce((a, b) => (b[1] > a[1] ? b : a));
-  const range = (Math.max(...ms) - Math.min(...ms)) / 1000;
-  const stressIndex = (modeCount / ms.length * 100) / (2 * (modeMs / 1000) * Math.max(range, 0.05));
-  const level = stressIndex < 150 ? "low" : stressIndex < 500 ? "elevated" : "high";
-  return { status: "estimated", stressIndex: Math.round(stressIndex), level, rmssdMs: Math.round(rmssd), sdnnMs: Math.round(sdnn), beats: clean.length + 1, retained };
+  const stressIndex = baevskyStressIndex(ms);
+  // RMSSD is the reported variability: it holds on windows of 10-60 s (Munoz et al., PLOS One 2015,
+  // 10:e0138921; Baek et al., Telemed J E Health 2015). Baevsky's low/elevated/high cut-offs are defined
+  // on 5-minute records, and on fewer beats the index reads high, so no label is given below SI_LABEL_MIN_BEATS.
+  const level = clean.length + 1 >= SI_LABEL_MIN_BEATS ? (stressIndex < 150 ? "low" : stressIndex < 500 ? "elevated" : "high") : null;
+  return { status: "estimated", stressIndex: Math.round(stressIndex), level, levelNote: level ? null : `Stress label needs ${SI_LABEL_MIN_BEATS} beats (about 5 minutes)`, rmssdMs: Math.round(rmssd), sdnnMs: Math.round(sdnn), beats: clean.length + 1, retained };
 }
 
 // In-place radix-2 FFT (inverse when invert is true, unscaled).
