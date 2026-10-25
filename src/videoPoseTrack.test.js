@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { PoseTrack, blendPoints } from "./videoPoseTrack.js";
 import { LEAD, planLookahead, planPlayback } from "./videoLookahead.js";
-import { estimatePulse, estimateStress, skinRegions } from "./rppg.js";
+import { SI_LABEL_MIN_BEATS, baevskyStressIndex, estimatePulse, estimateStress, skinRegions } from "./rppg.js";
 
 const point = (x, visibility = 0.9) => ({ x, y: 2 * x, z: 0, visibility });
 const pose = x => [Array.from({ length: 33 }, () => point(x))];
@@ -90,10 +90,21 @@ test("stress estimate recovers beat-to-beat variability from the pulse waveform"
   const stress = estimateStress(samples, pulse.bpm);
   assert.equal(stress.status, "estimated");
   assert.ok(Math.abs(stress.rmssdMs - rmssd) <= 12, `RMSSD ${stress.rmssdMs} vs ${rmssd.toFixed(1)}`);
-  assert.ok(stress.stressIndex > 0 && ["low", "elevated", "high"].includes(stress.level));
+  // About 37 beats: the index is reported, but Baevsky's 5-minute cut-offs are not applied.
+  assert.ok(stress.stressIndex > 0);
+  assert.equal(stress.level, null);
+  assert.match(stress.levelNote, /300 beats/);
   // A steadier heart (less variability) reads as more stress.
   const steady = beatingFace({ swingMs: 10 });
   assert.ok(estimateStress(steady.samples, 72).stressIndex > stress.stressIndex);
+});
+
+test("Baevsky's index reads high on short records, so its label waits for 300 beats", () => {
+  let seed = 3; const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 2 ** 32; };
+  const beats = Array.from({ length: 360 }, (_, i) => 833 + 40 * Math.sin(i * 0.52) + 60 * (rnd() - 0.5));
+  // Fewer beats miss the extreme intervals: the range shrinks and the index rises.
+  assert.ok(baevskyStressIndex(beats.slice(0, 35)) > baevskyStressIndex(beats));
+  assert.equal(SI_LABEL_MIN_BEATS, 300);
 });
 
 test("stress is withheld for short windows, wrong rates and a moving face", () => {
