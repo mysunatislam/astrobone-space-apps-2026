@@ -32,8 +32,8 @@ Five datasets from the NASA Open Science Data Repository / Ames Life Sciences Da
 
 | NASA study | What the data shows | What AstroBone does |
 | --- | --- | --- |
-| [OSD-804](https://osdr.nasa.gov/bio/repo/data/studies/OSD-804) · LSDS-130, spaceflight bone micro-CT (mice) | 54.5 % lower bone volume in the distal femur (just above the knee) after 37 days in space; 27.4 % at the hip, 8.3 % in the spine | The knee movement test comes first in every daily check |
-| [OSD-656](https://osdr.nasa.gov/bio/repo/data/studies/OSD-656) · LSDS-64 and [OSD-569](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) · LSDS-7, Inspiration4 crew | Immune protein VCAM1 stayed above pre-flight for 45 days after return, back by day 82; white blood cells fell the day after return | Immune checklist every day for 45 days after any return to gravity |
+| [OSD-804](https://osdr.nasa.gov/bio/repo/data/studies/OSD-804) · LSDS-130, spaceflight bone micro-CT (mice) | After 37 days in space, bone structure moved toward loss above the knee (distal femur, p = 0.004) and at the hip (p = 0.007), corrected across 5 sites; bone volume fraction above the knee −55 % (95% CI −68 to −30 %). No clear change in the spine | The knee movement test comes first in every daily check |
+| [OSD-656](https://osdr.nasa.gov/bio/repo/data/studies/OSD-656) · LSDS-64 and [OSD-569](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) · LSDS-7, Inspiration4 crew | Urine immune protein VCAM1 stayed above every pre-flight visit for 45 days after return, back by day 82 (group medians of 4 people); white blood cells stayed within the pre-flight range | Immune checklist every day for 45 days after any return to gravity |
 | [OSD-435](https://osdr.nasa.gov/bio/repo/data/studies/OSD-435) · LSDS-22 (mice) and [OSD-575](https://osdr.nasa.gov/bio/repo/data/studies/OSD-575) · LSDS-8, Inspiration4 crew | No consistent change in heart ejection fraction after 0.1–3 Gy; CRP already varied 1.9–19.9 mg/L before launch | No radiation alarm; dose is logged beside heart rate for the medical reviewer |
 
 The data sets priority and timing only. It never sets a personal threshold: mice and a four-person, three-day flight cannot calibrate one astronaut. Raw files, reproducible summaries and rules: [NASA data pipeline](docs/nasa-data-pipeline.md).
@@ -81,7 +81,7 @@ Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osd
 
 ## Validation and Limits
 
-- **Tested:** 287 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
+- **Tested:** 288 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
 - **Not yet validated:** camera joint angles have not yet been compared with a reference measurement. The Self-Check now has a built-in **accuracy check** (camera vs goniometer, Bland–Altman bias, limits of agreement and detectable change); once 20+ pairs from 3+ people are recorded, the knee review trigger is raised to match the measured error. The [validation protocol](docs/functional-camera-validation-protocol.md) is written. No astronaut or analog-crew user study has been run.
 - **Data boundaries:** Elena and all her values are synthetic. The NASA cohorts are mice and a four-person, three-day flight; they inform what to watch, never a diagnosis or a personal threshold.
 - AstroBone is a research prototype, not a medical device.

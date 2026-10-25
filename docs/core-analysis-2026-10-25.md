@@ -68,10 +68,41 @@ No source found gives separate numbers for side-on and frontal views. These resu
 - AstroBone's 3-minute reaction test is the **PVT-B** (Basner, Mollicone & Dinges, *Acta Astronautica* 2011). PVT-B is the test inside NASA's **Reaction Self Test**, used by 24 astronauts on 6-month ISS missions (University of Pennsylvania Unit for Experimental Psychiatry; NASA NTRS 20090029851).
 - NASA's **Earth-Independent Medical Operations** work describes a Mars two-way communication delay of up to 40 minutes and calls for decision support that can "passively monitor the crew for early signs of behavioral or medical anomalies" (Levin et al., *IEEE Open Journal of Engineering in Medicine and Biology* 2023, PMC10810302). NASA-STD-3001 Level of Care 5 (missions over 210 days) is "autonomous advanced care".
 
+## NASA Data Analysis
+
+**What was wrong.** The NASA rules used group means or medians with no measure of spread, so a noisy number could drive a claim.
+
+- The bone rule ranked skeletal sites by the single largest percent change. One femoral head measure read +756 %, which is meaningless: its ground-control values straddle zero (−7 to +5.6). The README also said "8.3 % in the spine" without noting that the spine change is indistinguishable from zero.
+- The immune text compared post-flight values with the lowest pre-flight visit. It said white blood cells "fell from 8.5 to 6.25", but 6.25 lies inside the crew's own pre-flight range (5.95–8.5).
+- The OSD-804 file fingerprint did not match the CSV in the repository: git stores it with LF line endings, while NASA serves CRLF.
+
+**What it does now** (`scripts/build_osdr_summary.py`, reproducible byte for byte from `data/`):
+
+| Per comparison (29) | Per site (5) |
+| --- | --- |
+| Flight and control SD; 95% bootstrap interval for the percent change; Hedges g with a 95% interval; Welch t-test; Benjamini–Hochberg q-value; the direction that means bone loss (Bouxsein et al., *J Bone Miner Res* 2010); percent marked unreliable when control values straddle zero | Loss score = mean loss-signed Hedges g; one-sided permutation test (20,000 seeded shuffles of whole animals, keeping the correlation between measures from the same bone); Holm correction across sites |
+
+**Results (OSD-804, 37 days, female mice).**
+
+| Site | Loss score | p (Holm) | Supported |
+| --- | --- | --- | --- |
+| Femoral head (hip) | 1.82 | 0.007 | Yes |
+| Distal femur (above the knee) | 1.11 | 0.004 | Yes |
+| Femoral neck | 0.71 | 0.19 | No |
+| Femoral shaft (cortical) | 0.60 | 0.19 | No |
+| Spine | 0.34 | 0.19 | No |
+
+Bone volume fraction above the knee was −55 % (95% CI −68 to −30 %). All 10 measures with p < 0.05 point toward bone loss, but none survives correction for 29 tests on its own (4–10 mice per group), so the site-level test is the claim the app makes. The knee-first rule now rests on a corrected test rather than one large percent.
+
+**Immune timing (OSD-656, 4 crew).** A post-flight value counts as raised only above every pre-flight visit median. VCAM1 stays raised through day 45 under that strict rule and under the median rule, so the 45-day checklist window does not depend on the choice. White blood cells are no longer cited as a change.
+
+**Not changed.** The heart rule already concludes "no consistent effect" from OSD-435 group medians. The raw data needed for a dose-response test is not in the repository.
+
 ## Tests
 
 - `summarizeKneeCapture`: bilateral (worse knee, asymmetry, protocol), side-only, insufficient.
 - Drift: a slow decline inside the day tolerance is flagged as drift; ordinary noise is not; drift needs a locked baseline and ignores improvement.
 - `calibratedFloors`: raises the floor only for ≥ 20 pairs from ≥ 3 people, never lowers it.
 - Trend line (`sparklineSvg`): needs two values, plots history then today, escapes its label.
-- Full suite: 287 tests pass. The Elena Day 147 result is unchanged.
+- NASA statistics: q ≥ p, intervals contain their estimates, percent intervals are dropped when unreliable, and site tests are Holm-consistent; the bone rule names the supported sites and says the spine is unclear; the immune window is the same under both baselines.
+- Full suite: 288 tests pass. The Elena Day 147 result is unchanged.

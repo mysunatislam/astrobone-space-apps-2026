@@ -64,6 +64,16 @@
       }
     ]
   },
+  "statistics": {
+    "test": "Welch two-sample t-test, two-sided",
+    "multipleComparisons": "Benjamini-Hochberg false discovery rate across all 29 flight vs ground-control comparisons",
+    "fdrAlpha": 0.05,
+    "effectSize": "Hedges g (flight minus ground control, pooled SD, small-sample corrected) with a 95% normal-approximation interval",
+    "percentInterval": "95% percentile bootstrap, 10000 resamples within each group, seeded",
+    "adverseDirection": "Direction that indicates bone loss or weaker structure, per Bouxsein et al., J Bone Miner Res 2010",
+    "percentReliable": "False when control values straddle zero, so a percent change is not interpretable; use Hedges g",
+    "siteTest": "Per site: mean of loss-signed Hedges g over measures with a known adverse direction; p from 20000 seeded permutations of flight and ground-control labels across animals, which keeps the correlation between measures from the same bone; Holm correction across sites"
+  },
   "flightVsGroundControl": [
     {
       "site": "CorticalFemur",
@@ -72,7 +82,26 @@
       "groundN": 8,
       "flightMean": 53.501243,
       "groundMean": 55.543491,
-      "percentDifference": -3.68
+      "percentDifference": -3.68,
+      "flightSd": 2.468089,
+      "groundSd": 1.755323,
+      "percentCi95": [
+        -6.93,
+        -0.5
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.89,
+      "hedgesGCi95": [
+        -1.864,
+        0.084
+      ],
+      "welchT": -2.048,
+      "welchDf": 15.84,
+      "pValue": 0.0575,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.134,
+      "adverse": false
     },
     {
       "site": "CorticalFemur",
@@ -81,7 +110,26 @@
       "groundN": 8,
       "flightMean": 0.214222,
       "groundMean": 0.225655,
-      "percentDifference": -5.07
+      "percentDifference": -5.07,
+      "flightSd": 0.012973,
+      "groundSd": 0.010348,
+      "percentCi95": [
+        -9.18,
+        -0.5
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.915,
+      "hedgesGCi95": [
+        -1.892,
+        0.061
+      ],
+      "welchT": -2.08,
+      "welchDf": 16.0,
+      "pValue": 0.054,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.134,
+      "adverse": false
     },
     {
       "site": "CorticalFemur",
@@ -90,7 +138,26 @@
       "groundN": 10,
       "flightMean": 3.612417,
       "groundMean": 3.615084,
-      "percentDifference": -0.07
+      "percentDifference": -0.07,
+      "flightSd": 0.101215,
+      "groundSd": 0.150607,
+      "percentCi95": [
+        -2.99,
+        2.9
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.02,
+      "hedgesGCi95": [
+        -0.896,
+        0.857
+      ],
+      "welchT": -0.046,
+      "welchDf": 15.75,
+      "pValue": 0.964,
+      "adverseDirection": "up",
+      "worse": false,
+      "qValue": 0.964,
+      "adverse": false
     },
     {
       "site": "CorticalFemur",
@@ -99,7 +166,26 @@
       "groundN": 10,
       "flightMean": 5.089538,
       "groundMean": 5.123466,
-      "percentDifference": -0.66
+      "percentDifference": -0.66,
+      "flightSd": 0.083874,
+      "groundSd": 0.250999,
+      "percentCi95": [
+        -3.57,
+        2.44
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.174,
+      "hedgesGCi95": [
+        -1.052,
+        0.705
+      ],
+      "welchT": -0.405,
+      "welchDf": 10.99,
+      "pValue": 0.693,
+      "adverseDirection": null,
+      "worse": null,
+      "qValue": 0.804,
+      "adverse": false
     },
     {
       "site": "DistalFemur",
@@ -108,7 +194,26 @@
       "groundN": 10,
       "flightMean": 3.089864,
       "groundMean": 6.798813,
-      "percentDifference": -54.55
+      "percentDifference": -54.55,
+      "flightSd": 0.710542,
+      "groundSd": 4.296948,
+      "percentCi95": [
+        -68.41,
+        -30.0
+      ],
+      "percentReliable": true,
+      "hedgesG": -1.153,
+      "hedgesGCi95": [
+        -2.1,
+        -0.207
+      ],
+      "welchT": -2.693,
+      "welchDf": 9.49,
+      "pValue": 0.0236,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.0934,
+      "adverse": false
     },
     {
       "site": "DistalFemur",
@@ -117,7 +222,26 @@
       "groundN": 8,
       "flightMean": 89.178914,
       "groundMean": 186.334387,
-      "percentDifference": -52.14
+      "percentDifference": -52.14,
+      "flightSd": 11.163892,
+      "groundSd": 95.701966,
+      "percentCi95": [
+        -65.23,
+        -32.05
+      ],
+      "percentReliable": true,
+      "hedgesG": -1.348,
+      "hedgesGCi95": [
+        -2.434,
+        -0.263
+      ],
+      "welchT": -2.852,
+      "welchDf": 7.19,
+      "pValue": 0.0239,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.0934,
+      "adverse": false
     },
     {
       "site": "DistalFemur",
@@ -126,7 +250,26 @@
       "groundN": 9,
       "flightMean": 1.432643,
       "groundMean": 1.4863,
-      "percentDifference": -3.61
+      "percentDifference": -3.61,
+      "flightSd": 0.19164,
+      "groundSd": 0.158738,
+      "percentCi95": [
+        -12.99,
+        7.0
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.29,
+      "hedgesGCi95": [
+        -1.195,
+        0.616
+      ],
+      "welchT": -0.667,
+      "welchDf": 16.9,
+      "pValue": 0.514,
+      "adverseDirection": null,
+      "worse": null,
+      "qValue": 0.678,
+      "adverse": false
     },
     {
       "site": "DistalFemur",
@@ -135,7 +278,26 @@
       "groundN": 8,
       "flightMean": 43.621945,
       "groundMean": 34.228,
-      "percentDifference": 27.45
+      "percentDifference": 27.45,
+      "flightSd": 3.708563,
+      "groundSd": 7.235483,
+      "percentCi95": [
+        10.7,
+        48.03
+      ],
+      "percentReliable": true,
+      "hedgesG": 1.616,
+      "hedgesGCi95": [
+        0.547,
+        2.685
+      ],
+      "welchT": 3.338,
+      "welchDf": 9.91,
+      "pValue": 0.00761,
+      "adverseDirection": "up",
+      "worse": true,
+      "qValue": 0.0736,
+      "adverse": false
     },
     {
       "site": "DistalFemur",
@@ -144,7 +306,26 @@
       "groundN": 9,
       "flightMean": 0.71389,
       "groundMean": 1.229376,
-      "percentDifference": -41.93
+      "percentDifference": -41.93,
+      "flightSd": 0.165268,
+      "groundSd": 0.619285,
+      "percentCi95": [
+        -58.21,
+        -17.52
+      ],
+      "percentReliable": true,
+      "hedgesG": -1.115,
+      "hedgesGCi95": [
+        -2.083,
+        -0.147
+      ],
+      "welchT": -2.421,
+      "welchDf": 9.03,
+      "pValue": 0.0385,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.112,
+      "adverse": false
     },
     {
       "site": "DistalFemur",
@@ -153,7 +334,26 @@
       "groundN": 9,
       "flightMean": 0.315063,
       "groundMean": 0.27588,
-      "percentDifference": 14.2
+      "percentDifference": 14.2,
+      "flightSd": 0.014901,
+      "groundSd": 0.043662,
+      "percentCi95": [
+        3.57,
+        26.67
+      ],
+      "percentReliable": true,
+      "hedgesG": 1.175,
+      "hedgesGCi95": [
+        0.2,
+        2.15
+      ],
+      "welchT": 2.561,
+      "welchDf": 9.67,
+      "pValue": 0.029,
+      "adverseDirection": "up",
+      "worse": true,
+      "qValue": 0.0934,
+      "adverse": false
     },
     {
       "site": "DistalFemur",
@@ -162,7 +362,26 @@
       "groundN": 10,
       "flightMean": 0.043341,
       "groundMean": 0.044797,
-      "percentDifference": -3.25
+      "percentDifference": -3.25,
+      "flightSd": 0.001165,
+      "groundSd": 0.00774,
+      "percentCi95": [
+        -11.25,
+        9.03
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.252,
+      "hedgesGCi95": [
+        -1.132,
+        0.628
+      ],
+      "welchT": -0.588,
+      "welchDf": 9.41,
+      "pValue": 0.57,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.719,
+      "adverse": false
     },
     {
       "site": "FemoralHead",
@@ -171,7 +390,26 @@
       "groundN": 5,
       "flightMean": 39.81625,
       "groundMean": 54.878,
-      "percentDifference": -27.45
+      "percentDifference": -27.45,
+      "flightSd": 5.154016,
+      "groundSd": 7.103543,
+      "percentCi95": [
+        -36.42,
+        -17.7
+      ],
+      "percentReliable": true,
+      "hedgesG": -2.36,
+      "hedgesGCi95": [
+        -3.799,
+        -0.921
+      ],
+      "welchT": -4.113,
+      "welchDf": 6.65,
+      "pValue": 0.00502,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.0732,
+      "adverse": false
     },
     {
       "site": "FemoralHead",
@@ -180,7 +418,26 @@
       "groundN": 5,
       "flightMean": 170.545,
       "groundMean": 232.916,
-      "percentDifference": -26.78
+      "percentDifference": -26.78,
+      "flightSd": 34.863097,
+      "groundSd": 79.030554,
+      "percentCi95": [
+        -44.62,
+        -0.2
+      ],
+      "percentReliable": true,
+      "hedgesG": -1.051,
+      "hedgesGCi95": [
+        -2.24,
+        0.137
+      ],
+      "welchT": -1.666,
+      "welchDf": 4.99,
+      "pValue": 0.157,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.304,
+      "adverse": false
     },
     {
       "site": "FemoralHead",
@@ -189,7 +446,26 @@
       "groundN": 5,
       "flightMean": 1.75625,
       "groundMean": 1.706,
-      "percentDifference": 2.95
+      "percentDifference": 2.95,
+      "flightSd": 0.177839,
+      "groundSd": 0.374005,
+      "percentCi95": [
+        -12.79,
+        25.09
+      ],
+      "percentReliable": true,
+      "hedgesG": 0.175,
+      "hedgesGCi95": [
+        -0.944,
+        1.295
+      ],
+      "welchT": 0.281,
+      "welchDf": 5.15,
+      "pValue": 0.789,
+      "adverseDirection": null,
+      "worse": null,
+      "qValue": 0.865,
+      "adverse": false
     },
     {
       "site": "FemoralHead",
@@ -198,7 +474,23 @@
       "groundN": 5,
       "flightMean": 9.51625,
       "groundMean": 1.112,
-      "percentDifference": 755.78
+      "percentDifference": 755.78,
+      "flightSd": 2.625811,
+      "groundSd": 5.387747,
+      "percentCi95": null,
+      "percentReliable": false,
+      "hedgesG": 2.022,
+      "hedgesGCi95": [
+        0.661,
+        3.384
+      ],
+      "welchT": 3.255,
+      "welchDf": 5.21,
+      "pValue": 0.0213,
+      "adverseDirection": "up",
+      "worse": true,
+      "qValue": 0.0934,
+      "adverse": false
     },
     {
       "site": "FemoralHead",
@@ -207,7 +499,26 @@
       "groundN": 5,
       "flightMean": 5.3825,
       "groundMean": 6.15,
-      "percentDifference": -12.48
+      "percentDifference": -12.48,
+      "flightSd": 0.498963,
+      "groundSd": 0.513955,
+      "percentCi95": [
+        -19.86,
+        -4.27
+      ],
+      "percentReliable": true,
+      "hedgesG": -1.415,
+      "hedgesGCi95": [
+        -2.658,
+        -0.172
+      ],
+      "welchT": -2.649,
+      "welchDf": 8.43,
+      "pValue": 0.028,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.0934,
+      "adverse": false
     },
     {
       "site": "FemoralHead",
@@ -216,7 +527,26 @@
       "groundN": 5,
       "flightMean": 0.12,
       "groundMean": 0.096,
-      "percentDifference": 25.0
+      "percentDifference": 25.0,
+      "flightSd": 0.009258,
+      "groundSd": 0.011402,
+      "percentCi95": [
+        12.98,
+        39.53
+      ],
+      "percentReliable": true,
+      "hedgesG": 2.213,
+      "hedgesGCi95": [
+        0.808,
+        3.617
+      ],
+      "welchT": 3.961,
+      "welchDf": 7.27,
+      "pValue": 0.00505,
+      "adverseDirection": "up",
+      "worse": true,
+      "qValue": 0.0732,
+      "adverse": false
     },
     {
       "site": "FemoralHead",
@@ -225,7 +555,26 @@
       "groundN": 5,
       "flightMean": 0.075,
       "groundMean": 0.088,
-      "percentDifference": -14.77
+      "percentDifference": -14.77,
+      "flightSd": 0.005345,
+      "groundSd": 0.008367,
+      "percentCi95": [
+        -21.87,
+        -7.01
+      ],
+      "percentReliable": true,
+      "hedgesG": -1.831,
+      "hedgesGCi95": [
+        -3.151,
+        -0.51
+      ],
+      "welchT": -3.101,
+      "welchDf": 6.08,
+      "pValue": 0.0207,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.0934,
+      "adverse": false
     },
     {
       "site": "FemoralNeck",
@@ -234,7 +583,26 @@
       "groundN": 5,
       "flightMean": 84.0125,
       "groundMean": 88.882,
-      "percentDifference": -5.48
+      "percentDifference": -5.48,
+      "flightSd": 3.807563,
+      "groundSd": 3.996476,
+      "percentCi95": [
+        -9.82,
+        -1.3
+      ],
+      "percentReliable": true,
+      "hedgesG": -1.168,
+      "hedgesGCi95": [
+        -2.373,
+        0.036
+      ],
+      "welchT": -2.176,
+      "welchDf": 8.3,
+      "pValue": 0.06,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.134,
+      "adverse": false
     },
     {
       "site": "FemoralNeck",
@@ -243,7 +611,26 @@
       "groundN": 5,
       "flightMean": 0.21125,
       "groundMean": 0.224,
-      "percentDifference": -5.69
+      "percentDifference": -5.69,
+      "flightSd": 0.018077,
+      "groundSd": 0.021909,
+      "percentCi95": [
+        -13.87,
+        4.17
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.606,
+      "hedgesGCi95": [
+        -1.748,
+        0.535
+      ],
+      "welchT": -1.09,
+      "welchDf": 7.37,
+      "pValue": 0.31,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.499,
+      "adverse": false
     },
     {
       "site": "FemoralNeck",
@@ -252,7 +639,26 @@
       "groundN": 4,
       "flightMean": 1.4475,
       "groundMean": 1.3525,
-      "percentDifference": 7.02
+      "percentDifference": 7.02,
+      "flightSd": 0.288828,
+      "groundSd": 0.074106,
+      "percentCi95": [
+        -7.12,
+        21.99
+      ],
+      "percentReliable": true,
+      "hedgesG": 0.358,
+      "hedgesGCi95": [
+        -0.851,
+        1.567
+      ],
+      "welchT": 0.875,
+      "welchDf": 8.62,
+      "pValue": 0.406,
+      "adverseDirection": "up",
+      "worse": true,
+      "qValue": 0.561,
+      "adverse": false
     },
     {
       "site": "FemoralNeck",
@@ -261,7 +667,26 @@
       "groundN": 5,
       "flightMean": 2.84125,
       "groundMean": 2.862,
-      "percentDifference": -0.73
+      "percentDifference": -0.73,
+      "flightSd": 0.089193,
+      "groundSd": 0.199048,
+      "percentCi95": [
+        -5.89,
+        5.74
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.138,
+      "hedgesGCi95": [
+        -1.257,
+        0.98
+      ],
+      "welchT": -0.22,
+      "welchDf": 5.02,
+      "pValue": 0.835,
+      "adverseDirection": null,
+      "worse": null,
+      "qValue": 0.865,
+      "adverse": false
     },
     {
       "site": "Vertebrae",
@@ -270,7 +695,26 @@
       "groundN": 10,
       "flightMean": 28.447312,
       "groundMean": 30.530392,
-      "percentDifference": -6.82
+      "percentDifference": -6.82,
+      "flightSd": 3.024484,
+      "groundSd": 6.661266,
+      "percentCi95": [
+        -18.6,
+        8.34
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.386,
+      "hedgesGCi95": [
+        -1.27,
+        0.499
+      ],
+      "welchT": -0.9,
+      "welchDf": 12.56,
+      "pValue": 0.385,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.558,
+      "adverse": false
     },
     {
       "site": "Vertebrae",
@@ -279,7 +723,26 @@
       "groundN": 9,
       "flightMean": 2526.6654,
       "groundMean": 2647.566111,
-      "percentDifference": -4.57
+      "percentDifference": -4.57,
+      "flightSd": 277.190638,
+      "groundSd": 302.574864,
+      "percentCi95": [
+        -13.3,
+        5.0
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.399,
+      "hedgesGCi95": [
+        -1.308,
+        0.51
+      ],
+      "welchT": -0.905,
+      "welchDf": 16.36,
+      "pValue": 0.379,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.558,
+      "adverse": false
     },
     {
       "site": "Vertebrae",
@@ -288,7 +751,26 @@
       "groundN": 10,
       "flightMean": 2.300443,
       "groundMean": 2.041965,
-      "percentDifference": 12.66
+      "percentDifference": 12.66,
+      "flightSd": 0.508933,
+      "groundSd": 0.377393,
+      "percentCi95": [
+        -4.29,
+        33.91
+      ],
+      "percentReliable": true,
+      "hedgesG": 0.553,
+      "hedgesGCi95": [
+        -0.341,
+        1.446
+      ],
+      "welchT": 1.29,
+      "welchDf": 16.6,
+      "pValue": 0.215,
+      "adverseDirection": null,
+      "worse": null,
+      "qValue": 0.387,
+      "adverse": false
     },
     {
       "site": "Vertebrae",
@@ -297,7 +779,26 @@
       "groundN": 10,
       "flightMean": 21.278334,
       "groundMean": 20.824147,
-      "percentDifference": 2.18
+      "percentDifference": 2.18,
+      "flightSd": 2.860182,
+      "groundSd": 5.963448,
+      "percentCi95": [
+        -15.25,
+        22.98
+      ],
+      "percentReliable": true,
+      "hedgesG": 0.093,
+      "hedgesGCi95": [
+        -0.784,
+        0.97
+      ],
+      "welchT": 0.217,
+      "welchDf": 12.93,
+      "pValue": 0.831,
+      "adverseDirection": "up",
+      "worse": true,
+      "qValue": 0.865,
+      "adverse": false
     },
     {
       "site": "Vertebrae",
@@ -306,7 +807,26 @@
       "groundN": 10,
       "flightMean": 5.721026,
       "groundMean": 6.23611,
-      "percentDifference": -8.26
+      "percentDifference": -8.26,
+      "flightSd": 0.442991,
+      "groundSd": 0.707748,
+      "percentCi95": [
+        -15.18,
+        -0.5
+      ],
+      "percentReliable": true,
+      "hedgesG": -0.836,
+      "hedgesGCi95": [
+        -1.75,
+        0.078
+      ],
+      "welchT": -1.951,
+      "welchDf": 15.11,
+      "pValue": 0.0699,
+      "adverseDirection": "down",
+      "worse": true,
+      "qValue": 0.145,
+      "adverse": false
     },
     {
       "site": "Vertebrae",
@@ -315,7 +835,26 @@
       "groundN": 10,
       "flightMean": 0.144723,
       "groundMean": 0.136303,
-      "percentDifference": 6.18
+      "percentDifference": 6.18,
+      "flightSd": 0.012764,
+      "groundSd": 0.016959,
+      "percentCi95": [
+        -2.9,
+        16.28
+      ],
+      "percentReliable": true,
+      "hedgesG": 0.537,
+      "hedgesGCi95": [
+        -0.355,
+        1.43
+      ],
+      "welchT": 1.254,
+      "welchDf": 16.72,
+      "pValue": 0.227,
+      "adverseDirection": "up",
+      "worse": true,
+      "qValue": 0.387,
+      "adverse": false
     },
     {
       "site": "Vertebrae",
@@ -324,7 +863,78 @@
       "groundN": 10,
       "flightMean": 0.049727,
       "groundMean": 0.048556,
-      "percentDifference": 2.41
+      "percentDifference": 2.41,
+      "flightSd": 0.003416,
+      "groundSd": 0.006557,
+      "percentCi95": [
+        -5.83,
+        12.96
+      ],
+      "percentReliable": true,
+      "hedgesG": 0.215,
+      "hedgesGCi95": [
+        -0.665,
+        1.094
+      ],
+      "welchT": 0.501,
+      "welchDf": 13.55,
+      "pValue": 0.625,
+      "adverseDirection": "down",
+      "worse": false,
+      "qValue": 0.755,
+      "adverse": false
+    }
+  ],
+  "siteTests": [
+    {
+      "site": "CorticalFemur",
+      "measures": 3,
+      "flightAnimals": 10,
+      "groundAnimals": 10,
+      "lossScore": 0.595,
+      "pValue": 0.0639,
+      "pHolm": 0.192,
+      "significant": false
+    },
+    {
+      "site": "DistalFemur",
+      "measures": 6,
+      "flightAnimals": 10,
+      "groundAnimals": 10,
+      "lossScore": 1.11,
+      "pValue": 0.00075,
+      "pHolm": 0.00375,
+      "significant": true
+    },
+    {
+      "site": "FemoralHead",
+      "measures": 6,
+      "flightAnimals": 8,
+      "groundAnimals": 5,
+      "lossScore": 1.815,
+      "pValue": 0.0017,
+      "pHolm": 0.0068,
+      "significant": true
+    },
+    {
+      "site": "FemoralNeck",
+      "measures": 3,
+      "flightAnimals": 8,
+      "groundAnimals": 5,
+      "lossScore": 0.711,
+      "pValue": 0.0911,
+      "pHolm": 0.192,
+      "significant": false
+    },
+    {
+      "site": "Vertebrae",
+      "measures": 6,
+      "flightAnimals": 10,
+      "groundAnimals": 10,
+      "lossScore": 0.339,
+      "pValue": 0.145,
+      "pHolm": 0.192,
+      "significant": false
     }
   ],
   "useBoundary": "Animal microCT evidence supports biological plausibility and site-specific trends. It is not a human fracture-risk calibration and does not set the crew bone-strength slider."
