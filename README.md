@@ -21,7 +21,7 @@ On a Mars transit a message to Earth can take up to 22 minutes one way, and ther
 | Step | How |
 | --- | --- |
 | **Gather** | A 5-minute daily self-check: seated knee-extension movement test with on-device pose AI, 3-minute reaction test (PVT-B), sleep, fatigue (Samn-Perelli), mood, stress, immune symptom checklist, resting heart rate and radiation dose. |
-| **Evaluate** | A quality check first: a poor camera capture is refused and repeated, never reported as a decline. Each indicator is then compared with the astronaut's own baseline (after 3 usable checks) across four domains: bone & muscle, cardiovascular, behavioral health and immune. Red-flag symptoms override everything. |
+| **Evaluate** | A quality check first: a poor camera capture is refused and repeated, never reported as a decline. Each indicator is then compared with the astronaut's own baseline (after 3 usable checks) across four domains: bone & muscle, cardiovascular, behavioral health and immune. A drift rule (CUSUM) also compares it with the astronaut's first checks, so a slow loss is caught even when every single day looks normal. Each result shows its trend. Red-flag symptoms override everything. |
 | **Act** | A bounded next step with a due time: contact the medical officer now, repeat a measurement, or re-check in 24 h and log it for medical review. AstroBone never diagnoses or prescribes. |
 
 The **digital twin** (home page) shows the astronaut's systems on 3D anatomy: skeleton, muscles, heart and vessels, across the mission timeline. Affected systems are highlighted after a self-check. **Live Capture** is the camera workspace: real-time pose tracking from a webcam or video, a musculoskeletal model that follows the tracked joints, and knee angle, range of motion and left-right difference with a quality gate. An uploaded video is analysed just ahead of playback, so the 3D model moves with the frame on screen. When a face is visible, an experimental camera pulse (and, with steady frames, a stress index from beat-to-beat timing) is shown.
@@ -65,7 +65,7 @@ Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osd
 - **Frontend:** JavaScript (ES modules), Vite, three.js / WebGL; a service worker for offline use.
 - **On-device AI:** Google MediaPipe Pose Landmarker (WebAssembly + GPU) in a Web Worker; EfficientDet-Lite0 object detection in Live Capture.
 - **Anatomy:** Z-Anatomy / BodyParts3D musculoskeletal and cardiovascular models, rigged for movement.
-- **Models:** personal-baseline review (2 × SD with a minimum change), PVT-B reaction metrics, Euler–Bernoulli bending stress and a seeded 10,000-run Monte Carlo for the Impact Lab, checked against a stored Simulink reference.
+- **Models:** personal-baseline review (2 × SD with a minimum change), CUSUM drift against a locked starting baseline (tuned by simulation, [results](docs/core-analysis-2026-10-25.md)), PVT-B reaction metrics, Euler–Bernoulli bending stress and a seeded 10,000-run Monte Carlo for the Impact Lab, checked against a stored Simulink reference.
 - **Data:** Python scripts that download unrestricted NASA OSDR files and record their hashes.
 - **Optional, off by default:** an Android app (Capacitor), and local services on the user's own computer for a whole-body mesh (YOLOX, RTMW, InstantHMR, MHR) and a Llama 3.2 review assistant. See [Android](docs/android-app.md) and [local companion](docs/local-companion-architecture.md).
 
@@ -81,8 +81,8 @@ Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osd
 
 ## Validation and Limits
 
-- **Tested:** 270 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
-- **Not yet validated:** camera joint angles have not yet been compared with a reference measurement (motion capture or a goniometer); the [validation protocol](docs/functional-camera-validation-protocol.md) is written and is our next step. No astronaut or analog-crew user study has been run.
+- **Tested:** 287 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
+- **Not yet validated:** camera joint angles have not yet been compared with a reference measurement. The Self-Check now has a built-in **accuracy check** (camera vs goniometer, Bland–Altman bias, limits of agreement and detectable change); once 20+ pairs from 3+ people are recorded, the knee review trigger is raised to match the measured error. The [validation protocol](docs/functional-camera-validation-protocol.md) is written. No astronaut or analog-crew user study has been run.
 - **Data boundaries:** Elena and all her values are synthetic. The NASA cohorts are mice and a four-person, three-day flight; they inform what to watch, never a diagnosis or a personal threshold.
 - AstroBone is a research prototype, not a medical device.
 

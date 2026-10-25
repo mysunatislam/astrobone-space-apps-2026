@@ -48,6 +48,8 @@ export function analyzePoseLandmarks(
   const upperAngles = {};
   const upperTracking = {};
   const visibilityValues = [];
+  const sideUsable = {};
+  const sideVisibility = {};
 
   SIDES.forEach((side) => {
     const shoulder = readLandmark(landmarks, LANDMARK[`${side}Shoulder`]);
@@ -61,6 +63,9 @@ export function analyzePoseLandmarks(
     if (points.some((point) => !point)) return;
 
     visibilityValues.push(...points.map((point) => point.visibility));
+    // A side-on camera sees the near leg well and the far leg poorly, so each side is gated on its own landmarks.
+    sideUsable[side] = [hip, knee, ankle].every((point) => point.visibility >= ASSESSMENT_MIN_VISIBILITY);
+    sideVisibility[side] = mean([hip, knee, ankle].map((point) => point.visibility));
     angles[side] = {
       hip: calculateJointAngle(shoulder, hip, knee),
       knee: calculateJointAngle(hip, knee, ankle),
@@ -91,6 +96,8 @@ export function analyzePoseLandmarks(
     angles,
     upperAngles,
     upperTracking,
+    sideUsable,
+    sideVisibility,
     visibility,
     shoulderAlignmentDegrees,
     usable:
@@ -173,6 +180,47 @@ export function summarizeFunctionalAssessment(
   }
 
   return result;
+}
+
+// Self-check knee capture: each knee is summarized from the frames where that knee was tracked,
+// so a side-on capture of one leg is usable and a loss in one knee is not hidden by the other.
+// Range of motion uses the 5th-95th percentile spread, which tracking jitter inflates far less than max - min.
+export const KNEE_CAPTURE = Object.freeze({ minSamples: ASSESSMENT_MIN_SAMPLES, minQuality: 0.7 });
+
+export function summarizeKneeCapture(samples) {
+  const frames = (samples || []).filter(Boolean);
+  const sides = {};
+  SIDES.forEach((side) => {
+    const usable = frames.filter((frame) => frame.sideUsable?.[side] && Number.isFinite(frame.angles?.[side]?.knee));
+    const knees = usable.map((frame) => frame.angles[side].knee);
+    const quality = usable.length ? mean(usable.map((frame) => frame.sideVisibility?.[side] ?? frame.visibility)) : 0;
+    const ok = usable.length >= KNEE_CAPTURE.minSamples && quality >= KNEE_CAPTURE.minQuality;
+    sides[side] = {
+      usable: ok,
+      sampleCount: usable.length,
+      trackingQuality: round(quality, 3),
+      extension: ok ? round(percentile(knees, 0.95), 1) : null,
+      rangeOfMotion: ok ? round(percentile(knees, 0.95) - percentile(knees, 0.05), 1) : null,
+    };
+  });
+  const usableSides = SIDES.filter((side) => sides[side].usable);
+  // The worse knee is the one with less extension; both knees must be usable for a bilateral result.
+  const view = usableSides.length === 2 ? "bilateral" : usableSides[0] ?? null;
+  const pick = view === "bilateral"
+    ? (sides.left.extension <= sides.right.extension ? "left" : "right")
+    : view;
+  return {
+    status: view ? "complete" : "insufficient",
+    view,
+    worseSide: view === "bilateral" ? pick : null,
+    sides,
+    kneeExtension: pick ? sides[pick].extension : null,
+    kneeRom: pick ? sides[pick].rangeOfMotion : null,
+    asymmetry: view === "bilateral" ? round(Math.abs(sides.left.extension - sides.right.extension), 1) : null,
+    sampleCount: pick ? sides[pick].sampleCount : Math.max(sides.left.sampleCount, sides.right.sampleCount),
+    trackingQuality: pick ? sides[pick].trackingQuality : Math.max(sides.left.trackingQuality, sides.right.trackingQuality),
+    protocol: view ? `self-check-seated-knee-extension-v2-${view}` : null,
+  };
 }
 
 function summarizeCameraFeatures(samples) {

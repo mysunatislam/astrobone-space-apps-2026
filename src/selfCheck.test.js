@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  summarizePvt, personalReference, evaluateIndicator, evaluateSelfCheck, recommendActions, newCheck, createSelfCheckStore, PVT_B, INDICATORS,
+  summarizePvt, personalReference, evaluateIndicator, lockedReference, driftCheck, evaluateSelfCheck, recommendActions, newCheck, createSelfCheckStore, PVT_B, INDICATORS,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, elenaDay147, ELENA_POOR_CAPTURE } from "./elenaSelfCheck.js";
 
@@ -88,4 +88,35 @@ test("store keeps records in memory unless consent to persist is given", () => {
   assert.deepEqual(store.load("you", true), [{ id: 2 }]);
   assert.ok(Object.keys(INDICATORS).length >= 9);
   assert.ok(recommendActions([], []).length === 1);
+});
+
+test("a slow decline that the rolling baseline absorbs is caught as drift from the locked baseline", () => {
+  const history = [170, 171, 169, 170, 170].map(v => ({ values: { kneeExtension: v } }));
+  assert.equal(lockedReference(history, "kneeExtension").count, 5);
+  let row;
+  for (let value = 169; value >= 162; value--) {
+    row = evaluateIndicator("kneeExtension", value, history);
+    if (value > 162) assert.equal(row.status, "stable", `${value} degrees is not yet a sustained drift`);
+    history.push({ values: { kneeExtension: value } });
+  }
+  assert.equal(row.status, "changed");
+  assert.equal(row.reason, "drift", "each day is inside the rolling tolerance; only the drift rule sees it");
+  assert.ok(row.drift.sinceBaseline < -7);
+});
+
+test("ordinary day-to-day noise around a steady value does not raise drift", () => {
+  const history = [];
+  const noise = [0, 1, -1, 2, -2, 1, 0, -1, 1, -2, 2, 0, -1, 1, 0, -1, 2, -2, 1, 0, 0, 1, -1, 2, -2, 1, 0, -1, 1, -2];
+  for (const n of noise) {
+    const row = evaluateIndicator("kneeExtension", 170 + n, history);
+    assert.notEqual(row.reason, "drift");
+    history.push({ values: { kneeExtension: 170 + n } });
+  }
+  assert.equal(driftCheck("kneeExtension", 170, history).drift, false);
+});
+
+test("drift needs a locked baseline and never flags an improvement", () => {
+  assert.equal(driftCheck("kneeExtension", 150, [170, 170].map(v => ({ values: { kneeExtension: v } }))).ready, false);
+  const history = [170, 170, 170, 170, 170, ...Array(20).fill(178)].map(v => ({ values: { kneeExtension: v } }));
+  assert.equal(driftCheck("kneeExtension", 178, history).drift, false);
 });

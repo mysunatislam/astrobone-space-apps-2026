@@ -83,23 +83,67 @@ export function personalReference(history, key, protocol) {
   return { ready: true, count: values.length, mean: mean(values), sd: sd(values) };
 }
 
-export function evaluateIndicator(key, value, history, { protocol, usable = true } = {}) {
+// Drift detection. A rolling baseline follows a slow decline, so gradual change (the way bone and
+// muscle are lost in flight) never leaves it. Each indicator therefore also keeps a locked baseline,
+// its first usable checks, and runs a one-sided CUSUM (Page, Biometrika 1954) of standardized
+// worsening against it. k = 1 SD and h = 6 SD were chosen with `scripts/simulate-detection.mjs`:
+// textbook k = 0.5, h = 4 raised a confirmed alarm in about 1 in 5 stable astronauts over 180 days. Sigma is floored at half the review floor so a
+// suspiciously tight baseline does not turn noise into alarms.
+export const DRIFT = Object.freeze({ k: 1, h: 6, reset: false });
+
+export function lockedReference(history, key, protocol) {
+  const values = usableValues(history, key, protocol).slice(0, BASELINE_WINDOW);
+  if (values.length < MIN_BASELINE) return { ready: false, count: values.length, needed: MIN_BASELINE };
+  return { ready: true, count: values.length, mean: mean(values), sd: sd(values) };
+}
+
+export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRIFT.h, reset = DRIFT.reset, floor } = {}) {
+  const def = INDICATORS[key], locked = lockedReference(history, key, protocol);
+  if (!locked.ready) return { ready: false };
+  const later = usableValues(history, key, protocol).slice(locked.count);
+  // The locked mean is itself estimated from a few checks; widen sigma for that uncertainty.
+  const sigma = Math.max(locked.sd, (floor ?? def.floor) / 2) * Math.sqrt(1 + 1 / locked.count);
+  const directions = def.direction === "both" ? ["up", "down"] : [def.direction];
+  let cusum = 0, drift = false;
+  for (const direction of directions) {
+    let s = 0;
+    for (const [i, x] of [...later, value].entries()) {
+      const z = (direction === "down" ? locked.mean - x : x - locked.mean) / sigma;
+      s = Math.max(0, s + z - k);
+      // An alarm raised on an earlier check restarts the sum, so a sustained drift re-alarms
+      // periodically instead of flagging every day after the first alarm.
+      if (reset && s >= h && i < later.length) s = 0;
+    }
+    if (s >= h) drift = true;
+    cusum = Math.max(cusum, s);
+  }
+  return { ready: true, cusum: round(cusum, 2), drift, lockedMean: locked.mean, sinceBaseline: value - locked.mean, checks: later.length + 1 };
+}
+
+function usableValues(history, key, protocol) {
+  return history.filter(check => check.values?.[key] !== undefined && check.values[key] !== null && (!protocol || check.protocols?.[key] === protocol) && check.quality?.[key] !== false)
+    .map(check => check.values[key]);
+}
+
+export function evaluateIndicator(key, value, history, { protocol, usable = true, floor, drift: driftParams } = {}) {
   const def = INDICATORS[key];
   if (value === null || value === undefined || Number.isNaN(value)) return { key, status: "notChecked", def };
   if (!usable) return { key, value, status: "repeat", def };
   const ref = personalReference(history, key, protocol);
   if (!ref.ready) return { key, value, status: "baseline", ref, def };
-  const tolerance = Math.max(2 * ref.sd, def.floor), delta = value - ref.mean;
+  const tolerance = Math.max(2 * ref.sd, floor ?? def.floor), delta = value - ref.mean;
   const worse = def.direction === "down" ? delta < -tolerance : def.direction === "up" ? delta > tolerance : Math.abs(delta) > tolerance;
-  return { key, value, status: worse ? "changed" : "stable", ref, delta, tolerance, def };
+  const drift = driftCheck(key, value, history, protocol, { floor, ...driftParams });
+  const reason = worse ? "day" : drift.drift ? "drift" : null;
+  return { key, value, status: reason ? "changed" : "stable", reason, ref, delta, tolerance, drift, series: usableValues(history, key, protocol), def };
 }
 
 const STATUS_RANK = { urgent: 5, changed: 4, repeat: 3, baseline: 2, stable: 1, notChecked: 0 };
 
-export function evaluateSelfCheck(check, history = []) {
+export function evaluateSelfCheck(check, history = [], { floors = {} } = {}) {
   const prior = history.filter(h => h.id !== check.id);
   const values = check.values || {}, protocols = check.protocols || {}, quality = check.quality || {};
-  const indicators = Object.keys(INDICATORS).map(key => evaluateIndicator(key, values[key], prior, { protocol: protocols[key], usable: quality[key] !== false }));
+  const indicators = Object.keys(INDICATORS).map(key => evaluateIndicator(key, values[key], prior, { protocol: protocols[key], usable: quality[key] !== false, floor: floors[key] }));
   const redFlags = RED_FLAGS.filter(([key]) => check.redFlags?.[key]).map(([, label]) => label);
   const symptoms = IMMUNE_SYMPTOMS.filter(([key]) => check.symptoms?.[key]).map(([, label]) => label);
   const domains = DOMAINS.map(([key, label, hazard]) => {
@@ -121,9 +165,13 @@ export function recommendActions(domains, redFlags, check = {}) {
     const repeats = domain.indicators.filter(row => row.status === "repeat");
     for (const row of repeats) actions.push({ id: `repeat-${row.key}`, priority: "repeat", text: `Repeat the ${row.def.label.toLowerCase()} measurement. This result did not pass its quality check, so it was not compared.`, due: 0 });
     if (domain.status === "changed") {
-      const items = domain.key === "immune" ? [] : domain.indicators.filter(r => r.status === "changed").map(r => r.def.label.toLowerCase());
-      const list = items.length > 1 ? `${items.slice(0, -1).join(", ")} and ${items.at(-1)}` : items[0];
-      const what = domain.key === "immune" ? `new symptoms reported (${domain.symptoms.join(", ").toLowerCase()})` : `${list} ${items.length > 1 ? "are" : "is"} outside your usual range`;
+      const changed = domain.key === "immune" ? [] : domain.indicators.filter(r => r.status === "changed");
+      const join = items => (items.length > 1 ? `${items.slice(0, -1).join(", ")} and ${items.at(-1)}` : items[0]);
+      const day = changed.filter(r => r.reason !== "drift").map(r => r.def.label.toLowerCase());
+      const drift = changed.filter(r => r.reason === "drift").map(r => r.def.label.toLowerCase());
+      const parts = [day.length ? `${join(day)} ${day.length > 1 ? "are" : "is"} outside your usual range` : null,
+        drift.length ? `${join(drift)} ${drift.length > 1 ? "have" : "has"} drifted steadily from your starting baseline` : null].filter(Boolean);
+      const what = domain.key === "immune" ? `new symptoms reported (${domain.symptoms.join(", ").toLowerCase()})` : parts.join("; ");
       actions.push({ id: `review-${domain.key}`, priority: "review", text: `${domain.label}: ${what}. Re-check in 24 h at the same time and log it for medical review at the next communication window.`, due: 24 });
     }
   }

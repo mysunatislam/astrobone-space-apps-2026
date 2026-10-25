@@ -3,6 +3,8 @@ import {
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, elenaDay147 } from "./elenaSelfCheck.js";
 import { createSelfCheckCamera } from "./selfCheckCamera.js";
+import { sparklineSvg } from "./trendSpark.js";
+import { HOLD, REFERENCE_TYPES, summarizeHold, agreement, calibratedFloors, pairsToCsv, createAngleCheckStore } from "./angleCheck.js";
 import { ELENA } from "./elenaMissionScenario.js";
 import { loadNasaEvidence, nasaWatchPlan } from "./nasaWatch.js";
 
@@ -25,6 +27,10 @@ function el(tag, attrs = {}, ...children) {
   return node;
 }
 const fmt = (v, d = 1) => (Number.isFinite(v) ? Number(v).toFixed(d) : "--");
+// Which knee the result describes: both (the worse one is compared) or the one leg a side-on camera saw.
+const kneeView = cap => !cap.view ? "" : cap.view === "bilateral"
+  ? ` · both knees seen, comparing the ${cap.worseSide} (left ${fmt(cap.sides.left.extension)}°, right ${fmt(cap.sides.right.extension)}°)`
+  : ` · ${cap.view} knee only (side-on view); compared only with ${cap.view}-knee checks`;
 
 export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} } = {}) {
   const store = createSelfCheckStore();
@@ -34,7 +40,10 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   const overlay = el("canvas", { class: "sc-overlay", "aria-hidden": "true" });
   const camStatus = el("small", { class: "sc-cam-status", role: "status" }, "Camera off");
   let camera = null, liveAngle = el("b", {}, "--");
+  const angleStore = createAngleCheckStore();
+  const check = { open: false, participant: "P1", side: "left", referenceType: REFERENCE_TYPES[0], reference: null, hold: null, holding: false, pairs: [] };
   try { state.persist = localStorage.getItem("astrobone-self-check-consent") === "1"; } catch { /* storage unavailable */ }
+  check.pairs = angleStore.load(state.persist);
   // NASA life-science data sets what this check asks for and when (src/nasaWatch.js).
   let evidence = null, evidenceError = null;
   loadNasaEvidence(import.meta.env.BASE_URL).then(data => { evidence = data; render(); }).catch(error => { evidenceError = error.message; render(); });
@@ -73,7 +82,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   function go(step) { state.step = Math.max(0, Math.min(STEPS.length - 1, step)); if (STEPS[state.step][0] !== "movement") stopCamera(); if (STEPS[state.step][0] === "result") evaluate(); render(); onStep(STEPS[state.step][0]); }
 
   function evaluate() {
-    state.evaluation = evaluateSelfCheck(state.check, history());
+    state.evaluation = evaluateSelfCheck(state.check, history(), { floors: state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor) });
     onEvaluate(state.evaluation, state.profile);
   }
 
@@ -93,7 +102,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   }
   async function startCamera() {
     camera ??= createSelfCheckCamera({ video, overlay, onStatus: text => { camStatus.textContent = text; }, onFrame: frame => {
-      liveAngle.textContent = frame?.angles ? `${Math.round((frame.angles.left.knee + frame.angles.right.knee) / 2)}°` : "--";
+      // Show only knees the camera can see; a far knee in a side-on view is guesswork.
+      const seen = frame?.angles ? ["left", "right"].filter(side => (frame.sideUsable ? frame.sideUsable[side] : true) && Number.isFinite(frame.angles[side]?.knee)) : [];
+      liveAngle.textContent = seen.length ? seen.map(side => `${side[0].toUpperCase()} ${Math.round(frame.angles[side].knee)}°`).join(" · ") : "--";
     } });
     try { await camera.start(); } catch (error) { camStatus.textContent = `Camera unavailable: ${error.message}`; }
     render();
@@ -105,6 +116,52 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
     applyCapture(result, "CAMERA · this device");
   }
   function stopCamera() { camera?.stop(); }
+
+  // ---------- Accuracy check (camera vs goniometer) ----------
+  async function holdAngle() {
+    if (!camera?.running || check.holding) return;
+    check.holding = true; check.hold = null; render();
+    try { check.hold = summarizeHold(await camera.hold(HOLD.durationMs), check.side); }
+    catch (error) { check.hold = { usable: false, reason: error.message }; }
+    check.holding = false; render();
+  }
+  function savePair() {
+    if (!check.hold?.usable || !Number.isFinite(check.reference)) return;
+    check.pairs = [...check.pairs, { participant: check.participant.trim() || "P?", side: check.side, referenceType: check.referenceType, referenceFlexion: check.reference,
+      cameraFlexion: check.hold.flexion, holdSd: check.hold.sd, samples: check.hold.samples, at: new Date().toISOString() }];
+    angleStore.save(check.pairs, state.persist);
+    check.hold = null; check.reference = null; render();
+  }
+  function exportPairs() {
+    const url = URL.createObjectURL(new Blob([pairsToCsv(check.pairs)], { type: "text/csv" }));
+    const a = el("a", { href: url, download: `AstroBone-angle-check-${Date.now()}.csv` }); a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function accuracyCheck() {
+    const camOn = camera?.running, h = check.hold, a = agreement(check.pairs);
+    const details = el("details", { class: "sc-validate", open: check.open || undefined, ontoggle: e => { check.open = e.target.open; } },
+      el("summary", {}, `Accuracy check · camera vs goniometer (${check.pairs.length} pairs)`),
+      el("p", { class: "sc-note" }, "For validating the camera, not part of the daily check. Hold one knee still at any bend, read it with a goniometer or phone inclinometer (0° = straight), and capture the camera angle for the same knee."),
+      el("div", { class: "sc-validate-grid" },
+        el("label", { class: "sc-text" }, "Participant code", el("input", { type: "text", maxlength: 12, value: check.participant, oninput: e => { check.participant = e.target.value; } })),
+        el("label", { class: "sc-text" }, "Knee", el("select", { onchange: e => { check.side = e.target.value; check.hold = null; render(); } },
+          [["left", "Left"], ["right", "Right"]].map(([v, l]) => el("option", { value: v, selected: check.side === v || undefined }, l)))),
+        el("label", { class: "sc-text" }, "Reference", el("select", { onchange: e => { check.referenceType = e.target.value; } },
+          REFERENCE_TYPES.map(t => el("option", { selected: check.referenceType === t || undefined }, t))))),
+      number("Reference reading (knee flexion)", "°", check.reference, 0, 160, 0.5, value => { check.reference = value; }),
+      el("div", { class: "sc-row" },
+        el("button", { type: "button", class: "sc-secondary", disabled: !camOn || check.holding || undefined, onclick: holdAngle }, check.holding ? "Hold still…" : camOn ? "Capture camera angle (3 s hold)" : "Start the camera first"),
+        el("button", { type: "button", class: "sc-primary", disabled: !(h?.usable) || undefined, onclick: savePair }, "Save pair")),
+      h ? el("p", { class: h.usable ? "sc-note" : "sc-note sc-bad" }, h.usable ? `Camera: ${h.flexion}° flexion (SD ${h.sd}°, ${h.samples} frames). Enter the reference reading, then save.` : `Not paired: ${h.reason}.`) : null,
+      a.ready ? el("div", { class: "sc-result" },
+        el("strong", {}, `Bias ${a.bias > 0 ? "+" : ""}${a.bias}° · 95% limits ${a.loa[0]}° to ${a.loa[1]}°`),
+        el("p", {}, `${a.n} pairs from ${a.people} ${a.people === 1 ? "person" : "people"} · mean absolute difference ${a.meanAbsError}° · conservative detectable change ${a.mdc95}° ${a.triggerAboveNoise ? "is below" : "is not below"} the ${a.reviewTrigger}° review trigger.`),
+        a.caution ? el("small", {}, a.caution) : el("small", {}, `Agreement for this camera, lighting and setup only. Differences are camera minus reference.${calibratedFloors(check.pairs, a.reviewTrigger).kneeExtension ? ` The knee review trigger is raised to ${a.mdc95}° to match.` : ""}`))
+        : el("p", { class: "sc-note" }, a.reason),
+      check.pairs.length ? el("div", { class: "sc-row" },
+        el("button", { type: "button", class: "sc-secondary", onclick: exportPairs }, "Export pairs (CSV)"),
+        el("button", { type: "button", class: "sc-link", onclick: () => { if (confirm("Delete all accuracy-check pairs on this device?")) { check.pairs = []; angleStore.clear(); render(); } } }, "Clear pairs")) : null);
+    return details;
+  }
 
   // ---------- Reaction test (PVT-B) ----------
   const pvt = { running: false, trials: [], timer: null, raf: null, onset: null, start: 0, duration: PVT_B.durationMs, feedback: "" };
@@ -186,7 +243,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
       const cap = state.capture, usable = cap && !cap.capturing && c.quality.kneeExtension;
       const camOn = camera?.running;
       return [why("bone", "In spaceflight the legs lose the most bone, so this test comes first."),
-        el("p", { class: "sc-lead" }, "Seated knee extension, 10 seconds. Sit side-on or facing the camera with both legs visible. Straighten and bend both knees slowly."),
+        el("p", { class: "sc-lead" }, "Seated knee extension, 10 seconds. Face the camera with both legs visible, or sit side-on to measure the near knee. Straighten and bend your knees slowly."),
         demo ? el("div", { class: "sc-row" },
           el("button", { type: "button", class: "sc-secondary", "data-demo": "poor", onclick: () => demoCapture("poor") }, "Demo capture · poor framing"),
           el("button", { type: "button", class: "sc-secondary", "data-demo": "usable", onclick: () => demoCapture("usable") }, "Demo capture · usable"))
@@ -197,10 +254,11 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
         cap?.capturing && demo ? el("p", { class: "sc-note" }, "Capturing demo movement…") : null,
         cap && !cap.capturing ? el("div", { class: `sc-result ${usable ? "" : "sc-bad"}` },
           el("strong", {}, usable ? "Capture usable" : "Comparison withheld · repeat the capture"),
-          el("p", {}, usable ? `Knee extension ${fmt(cap.kneeExtension)}° · range of motion ${fmt(cap.kneeRom)}° · tracking quality ${fmt(cap.trackingQuality, 2)} · ${cap.sampleCount} samples`
+          el("p", {}, usable ? `Knee extension ${fmt(cap.kneeExtension)}° · range of motion ${fmt(cap.kneeRom)}° · tracking quality ${fmt(cap.trackingQuality, 2)} · ${cap.sampleCount} samples${kneeView(cap)}`
             : `Tracking quality ${fmt(cap.trackingQuality, 2)} with ${cap.sampleCount} usable samples is below the quality rule (≥ 0.70 and ≥ 12 samples). A worse-looking number from a poor capture is not treated as a health change.`),
           el("small", {}, `${cap.source} · attempt ${state.captures}`)) : null,
-        el("p", { class: "sc-note" }, "Video stays on this device. Only the summary angles are kept.")];
+        el("p", { class: "sc-note" }, "Video stays on this device. Only the summary angles are kept."),
+        demo ? null : accuracyCheck()];
     }
     if (key === "reaction") {
       const result = state.pvt;
@@ -254,7 +312,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
         d.key === "immune" ? el("p", {}, d.status === "notChecked" ? "Symptoms not answered." : d.symptoms.length ? d.symptoms.join(", ") : "No new symptoms reported.")
           : el("ul", {}, d.indicators.filter(r => r.status !== "notChecked").map(r => el("li", { class: `sc-${r.status}` },
             el("span", {}, r.def.label), el("b", {}, `${fmt(r.value, r.def.digits ?? 0)}${r.def.unit}`),
-            el("small", {}, r.status === "baseline" ? `baseline ${r.ref.count}/${r.ref.needed}` : r.status === "repeat" ? "quality failed" : `usual ${fmt(r.ref.mean, r.def.digits ?? 0)} ± ${fmt(r.tolerance, r.def.digits ?? 1)}`)))),
+            el("small", {}, r.status === "baseline" ? `baseline ${r.ref.count}/${r.ref.needed}` : r.status === "repeat" ? "quality failed"
+              : r.reason === "drift" ? `gradual drift · start ${fmt(r.drift.lockedMean, r.def.digits ?? 0)}` : `usual ${fmt(r.ref.mean, r.def.digits ?? 0)} ± ${fmt(r.tolerance, r.def.digits ?? 1)}`),
+            trend(r)))),
         d.key !== "immune" && !d.indicators.some(r => r.status !== "notChecked") ? el("p", {}, "Not checked.") : null))),
       el("section", { class: "sc-actions" }, el("h3", {}, "Your next step"),
         ev.actions.map(a => el("label", { class: `sc-action sc-${a.priority}` }, el("input", { type: "checkbox", "data-action": a.id, checked: (a.priority !== "info" || a.id === "routine") || undefined, disabled: state.saved || undefined }), el("span", {}, a.text)))),
@@ -262,8 +322,18 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
         el("small", {}, state.profile === "elena" ? "Demo record kept in memory for this tab." : state.persist ? "Saved on this device." : "Kept in memory for this tab (saving on this device is off)."))
         : el("button", { type: "button", class: "sc-primary", onclick: saveCheck }, "Save check & selected actions"),
       el("div", { class: "sc-row" }, el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
-      el("p", { class: "sc-note" }, "Review triggers: outside 2× your own spread or a minimum change, whichever is larger, after 3 usable checks. Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
+      el("p", { class: "sc-note" }, "Review triggers: outside 2× your own spread or a minimum change, whichever is larger, after 3 usable checks; or a steady drift from your first checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
       state.profile === "elena" ? el("p", { class: "sc-note" }, ELENA_SELF_CHECK_BOUNDARY) : null];
+  }
+
+  // Trend under each compared indicator: shaded usual range, dashed starting level, today's dot.
+  function trend(r) {
+    if (r.status !== "stable" && r.status !== "changed") return null;
+    const d = r.def.digits ?? 0, start = r.drift?.ready ? r.drift.lockedMean : null;
+    const svg = sparklineSvg({ series: r.series, value: r.value, band: [r.ref.mean - r.tolerance, r.ref.mean + r.tolerance], start, changed: r.status === "changed",
+      label: `${r.def.label}: ${r.series.length + 1} checks, ${start === null ? "" : `start ${fmt(start, d)}, `}today ${fmt(r.value, d)}${r.def.unit}` });
+    if (!svg) return null;
+    const box = el("div", { class: "sc-trend" }); box.innerHTML = svg; return box;
   }
 
   function checkbox(id, label, checked, change) {
@@ -286,7 +356,8 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
       el("button", { type: "button", "aria-pressed": String(state.profile === "elena"), onclick: () => { if (state.profile !== "elena") { state.profile = "elena"; reset(); } } }, "Elena · synthetic demo"),
       el("button", { type: "button", "aria-pressed": String(state.profile === "you"), onclick: () => { if (state.profile !== "you") { state.profile = "you"; reset(); } } }, "You · this device"));
     const consent = state.profile === "you" ? el("label", { class: "sc-consent" }, el("input", { type: "checkbox", checked: state.persist || undefined, onchange: e => {
-      state.persist = e.target.checked; try { localStorage.setItem("astrobone-self-check-consent", state.persist ? "1" : "0"); } catch { /* storage unavailable */ } render();
+      state.persist = e.target.checked; try { localStorage.setItem("astrobone-self-check-consent", state.persist ? "1" : "0"); } catch { /* storage unavailable */ }
+      angleStore.save(check.pairs, state.persist); render();
     } }), `Save my checks on this device (${history().length} saved)`) : null;
     const nav = STEPS[state.step][0] === "result" ? null : el("div", { class: "sc-nav" },
       state.step > 0 ? el("button", { type: "button", class: "sc-secondary", onclick: () => go(state.step - 1) }, "Back") : el("span"),

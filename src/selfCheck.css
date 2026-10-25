@@ -33,12 +33,19 @@
 .sc-result strong { font-size: 13px; color: #fff; }
 .sc-result p { margin: 0; font-size: 12px; line-height: 1.45; color: var(--tw-dim); }
 .sc-result small { font: 600 9px var(--tw-mono); letter-spacing: .1em; color: var(--tw-faint); text-transform: uppercase; }
+.sc-validate { display: grid; gap: 10px; padding: 10px 12px; border: 1px dashed var(--tw-line-strong); border-radius: 10px; }
+.sc-validate[open] { gap: 10px; }
+.sc-validate summary { cursor: pointer; font: 600 10px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-dim); }
+.sc-validate[open] > * + * { margin-top: 8px; }
+.sc-validate-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sc-note.sc-bad { color: #ffd27a; }
+@media (max-width: 420px) { .sc-validate-grid { grid-template-columns: 1fr; } }
 .sc-pvt-stage { position: relative; width: 100%; height: 150px; border-radius: 12px; border: 1px solid var(--tw-line); background: #01040a; color: var(--tw-dim); touch-action: manipulation; }
 .sc-pvt-stage::after { content: attr(data-count); position: absolute; inset: 0; display: grid; place-items: center; font: 600 34px var(--tw-mono); font-variant-numeric: tabular-nums; }
 .sc-pvt-stage.sc-on { border-color: var(--tw-amber); color: var(--tw-amber); }
 .sc-number, .sc-text, .sc-slider { display: grid; gap: 6px; font-size: 12.5px; color: var(--tw-ink); }
 .sc-number span { display: flex; align-items: center; gap: 8px; }
-.sc-number input, .sc-text textarea, .sc-text select { width: 100%; max-width: 200px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 14px var(--tw-sans); }
+.sc-number input, .sc-text textarea, .sc-text select, .sc-text input { width: 100%; max-width: 200px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 14px var(--tw-sans); }
 .sc-text textarea { max-width: none; resize: vertical; }
 .sc-number i { font-style: normal; color: var(--tw-dim); font: 600 11px var(--tw-mono); }
 .sc-slider > span { display: flex; justify-content: space-between; }
@@ -70,6 +77,13 @@
 .sc-domain li b { color: #fff; font-family: var(--tw-mono); font-variant-numeric: tabular-nums; }
 .sc-domain li small { font: 10px var(--tw-mono); color: var(--tw-faint); }
 .sc-domain li.sc-changed b { color: #ffb347; }
+.sc-trend { grid-column: 1 / -1; margin: 1px 0 4px; }
+.sc-spark { display: block; width: 100%; max-width: 220px; height: auto; overflow: visible; }
+.sc-spark-band { fill: rgba(127, 227, 255, .1); }
+.sc-spark-start { stroke: var(--tw-faint); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+.sc-spark-line { fill: none; stroke: #7fe3ff; stroke-width: 1.5; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.sc-spark-now { fill: #7fe3ff; }
+.sc-spark-now.sc-spark-changed { fill: #ffb347; }
 .sc-domain li.sc-repeat b { color: var(--tw-amber); text-decoration: line-through; }
 .tw-drawer .sc-actions { display: grid; gap: 6px; margin: 0; padding: 0; border: 0; }
 .sc-actions h3 { margin-bottom: 2px; }
