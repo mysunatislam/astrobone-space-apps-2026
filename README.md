@@ -21,10 +21,10 @@ On a Mars transit a message to Earth can take up to 22 minutes one way, and ther
 | Step | How |
 | --- | --- |
 | **Gather** | A 5-minute daily self-check: seated knee-extension movement test with on-device pose AI, 3-minute reaction test (PVT-B), sleep, fatigue (Samn-Perelli), mood, stress, immune symptom checklist, resting heart rate and radiation dose. |
-| **Evaluate** | A quality check first: a poor camera capture is refused and repeated, never reported as a decline. Each indicator is then compared with the astronaut's own baseline (after 3 usable checks) across four domains: bone & muscle, cardiovascular, behavioral health and immune. Red-flag symptoms override everything. |
+| **Evaluate** | A quality check first: a poor camera capture is refused and repeated, never reported as a decline. Each indicator is then compared with the astronaut's own baseline (after 3 usable checks) across four domains: bone & muscle, cardiovascular, behavioral health and immune. A drift rule (CUSUM) also compares it with the astronaut's first checks, so a slow loss is caught even when every single day looks normal. Each result shows its trend. Red-flag symptoms override everything. |
 | **Act** | A bounded next step with a due time: contact the medical officer now, repeat a measurement, or re-check in 24 h and log it for medical review. AstroBone never diagnoses or prescribes. |
 
-The **digital twin** (home page) shows the astronaut's systems on 3D anatomy: skeleton, muscles, heart and vessels, across the mission timeline. Affected systems are highlighted after a self-check. **Live Capture** is the camera workspace: real-time pose tracking from a webcam or video, a musculoskeletal model that follows the tracked joints, and knee angle, range of motion and left-right difference with a quality gate. An uploaded video is analysed just ahead of playback, so the 3D model moves with the frame on screen. When a face is visible, an experimental camera pulse (and, with steady frames, a stress index from beat-to-beat timing) is shown.
+The **digital twin** (home page) shows the astronaut's systems on 3D anatomy: skeleton, muscles, heart and vessels, across the mission timeline. Affected systems are highlighted after a self-check. **Live Capture** is the camera workspace: real-time pose tracking from a webcam or video, a musculoskeletal model that follows the tracked joints, and knee angle, range of motion and left-right difference with a quality gate. An uploaded video is analysed just ahead of playback, so the 3D model moves with the frame on screen. When a face is visible, an experimental camera pulse (and, with steady frames, heart-rate variability (RMSSD) from beat-to-beat timing) is shown.
 
 ## NASA Data Drives the Checks
 
@@ -32,8 +32,8 @@ Five datasets from the NASA Open Science Data Repository / Ames Life Sciences Da
 
 | NASA study | What the data shows | What AstroBone does |
 | --- | --- | --- |
-| [OSD-804](https://osdr.nasa.gov/bio/repo/data/studies/OSD-804) · LSDS-130, spaceflight bone micro-CT (mice) | 54.5 % lower bone volume in the distal femur (just above the knee) after 37 days in space; 27.4 % at the hip, 8.3 % in the spine | The knee movement test comes first in every daily check |
-| [OSD-656](https://osdr.nasa.gov/bio/repo/data/studies/OSD-656) · LSDS-64 and [OSD-569](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) · LSDS-7, Inspiration4 crew | Immune protein VCAM1 stayed above pre-flight for 45 days after return, back by day 82; white blood cells fell the day after return | Immune checklist every day for 45 days after any return to gravity |
+| [OSD-804](https://osdr.nasa.gov/bio/repo/data/studies/OSD-804) · LSDS-130, spaceflight bone micro-CT (mice) | After 37 days in space, bone structure moved toward loss above the knee (distal femur, p = 0.004) and at the hip (p = 0.007), corrected across 5 sites; bone volume fraction above the knee −55 % (95% CI −68 to −30 %). No clear change in the spine | The knee movement test comes first in every daily check |
+| [OSD-656](https://osdr.nasa.gov/bio/repo/data/studies/OSD-656) · LSDS-64 and [OSD-569](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) · LSDS-7, Inspiration4 crew | Urine immune protein VCAM1 stayed above every pre-flight visit for 45 days after return, back by day 82 (group medians of 4 people); white blood cells stayed within the pre-flight range | Immune checklist every day for 45 days after any return to gravity |
 | [OSD-435](https://osdr.nasa.gov/bio/repo/data/studies/OSD-435) · LSDS-22 (mice) and [OSD-575](https://osdr.nasa.gov/bio/repo/data/studies/OSD-575) · LSDS-8, Inspiration4 crew | No consistent change in heart ejection fraction after 0.1–3 Gy; CRP already varied 1.9–19.9 mg/L before launch | No radiation alarm; dose is logged beside heart rate for the medical reviewer |
 
 The data sets priority and timing only. It never sets a personal threshold: mice and a four-person, three-day flight cannot calibrate one astronaut. Raw files, reproducible summaries and rules: [NASA data pipeline](docs/nasa-data-pipeline.md).
@@ -65,7 +65,7 @@ Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osd
 - **Frontend:** JavaScript (ES modules), Vite, three.js / WebGL; a service worker for offline use.
 - **On-device AI:** Google MediaPipe Pose Landmarker (WebAssembly + GPU) in a Web Worker; EfficientDet-Lite0 object detection in Live Capture.
 - **Anatomy:** Z-Anatomy / BodyParts3D musculoskeletal and cardiovascular models, rigged for movement.
-- **Models:** personal-baseline review (2 × SD with a minimum change), PVT-B reaction metrics, Euler–Bernoulli bending stress and a seeded 10,000-run Monte Carlo for the Impact Lab, checked against a stored Simulink reference.
+- **Models:** personal-baseline review (2 × SD with a minimum change), CUSUM drift against a locked starting baseline (tuned by simulation, [results](docs/core-analysis-2026-10-25.md)), PVT-B reaction metrics, Euler–Bernoulli bending stress and a seeded 10,000-run Monte Carlo for the Impact Lab, checked against a stored Simulink reference.
 - **Data:** Python scripts that download unrestricted NASA OSDR files and record their hashes.
 - **Optional, off by default:** an Android app (Capacitor), and local services on the user's own computer for a whole-body mesh (YOLOX, RTMW, InstantHMR, MHR) and a Llama 3.2 review assistant. See [Android](docs/android-app.md) and [local companion](docs/local-companion-architecture.md).
 
@@ -81,8 +81,8 @@ Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osd
 
 ## Validation and Limits
 
-- **Tested:** 270 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
-- **Not yet validated:** camera joint angles have not yet been compared with a reference measurement (motion capture or a goniometer); the [validation protocol](docs/functional-camera-validation-protocol.md) is written and is our next step. No astronaut or analog-crew user study has been run.
+- **Tested:** 288 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
+- **Not yet validated:** camera joint angles have not yet been compared with a reference measurement. The Self-Check now has a built-in **accuracy check** (camera vs goniometer, Bland–Altman bias, limits of agreement and detectable change); once 20+ pairs from 3+ people are recorded, the knee review trigger is raised to match the measured error. The [validation protocol](docs/functional-camera-validation-protocol.md) is written. No astronaut or analog-crew user study has been run.
 - **Data boundaries:** Elena and all her values are synthetic. The NASA cohorts are mice and a four-person, three-day flight; they inform what to watch, never a diagnosis or a personal threshold.
 - AstroBone is a research prototype, not a medical device.
 

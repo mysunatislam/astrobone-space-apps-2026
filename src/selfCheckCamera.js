@@ -1,5 +1,5 @@
 import { PoseLandmarkFilter } from "./poseRetargeting.js";
-import { analyzePoseLandmarks, summarizeFunctionalAssessment } from "./functionalAssessment.js";
+import { analyzePoseLandmarks, summarizeKneeCapture } from "./functionalAssessment.js";
 
 // Camera knee-extension capture for the self-check. Uses the same pose worker, landmark
 // filter, offscreen-joint rule and summary as the Movement capture workspace, so the
@@ -85,15 +85,18 @@ export function createSelfCheckCamera({ video, overlay, onStatus = () => {}, onF
     if (!running) return Promise.reject(new Error("Camera is not running."));
     recording = { samples: [], telemetry: [], start: performance.now() };
     return new Promise(resolve => setTimeout(() => {
-      const { samples, telemetry } = recording; recording = null;
-      const summary = summarizeFunctionalAssessment(samples, null, { telemetry, durationMs });
-      const rom = summary.rangeOfMotion ? (summary.rangeOfMotion.left.knee + summary.rangeOfMotion.right.knee) / 2 : null;
-      resolve({
-        status: summary.status, trackingQuality: summary.trackingQuality ?? 0, sampleCount: summary.sampleCount ?? 0,
-        kneeExtension: summary.cameraFeatures?.kneeExtensionP95Degrees ?? null, kneeRom: rom === null ? null : Math.round(rom * 10) / 10,
-        reason: summary.reason ?? null, durationMs, protocol: "self-check-seated-knee-extension-v1",
-      });
+      const { samples } = recording; recording = null;
+      const summary = summarizeKneeCapture(samples);
+      resolve({ ...summary, reason: summary.status === "complete" ? null : "Keep at least one whole leg in view and repeat.", durationMs });
     }, durationMs));
+  }
+
+  // Collect analyzed frames for a short still hold, used by the camera-versus-reference angle check.
+  function hold(durationMs = 3000) {
+    if (!running) return Promise.reject(new Error("Camera is not running."));
+    if (recording) return Promise.reject(new Error("A capture is already running."));
+    recording = { samples: [], telemetry: [], start: performance.now() };
+    return new Promise(resolve => setTimeout(() => { const { samples } = recording ?? { samples: [] }; recording = null; resolve(samples); }, durationMs));
   }
 
   function stop() {
@@ -104,5 +107,5 @@ export function createSelfCheckCamera({ video, overlay, onStatus = () => {}, onF
     overlay.getContext("2d")?.clearRect(0, 0, overlay.width, overlay.height);
   }
 
-  return { start, record, stop, get running() { return running; } };
+  return { start, record, hold, stop, get running() { return running; } };
 }

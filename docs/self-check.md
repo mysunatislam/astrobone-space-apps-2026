@@ -11,7 +11,7 @@ The 2026 challenge asks for software that **gathers health indicators** and **en
 | Domain | Indicator | How it is gathered | Source label |
 | --- | --- | --- | --- |
 | Safety | Chest pain, fainting, severe breathlessness, sudden neurological symptoms, thoughts of self-harm | Checklist, always first | Self-report |
-| Bone & muscle | Knee extension (95th-percentile interior angle) and knee range of motion | 10-second seated knee extension on the device camera; MediaPipe pose, same filter and definition as Movement capture | Camera |
+| Bone & muscle | Knee extension (95th-percentile interior angle) and knee range of motion (5th–95th percentile spread) | 10-second seated knee extension on the device camera; MediaPipe pose with the Movement capture filter. Each knee is gated on its own hip, knee and ankle tracking. Facing the camera with both legs visible compares the worse knee and records asymmetry; sitting side-on measures the near knee. Bilateral and single-side results are separate protocols and are never compared with each other | Camera |
 | Behavioral health | Reaction speed and lapses | PVT-B: 3 minutes, 2–5 s intervals, 355 ms lapse threshold (Basner, Mollicone & Dinges, Acta Astronautica 2011); 1-minute practice is labeled and never compared with 3-minute runs | Test |
 | Behavioral health | Sleep hours, fatigue, mood, stress | Sleep entry; Samn–Perelli 7-point fatigue checklist; 0–10 mood and stress ratings | Self-report |
 | Immune | New fever or chills, respiratory symptoms, rash or cold sores, slow-healing wounds, unusual tiredness | Checklist | Self-report |
@@ -25,6 +25,8 @@ Video never leaves the device; only summary angles are kept.
 - **Quality first.** A movement capture needs tracking quality ≥ 0.70 and ≥ 12 usable samples. A reaction test needs to be complete, with enough valid responses and ≤ 10 early taps. A failed result is shown as **REPEAT** and is not compared. A worse-looking number from a poor capture is never treated as a health change.
 - **Personal baseline.** Each indicator is compared with the person's own last ≤ 5 usable results of the same protocol. Comparison starts after 3 usable checks; until then the status is **BASELINE**.
 - **Review trigger.** A result is **REVIEW** when it moves in the worsening direction by more than 2× the person's own spread, or by a minimum change (for example 5° knee extension, 8 bpm, 3 lapses, 1.5 h sleep), whichever is larger. These are engineering defaults for prompting a re-check, **not clinical thresholds**.
+- **Slow drift.** A rolling baseline follows a slow decline, which is how bone and muscle are lost in flight, so a steady loss never leaves it. Each indicator therefore also keeps a **locked baseline** (its first 5 usable checks) and runs a one-sided CUSUM (Page, 1954) of worsening against it, with k = 1 SD and h = 6 SD. A result that crosses it is **REVIEW · gradual drift**. In a 1,000-run simulation with 2° daily noise, a 4°/month knee-extension decline was confirmed on two consecutive checks in 99.8% of runs (median 36 days after onset) versus 1.0% with the rolling rule alone, for 0.7% versus 0.3% confirmed false alarms in stable runs over 180 days. See `core-analysis-2026-10-25.md`.
+- **Trigger tied to measured accuracy.** Once the camera accuracy check has at least 20 pairs from 3 or more people, the knee review trigger is raised to the measured detectable change (MDC95) if that is larger than 5°. It is never lowered.
 - **Red flags override everything** and make the check **URGENT**.
 
 ## Act
@@ -43,6 +45,14 @@ Checks stay in memory unless the astronaut ticks **Save my checks on this device
 
 - 10 unit tests: PVT-B scoring, protocol separation, baseline readiness, direction and floor rules, red-flag priority, immune symptoms, bounded wording, Elena's Day 147 result, poor-capture refusal, consent-gated storage.
 - Browser: the full Elena flow, the reaction test with simulated taps (0 false starts, correct latency), and the camera path loading the pose model and detecting a person at 0.97 tracking quality from the project's squat test video.
+
+## Accuracy Check (Camera vs Goniometer)
+
+Added 2026-10-18 in the Movement step for **You · this device** (`src/angleCheck.js`, tests in `src/angleCheck.test.js`). A tester holds one knee still, reads it with a goniometer or phone inclinometer (knee flexion, 0° = straight) and captures a 3-second camera hold of the same knee. A hold is paired only if at least 10 frames tracked that knee and its angle varied by no more than 3° SD. From the pairs the panel shows Bland-Altman bias with 95% limits of agreement, mean absolute difference, and a conservative minimal detectable change (1.96 × √2 × SD of differences) compared with the 5° review trigger. Pairs stay in memory unless saving on this device is ticked, and export as CSV. Results describe that camera, lighting and setup only. The study procedure is in `space-apps-2026-win-plan.md`.
+
+## Offline
+
+`npm run build` and `npm run build:github` generate `sw.js` and `offline-manifest.json` (`scripts/write-offline-cache.mjs`). **Save for offline** in the twin's systems rail stores the twin, self-check, anatomy, pose model and data (about 35 MB). Verified in Chromium: after saving, a reload with the network off renders the twin and starts the camera pose model.
 
 ## Not Yet Verified
 

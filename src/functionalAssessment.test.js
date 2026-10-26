@@ -6,6 +6,7 @@ import {
   analyzePoseLandmarks,
   calculateJointAngle,
   summarizeFunctionalAssessment,
+  summarizeKneeCapture,
 } from "./functionalAssessment.js";
 
 test("joint angle returns a geometric angle in degrees", () => {
@@ -107,3 +108,38 @@ function makeLandmarks() {
   Object.assign(landmarks[32], { x: 0.61, y: 0.9 });
   return landmarks;
 }
+
+const kneeFrame = (left, right, { leftOk = true, rightOk = true } = {}) => ({
+  angles: { left: { knee: left }, right: { knee: right } },
+  sideUsable: { left: leftOk, right: rightOk },
+  sideVisibility: { left: leftOk ? 0.9 : 0.3, right: rightOk ? 0.9 : 0.3 },
+});
+
+test("knee capture compares the worse knee when both legs are tracked", () => {
+  const frames = Array.from({ length: ASSESSMENT_MIN_SAMPLES + 4 }, (_, i) => kneeFrame(120 + i * 3, 125 + i * 3));
+  const result = summarizeKneeCapture(frames);
+  assert.equal(result.status, "complete");
+  assert.equal(result.view, "bilateral");
+  assert.equal(result.worseSide, "left");
+  assert.equal(result.kneeExtension, result.sides.left.extension);
+  assert.ok(result.asymmetry > 0);
+  assert.equal(result.protocol, "self-check-seated-knee-extension-v2-bilateral");
+});
+
+test("knee capture uses the near knee when only one leg is tracked side-on", () => {
+  const frames = Array.from({ length: ASSESSMENT_MIN_SAMPLES + 2 }, (_, i) => kneeFrame(90 + i * 5, 40, { leftOk: false }));
+  const result = summarizeKneeCapture(frames);
+  assert.equal(result.view, "right");
+  assert.equal(result.worseSide, null);
+  assert.equal(result.asymmetry, null);
+  assert.equal(result.sides.left.usable, false);
+  assert.equal(result.protocol, "self-check-seated-knee-extension-v2-right", "single-side checks are never mixed with bilateral ones");
+});
+
+test("knee capture is insufficient when no leg is tracked well enough", () => {
+  const frames = Array.from({ length: ASSESSMENT_MIN_SAMPLES - 1 }, () => kneeFrame(170, 170));
+  const result = summarizeKneeCapture(frames);
+  assert.equal(result.status, "insufficient");
+  assert.equal(result.kneeExtension, null);
+  assert.equal(result.protocol, null);
+});

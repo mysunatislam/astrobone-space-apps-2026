@@ -22,7 +22,7 @@ export function initHealthLayers({ scene, rig, video, getFace, isLiveCamera, onC
   // Pulse and stress from the face: on request for the live camera, automatically for an uploaded video.
   const panel = document.createElement("section"); panel.className = "pulse-capture"; panel.setAttribute("aria-labelledby", "pulse-title");
   panel.innerHTML = `<div class="pulse-heading"><h4 id="pulse-title">Pulse and stress from the face</h4><button type="button" id="pulse-start" aria-pressed="false">Measure from camera</button></div>
-    <div class="pulse-readouts"><div><span>Pulse</span><output id="pulse-value">-- bpm</output></div><div><span>Stress index</span><output id="stress-value">--</output><small id="stress-detail"></small></div></div>
+    <div class="pulse-readouts"><div><span>Pulse</span><output id="pulse-value">-- bpm</output></div><div><span>Heart-rate variability</span><output id="stress-value">--</output><small id="stress-detail"></small></div></div>
     <p id="pulse-status" role="status">Upload a video with a visible face, or start the camera and press Measure.</p><canvas width="400" height="60" aria-label="Experimental pulse signal" role="img"></canvas>
     <small>Experimental, processed on this device. Needs a close, still face and steady light: pulse after 12 s, stress after 30 s. Stress is Baevsky's index from beat-to-beat timing; compare only with the same person's own readings. No SpO2, diagnosis or medical alerting.</small>`;
   (document.querySelector(".detail-analysis") ?? document.querySelector(".motionguard-capture-details")).after(panel);
@@ -36,12 +36,12 @@ export function initHealthLayers({ scene, rig, video, getFace, isLiveCamera, onC
     pulse = { ...result, source, receivedAt: performance.now() };
     const stress = result.stress?.status === "estimated" ? result.stress : null;
     value.textContent = result.bpm ? `${result.bpm} bpm` : "-- bpm";
-    stressValue.textContent = stress ? `${stress.stressIndex} · ${stress.level}` : "--";
-    stressDetail.textContent = stress ? `RMSSD ${stress.rmssdMs} ms / ${stress.beats} beats` : "";
+    stressValue.textContent = stress ? `RMSSD ${stress.rmssdMs} ms` : "--";
+    stressDetail.textContent = stress ? `${stress.beats} beats${stress.level ? ` / stress ${stress.level} (SI ${stress.stressIndex})` : ` / ${stress.levelNote}`}` : "";
     const note = result.status === "estimated" ? result.stress?.status === "estimated" ? "Experimental estimate" : result.stress?.reason ?? "" : result.reason;
     status.textContent = `${source === "video" ? "Recorded video" : "Live camera"} / ${note}${result.collectedSeconds && !stress ? ` / ${Math.floor(result.collectedSeconds)} s collected` : ""}`;
     chip.hidden = !result.bpm;
-    chip.textContent = result.bpm ? `♥ ${result.bpm} bpm${stress ? ` · stress ${stress.level}` : ""}` : "";
+    chip.textContent = result.bpm ? `♥ ${result.bpm} bpm${stress ? ` · RMSSD ${stress.rmssdMs} ms` : ""}` : "";
     const ctx = chart.getContext("2d"); ctx.clearRect(0, 0, 400, 60);
     if (result.waveform?.length) {
       const max = Math.max(...result.waveform.map(Math.abs), 1e-6); ctx.strokeStyle = "#d76283"; ctx.beginPath();
