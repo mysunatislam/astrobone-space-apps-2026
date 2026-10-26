@@ -43,12 +43,12 @@ if dh:
 w("## 1. Pose: which pretrained model reads the knee best\n")
 ds = P["dataset"]
 w(f"**Data.** {ds['name']} ({ds['cite']}; doi:10.5281/zenodo.13305826, CC BY-NC 4.0): {ds['people']} people doing squats (Ex6) and lunges (Ex5), "
-  f"two synchronized cameras, Vicon motion capture. {ds['videos']} camera videos, {ds['frames']:,} scored frames (every 6th frame), {ds['reps']} rep-and-knee pairs "
+  f"two synchronized cameras, Vicon motion capture. {ds['videos']} camera videos, {ds['frames']:,} scored frames (every 6th frame of squats, every 10th of lunges), {ds['reps']} rep-and-knee pairs "
   "in the hybrid analysis. Camera position per rep from the dataset's orientation labels; the knee nearer a side-on camera from the camera centre recovered "
   "by direct linear transform from the motion-capture joints and their 2D projections.\n")
 w("**Scoring.** Knee keypoints against the motion-capture knee projected into the same camera (PCK: within 10 % of the thigh length). Knee angle against the "
   "motion-capture 3D interior knee angle. Rep-level numbers use the app's definitions: extension = 95th percentile of the knee angle, range of motion (ROM) = 95th − 5th percentile. "
-  "MediaPipe frames are gated at the app's visibility of 0.62.\n")
+  "MediaPipe frames are gated at the app's visibility of 0.62. The slower models ran on every second scored frame, so the table below scores every model on those shared frames only.\n")
 w("| Model | In browser | Knee within 10 % of thigh | Side-on squat ROM error (2D angle) | ICC | CPU ms/frame |")
 w("|---|---|---|---|---|---|")
 for m in sorted(P["models"], key=lambda m: -(m["pck10"] or 0)):
@@ -77,6 +77,10 @@ for k, label in [("Ex6|front", "Squat, facing"), ("Ex6|half", "Squat, part-turne
     r = H["rep"].get(k)
     if r:
         w(f"| {label} (n = {r['est3']['n']}) | {f1(r['est3']['romMae'])} | {f1(r['rule']['romMae'])} | {f1(r['shipped']['romMae'])} |")
+sq, lu = H["rep"].get("Ex6|side"), H["rep"].get("Ex5|side")
+if sq and lu and (sq["rule"]["romMae"] < sq["shipped"]["romMae"] or lu["rule"]["romMae"] < lu["shipped"]["romMae"]):
+    w(f"\nSide-on, the fixed rule (the 2D angle) was slightly better than the trees: {f1(sq['rule']['romMae'])}° against {f1(sq['shipped']['romMae'])}° in squats and "
+      f"{f1(lu['rule']['romMae'])}° against {f1(lu['shipped']['romMae'])}° in lunges. The gap is under 1°, and facing the camera the trees are far better, so the trees are used in every position.")
 w("\n**Per held-out person** (rep ROM error, degrees):\n")
 w("| Person | App before | Hybrid (shipped) |")
 w("|---|---|---|")

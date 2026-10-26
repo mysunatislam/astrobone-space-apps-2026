@@ -32,7 +32,7 @@ node score-wave-pulse.mjs /home/user/data/eval.json /home/user/data/signals /hom
 Knee:
 
 ```sh
-python make_frames.py                 # which frames to score (every 6th) per video
+python make_frames.py                 # which frames to score (every 6th of squats, 10th of lunges)
 ./pose_driver.sh                      # every pose model over every video (run_pose.py), skips finished outputs
 python eval_pose.py                   # keypoints, angles, camera position, rep extension and ROM vs motion capture
 python hybrid_pose.py mp-lite mp-full # rule, ridge blend, boosted trees, shipped (guarded) trees; leave-one-person-out

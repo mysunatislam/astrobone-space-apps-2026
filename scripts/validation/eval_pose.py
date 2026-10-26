@@ -71,6 +71,8 @@ yaw_rows = []
 for job in open(f"{P}/jobs.txt"):
     ex, vid, cam, path, _ = job.split()
     frames = np.load(f"{P}/frames_{ex}_{vid}.npy")
+    # The slower models ran on every second scored frame; the model comparison uses only those, for every model.
+    common = np.isin(frames, np.load(f"{P}/fsub_{ex}_{vid}.npy"))
     g3 = np.load(f"{R}/{ex}/{vid}-30fps.npy")[:, :, :3]
     g2 = np.load(f"{R}/{ex}/{vid}-{cam}-30fps.npy")
     # Camera centre for near/far knee in this view.
@@ -93,11 +95,18 @@ for job in open(f"{P}/jobs.txt"):
         d = np.load(f_)
         kp = d["anat"] if m.endswith("-anat") else d["kp"]
         sc = d["score"]; world = d["world"]
+        computed = np.ones(len(frames), bool)
+        if "frames" in d.files and not np.array_equal(d["frames"], frames):
+            # Spread a model's frames onto the scored-frame grid; frames it did not process are skipped below.
+            pos = {int(f): k for k, f in enumerate(d["frames"])}
+            take = np.array([pos.get(int(f), -1) for f in frames]); computed = take >= 0
+            spread = lambda a: np.where(computed.reshape((-1,) + (1,) * (a.ndim - 1)), a[np.maximum(take, 0)], np.nan)
+            kp, sc, world = spread(kp), spread(sc), spread(world)
         est2 = {"left": ang(kp[:, 2], kp[:, 4], kp[:, 6]), "right": ang(kp[:, 3], kp[:, 5], kp[:, 7])}
         est3 = {"left": ang(world[:, 2], world[:, 4], world[:, 6]), "right": ang(world[:, 3], world[:, 5], world[:, 7])}
         for i, f in enumerate(frames):
             s = rep_of.get(int(f))
-            if s is None:
+            if s is None or not computed[i]:
                 continue
             view = view_of(cam, s["cam17_orientation"])
             near = "left" if dist["left"][i] < dist["right"][i] else "right"
@@ -109,7 +118,7 @@ for job in open(f"{P}/jobs.txt"):
                 detected = np.isfinite(kp[i, kj, 0]) and np.isfinite(kp[i, 2 + j, 0]) and np.isfinite(kp[i, 6 + j, 0])
                 vis = float(min(sc[i, 2 + j], sc[i, kj], sc[i, 6 + j]))
                 err_px = float(np.linalg.norm(kp[i, kj] - G2[i, 4 + j])) if detected else np.nan
-                rows.append(dict(model=m, ex=ex, vid=vid, cam=cam, view=view, side=side, near=(side == near), frame=int(f), rep=f"{vid}-{s['repetition_number']}", person=s["person_id"],
+                rows.append(dict(model=m, ex=ex, vid=vid, cam=cam, view=view, side=side, near=(side == near), frame=int(f), common=bool(common[i]), rep=f"{vid}-{s['repetition_number']}", person=s["person_id"],
                                  yaw=float(body_yaw(world[i])[0]) if m.startswith("mp-") and np.isfinite(world[i, 0, 0]) else np.nan,
                                  thigh2d=float(np.linalg.norm(kp[i, 2 + j] - kp[i, kj])) if detected else np.nan, shank2d=float(np.linalg.norm(kp[i, 6 + j] - kp[i, kj])) if detected else np.nan,
                                  lights=s["lights_on"], detected=bool(detected), vis=vis,
@@ -129,8 +138,8 @@ json.dump(traces, open("/home/user/data/pose_traces.json", "w"))
 import pandas as pd
 df = pd.DataFrame(rows)
 df.to_parquet("/home/user/data/pose_frames.parquet")
-out = {"models": {}, "yaw": {}}
-for m, g in df.groupby("model"):
+out = {"models": {}, "yaw": {}, "frames": "model comparison on the frames every model processed (every 12th frame of squats, every 20th of lunges)"}
+for m, g in df[df["common"]].groupby("model"):
     mo = out["models"].setdefault(m, {})
     for (ex, view), h in list(g.groupby(["ex", "view"])) + [(("all", "all"), g)]:
         det = h["detected"].mean() * 100

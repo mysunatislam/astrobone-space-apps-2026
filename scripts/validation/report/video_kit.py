@@ -44,7 +44,7 @@ table("pulse_gate_sweep.csv", ["method", "quality_gate", "mae_bpm", "windows_ans
       [[m["label"], s["q"], s["mae"], s["coverage"]] for m in U["methods"] for s in m["sweep"]])
 if dh:
     table("pulse_rest_vs_squats.csv", ["person", "finger_rest_bpm", "finger_after_squats_bpm", "camera_rest_bpm", "camera_after_squats_bpm"],
-          [[p["id"], round(p["gtBefore"], 1), round(p["gtAfter"], 1), round(p["estBefore"], 1), round(p["estAfter"], 1)] for p in dh["pairs"]])
+          [[p["id"]] + [None if p[k] is None else round(p[k], 1) for k in ("gtBefore", "gtAfter", "estBefore", "estAfter")] for p in dh["pairs"]])
 table("pulse_wave_12s.csv", ["t_seconds", "finger_ppg", "camera_me_rppg"],
       [[round(i / U["wave"]["fps"], 3), a, b] for i, (a, b) in enumerate(zip(U["wave"]["finger"], U["wave"]["camera"]))])
 

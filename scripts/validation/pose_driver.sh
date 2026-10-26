@@ -8,7 +8,7 @@ for m in ${MODELS:-mp-lite mp-full mp-heavy yolo11m movenet-thunder rtmo-m vitpo
     [ -f $out ] && continue
     boxes=$P/yolo11m__${ex}_${vid}_${cam}.npz
     ff=$P/frames_${ex}_${vid}.npy; case $m in mp-*) ;; *) ff=$P/fsub_${ex}_${vid}.npy;; esac
-    OMP_NUM_THREADS=2 $PY $m $path $out $ff $boxes 2>&1 | grep -E "ms/frame|Error|error" 
+    OMP_NUM_THREADS=${THREADS:-2} $PY $m $path $out $ff $boxes 2>&1 | grep -E "ms/frame|Error|error" 
   done < $P/jobs.txt
   echo "MODEL DONE $m $(date +%T)"
 done

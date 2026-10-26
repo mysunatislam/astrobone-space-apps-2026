@@ -13,14 +13,15 @@ Generated 2026-10-26 by `scripts/validation/`. Every number below was measured o
 
 ## 1. Pose: which pretrained model reads the knee best
 
-**Data.** REHAB24-6 (Černek et al., 2024; doi:10.5281/zenodo.13305826, CC BY-NC 4.0): 9 people doing squats (Ex6) and lunges (Ex5), two synchronized cameras, Vicon motion capture. 36 camera videos, 10,124 scored frames (every 6th frame), 928 rep-and-knee pairs in the hybrid analysis. Camera position per rep from the dataset's orientation labels; the knee nearer a side-on camera from the camera centre recovered by direct linear transform from the motion-capture joints and their 2D projections.
+**Data.** REHAB24-6 (Černek et al., 2024; doi:10.5281/zenodo.13305826, CC BY-NC 4.0): 9 people doing squats (Ex6) and lunges (Ex5), two synchronized cameras, Vicon motion capture. 36 camera videos, 10,124 scored frames (every 6th frame of squats, every 10th of lunges), 928 rep-and-knee pairs in the hybrid analysis. Camera position per rep from the dataset's orientation labels; the knee nearer a side-on camera from the camera centre recovered by direct linear transform from the motion-capture joints and their 2D projections.
 
-**Scoring.** Knee keypoints against the motion-capture knee projected into the same camera (PCK: within 10 % of the thigh length). Knee angle against the motion-capture 3D interior knee angle. Rep-level numbers use the app's definitions: extension = 95th percentile of the knee angle, range of motion (ROM) = 95th − 5th percentile. MediaPipe frames are gated at the app's visibility of 0.62.
+**Scoring.** Knee keypoints against the motion-capture knee projected into the same camera (PCK: within 10 % of the thigh length). Knee angle against the motion-capture 3D interior knee angle. Rep-level numbers use the app's definitions: extension = 95th percentile of the knee angle, range of motion (ROM) = 95th − 5th percentile. MediaPipe frames are gated at the app's visibility of 0.62. The slower models ran on every second scored frame, so the table below scores every model on those shared frames only.
 
 | Model | In browser | Knee within 10 % of thigh | Side-on squat ROM error (2D angle) | ICC | CPU ms/frame |
 |---|---|---|---|---|---|
-| MediaPipe Pose full | yes | 56.3 % | 4.7° | 0.941 | 29 |
-| MediaPipe Pose lite | yes | 53.9 % | 6.1° | 0.924 | 24 |
+| MediaPipe Pose heavy | yes | 63.1 % | 5.6° | 0.919 | 80 |
+| MediaPipe Pose full | yes | 55.9 % | 4.9° | 0.933 | 29 |
+| MediaPipe Pose lite | yes | 53.8 % | 5.9° | 0.917 | 24 |
 
 **Camera position.** The app's body-yaw rule read facing captures as facing 100 % of the time and side-on captures as side-on 100 %; part-turned captures were caught as part-turned 55 % of the time (the app refuses those). Side-on, it picked the knee nearer the camera 99.3 % of the time.
 
