@@ -11,6 +11,12 @@ This file records external resources used by the public prototype. Their origina
 - Transformations, exclusions, original URLs and source hashes: `docs/mission-health-data.md` and `public/data/mission-research.json`.
 - NASA cohorts are external evidence, never assigned to the fictional demo astronaut or used as a clinical calibration set.
 
+### Inspiration4 per-crew blood (OSD-569 / LSDS-7, OSD-575 / LSDS-8) and EFLM biological variation
+
+- Raw per-sample CBC, metabolic panel and serum multiplex files from [OSD-569](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) and [OSD-575](https://osdr.nasa.gov/bio/repo/data/studies/OSD-575), public and unrestricted, bundled as de-identified per-crew values in `public/data/i4-crew-blood.json` with each source file's SHA-256. Original data terms apply. Crew codes are kept as published; no re-identification is attempted and sex is not copied.
+- Within-subject biological variation (CVI) from the [EFLM Biological Variation Database](https://biologicalvariation.eu/) (European Federation of Clinical Chemistry and Laboratory Medicine), retrieved from its public meta-calculation API; only the per-analyte median CVI and study count are stored, with attribution.
+- Used only to test AstroBone's personal-baseline rule retrospectively (docs/crew-replay.md); never assigned to the fictional demo astronaut or used as a clinical calibration set.
+
 ### NASA Open Science Data Repository OSDR-804 / LSDS-130
 
 - Study: Rodent Research-1 bone microCT data

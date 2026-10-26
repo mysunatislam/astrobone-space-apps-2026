@@ -36,6 +36,8 @@ Five datasets from the NASA Open Science Data Repository / Ames Life Sciences Da
 | [OSD-656](https://osdr.nasa.gov/bio/repo/data/studies/OSD-656) · LSDS-64 and [OSD-569](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) · LSDS-7, Inspiration4 crew | Urine immune protein VCAM1 stayed above every pre-flight visit for 45 days after return, back by day 82 (group medians of 4 people); white blood cells stayed within the pre-flight range | Immune checklist every day for 45 days after any return to gravity |
 | [OSD-435](https://osdr.nasa.gov/bio/repo/data/studies/OSD-435) · LSDS-22 (mice) and [OSD-575](https://osdr.nasa.gov/bio/repo/data/studies/OSD-575) · LSDS-8, Inspiration4 crew | No consistent change in heart ejection fraction after 0.1–3 Gy; CRP already varied 1.9–19.9 mg/L before launch | No radiation alarm; dose is logged beside heart rate for the medical reviewer |
 
+**The rule itself, tested on real astronauts.** AstroBone's own personal-baseline and drift code, unchanged, was replayed on the four Inspiration4 crew members' raw blood results ([OSD-569](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) and [OSD-575](https://osdr.nasa.gov/bio/repo/data/studies/OSD-575), 27 clinical measures, each person against their own three pre-flight draws, review floor from the EFLM biological variation database). It found mean cell volume down in all four crew the day after landing (−3.4 to −5.2 %, all inside the lab's population range), recognised a one-draw glucose drop at R+45 as a sample-handling suspect, and 23 of its 31 flags were changes the population range would have missed. Method and full results: [crew replay](docs/crew-replay.md) ([`src/crewReplay.js`](src/crewReplay.js)); the Self-Check shows it as a "Tested" card.
+
 The data sets priority and timing only. It never sets a personal threshold: mice and a four-person, three-day flight cannot calibrate one astronaut. Raw files, reproducible summaries and rules: [NASA data pipeline](docs/nasa-data-pipeline.md).
 
 ## Try It in 3 Minutes
@@ -54,7 +56,7 @@ Requires Node.js 20.19+ or 22.12+.
 ```bash
 npm install
 npm run dev        # http://127.0.0.1:5173/
-npm test           # 270 automated tests
+npm test           # 300 automated tests
 npm run build      # production build in dist/
 ```
 
@@ -81,7 +83,7 @@ Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osd
 
 ## Validation and Limits
 
-- **Tested:** 288 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
+- **Tested:** 300 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
 - **Not yet validated:** camera joint angles have not yet been compared with a reference measurement. The Self-Check now has a built-in **accuracy check** (camera vs goniometer, Bland–Altman bias, limits of agreement and detectable change); once 20+ pairs from 3+ people are recorded, the knee review trigger is raised to match the measured error. The [validation protocol](docs/functional-camera-validation-protocol.md) is written. No astronaut or analog-crew user study has been run.
 - **Data boundaries:** Elena and all her values are synthetic. The NASA cohorts are mice and a four-person, three-day flight; they inform what to watch, never a diagnosis or a personal threshold.
 - AstroBone is a research prototype, not a medical device.
