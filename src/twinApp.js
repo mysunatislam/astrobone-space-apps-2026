@@ -115,6 +115,7 @@ export function createTwinApp(root) {
       const [system, focus] = SELF_STEP_VIEW[step]; scene.setSystem(system, { focusTarget: focus }); render();
     },
     onEvaluate: evaluation => { scene.setAlerts(Object.fromEntries(evaluation.domains.map(d => [d.key, d.status === "changed"]))); render(); },
+    onTimedTest: active => scene.setPaused(active),
   });
 
   // Body as navigation: the structure clicked selects the analysis.

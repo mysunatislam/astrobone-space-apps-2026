@@ -1,5 +1,5 @@
 import {
-  PVT_B, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
+  PVT_B, PVT_PROTOCOL, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, elenaDay147 } from "./elenaSelfCheck.js";
 import { createSelfCheckCamera } from "./selfCheckCamera.js";
@@ -36,7 +36,7 @@ const kneeView = cap => !cap.view ? "" : cap.view === "bilateral"
 // Live position cue: the same position every day keeps the camera's error the same.
 const VIEW_CUE = { front: "facing camera", side: "side-on", oblique: "turned partway: face the camera or turn fully side-on" };
 
-export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} } = {}) {
+export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {}, onTimedTest = () => {} } = {}) {
   const store = createSelfCheckStore();
   const state = { profile: "elena", persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false };
   const element = el("div", { class: "sc" });
@@ -195,24 +195,33 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   const pvtStage = el("button", { type: "button", class: "sc-pvt-stage", "aria-label": "Reaction test response area. Tap or press space when the counter appears." });
   function startPvt(duration) {
     Object.assign(pvt, { running: true, trials: [], onset: null, start: performance.now(), duration, feedback: "Wait for the counter, then tap or press space." });
-    render(); pvtStage.focus(); schedule();
+    // The host pauses its 3D rendering: a busy main thread delays the frame that shows the stimulus.
+    onTimedTest(true); render(); pvtStage.focus(); schedule();
   }
   function schedule() {
     clearTimeout(pvt.timer);
     if (performance.now() - pvt.start >= pvt.duration) { finishPvt(true); return; }
     const isi = PVT_B.isiMinMs + Math.random() * (PVT_B.isiMaxMs - PVT_B.isiMinMs);
     pvt.timer = setTimeout(() => {
-      // Onset is stamped when the stimulus is shown; animation frames only drive the counter,
-      // so throttled frames cannot turn real responses into early taps.
-      pvtStage.classList.add("sc-on"); pvt.onset = performance.now();
-      const tick = () => { if (pvt.onset === null) return; pvtStage.dataset.count = String(Math.round(performance.now() - pvt.onset)); pvt.raf = requestAnimationFrame(tick); };
-      tick();
+      // Onset is first stamped when the stimulus is set, so a tap can never count as early, then moved to
+      // the start of the frame that draws it: on a slow frame the stimulus appears later than it was set,
+      // and that wait is the device's, not the astronaut's. Animation frames also drive the counter.
+      pvtStage.classList.add("sc-on"); pvt.onset = performance.now(); pvt.onsetMethod = "set";
+      const shown = pvt.onset, tick = time => {
+        if (pvt.onset === null) return;
+        if (pvt.onsetMethod === "set" && time) { pvt.onset = Math.max(shown, time); pvt.onsetMethod = "frame"; }
+        pvtStage.dataset.count = String(Math.round(performance.now() - pvt.onset)); pvt.raf = requestAnimationFrame(tick);
+      };
+      pvt.raf = requestAnimationFrame(tick);
       pvt.timer = setTimeout(() => { if (pvt.onset !== null) record(PVT_B.timeoutMs); }, PVT_B.timeoutMs);
     }, isi);
   }
   function record(rtMs) {
     cancelAnimationFrame(pvt.raf); pvtStage.classList.remove("sc-on");
-    pvt.trials.push({ rtMs }); pvt.onset = null; pvt.feedback = `${Math.round(rtMs)} ms`; pvtStage.dataset.count = pvt.feedback; schedule();
+    pvt.trials.push({ rtMs, onset: pvt.onsetMethod }); pvt.onset = null; pvt.feedback = `${Math.round(rtMs)} ms`; pvtStage.dataset.count = pvt.feedback;
+    // The reaction time shows for the 1 s feedback period, which is part of the 1-4 s interval.
+    clearTimeout(pvt.feedbackTimer); pvt.feedbackTimer = setTimeout(() => { if (pvt.onset === null && pvt.running) pvtStage.dataset.count = ""; }, PVT_B.feedbackMs);
+    schedule();
   }
   function respond(event) {
     if (!pvt.running) return;
@@ -224,10 +233,10 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   pvtStage.addEventListener("keydown", event => { if (event.code === "Space" || event.key === " ") respond(event); });
   function finishPvt(completed) {
     clearTimeout(pvt.timer); cancelAnimationFrame(pvt.raf); pvtStage.classList.remove("sc-on");
-    if (!pvt.running) return; pvt.running = false;
+    if (!pvt.running) return; pvt.running = false; onTimedTest(false);
     applyPvt(summarizePvt(pvt.trials, { durationMs: pvt.duration, completed }), "TEST · this device");
   }
-  function stopPvt(silent) { if (pvt.running) { if (silent) { pvt.running = false; clearTimeout(pvt.timer); cancelAnimationFrame(pvt.raf); } else finishPvt(false); } }
+  function stopPvt(silent) { if (pvt.running) { if (silent) { pvt.running = false; clearTimeout(pvt.timer); cancelAnimationFrame(pvt.raf); onTimedTest(false); } else finishPvt(false); } }
   function applyPvt(summary, source) {
     state.pvt = { ...summary, source };
     Object.assign(state.check.values, { pvtSpeed: summary.meanSpeed, pvtLapses: summary.lapses });
@@ -299,7 +308,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
             pvt.running ? el("p", { class: "sc-note", "aria-live": "polite" }, pvt.feedback) : null),
         result ? el("div", { class: `sc-result ${result.usable ? "" : "sc-bad"}` },
           el("strong", {}, result.usable ? `${result.lapses} lapses · speed ${fmt(result.meanSpeed, 2)}/s` : `Not compared · ${result.reason}`),
-          el("p", {}, `${result.validResponses} valid responses · ${result.falseStarts} early · median ${result.medianRtMs ?? "--"} ms · ${result.protocol === "pvt-b-3min" ? "3-minute protocol" : "practice length (only compared with practice runs)"}`),
+          el("p", {}, `${result.validResponses} valid responses · ${result.falseStarts} early · median ${result.medianRtMs ?? "--"} ms · ${Number.isFinite(result.performanceScore) ? `performance score ${result.performanceScore} % · ` : ""}${result.protocol === PVT_PROTOCOL.full ? "3-minute protocol" : "practice length (only compared with practice runs)"}`),
           el("small", {}, result.source)) : null,
         el("p", { class: "sc-note" }, "Browser timing adds about one display frame of uncertainty. Results are compared only with your own runs on the same protocol.")];
     }

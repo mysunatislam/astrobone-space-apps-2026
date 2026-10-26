@@ -88,6 +88,22 @@ Three changes follow:
 
 **Limits.** The noise model is independent per joint; MediaPipe's errors are correlated and shaped by learned body proportions. The depth-to-image noise ratio is an assumption, varied from 1× to 3×. The simulation shows which way the position matters and why, not this camera's error, which only the accuracy check can measure.
 
+## Reaction Test Timing
+
+The reaction test had two faults that made a slow device look like a tired astronaut.
+
+1. **Stimulus drawn late.** The stimulus time was taken when the counter was set, but the screen shows it only on the next drawn frame, and the 3D twin kept rendering behind the test. Every frame of delay was added to the reaction time. Now the 3D view pauses for the test and the onset is the start of the frame that draws the stimulus.
+2. **Wrong intervals.** The app waited 2–5 s between a response and the next stimulus; PVT-B uses 1–4 s including 1 s of reaction-time feedback (Basner, Mollicone & Dinges, *Acta Astronautica* 2011, 69:949–959, §2.2). Now it matches, and results also carry the paper's performance score (100 % minus lapses and false starts relative to valid stimuli plus false starts). The protocol id is now `pvt-b-3min-v2`, so older results are never compared with new ones.
+
+**Measured** (`node scripts/qa-pvt-timing.mjs <url>`): a simulated person responds exactly 300 ms after the stimulus is drawn, during a 45 s practice run in a software-rendered browser (no GPU, the worst case for drawing delay).
+
+| Build | Responses | Scored reaction time | Lapses (≥ 355 ms) | Mean wait for the stimulus to be drawn |
+| --- | --- | --- | --- | --- |
+| Before (main) | 9 | mean 665 ms, max 1,085 ms | 7 of 9 | 365 ms |
+| After | 14 | 300 ms every time | 0 of 14 | 49 ms, now excluded from the score |
+
+On a device with a GPU the drawing delay is far smaller (one frame is 17 ms at 60 fps), but it was still added to every response and grows on a weak laptop or phone. Basner notes the 355 ms threshold "may depend on PVT hardware": a phone's touch latency still adds to every response. AstroBone compares each person with their own baseline on the same device, which cancels a constant delay; the lapse count, an absolute threshold, does not cancel it.
+
 ## The Reaction Test and the Mission Context
 
 - AstroBone's 3-minute reaction test is the **PVT-B** (Basner, Mollicone & Dinges, *Acta Astronautica* 2011). PVT-B is the test inside NASA's **Reaction Self Test**, used by 24 astronauts on 6-month ISS missions (University of Pennsylvania Unit for Experimental Psychiatry; NASA NTRS 20090029851).

@@ -4,9 +4,12 @@
 
 export const SELF_CHECK_SCHEMA = "astrobone-self-check-v1";
 
-// PVT-B parameters: 3-minute psychomotor vigilance test, 2-5 s inter-stimulus interval,
-// 355 ms lapse threshold (Basner, Mollicone & Dinges, Acta Astronautica 2011).
-export const PVT_B = Object.freeze({ durationMs: 180000, practiceDurationMs: 60000, isiMinMs: 2000, isiMaxMs: 5000, lapseMs: 355, falseStartMs: 100, timeoutMs: 30000 });
+// PVT-B parameters: 3-minute psychomotor vigilance test, 1-4 s from a response to the next stimulus
+// including 1 s of reaction-time feedback, 355 ms lapse threshold, responses under 100 ms are false
+// starts, 30 s without a response is a lapse (Basner, Mollicone & Dinges, Acta Astronautica 2011,
+// 69:949-959). v2: these intervals and stimulus onset timed to the frame that draws it; v1 used 2-5 s.
+export const PVT_B = Object.freeze({ durationMs: 180000, practiceDurationMs: 60000, isiMinMs: 1000, isiMaxMs: 4000, feedbackMs: 1000, lapseMs: 355, falseStartMs: 100, timeoutMs: 30000 });
+export const PVT_PROTOCOL = Object.freeze({ full: "pvt-b-3min-v2", practice: "pvt-practice-v2" });
 
 // Samn-Perelli 7-point fatigue checklist (USAF School of Aerospace Medicine, 1982).
 export const SAMN_PERELLI = Object.freeze([
@@ -63,11 +66,13 @@ export function summarizePvt(trials = [], { durationMs = PVT_B.durationMs, compl
   const valid = responses.filter(t => t.rtMs >= PVT_B.falseStartMs);
   const falseStarts = trials.filter(t => t.falseStart).length + responses.filter(t => t.rtMs < PVT_B.falseStartMs).length;
   const rts = valid.map(t => t.rtMs).sort((a, b) => a - b);
-  const protocol = durationMs >= PVT_B.durationMs ? "pvt-b-3min" : "pvt-practice";
-  const usable = completed && valid.length >= (protocol === "pvt-b-3min" ? 20 : 8) && falseStarts <= 10;
+  const protocol = durationMs >= PVT_B.durationMs ? PVT_PROTOCOL.full : PVT_PROTOCOL.practice;
+  const usable = completed && valid.length >= (protocol === PVT_PROTOCOL.full ? 20 : 8) && falseStarts <= 10;
+  const stimuli = trials.filter(t => !t.falseStart).length, lapses = valid.filter(t => t.rtMs >= PVT_B.lapseMs).length;
   return {
-    protocol, durationMs, completed, stimuli: trials.filter(t => !t.falseStart).length, validResponses: valid.length, falseStarts,
-    lapses: valid.filter(t => t.rtMs >= PVT_B.lapseMs).length,
+    protocol, durationMs, completed, stimuli, validResponses: valid.length, falseStarts, lapses,
+    // Basner 2011: 100 % minus lapses and false starts relative to valid stimuli plus false starts.
+    performanceScore: stimuli + falseStarts ? round(100 * (1 - (lapses + falseStarts) / (stimuli + falseStarts)), 1) : null,
     meanSpeed: valid.length ? round(mean(valid.map(t => 1000 / t.rtMs)), 3) : null,
     medianRtMs: rts.length ? round(rts[Math.floor((rts.length - 1) / 2)], 0) : null,
     usable,

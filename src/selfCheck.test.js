@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  summarizePvt, personalReference, evaluateIndicator, lockedReference, driftCheck, evaluateSelfCheck, recommendActions, newCheck, createSelfCheckStore, PVT_B, INDICATORS,
+  summarizePvt, PVT_PROTOCOL, personalReference, evaluateIndicator, lockedReference, driftCheck, evaluateSelfCheck, recommendActions, newCheck, createSelfCheckStore, PVT_B, INDICATORS,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, elenaDay147, ELENA_POOR_CAPTURE } from "./elenaSelfCheck.js";
 
@@ -12,25 +12,32 @@ test("PVT-B scoring counts lapses at 355 ms and early taps as false starts", () 
   assert.equal(summary.validResponses, 4);
   assert.equal(summary.lapses, 2);
   assert.equal(summary.falseStarts, 2);
-  assert.equal(summary.protocol, "pvt-b-3min");
+  assert.equal(summary.protocol, PVT_PROTOCOL.full);
   assert.equal(summary.usable, false, "too few valid responses for a 3-minute test");
+  // Basner 2011 performance score: 100 % - (lapses + false starts) / (valid stimuli + false starts); 5 stimuli, 2 early.
+  assert.equal(summary.performanceScore, 42.9);
   const full = summarizePvt(trials(Array.from({ length: 40 }, () => 300)));
   assert.equal(full.usable, true);
   assert.equal(full.meanSpeed, Number((1000 / 300).toFixed(3)));
 });
 
+test("PVT-B timing follows Basner 2011: 1-4 s intervals with 1 s feedback, 30 s response window", () => {
+  assert.deepEqual([PVT_B.isiMinMs, PVT_B.isiMaxMs, PVT_B.feedbackMs, PVT_B.timeoutMs, PVT_B.lapseMs, PVT_B.falseStartMs], [1000, 4000, 1000, 30000, 355, 100]);
+  assert.notEqual(PVT_PROTOCOL.full, "pvt-b-3min", "results from the old 2-5 s timing are never mixed with the new ones");
+});
+
 test("an unfinished or practice-length test is labeled and gated", () => {
   assert.equal(summarizePvt(trials(Array(40).fill(300)), { completed: false }).usable, false);
-  assert.equal(summarizePvt(trials(Array(12).fill(300)), { durationMs: PVT_B.practiceDurationMs }).protocol, "pvt-practice");
+  assert.equal(summarizePvt(trials(Array(12).fill(300)), { durationMs: PVT_B.practiceDurationMs }).protocol, PVT_PROTOCOL.practice);
 });
 
 test("a personal reference needs three usable checks of the same protocol", () => {
-  const history = [1, 2].map(i => ({ values: { pvtLapses: i }, protocols: { pvtLapses: "pvt-b-3min" } }));
-  assert.equal(personalReference(history, "pvtLapses", "pvt-b-3min").ready, false);
-  history.push({ values: { pvtLapses: 3 }, protocols: { pvtLapses: "pvt-practice" } });
-  assert.equal(personalReference(history, "pvtLapses", "pvt-b-3min").ready, false, "practice tests are not mixed with 3-minute tests");
-  history.push({ values: { pvtLapses: 3 }, protocols: { pvtLapses: "pvt-b-3min" }, quality: { pvtLapses: false } });
-  assert.equal(personalReference(history, "pvtLapses", "pvt-b-3min").ready, false, "failed-quality results are excluded");
+  const history = [1, 2].map(i => ({ values: { pvtLapses: i }, protocols: { pvtLapses: PVT_PROTOCOL.full } }));
+  assert.equal(personalReference(history, "pvtLapses", PVT_PROTOCOL.full).ready, false);
+  history.push({ values: { pvtLapses: 3 }, protocols: { pvtLapses: PVT_PROTOCOL.practice } });
+  assert.equal(personalReference(history, "pvtLapses", PVT_PROTOCOL.full).ready, false, "practice tests are not mixed with 3-minute tests");
+  history.push({ values: { pvtLapses: 3 }, protocols: { pvtLapses: PVT_PROTOCOL.full }, quality: { pvtLapses: false } });
+  assert.equal(personalReference(history, "pvtLapses", PVT_PROTOCOL.full).ready, false, "failed-quality results are excluded");
 });
 
 test("indicators respect direction, personal spread and the review floor", () => {
