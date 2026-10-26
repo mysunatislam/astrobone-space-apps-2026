@@ -61,7 +61,32 @@ Two findings matter for the pitch:
 | Spadea et al., *Sensors* 2026, 26:2148 (n = 27) | MediaPipe vs IMU, knee | Extension MAE 2.3–3.1°, flexion MAE 3.2–4.1° |
 | Latreche et al. (n = 25) | MediaPipe vs goniometer, knee | Extension limits of agreement −0.6° to 1.0°; flexion −0.98° to 1.78° |
 
-No source found gives separate numbers for side-on and frontal views. These results describe other setups; AstroBone's own accuracy check (camera vs goniometer, Bland–Altman) measures this device.
+No source found gives separate numbers for pure side-on and frontal views. The closest, Baldinger, Reimer & Senner (*Sensors* 2025, 25:799, n = 16, OpenPose 2D, front lunge), tested only 45° diagonal views: knee RMSE 15.5–29.4° and limits of agreement as wide as −51° to 62°, with back-diagonal views best. These results describe other setups; AstroBone's own accuracy check (camera vs goniometer, Bland–Altman) measures this device.
+
+## Camera Position
+
+AstroBone measures the knee from MediaPipe's 3D world landmarks, which keep the camera's axes, so the camera position decides which joint direction rests on the model's depth estimate, the axis a single camera is least sure of. Each frame now records the body's yaw relative to the camera from the hip and shoulder lines (`bodyYaw` in `src/functionalAssessment.js`): under 35° is facing, 60° or more is side-on.
+
+**Simulation** (`node scripts/simulate-camera-view.mjs`, 20,000 runs per cell). Seated knee, thigh 0.45 m, shank 0.40 m. Each joint gets 1.5 cm Gaussian noise across the picture and k times that in depth. Knee-angle error in degrees, RMSE, bias (95th percentile of the absolute error):
+
+| Depth noise | Knee angle | Facing the camera | Side-on |
+| --- | --- | --- | --- |
+| 1× | 150° | 4.9, −0.4 (9.5) | 4.9, −0.4 (9.6) |
+| 1× | 170° | 4.8, −1.3 (9.2) | 4.7, −1.3 (9.1) |
+| 2× | 150° | 5.6, −0.6 (10.8) | 5.2, −1.5 (10.3) |
+| 2× | 170° | 4.9, −1.4 (9.4) | 6.6, −3.7 (13.2) |
+| 3× | 150° | 6.8, −1.0 (13.3) | 6.6, −3.0 (13.1) |
+| 3× | 170° | 5.2, −1.7 (10.3) | 10.2, −6.8 (21.0) |
+
+Near full extension, which is what the self-check reports, side-on is worse whenever depth is noisier than the picture: the unsigned 3D angle can only shrink when a joint is pushed off the leg's plane, and side-on the depth axis points straight off that plane. Facing the camera, depth runs along the straightened leg and barely moves the angle. This is the opposite of the usual advice to film sagittal angles from the side, which holds for 2D angles measured in the image.
+
+Three changes follow:
+
+1. **Facing the camera is the recommended position for extension;** side-on stays allowed for one leg.
+2. **Side-on, only the near knee counts.** The far leg is hidden behind the near one, but the model can still report it as visible; before, a guessed far knee could become the "worse knee" and raise a review.
+3. **A part-turned capture (35–60°) is refused and repeated,** and the live readout tells the person to face the camera or turn fully side-on. With depth noise 2–3× the image noise, switching from facing to side-on reads 2–5° lower at 170°: a position change alone could look like a loss of extension. Results from different positions are never compared, and accuracy-check holds record the position so the study can report each one separately.
+
+**Limits.** The noise model is independent per joint; MediaPipe's errors are correlated and shaped by learned body proportions. The depth-to-image noise ratio is an assumption, varied from 1× to 3×. The simulation shows which way the position matters and why, not this camera's error, which only the accuracy check can measure.
 
 ## The Reaction Test and the Mission Context
 

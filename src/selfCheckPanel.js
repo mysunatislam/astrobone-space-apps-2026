@@ -3,6 +3,7 @@ import {
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, elenaDay147 } from "./elenaSelfCheck.js";
 import { createSelfCheckCamera } from "./selfCheckCamera.js";
+import { cameraViewFor } from "./functionalAssessment.js";
 import { sparklineSvg } from "./trendSpark.js";
 import { HOLD, REFERENCE_TYPES, summarizeHold, agreement, calibratedFloors, pairsToCsv, createAngleCheckStore } from "./angleCheck.js";
 import { ELENA } from "./elenaMissionScenario.js";
@@ -32,6 +33,8 @@ const fmt = (v, d = 1) => (Number.isFinite(v) ? Number(v).toFixed(d) : "--");
 const kneeView = cap => !cap.view ? "" : cap.view === "bilateral"
   ? ` · both knees seen, comparing the ${cap.worseSide} (left ${fmt(cap.sides.left.extension)}°, right ${fmt(cap.sides.right.extension)}°)`
   : ` · ${cap.view} knee only (side-on view); compared only with ${cap.view}-knee checks`;
+// Live position cue: the same position every day keeps the camera's error the same.
+const VIEW_CUE = { front: "facing camera", side: "side-on", oblique: "turned partway: face the camera or turn fully side-on" };
 
 export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} } = {}) {
   const store = createSelfCheckStore();
@@ -126,7 +129,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
     camera ??= createSelfCheckCamera({ video, overlay, onStatus: text => { camStatus.textContent = text; }, onFrame: frame => {
       // Show only knees the camera can see; a far knee in a side-on view is guesswork.
       const seen = frame?.angles ? ["left", "right"].filter(side => (frame.sideUsable ? frame.sideUsable[side] : true) && Number.isFinite(frame.angles[side]?.knee)) : [];
-      liveAngle.textContent = seen.length ? seen.map(side => `${side[0].toUpperCase()} ${Math.round(frame.angles[side].knee)}°`).join(" · ") : "--";
+      const view = cameraViewFor(frame?.bodyYawDeg), shown = view === "side" && frame.nearSide ? seen.filter(side => side === frame.nearSide) : seen;
+      liveAngle.textContent = view === "oblique" ? VIEW_CUE.oblique
+        : shown.length ? `${shown.map(side => `${side[0].toUpperCase()} ${Math.round(frame.angles[side].knee)}°`).join(" · ")}${view ? ` · ${VIEW_CUE[view]}` : ""}` : "--";
     } });
     try { await camera.start(); } catch (error) { camStatus.textContent = `Camera unavailable: ${error.message}`; }
     render();
@@ -150,7 +155,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   function savePair() {
     if (!check.hold?.usable || !Number.isFinite(check.reference)) return;
     check.pairs = [...check.pairs, { participant: check.participant.trim() || "P?", side: check.side, referenceType: check.referenceType, referenceFlexion: check.reference,
-      cameraFlexion: check.hold.flexion, holdSd: check.hold.sd, samples: check.hold.samples, at: new Date().toISOString() }];
+      cameraFlexion: check.hold.flexion, holdSd: check.hold.sd, samples: check.hold.samples, cameraView: check.hold.cameraView ?? null, bodyYawDeg: check.hold.bodyYawDeg ?? null, at: new Date().toISOString() }];
     angleStore.save(check.pairs, state.persist);
     check.hold = null; check.reference = null; render();
   }
@@ -265,7 +270,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
       const cap = state.capture, usable = cap && !cap.capturing && c.quality.kneeExtension;
       const camOn = camera?.running;
       return [why("bone", "In spaceflight the legs lose the most bone, so this test comes first."),
-        el("p", { class: "sc-lead" }, "Seated knee extension, 10 seconds. Face the camera with both legs visible, or sit side-on to measure the near knee. Straighten and bend your knees slowly."),
+        el("p", { class: "sc-lead" }, "Seated knee extension, 10 seconds. Face the camera with both legs visible (best for extension), or sit fully side-on to measure the near knee. Use the same position every day. Straighten and bend your knees slowly."),
         demo ? el("div", { class: "sc-row" },
           el("button", { type: "button", class: "sc-secondary", "data-demo": "poor", onclick: () => demoCapture("poor") }, "Demo capture · poor framing"),
           el("button", { type: "button", class: "sc-secondary", "data-demo": "usable", onclick: () => demoCapture("usable") }, "Demo capture · usable"))
@@ -277,6 +282,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
         cap && !cap.capturing ? el("div", { class: `sc-result ${usable ? "" : "sc-bad"}` },
           el("strong", {}, usable ? "Capture usable" : "Comparison withheld · repeat the capture"),
           el("p", {}, usable ? `Knee extension ${fmt(cap.kneeExtension)}° · range of motion ${fmt(cap.kneeRom)}° · tracking quality ${fmt(cap.trackingQuality, 2)} · ${cap.sampleCount} samples${kneeView(cap)}`
+            : cap.reason === "oblique" ? `You were turned partway (${fmt(cap.bodyYawDeg, 0)}° from facing the camera). Face the camera, or turn fully side-on, and repeat: a part-turned reading matches neither position's baseline.`
             : `Tracking quality ${fmt(cap.trackingQuality, 2)} with ${cap.sampleCount} usable samples is below the quality rule (≥ 0.70 and ≥ 12 samples). A worse-looking number from a poor capture is not treated as a health change.`),
           el("small", {}, `${cap.source} · attempt ${state.captures}`)) : null,
         el("p", { class: "sc-note" }, "Video stays on this device. Only the summary angles are kept."),

@@ -87,7 +87,7 @@ export function createSelfCheckCamera({ video, overlay, onStatus = () => {}, onF
     return new Promise(resolve => setTimeout(() => {
       const { samples } = recording; recording = null;
       const summary = summarizeKneeCapture(samples);
-      resolve({ ...summary, reason: summary.status === "complete" ? null : "Keep at least one whole leg in view and repeat.", durationMs });
+      resolve({ ...summary, reason: summary.status === "complete" ? null : summary.reason === "oblique" ? "oblique" : "Keep at least one whole leg in view and repeat.", durationMs });
     }, durationMs));
   }
 

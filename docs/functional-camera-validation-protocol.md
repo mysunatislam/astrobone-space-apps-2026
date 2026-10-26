@@ -44,7 +44,7 @@ Start with movements dominated by the sagittal plane because monocular pose vali
 3. Repeated sit-to-stand or a shallow bilateral squat within the participant's comfortable range.
 4. Normal standing movement used only to test repeatability, not to claim clinical gait validity.
 
-Capture repeated trials in the nominal setup, then vary one factor at a time: lighting, clothing contrast, camera distance, partial limb occlusion, left/right body orientation, and device performance. Record every failed or incomplete trial. Do not silently discard low-quality frames or participants.
+Record every participant both facing the camera and side-on: a simulation shows the position changes the error and the bias near full extension (`scripts/simulate-camera-view.mjs`), and each hold stores its position for a separate analysis. Capture repeated trials in the nominal setup, then vary one factor at a time: lighting, clothing contrast, camera distance, partial limb occlusion, left/right body orientation, and device performance. Record every failed or incomplete trial. Do not silently discard low-quality frames or participants.
 
 ## Recorded Outputs
 

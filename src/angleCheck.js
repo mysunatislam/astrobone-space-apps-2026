@@ -4,6 +4,8 @@
 // minimal detectable change, so the self-check's 5° review trigger can be compared with
 // measured error instead of assumed accuracy. Results describe this setup only.
 
+import { cameraViewFor } from "./functionalAssessment.js";
+
 export const ANGLE_CHECK_SCHEMA = "astrobone-angle-check-v1";
 export const HOLD = Object.freeze({ durationMs: 3000, minSamples: 10, maxSd: 3 });
 export const REFERENCE_TYPES = Object.freeze(["Goniometer", "Phone inclinometer", "Other"]);
@@ -24,7 +26,10 @@ export function summarizeHold(frames, side) {
   if (angles.length < HOLD.minSamples) return { usable: false, samples: angles.length, reason: `only ${angles.length} usable frames (need ${HOLD.minSamples})` };
   const spread = sd(angles);
   if (spread > HOLD.maxSd) return { usable: false, samples: angles.length, sd: round(spread), reason: `knee moved during the hold (SD ${round(spread)}°, limit ${HOLD.maxSd}°)` };
-  return { usable: true, samples: angles.length, sd: round(spread), interior: round(mean(angles)), flexion: round(interiorToFlexion(mean(angles))) };
+  // Camera position during the hold, so the accuracy study can report facing and side-on separately.
+  const yaws = frames.map(f => f?.bodyYawDeg).filter(Number.isFinite).sort((a, b) => a - b);
+  const yaw = yaws.length ? yaws[yaws.length >> 1] : null;
+  return { usable: true, samples: angles.length, sd: round(spread), interior: round(mean(angles)), flexion: round(interiorToFlexion(mean(angles))), bodyYawDeg: yaw === null ? null : round(yaw), cameraView: cameraViewFor(yaw) };
 }
 
 // Two-sided 95% t quantiles for small samples; 1.96 beyond the table.
@@ -60,9 +65,9 @@ export function calibratedFloors(pairs, defaultFloor = 5) {
 }
 
 export function pairsToCsv(pairs) {
-  const head = "participant,side,reference_type,reference_flexion_deg,camera_flexion_deg,camera_hold_sd_deg,camera_samples,difference_deg,recorded_at";
+  const head = "participant,side,camera_view,body_yaw_deg,reference_type,reference_flexion_deg,camera_flexion_deg,camera_hold_sd_deg,camera_samples,difference_deg,recorded_at";
   const cell = value => { const text = String(value ?? ""); return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text; };
-  return [head, ...pairs.map(p => [p.participant, p.side, p.referenceType, p.referenceFlexion, p.cameraFlexion, p.holdSd, p.samples, round(p.cameraFlexion - p.referenceFlexion), p.at].map(cell).join(","))].join("\n");
+  return [head, ...pairs.map(p => [p.participant, p.side, p.cameraView, p.bodyYawDeg, p.referenceType, p.referenceFlexion, p.cameraFlexion, p.holdSd, p.samples, round(p.cameraFlexion - p.referenceFlexion), p.at].map(cell).join(","))].join("\n");
 }
 
 // Pairs are kept in memory unless the tester consents to saving them on this device.

@@ -7,6 +7,8 @@ import {
   calculateJointAngle,
   summarizeFunctionalAssessment,
   summarizeKneeCapture,
+  bodyYaw,
+  cameraViewFor,
 } from "./functionalAssessment.js";
 
 test("joint angle returns a geometric angle in degrees", () => {
@@ -109,10 +111,11 @@ function makeLandmarks() {
   return landmarks;
 }
 
-const kneeFrame = (left, right, { leftOk = true, rightOk = true } = {}) => ({
+const kneeFrame = (left, right, { leftOk = true, rightOk = true, yaw, near } = {}) => ({
   angles: { left: { knee: left }, right: { knee: right } },
   sideUsable: { left: leftOk, right: rightOk },
   sideVisibility: { left: leftOk ? 0.9 : 0.3, right: rightOk ? 0.9 : 0.3 },
+  bodyYawDeg: yaw, nearSide: near,
 });
 
 test("knee capture compares the worse knee when both legs are tracked", () => {
@@ -136,10 +139,54 @@ test("knee capture uses the near knee when only one leg is tracked side-on", () 
   assert.equal(result.protocol, "self-check-seated-knee-extension-v2-right", "single-side checks are never mixed with bilateral ones");
 });
 
+test("body yaw reads facing vs side-on from the hip and shoulder lines, and names the near leg", () => {
+  const world = (yawDeg) => {
+    const points = Array.from({ length: 33 }, () => ({ x: 0, y: 0, z: 0, visibility: 0.9 }));
+    const c = Math.cos(yawDeg * Math.PI / 180), s = Math.sin(yawDeg * Math.PI / 180);
+    // Left hip and shoulder rotate toward the camera (smaller z) as the person turns.
+    for (const [index, half] of [[23, 0.1], [24, -0.1], [11, 0.18], [12, -0.18]]) Object.assign(points[index], { x: half * c, z: -half * s });
+    return points;
+  };
+  assert.ok(Math.abs(bodyYaw(world(0)).yawDeg) < 1e-9);
+  const side = bodyYaw(world(80));
+  assert.ok(Math.abs(side.yawDeg - 80) < 1e-6);
+  assert.equal(side.nearSide, "left");
+  assert.equal(cameraViewFor(10), "front");
+  assert.equal(cameraViewFor(45), "oblique");
+  assert.equal(cameraViewFor(75), "side");
+  assert.equal(cameraViewFor(null), null);
+});
+
+test("side-on, only the near knee counts even if the model reports the far knee as visible", () => {
+  // The far (right) knee reads lower but is occluded: it must not become the 'worse knee'.
+  const frames = Array.from({ length: ASSESSMENT_MIN_SAMPLES + 4 }, (_, i) => kneeFrame(150 + i, 120 + i, { yaw: 78, near: "left" }));
+  const result = summarizeKneeCapture(frames);
+  assert.equal(result.cameraView, "side");
+  assert.equal(result.view, "left");
+  assert.equal(result.sides.right.hiddenSideOn, true);
+  assert.equal(result.kneeExtension, result.sides.left.extension);
+  assert.equal(result.protocol, "self-check-seated-knee-extension-v2-left");
+  // Facing the camera, both knees count and the worse one is compared.
+  const front = summarizeKneeCapture(frames.map(frame => ({ ...frame, bodyYawDeg: 8 })));
+  assert.equal(front.cameraView, "front");
+  assert.equal(front.view, "bilateral");
+  assert.equal(front.worseSide, "right");
+});
+
 test("knee capture is insufficient when no leg is tracked well enough", () => {
   const frames = Array.from({ length: ASSESSMENT_MIN_SAMPLES - 1 }, () => kneeFrame(170, 170));
   const result = summarizeKneeCapture(frames);
   assert.equal(result.status, "insufficient");
   assert.equal(result.kneeExtension, null);
   assert.equal(result.protocol, null);
+});
+
+test("near full extension, depth noise hurts a side-on knee angle more than a facing one", async () => {
+  const { viewError } = await import("../scripts/simulate-camera-view.mjs");
+  const front = viewError({ view: "front", theta: 170, k: 3, runs: 4000 }), side = viewError({ view: "side", theta: 170, k: 3, runs: 4000 });
+  assert.ok(side.rmse > 1.5 * front.rmse, `side ${side.rmse} vs front ${front.rmse}`);
+  assert.ok(side.bias < front.bias - 2, "side-on reads lower: a position change can look like lost extension");
+  // With equal noise on every axis the position does not matter.
+  const even = ["front", "side"].map(view => viewError({ view, theta: 170, k: 1, runs: 4000 }).rmse);
+  assert.ok(Math.abs(even[0] - even[1]) < 0.5);
 });
