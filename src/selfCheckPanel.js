@@ -3,6 +3,7 @@ import {
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, elenaDay147 } from "./elenaSelfCheck.js";
 import { createSelfCheckCamera } from "./selfCheckCamera.js";
+import { createCameraPulse, CAMERA_PULSE, RESTING_CAMERA_PROTOCOL } from "./cameraPulse.js";
 import { cameraViewFor } from "./functionalAssessment.js";
 import { sparklineSvg } from "./trendSpark.js";
 import { HOLD, REFERENCE_TYPES, summarizeHold, agreement, calibratedFloors, pairsToCsv, createAngleCheckStore } from "./angleCheck.js";
@@ -33,6 +34,8 @@ const fmt = (v, d = 1) => (Number.isFinite(v) ? Number(v).toFixed(d) : "--");
 const kneeView = cap => !cap.view ? "" : cap.view === "bilateral"
   ? ` · both knees seen, comparing the ${cap.worseSide} (left ${fmt(cap.sides.left.extension)}°, right ${fmt(cap.sides.right.extension)}°)`
   : ` · ${cap.view} knee only (side-on view); compared only with ${cap.view}-knee checks`;
+// The knee model behind the numbers: the validated hybrid, or the pose model's 3D angle alone.
+const kneeMethod = cap => cap.angleMethod === "hybrid" ? ` · hybrid knee model (${fmt(100 * (cap.hybridShare ?? 0), 0)} % learned, rest fixed rule)` : "";
 // Live position cue: the same position every day keeps the camera's error the same.
 const VIEW_CUE = { front: "facing camera", side: "side-on", oblique: "turned partway: face the camera or turn fully side-on" };
 
@@ -44,6 +47,10 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   const overlay = el("canvas", { class: "sc-overlay", "aria-hidden": "true" });
   const camStatus = el("small", { class: "sc-cam-status", role: "status" }, "Camera off");
   let camera = null, liveAngle = el("b", {}, "--");
+  // Resting pulse from the face: ME-rPPG-led hybrid with POS (src/cameraPulse.js).
+  const pulseVideo = el("video", { class: "sc-video", playsinline: true, muted: true, "aria-label": "Face camera preview" });
+  const pulseStatus = el("small", { class: "sc-cam-status", role: "status" }, "Camera off");
+  const pulse = { engine: null, measuring: false, result: null, progress: null };
   const angleStore = createAngleCheckStore();
   const check = { open: false, participant: "P1", side: "left", referenceType: REFERENCE_TYPES[0], reference: null, hold: null, holding: false, pairs: [] };
   try { state.persist = localStorage.getItem("astrobone-self-check-consent") === "1"; } catch { /* storage unavailable */ }
@@ -104,7 +111,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     } else state.check = newCheck("you");
     render(); onStep(STEPS[0][0]);
   }
-  function go(step) { state.step = Math.max(0, Math.min(STEPS.length - 1, step)); if (STEPS[state.step][0] !== "movement") stopCamera(); if (STEPS[state.step][0] === "result") evaluate(); render(); onStep(STEPS[state.step][0]); }
+  function go(step) { state.step = Math.max(0, Math.min(STEPS.length - 1, step)); if (STEPS[state.step][0] !== "movement") stopCamera(); if (STEPS[state.step][0] !== "body") stopPulse(); if (STEPS[state.step][0] === "result") evaluate(); render(); onStep(STEPS[state.step][0]); }
 
   function evaluate() {
     state.evaluation = evaluateSelfCheck(state.check, history(), { floors: state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor) });
@@ -131,7 +138,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       const seen = frame?.angles ? ["left", "right"].filter(side => (frame.sideUsable ? frame.sideUsable[side] : true) && Number.isFinite(frame.angles[side]?.knee)) : [];
       const view = cameraViewFor(frame?.bodyYawDeg), shown = view === "side" && frame.nearSide ? seen.filter(side => side === frame.nearSide) : seen;
       liveAngle.textContent = view === "oblique" ? VIEW_CUE.oblique
-        : shown.length ? `${shown.map(side => `${side[0].toUpperCase()} ${Math.round(frame.angles[side].knee)}°`).join(" · ")}${view ? ` · ${VIEW_CUE[view]}` : ""}` : "--";
+        : shown.length ? `${shown.map(side => `${side[0].toUpperCase()} ${Math.round(frame.kneeHybrid?.[side]?.angle ?? frame.angles[side].knee)}°`).join(" · ")}${view ? ` · ${VIEW_CUE[view]}` : ""}` : "--";
     } });
     try { await camera.start(); } catch (error) { camStatus.textContent = `Camera unavailable: ${error.message}`; }
     render();
@@ -143,6 +150,28 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     applyCapture(result, "CAMERA · this device");
   }
   function stopCamera() { camera?.stop(); }
+
+  // ---------- Resting pulse from the camera ----------
+  async function measurePulse() {
+    if (pulse.measuring) return;
+    pulse.engine ??= createCameraPulse({ video: pulseVideo, onStatus: text => { pulseStatus.textContent = text; } });
+    // The 3D scene pauses while measuring, as for the reaction test: on a phone it competes with the
+    // pulse models for the processor, and fewer frames a second make a noisier pulse wave.
+    pulse.measuring = true; pulse.result = null; onTimedTest(true); render();
+    try {
+      await pulse.engine.start();
+      pulseStatus.textContent = `Hold still, face the camera, steady light · ${CAMERA_PULSE.seconds} s`;
+      const result = await pulse.engine.measure(CAMERA_PULSE.seconds, progress => { pulse.progress = progress; pulseStatus.textContent = `${Math.floor(progress.elapsed)} / ${progress.seconds} s${progress.live?.bpm ? ` · about ${progress.live.bpm} bpm` : ""}${progress.faceShare < 0.8 ? " · face not found" : ""}`; });
+      pulse.result = result;
+      if (result.status === "estimated") {
+        const c = state.check;
+        c.values.restingHr = result.bpm; c.protocols.restingHr = RESTING_CAMERA_PROTOCOL; c.sources.restingHr = "Camera (rPPG hybrid)";
+        c.quality = { ...(c.quality || {}), restingHr: true };
+      }
+    } catch (error) { pulse.result = { status: "insufficient", reason: `Camera unavailable: ${error.message}` }; }
+    finally { pulse.engine?.stop(); pulse.measuring = false; onTimedTest(false); render(); }
+  }
+  function stopPulse() { pulse.engine?.stop(); pulse.measuring = false; onTimedTest(false); }
 
   // ---------- Accuracy check (camera vs goniometer) ----------
   async function holdAngle() {
@@ -279,7 +308,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       const cap = state.capture, usable = cap && !cap.capturing && c.quality.kneeExtension;
       const camOn = camera?.running;
       return [why("bone", "In spaceflight the legs lose the most bone, so this test comes first."),
-        el("p", { class: "sc-lead" }, "Seated knee extension, 10 seconds. Face the camera with both legs visible (best for extension), or sit fully side-on to measure the near knee. Use the same position every day. Straighten and bend your knees slowly."),
+        el("p", { class: "sc-lead" }, "Seated knee extension, 10 seconds. Sit fully side-on to the camera (most accurate on real video: the near knee is measured), or face it with both legs visible. Use the same position every day. Straighten and bend your knees slowly."),
         demo ? el("div", { class: "sc-row" },
           el("button", { type: "button", class: "sc-secondary", "data-demo": "poor", onclick: () => demoCapture("poor") }, "Demo capture · poor framing"),
           el("button", { type: "button", class: "sc-secondary", "data-demo": "usable", onclick: () => demoCapture("usable") }, "Demo capture · usable"))
@@ -290,7 +319,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         cap?.capturing && demo ? el("p", { class: "sc-note" }, "Capturing demo movement…") : null,
         cap && !cap.capturing ? el("div", { class: `sc-result ${usable ? "" : "sc-bad"}` },
           el("strong", {}, usable ? "Capture usable" : "Comparison withheld · repeat the capture"),
-          el("p", {}, usable ? `Knee extension ${fmt(cap.kneeExtension)}° · range of motion ${fmt(cap.kneeRom)}° · tracking quality ${fmt(cap.trackingQuality, 2)} · ${cap.sampleCount} samples${kneeView(cap)}`
+          el("p", {}, usable ? `Knee extension ${fmt(cap.kneeExtension)}° · range of motion ${fmt(cap.kneeRom)}° · tracking quality ${fmt(cap.trackingQuality, 2)} · ${cap.sampleCount} samples${kneeView(cap)}${kneeMethod(cap)}`
             : cap.reason === "oblique" ? `You were turned partway (${fmt(cap.bodyYawDeg, 0)}° from facing the camera). Face the camera, or turn fully side-on, and repeat: a part-turned reading matches neither position's baseline.`
             : `Tracking quality ${fmt(cap.trackingQuality, 2)} with ${cap.sampleCount} usable samples is below the quality rule (≥ 0.70 and ≥ 12 samples). A worse-looking number from a poor capture is not treated as a health change.`),
           el("small", {}, `${cap.source} · attempt ${state.captures}`)) : null,
@@ -329,9 +358,18 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         el("fieldset", { class: "sc-fieldset" }, el("legend", {}, "New since your last check"),
           IMMUNE_SYMPTOMS.map(([k, label]) => checkbox(`sym-${k}`, label, Boolean(c.symptoms?.[k]), value => { c.symptoms = { ...(c.symptoms || {}), [k]: value }; })),
           el("button", { type: "button", class: "sc-link", onclick: () => { c.symptoms = {}; render(); } }, "None of these")),
-        number("Resting heart rate", "bpm", v.restingHr, 30, 200, 1, value => { v.restingHr = value; c.protocols.restingHr = c.protocols.restingHr ?? "resting-self-reported-v1"; }),
+        el("section", { class: "sc-pulse" },
+          el("p", { class: "sc-lead" }, `Resting pulse from your face: sit still for ${CAMERA_PULSE.seconds} s, facing the camera in steady light. It is compared only with your own earlier camera readings, to show whether your resting heart rate is drifting up or down.`),
+          demo ? null : el("div", { class: "sc-camera" }, pulseVideo, el("div", { class: "sc-cam-hud" }, pulseStatus)),
+          demo ? null : el("div", { class: "sc-row" }, pulse.measuring ? el("button", { type: "button", class: "sc-secondary", onclick: () => { stopPulse(); render(); } }, "Stop")
+            : el("button", { type: "button", class: "sc-primary", onclick: measurePulse }, pulse.result ? "Measure again" : `Measure resting pulse (${CAMERA_PULSE.seconds} s)`)),
+          pulse.result ? el("div", { class: `sc-result ${pulse.result.status === "estimated" ? "" : "sc-bad"}` },
+            el("strong", {}, pulse.result.status === "estimated" ? `${pulse.result.bpm} bpm · camera hybrid` : `Not measured · ${pulse.result.reason}`),
+            pulse.result.status === "estimated" ? el("p", {}, `Signal agreement ${Math.round(pulse.result.quality * 100)} % · ${pulse.result.parts?.map(p => `${p.name} ${p.bpm}`).join(" · ")} · ${Math.round(pulse.result.fps)} frames/s`) : null,
+            el("small", {}, "ME-rPPG deep model, cross-checked with the POS colour method. Tested on 40 people at rest and after squats against a finger sensor (docs/real-video-validation.md). Not a medical device.")) : null),
+        number("Resting heart rate", "bpm", v.restingHr, 30, 200, 1, value => { v.restingHr = value; c.protocols.restingHr = c.protocols.restingHr === RESTING_CAMERA_PROTOCOL ? "resting-self-reported-v1" : c.protocols.restingHr ?? "resting-self-reported-v1"; c.sources.restingHr = c.sources.restingHr === "Camera (rPPG hybrid)" ? "Manual pulse count" : c.sources.restingHr; }),
         el("label", { class: "sc-text" }, "Heart-rate source",
-          el("select", { onchange: e => { c.sources.restingHr = e.target.value; } }, ["Wearable or chest strap", "Pulse oximeter", "Manual pulse count", "Synthetic demo"].map(s => el("option", { selected: (c.sources.restingHr ?? (demo ? "Synthetic demo" : "Wearable or chest strap")) === s || undefined }, s)))),
+          el("select", { onchange: e => { c.sources.restingHr = e.target.value; } }, ["Wearable or chest strap", "Pulse oximeter", "Manual pulse count", "Camera (rPPG hybrid)", "Synthetic demo"].map(s => el("option", { selected: (c.sources.restingHr ?? (demo ? "Synthetic demo" : "Wearable or chest strap")) === s || undefined }, s)))),
         number("Personal dosimeter, cumulative (context only)", "mGy", c.dosimeter, 0, 10000, 0.01, value => { c.dosimeter = value; }),
         why("heart", "showed no consistent heart effect from radiation, so dose never raises an alarm. It is logged beside heart rate for the medical reviewer.")
           ?? el("p", { class: "sc-note" }, "Radiation dose is recorded as mission context. It is never turned into a health status.")];
@@ -409,7 +447,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   return {
     element, reset, go, demoCapture, applyDemoPvt: () => applyPvt(ELENA_PVT, "SYNTHETIC DEMO"), saveCheck,
     setProfile(profile) { if (state.profile !== profile) { state.profile = profile; reset(); } },
-    stop() { stopCamera(); stopPvt(true); },
+    stop() { stopCamera(); stopPulse(); stopPvt(true); },
     get state() { return state; },
     latestEvaluation(profile = state.profile) {
       if (state.evaluation && state.profile === profile) return state.evaluation;

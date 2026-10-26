@@ -1,10 +1,12 @@
 // AstroBone offline pack. After one online visit, the twin (home), Live Capture and their models,
 // NASA summaries and pose runtime are served from this device's cache.
-const CACHE = "astrobone-offline-v5";
+const CACHE = "astrobone-offline-v6";
 const CORE = [
   "./", "lab.html",
   "models/anatomy/musculoskeletal.glb", "models/anatomy/musculoskeletal-rigged.glb", "models/anatomy/cardiovascular.glb", "models/anatomy/SOURCE-LICENSE.txt",
   "models/pose_landmarker_lite.task",
+  "models/face_landmarker.task",
+  "models/me-rppg/model.onnx", "models/me-rppg/state.json", "models/me-rppg/state.bin",
   "mediapipe/vision_wasm_internal.js", "mediapipe/vision_wasm_internal.wasm",
   "mediapipe/vision_wasm_nosimd_internal.js", "mediapipe/vision_wasm_nosimd_internal.wasm",
   "mediapipe/vision_wasm_module_internal.js", "mediapipe/vision_wasm_module_internal.wasm",

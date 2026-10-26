@@ -21,15 +21,18 @@ export const interiorToFlexion = interior => 180 - interior;
 
 // Summarize one still hold from camera frames. A hold is usable only if enough frames tracked
 // the chosen knee and the angle stayed steady, so a moving or poorly tracked knee is not paired.
+// The knee angle is the one the self-check reports: the hybrid one (src/kneeHybrid.js) when every frame has it.
 export function summarizeHold(frames, side) {
-  const angles = frames.filter(f => (f?.sideUsable ? f.sideUsable[side] : f?.usable) && Number.isFinite(f.angles?.[side]?.knee)).map(f => f.angles[side].knee);
+  const hybrid = frames.length > 0 && frames.every(f => Number.isFinite(f?.kneeHybrid?.[side]?.angle));
+  const kneeOf = f => (hybrid ? f.kneeHybrid[side].angle : f?.angles?.[side]?.knee);
+  const angles = frames.filter(f => (f?.sideUsable ? f.sideUsable[side] : f?.usable) && Number.isFinite(kneeOf(f))).map(kneeOf);
   if (angles.length < HOLD.minSamples) return { usable: false, samples: angles.length, reason: `only ${angles.length} usable frames (need ${HOLD.minSamples})` };
   const spread = sd(angles);
   if (spread > HOLD.maxSd) return { usable: false, samples: angles.length, sd: round(spread), reason: `knee moved during the hold (SD ${round(spread)}°, limit ${HOLD.maxSd}°)` };
   // Camera position during the hold, so the accuracy study can report facing and side-on separately.
   const yaws = frames.map(f => f?.bodyYawDeg).filter(Number.isFinite).sort((a, b) => a - b);
   const yaw = yaws.length ? yaws[yaws.length >> 1] : null;
-  return { usable: true, samples: angles.length, sd: round(spread), interior: round(mean(angles)), flexion: round(interiorToFlexion(mean(angles))), bodyYawDeg: yaw === null ? null : round(yaw), cameraView: cameraViewFor(yaw) };
+  return { usable: true, samples: angles.length, sd: round(spread), interior: round(mean(angles)), flexion: round(interiorToFlexion(mean(angles))), bodyYawDeg: yaw === null ? null : round(yaw), cameraView: cameraViewFor(yaw), angleMethod: hybrid ? "hybrid" : "3d" };
 }
 
 // Two-sided 95% t quantiles for small samples; 1.96 beyond the table.

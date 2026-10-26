@@ -1,0 +1,643 @@
+<title>AstroBone Real-Video Validation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a flight-test log. One dark instrument panel per test; truth is white, the old app amber, the hybrid cyan, everywhere. */
+:root {
+  color-scheme: dark;
+  --bg: #03070f; --panel: #08111f; --panel-2: #0c1829; --line: #18273f; --line-2: #22375a;
+  --fg: #e8f1ff; --muted: #8ea3c0; --faint: #5d7190;
+  --truth: #f4f8ff; --old: #ffb347; --new: #6fe3ff; --deep: #8fa8ff; --classic: #5f7394; --rule: #b7c3d6;
+  --good: #5ee6a0; --bad: #ff7a6b;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 400 16px/1.55 var(--body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: .01em; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.3rem, 5.4vw, 4.1rem); line-height: 1.02; }
+h2 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); line-height: 1.08; }
+h3 { font-size: 1.25rem; line-height: 1.2; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--new); }
+.eyebrow { font: 600 .78rem/1.2 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.lead { color: #c4d3ea; font-size: 1.08rem; }
+.muted { color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.k-truth { color: var(--truth); } .k-old { color: var(--old); } .k-new { color: var(--new); } .k-good { color: var(--good); } .k-bad { color: var(--bad); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: clamp(16px, 2.6vw, 28px); display: grid; gap: 20px; min-width: 0; }
+.test-head { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+.test-id { font: 600 .8rem/1 var(--mono); color: var(--bg); background: var(--new); padding: 5px 8px; border-radius: 4px; letter-spacing: .08em; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.card { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font: 500 .82rem/1.2 var(--mono); color: var(--muted); }
+.legend .note { color: var(--faint); }
+.legend .note::before { display: none; }
+.legend span::before { content: ""; display: inline-block; width: 18px; height: 3px; border-radius: 2px; margin-right: 7px; vertical-align: middle; background: currentColor; }
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { fill: var(--muted); font: 500 11px var(--mono); }
+.chart .axis line, .chart .grid line { stroke: var(--line-2); }
+.chart .grid line { stroke-dasharray: 2 4; }
+.scroll-x { overflow-x: auto; }
+button, .seg button { font: 600 .82rem/1 var(--mono); letter-spacing: .04em; color: var(--fg); background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 999px; padding: 9px 14px; cursor: pointer; }
+button:hover { border-color: var(--new); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--new); outline-offset: 2px; }
+.seg { display: inline-flex; gap: 0; border: 1px solid var(--line-2); border-radius: 999px; padding: 3px; background: var(--panel-2); }
+.seg button { border: 0; background: transparent; color: var(--muted); padding: 7px 12px; }
+.seg button[aria-pressed="true"] { background: var(--new); color: var(--bg); }
+.tip { position: fixed; z-index: 20; pointer-events: none; background: #0f1d33; border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 10px; font: 500 12px/1.4 var(--mono); color: var(--fg); max-width: 260px; }
+
+/* Hero */
+.hero { display: grid; gap: 22px; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 20px; align-items: stretch; }
+@media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+.stage { background: radial-gradient(120% 90% at 50% 0%, #0b1a30 0%, var(--panel) 62%); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+.cams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cam { position: relative; background: #050c18; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; aspect-ratio: 4 / 5; max-width: 100%; }
+.cam canvas { width: 100%; height: 100%; display: block; }
+.cam-label { position: absolute; left: 10px; top: 9px; font: 600 .72rem/1 var(--mono); letter-spacing: .12em; color: var(--muted); }
+.cam-label b { color: var(--fg); }
+.rec { position: absolute; right: 10px; top: 9px; font: 600 .7rem/1 var(--mono); color: var(--bad); letter-spacing: .1em; }
+.rec::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--bad); margin-right: 6px; animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+.readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ro { background: #061020; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
+.ro small { font: 600 .68rem/1.2 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.ro strong { font: 600 clamp(1.5rem, 3.4vw, 2.3rem)/1 var(--mono); font-variant-numeric: tabular-nums; }
+.ro em { font: 500 .78rem/1.2 var(--mono); font-style: normal; color: var(--muted); }
+.controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.controls input[type=range] { flex: 1 1 160px; accent-color: var(--new); min-width: 0; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-content: start; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 6px; align-content: start; }
+.tile .big { font: 600 clamp(1.6rem, 3vw, 2.2rem)/1.05 var(--display); letter-spacing: .01em; }
+.tile .big .arrow { color: var(--faint); margin: 0 .2em; }
+.tile p { font-size: .86rem; color: var(--muted); }
+.tile.wide { grid-column: 1 / -1; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font: 600 .72rem/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+th button { all: unset; cursor: pointer; }
+th button:focus-visible { outline: 2px solid var(--new); }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar { display: inline-block; height: 8px; border-radius: 4px; background: var(--classic); vertical-align: middle; margin-right: 8px; }
+.pill { display: inline-block; font: 600 .68rem/1 var(--mono); padding: 4px 7px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--muted); letter-spacing: .05em; }
+.pill.yes { color: var(--good); border-color: #1f5d45; }
+tr.app td:first-child { box-shadow: inset 3px 0 0 var(--old); }
+
+/* Flow diagram */
+.flow { width: 100%; height: auto; }
+.flow text { font: 600 12px var(--mono); fill: var(--fg); }
+.flow .sub { font: 500 10.5px var(--mono); fill: var(--muted); }
+.flow rect { fill: var(--panel-2); stroke: var(--line-2); }
+.flow .hot rect { stroke: var(--new); }
+.flow path { stroke: var(--faint); fill: none; stroke-width: 1.5; }
+.flow .pulse { stroke: var(--new); stroke-dasharray: 4 10; animation: flow 1.4s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -28; } }
+
+.callout { align-self: start; border-left: 3px solid var(--old); padding: 10px 14px; background: #1a1408; border-radius: 0 8px 8px 0; color: #ffe3bd; }
+.callout.new { border-left-color: var(--new); background: #06202a; color: #d6f7ff; }
+ul.changes { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+ul.changes li { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
+ul.changes code { font: 500 .8rem var(--mono); color: var(--new); }
+.tag { font: 600 .7rem/1 var(--mono); color: var(--bg); background: var(--new); border-radius: 4px; padding: 4px 6px; margin-top: 3px; }
+.tag.fix { background: var(--old); }
+.cite { font-size: .82rem; color: var(--muted); }
+footer { color: var(--faint); font-size: .82rem; display: grid; gap: 6px; }
+@media (prefers-reduced-motion: reduce) { .rec::before, .flow .pulse { animation: none; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">AstroBone · real-video validation · <span id="gen"></span></div>
+    <h1>Tested on real people, against lab ground truth</h1>
+    <p class="lead">Every number on this page comes from recorded video of real people, scored against a motion-capture lab for joints and a finger pulse sensor for heart rate. Fitted models are always scored on people they never saw.</p>
+    <div class="hero-grid">
+      <div class="stage" id="stage">
+        <div class="cams">
+          <div class="cam"><canvas id="cam-front" width="480" height="600" aria-label="Front camera: motion-capture skeleton and pose model skeleton"></canvas><div class="cam-label">CAM 17 · <b>FACING</b></div><div class="rec">LIVE REPLAY</div></div>
+          <div class="cam"><canvas id="cam-side" width="480" height="600" aria-label="Side camera: motion-capture skeleton and pose model skeleton"></canvas><div class="cam-label">CAM 18 · <b>SIDE-ON</b></div></div>
+        </div>
+        <div class="legend"><span class="k-truth">Motion capture (truth)</span><span class="k-new">Pose model keypoints</span><span class="note" id="replay-who"></span></div>
+        <div class="readouts" aria-live="off">
+          <div class="ro"><small>Knee · mocap</small><strong class="k-truth" id="ro-gt">--</strong><em>Vicon, 3D</em></div>
+          <div class="ro"><small>App before</small><strong class="k-old" id="ro-old">--</strong><em id="ro-old-d">3D world angle</em></div>
+          <div class="ro"><small>Hybrid</small><strong class="k-new" id="ro-new">--</strong><em id="ro-new-d">pose model + trees</em></div>
+        </div>
+        <svg class="chart" id="trace" viewBox="0 0 720 170" role="img" aria-label="Knee angle over the squat set"></svg>
+        <div class="controls">
+          <button id="play" type="button" aria-label="Pause replay">❚❚ Pause</button>
+          <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Replay position">
+          <div class="seg" role="group" aria-label="Which camera's knee angle to read">
+            <button type="button" data-cam="front" aria-pressed="true">Facing</button>
+            <button type="button" data-cam="side" aria-pressed="false">Side-on</button>
+          </div>
+          <div class="seg" role="group" aria-label="Replay speed">
+            <button type="button" data-speed="0.5" aria-pressed="false">0.5×</button>
+            <button type="button" data-speed="1" aria-pressed="true">1×</button>
+            <button type="button" data-speed="2" aria-pressed="false">2×</button>
+          </div>
+        </div>
+      </div>
+      <div class="tiles" id="tiles"></div>
+    </div>
+  </header>
+
+  <section class="panel" id="pose">
+    <div class="test-head"><span class="test-id">TEST 01</span><h2>Which pretrained pose model sees the knee best?</h2></div>
+    <p class="muted" id="pose-intro"></p>
+    <div class="scroll-x"><table id="models"></table></div>
+    <div class="grid-2">
+      <div class="callout" id="pose-callout"></div>
+      <div class="card" id="yaw-card"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="hybrid">
+    <div class="test-head"><span class="test-id">TEST 02</span><h2>The hybrid: a pretrained model plus our own learned correction</h2></div>
+    <p class="muted">The pretrained model gives two knee angles that fail in opposite camera positions. A small gradient-boosted model, trained on motion capture, reads both together with the body's turn and how foreshortened the thigh looks, and returns the knee angle. Outside the conditions it was trained on, it steps aside for a fixed rule.</p>
+    <svg class="flow" id="flow" viewBox="0 0 980 210" role="img" aria-label="Hybrid knee model: inputs, trees, fallback rule"></svg>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Every unseen person improved</h3>
+        <p class="muted" style="font-size:.9rem">Knee range-of-motion error per rep, each person scored by a model trained on the other eight.</p>
+        <div class="legend"><span class="k-old">App before (3D angle)</span><span class="k-new">Hybrid</span></div>
+        <svg class="chart" id="dumbbell" viewBox="0 0 460 330" role="img" aria-label="Error per person, before and after"></svg>
+      </div>
+      <div class="card">
+        <h3>By movement and camera position</h3>
+        <p class="muted" style="font-size:.9rem">Mean range-of-motion error per rep, degrees. Lower is better.</p>
+        <div class="legend"><span class="k-old">App before</span><span style="color:var(--rule)">Fixed rule</span><span class="k-new">Hybrid</span></div>
+        <svg class="chart" id="byview" viewBox="0 0 460 318" role="img" aria-label="Error by movement and camera position"></svg>
+        <p class="muted mono" style="font-size:.78rem" id="byview-note"></p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="test-head" style="justify-content:space-between"><h3>Agreement with motion capture</h3>
+          <div class="seg" role="group" aria-label="Method shown"><button type="button" data-ba="app" aria-pressed="false">App before</button><button type="button" data-ba="hybrid" aria-pressed="true">Hybrid</button></div></div>
+        <p class="muted" style="font-size:.9rem">Bland–Altman plot of knee range of motion, one dot per rep and knee. Dashed lines: mean difference and 95 % limits of agreement.</p>
+        <svg class="chart" id="ba" viewBox="0 0 460 300" role="img" aria-label="Bland-Altman plot"></svg>
+      </div>
+      <div class="card">
+        <h3>Six ways to read the knee, scored the same way</h3>
+        <p class="muted" style="font-size:.9rem">All scored leave-one-person-out on <span id="hy-n"></span>. The shipped version keeps the trees inside their training range.</p>
+        <div class="scroll-x"><table id="hytable"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="pulse">
+    <div class="test-head"><span class="test-id">TEST 03</span><h2>Pulse from the face: which method agrees with a finger sensor?</h2></div>
+    <p class="muted" id="pulse-intro"></p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Camera pulse wave against the finger sensor</h3>
+        <div class="legend"><span class="k-truth">Finger sensor (PPG)</span><span class="k-new">Camera: ME-rPPG, app crop</span></div>
+        <canvas id="wave" width="900" height="260" style="width:100%;height:auto;display:block" aria-label="Scrolling pulse waves"></canvas>
+        <p class="muted mono" style="font-size:.8rem" id="wave-note"></p>
+      </div>
+      <div class="card">
+        <h3>The old app method</h3>
+        <div class="callout" id="old-callout"></div>
+        <h3>What the hybrid does</h3>
+        <div class="callout new">ME-rPPG (a 2025 deep model, 2.5 MB, run in the browser) leads. The classic POS colour method reads the same frames and adds its spectrum at a quarter weight; each spectrum also counts by how clean its peak is, so a noisy one is outvoted. Our first design gave POS and CHROM equal weight with the deep model; on 40 people that was worse than the deep model alone, so it was retuned. A window whose fused peak is not clear is refused.</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Error per 30-second window</h3>
+        <div class="legend"><span class="k-new">AstroBone</span><span style="color:var(--deep)">Deep models</span><span style="color:var(--old)">First hybrid design</span><span style="color:var(--classic)">Classic methods</span></div>
+        <svg class="chart" id="leader" viewBox="0 0 460 420" role="img" aria-label="Pulse method leaderboard"></svg>
+      </div>
+      <div class="card">
+        <h3>Accuracy against windows answered</h3>
+        <p class="muted" style="font-size:.9rem">Each method can refuse unclear windows. Moving the quality gate trades coverage for accuracy; points are gate settings 0 to 0.6.</p>
+        <svg class="chart" id="sweep" viewBox="0 0 460 330" role="img" aria-label="Error against coverage"></svg>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Tuning the hybrid without peeking</h3>
+        <p class="muted" style="font-size:.9rem" id="tune-note"></p>
+        <svg class="chart" id="tune" viewBox="0 0 460 270" role="img" aria-label="Pulse error by POS weight"></svg>
+      </div>
+      <div class="card" id="parts-card"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="baseline">
+    <div class="test-head"><span class="test-id">TEST 04</span><h2>Does it see a change from the person's own baseline?</h2></div>
+    <p class="muted">AstroBone does not judge a single heart rate. It watches each person's resting rate against their own earlier readings. Here the same people were filmed at rest and again right after 15 squats.</p>
+    <div class="grid-2">
+      <div class="card"><div class="legend"><span class="k-truth">Finger sensor</span><span class="k-new">Camera hybrid</span></div>
+        <svg class="chart" id="slope" viewBox="0 0 460 340" role="img" aria-label="Heart rate at rest and after squats per person"></svg></div>
+      <div class="card" id="delta-card"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="nasa">
+    <div class="test-head"><span class="test-id">CONTEXT</span><h2>Why a resting-pulse trend matters in space</h2></div>
+    <div class="grid-3">
+      <div class="card"><h3>Stable at rest in orbit</h3><p class="muted">Holter recordings of seven ISS crew members: night-time heart rate was about 55 bpm both before flight and on the station, while daytime rates were lower in flight.</p><p class="cite">Fraser, Hughson et al., IAC 2011, <a href="https://iafastro.directory/iac/archive/browse/IAC-11/A1/2/9471/" target="_blank" rel="noopener">IAC-11.A1.2.9</a></p></div>
+      <div class="card"><h3>Higher on standing after flight</h3><p class="muted">After spaceflight, heart rate during head-up tilt was 93 bpm against 74 before flight in six astronauts. A stand test on landing day shows the same rise unless compression garments are worn.</p><p class="cite">Cox et al., J Physiol 2002 (<a href="https://digitalcommons.mtu.edu/michigantech-p/11512" target="_blank" rel="noopener">Neurolab</a>); Lee et al., Front Physiol 2020 (<a href="https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2020.00784" target="_blank" rel="noopener">11 ISS astronauts</a>)</p></div>
+      <div class="card"><h3>So: watch the trend, not one number</h3><p class="muted">A resting rate that drifts away from a crew member's own baseline is the signal. The camera reading is compared only with that person's earlier camera readings, and a change is flagged for review only past 8 bpm. It is not a diagnosis.</p><p class="cite">AstroBone self-check, resting-HR drift rule</p></div>
+    </div>
+  </section>
+
+  <section class="panel" id="changes">
+    <div class="test-head"><span class="test-id">SHIPPED</span><h2>What changed in the app</h2></div>
+    <ul class="changes" id="changelist"></ul>
+  </section>
+
+  <section class="panel" id="method">
+    <div class="test-head"><span class="test-id">METHOD</span><h2>How this was measured, and its limits</h2></div>
+    <div class="grid-2" id="method-body"></div>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script id="report-data" type="application/json">__DATA__</script>
+<script>
+(() => {
+const D = JSON.parse(document.getElementById("report-data").textContent);
+const H = D.pose.hybrid["mp-lite"], ALL = H.rep["all|all"];
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = s => document.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const s = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (parent) parent.appendChild(e); return e; };
+const h = (tag, attrs = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else e.setAttribute(k, v); } kids.flat().forEach(k => k != null && e.append(k)); return e; };
+const f1 = v => (v == null || !isFinite(v) ? "--" : (+v).toFixed(1));
+const f0 = v => (v == null || !isFinite(v) ? "--" : Math.round(v).toString());
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = { truth: css("--truth"), old: css("--old"), neu: css("--new"), deep: css("--deep"), classic: css("--classic"), rule: css("--rule"), line: css("--line-2"), muted: css("--muted"), faint: css("--faint"), good: css("--good"), bad: css("--bad") };
+const tip = $("#tip");
+const showTip = (ev, html) => { tip.innerHTML = html; tip.hidden = false; const r = tip.getBoundingClientRect(); let x = ev.clientX + 14, y = ev.clientY + 14; if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - 14; if (y + r.height > innerHeight - 8) y = ev.clientY - r.height - 14; tip.style.left = x + "px"; tip.style.top = y + "px"; };
+const hideTip = () => { tip.hidden = true; };
+$("#gen").textContent = D.generated.slice(0, 10);
+
+// ---------- Hero tiles ----------
+const people = Object.values(H.perPerson);
+const improved = people.filter(p => p.shipped < p.est3).length;
+const hyb = D.pulse.methods.find(m => m.id === "Hybrid (app self-check)");
+const dHyb = D.pulse.delta["Hybrid (app self-check)"];
+const tiles = [
+  ["Knee range-of-motion error", `<span class="k-old">${f1(ALL.est3.romMae)}°</span><span class="arrow">→</span><span class="k-new">${f1(ALL.shipped.romMae)}°</span>`, `${ALL.est3.n} squat and lunge reps, ${H.people} people, motion capture as truth.`],
+  ["Unseen people improved", `<span class="k-new">${improved} of ${people.length}</span>`, "Each person scored by a hybrid trained only on the others."],
+  ["Pulse error, 30 s windows", `<span class="k-new">${f1(hyb.mae)} bpm</span>`, `${f0(hyb.within5)} % of windows within 5 bpm of a finger sensor, ${D.pulse.dataset.people} people.`],
+  ["Old pulse method", `<span class="k-old">${f0(D.pulse.oldRefusedPct)} % refused</span>`, `On real webcam video it rarely gave a reading; the hybrid answers ${f0(hyb.coverage)} % of windows.`],
+  ["Rest → after squats, change error", `<span class="k-new">${f1(dHyb?.deltaMae)} bpm</span>`, `The rise against the person's own baseline, r = ${dHyb?.deltaR} with the finger sensor.`],
+];
+tiles.forEach(([label, big, note], i) => $("#tiles").append(h("div", { class: "tile" + (i === 4 ? " wide" : "") }, h("div", { class: "eyebrow", text: label }), Object.assign(h("div", { class: "big" }), { innerHTML: big }), h("p", { text: note }))));
+
+// ---------- Replay ----------
+const P = D.pose.playback, N = P.frames.length, EDGES = [[0, 1], [0, 2], [1, 3], [2, 3], [2, 4], [4, 6], [3, 5], [5, 7]];
+let t = 0, playing = !reduce, speed = 1, camSel = "front", last = null;
+const DATA_FPS = 5; // every 6th frame of 30 fps video
+$("#replay-who").textContent = `${P.exercise}s, person ${P.person}: the hybrid shown was trained without this person`;
+const lerpPt = (a, b, u) => (!a || !b ? a || b : [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u]);
+const lerpV = (a, b, u) => (a == null || b == null ? (u < .5 ? a : b) : a + (b - a) * u);
+function drawCam(id, cam, pos) {
+  const cv = document.getElementById(id), ctx = cv.getContext("2d"), W = cv.width, Hh = cv.height;
+  ctx.clearRect(0, 0, W, Hh);
+  ctx.strokeStyle = "rgba(110,150,200,.07)"; ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, Hh); ctx.stroke(); }
+  for (let y = 0; y < Hh; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  const i = Math.min(N - 1, Math.floor(pos)), j = Math.min(N - 1, i + 1), u = pos - i;
+  if (!cam._ext) { const all = [...cam.mocap, ...cam.model].flat().filter(Boolean); cam._ext = [Math.max(...all.map(p => p[0])), Math.max(...all.map(p => p[1]))]; }
+  const pad = 28, scale = Math.min((W - 2 * pad) / cam._ext[0], (Hh - 2 * pad) / cam._ext[1]), ox = (W - scale * cam._ext[0]) / 2, oy = (Hh - scale * cam._ext[1]) / 2;
+  const P2 = p => [ox + p[0] * scale, oy + p[1] * scale];
+  const skel = (pts, color, width, dash) => {
+    ctx.setLineDash(dash || []); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineCap = "round";
+    for (const [a, b] of EDGES) { if (!pts[a] || !pts[b]) continue; const A = P2(pts[a]), B = P2(pts[b]); ctx.beginPath(); ctx.moveTo(...A); ctx.lineTo(...B); ctx.stroke(); }
+    ctx.setLineDash([]); ctx.fillStyle = color;
+    pts.forEach(p => { if (!p) return; const q = P2(p); ctx.beginPath(); ctx.arc(q[0], q[1], width + 1.5, 0, 7); ctx.fill(); });
+  };
+  const mo = cam.mocap[i].map((p, k) => lerpPt(p, cam.mocap[j][k], u)), md = cam.model[i].map((p, k) => lerpPt(p, cam.model[j][k], u));
+  ctx.shadowColor = C.neu; ctx.shadowBlur = 14; skel(md, C.neu, 4); ctx.shadowBlur = 0;
+  skel(mo, "rgba(244,248,255,.85)", 2, [6, 5]);
+  // Knee angle arc on the measured knee.
+  const kneeIdx = cam.knee === "left" ? 4 : 5, hipIdx = kneeIdx - 2, ankIdx = kneeIdx + 2;
+  if (md[kneeIdx] && md[hipIdx] && md[ankIdx]) {
+    const K = P2(md[kneeIdx]), A1 = Math.atan2(P2(md[hipIdx])[1] - K[1], P2(md[hipIdx])[0] - K[0]), A2 = Math.atan2(P2(md[ankIdx])[1] - K[1], P2(md[ankIdx])[0] - K[0]);
+    let d = A2 - A1; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+    ctx.strokeStyle = C.neu; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(K[0], K[1], 26, A1, A1 + d, d < 0); ctx.stroke();
+    const hv = lerpV(cam.hybrid[i], cam.hybrid[j], u);
+    ctx.font = "600 15px 'JetBrains Mono', monospace"; ctx.fillStyle = C.neu; ctx.fillText(hv == null ? "--" : `${Math.round(hv)}°`, K[0] + 32, K[1] + 5);
+  }
+}
+const trace = $("#trace");
+const SPAN = 80; // 16 s of replay in view, centred on the playhead
+function drawTrace(pos = 0) {
+  trace.innerHTML = "";
+  const cam = P.cams[camSel], W = 720, Ht = 170, L = 40, R = 8, T = 10, B = 22;
+  const vals = [...cam.gt3, ...cam.app3d, ...cam.hybrid].filter(v => v != null);
+  const lo = Math.floor(Math.min(...vals) / 10) * 10, hi = Math.ceil(Math.max(...vals) / 10) * 10;
+  const k0 = Math.max(0, Math.min(N - 1 - SPAN, pos - SPAN / 2));
+  const x = k => L + (W - L - R) * (k - k0) / SPAN, y = v => T + (Ht - T - B) * (1 - (v - lo) / (hi - lo));
+  const g = s("g", { class: "grid" }, trace);
+  for (let v = lo; v <= hi; v += 20) { s("line", { x1: L, x2: W - R, y1: y(v), y2: y(v) }, g); s("text", { x: L - 6, y: y(v) + 4, "text-anchor": "end" }, trace).textContent = `${v}°`; }
+  s("text", { x: L, y: Ht - 4 }, trace).textContent = `${cam.knee} knee · ${(k0 / DATA_FPS).toFixed(0)}–${((k0 + SPAN) / DATA_FPS).toFixed(0)} s of ${Math.round(N / DATA_FPS)} s`;
+  const a = Math.floor(k0), b = Math.min(N - 1, Math.ceil(k0 + SPAN));
+  const path = (arr, color, w, dash) => { let d = "", pen = false; for (let k = a; k <= b; k++) { const v = arr[k]; if (v == null) { pen = false; continue; } d += `${pen ? "L" : "M"}${x(k).toFixed(1)},${y(v).toFixed(1)}`; pen = true; } s("path", { d, fill: "none", stroke: color, "stroke-width": w, "stroke-dasharray": dash || "none", "stroke-linejoin": "round" }, trace); };
+  path(cam.app3d, C.old, 1.6); path(cam.hybrid, C.neu, 2.2); path(cam.gt3, C.truth, 1.6, "5 4");
+  s("line", { id: "playhead", x1: x(0), x2: x(0), y1: T, y2: Ht - B, stroke: C.neu, "stroke-width": 1.5, opacity: .8 }, trace);
+  trace._x = x;
+}
+function frameUpdate(pos) {
+  drawCam("cam-front", P.cams.front, pos); drawCam("cam-side", P.cams.side, pos);
+  const i = Math.min(N - 1, Math.round(pos)), cam = P.cams[camSel];
+  const gt = cam.gt3[i], old = cam.app3d[i], neu = cam.hybrid[i];
+  $("#ro-gt").textContent = `${f0(gt)}°`; $("#ro-old").textContent = `${f0(old)}°`; $("#ro-new").textContent = neu == null ? "--" : `${f0(neu)}°`;
+  $("#ro-old-d").textContent = old == null || gt == null ? "3D world angle" : `off by ${f0(Math.abs(old - gt))}°`;
+  $("#ro-new-d").textContent = neu == null || gt == null ? "knee not tracked well" : `off by ${f0(Math.abs(neu - gt))}°`;
+  drawTrace(pos); const ph = document.getElementById("playhead"); if (ph) { const xx = trace._x(pos); ph.setAttribute("x1", xx); ph.setAttribute("x2", xx); }
+  $("#scrub").value = Math.round(1000 * pos / (N - 1));
+}
+function tick(now) {
+  if (last != null && playing) { t += (now - last) / 1000 * DATA_FPS * speed; if (t >= N - 1) t = 0; frameUpdate(t); }
+  last = now; requestAnimationFrame(tick);
+}
+frameUpdate(reduce ? 40 : 0); if (reduce) t = 40;
+requestAnimationFrame(tick);
+const playBtn = $("#play");
+const setPlay = p => { playing = p; playBtn.textContent = p ? "❚❚ Pause" : "▶ Play"; playBtn.setAttribute("aria-label", p ? "Pause replay" : "Play replay"); };
+setPlay(playing);
+playBtn.addEventListener("click", () => setPlay(!playing));
+$("#scrub").addEventListener("input", e => { t = e.target.value / 1000 * (N - 1); frameUpdate(t); });
+document.querySelectorAll("[data-cam]").forEach(b => b.addEventListener("click", () => { camSel = b.dataset.cam; document.querySelectorAll("[data-cam]").forEach(x => x.setAttribute("aria-pressed", x === b)); frameUpdate(t); }));
+document.querySelectorAll("[data-speed]").forEach(b => b.addEventListener("click", () => { speed = +b.dataset.speed; document.querySelectorAll("[data-speed]").forEach(x => x.setAttribute("aria-pressed", x === b)); }));
+$("#trace").insertAdjacentElement("beforebegin", Object.assign(h("div", { class: "legend" }), { innerHTML: '<span class="k-truth">Mocap knee angle</span><span class="k-old">App before</span><span class="k-new">Hybrid</span>' }));
+
+// ---------- Test 01: pose models ----------
+const ds = D.pose.dataset;
+$("#pose-intro").textContent = `${ds.name}: ${ds.people} people doing squats and lunges, filmed by two cameras while a Vicon motion-capture system tracked their joints (${ds.cite}). ${ds.videos} camera videos, ${ds.frames.toLocaleString()} scored frames, ${ds.reps} reps. Each model saw the raw video; the knee was scored against the motion-capture knee projected into the same camera.`;
+const models = D.pose.models;
+const cols = [
+  ["label", "Model", m => h("td", {}, h("div", { text: m.label }), h("div", { class: "muted", style: "font-size:.8rem", text: m.note }))],
+  ["browser", "In browser", m => h("td", {}, h("span", { class: "pill" + (m.browser ? " yes" : ""), text: m.browser ? "YES" : "SERVER" }))],
+  ["pck10", "Knee found within 10 % of thigh", m => barCell(m.pck10, 100, "%", true)],
+  ["sideRomMaeSquat", "Side-on squat ROM error", m => barCell(m.sideRomMaeSquat, 20, "°", false)],
+  ["msPerFrame", "CPU ms / frame", m => h("td", { class: "num", text: m.msPerFrame == null ? "--" : f0(m.msPerFrame) })],
+];
+function barCell(v, max, unit, higherBetter) {
+  if (v == null) return h("td", { class: "num muted", text: "running" });
+  const w = Math.max(4, Math.min(120, 120 * v / max));
+  return h("td", { class: "num" }, h("span", { class: "bar", style: `width:${w}px;background:${higherBetter ? C.neu : C.classic}` }), `${f1(v)}${unit}`);
+}
+let sortKey = "pck10", sortDir = -1;
+function drawModels() {
+  const t = $("#models"); t.innerHTML = "";
+  const head = h("tr", {}, cols.map(([k, label]) => h("th", {}, Object.assign(h("button", { type: "button", text: label + (sortKey === k ? (sortDir < 0 ? " ↓" : " ↑") : "") }), { onclick: () => { sortDir = sortKey === k ? -sortDir : (k === "sideRomMaeSquat" || k === "msPerFrame" ? 1 : -1); sortKey = k; drawModels(); } }))));
+  t.append(h("thead", {}, head));
+  const rows = [...models].sort((a, b) => { const x = a[sortKey], y = b[sortKey]; if (x == null) return 1; if (y == null) return -1; return typeof x === "string" ? sortDir * x.localeCompare(y) : sortDir * (x - y); });
+  t.append(h("tbody", {}, rows.map(m => h("tr", { class: m.id === "mp-lite" ? "app" : "" }, cols.map(([, , cell]) => cell(m))))));
+}
+drawModels();
+const lite = models.find(m => m.id === "mp-lite");
+$("#pose-callout").innerHTML = `<b>The finding that changed the app.</b> The app read the knee from the model's 3D world landmarks. Facing the camera, that angle missed the squat depth: range of motion was ${f1(Math.abs(H.rep["Ex6|front"].est3.romBias))}° too small on average for squats and ${f1(Math.abs(H.rep["Ex5|front"].est3.romBias))}° for lunges. A larger MediaPipe model did not fix it. Side-on, the plain 2D image angle was already good (${f1(lite.sideRomMaeSquat)}° error, ICC ${lite.sideRomIccSquat}).`;
+const yaw = D.pose.yaw;
+$("#yaw-card").append(h("h3", { text: "Does the app know where the camera is?" }), h("p", { class: "muted", style: "font-size:.9rem", text: "The body turn the app measures, against the true camera position. The app refuses part-turned captures, so those only need to be caught, not read." }));
+const yt = h("table", {}, h("thead", {}, h("tr", {}, ["True position", "Read as facing", "Part-turned", "Side-on"].map(x => h("th", { text: x })))));
+yt.append(h("tbody", {}, [["front", "Facing"], ["half", "Part-turned"], ["side", "Side-on"]].map(([k, label]) => { const r = yaw[`mp-lite|${k}`]; if (!r) return null; return h("tr", {}, h("td", { text: label }), ...["front", "oblique", "side"].map(c => h("td", { class: "num" + ((k === "front" && c === "front") || (k === "half" && c === "oblique") || (k === "side" && c === "side") ? " k-new" : ""), text: `${f0(r.class_pct[c])} %` }))); })));
+$("#yaw-card").append(h("div", { class: "scroll-x" }, yt), h("p", { class: "muted", style: "font-size:.85rem", text: `Side-on, the app picks the knee nearer the camera correctly ${f1(yaw["mp-lite|side"]?.near_side_correct_pct)} % of the time.` }));
+
+// ---------- Test 02: hybrid ----------
+(function flow() {
+  const g = $("#flow");
+  const box = (x, y, w, hh, title, sub, hot) => { const gg = s("g", { class: hot ? "hot" : "" }, g); s("rect", { x, y, width: w, height: hh, rx: 8 }, gg); s("text", { x: x + 12, y: y + 22 }, gg).textContent = title; if (sub) s("text", { x: x + 12, y: y + 40, class: "sub" }, gg).textContent = sub; return gg; };
+  box(10, 70, 170, 56, "Camera frame", "phone or laptop, 30 fps");
+  box(220, 70, 190, 56, "MediaPipe Pose lite", "pretrained, in the browser");
+  const ins = [["3D world knee angle", 8], ["2D image knee angle", 56], ["Body turn (yaw)", 104], ["Thigh / shank length", 152]];
+  ins.forEach(([t, y]) => box(450, y, 190, 40, t));
+  box(690, 50, 160, 76, "Learned trees", "100 trees, trained on", true); s("text", { x: 702, y: 112, class: "sub" }, g).textContent = "motion capture";
+  box(690, 146, 160, 50, "Fixed rule", "outside training range");
+  box(880, 92, 90, 56, "Knee", "angle", true);
+  const line = (d, hot) => s("path", { d, class: hot ? "pulse" : "" }, g);
+  line("M180,98 H220", true); ins.forEach(([, y]) => line(`M410,98 C430,98 430,${y + 20} 450,${y + 20}`, true));
+  ins.forEach(([, y]) => line(`M640,${y + 20} C665,${y + 20} 665,88 690,88`, true));
+  line("M640,172 H690"); line("M850,88 C865,88 865,112 880,112", true); line("M850,171 C865,171 865,128 880,128");
+})();
+(function dumbbell() {
+  const g = $("#dumbbell"), W = 460, L = 74, R = 16, T = 12, rowH = 32;
+  const ids = Object.keys(H.perPerson).sort((a, b) => H.perPerson[b].est3 - H.perPerson[a].est3);
+  const max = Math.ceil(Math.max(...ids.map(k => H.perPerson[k].est3)) / 5) * 5;
+  const x = v => L + (W - L - R) * v / max, Ht = T + rowH * ids.length;
+  const grid = s("g", { class: "grid" }, g);
+  for (let v = 0; v <= max; v += 5) { s("line", { x1: x(v), x2: x(v), y1: T, y2: Ht }, grid); s("text", { x: x(v), y: Ht + 16, "text-anchor": "middle" }, g).textContent = `${v}°`; }
+  ids.forEach((k, i) => {
+    const p = H.perPerson[k], y = T + rowH * i + rowH / 2;
+    s("text", { x: 0, y: y + 4 }, g).textContent = `Person ${k}`;
+    s("line", { x1: x(p.shipped), x2: x(p.est3), y1: y, y2: y, stroke: C.faint, "stroke-width": 3, "stroke-linecap": "round" }, g);
+    const a = s("circle", { cx: x(p.est3), cy: y, r: 6, fill: C.old }, g), b = s("circle", { cx: reduce ? x(p.shipped) : x(p.est3), cy: y, r: 7, fill: C.neu }, g);
+    if (!reduce) { b.style.transition = `cx 1.1s cubic-bezier(.2,.8,.2,1) ${0.15 + i * 0.08}s`; requestAnimationFrame(() => requestAnimationFrame(() => b.setAttribute("cx", x(p.shipped)))); }
+    [a, b].forEach(c => c.addEventListener("mousemove", ev => showTip(ev, `Person ${k}<br><span style="color:${C.old}">App before ${f1(p.est3)}°</span><br><span style="color:${C.neu}">Hybrid ${f1(p.shipped)}°</span><br>${f0(100 * (1 - p.shipped / p.est3))} % smaller error`)));
+    [a, b].forEach(c => c.addEventListener("mouseleave", hideTip));
+  });
+  s("text", { x: L, y: Ht + 32 }, g).textContent = "mean ROM error per rep, degrees";
+})();
+(function byView() {
+  const g = $("#byview"), W = 460, L = 132, R = 40, T = 6, groupH = 52;
+  const groups = [["Ex6|front", "Squat · facing"], ["Ex6|half", "Squat · part-turned"], ["Ex6|side", "Squat · side-on"], ["Ex5|front", "Lunge · facing"], ["Ex5|half", "Lunge · part-turned"], ["Ex5|side", "Lunge · side-on"]];
+  const series = [["est3", C.old], ["rule", C.rule], ["shipped", C.neu]];
+  const max = 32, x = v => L + (W - L - R) * Math.min(v, max) / max;
+  groups.forEach(([k, label], gi) => {
+    const r = H.rep[k]; if (!r) return;
+    const y0 = T + gi * groupH;
+    s("text", { x: 0, y: y0 + 26 }, g).textContent = label;
+    series.forEach(([e, col], si) => {
+      const v = r[e].romMae, y = y0 + 6 + si * 14;
+      const rect = s("rect", { x: L, y, height: 10, width: reduce ? x(v) - L : 0, rx: 3, fill: col }, g);
+      if (!reduce) { rect.style.transition = `width .9s ease ${0.1 + gi * 0.06 + si * 0.05}s`; requestAnimationFrame(() => requestAnimationFrame(() => rect.setAttribute("width", x(v) - L))); }
+      s("text", { x: x(v) + 5, y: y + 9 }, g).textContent = f1(v);
+    });
+  });
+
+})();
+let baMode = "hybrid";
+function drawBA() {
+  const g = $("#ba"); g.innerHTML = "";
+  const W = 460, Ht = 300, L = 40, R = 10, T = 10, B = 30;
+  const b = D.pose.bland, key = baMode === "app" ? "app" : "hybrid", col = baMode === "app" ? C.old : C.neu;
+  const pts = b.gt.flatMap((gv, i) => (Number.isFinite(gv) && Number.isFinite(b[key][i]) ? [[(gv + b[key][i]) / 2, b[key][i] - gv]] : []));
+  const x = v => L + (W - L - R) * (v - 0) / 140, y = v => T + (Ht - T - B) * (1 - (v + 80) / 140);
+  const grid = s("g", { class: "grid" }, g);
+  for (let v = -80; v <= 60; v += 20) { s("line", { x1: L, x2: W - R, y1: y(v), y2: y(v) }, grid); s("text", { x: L - 6, y: y(v) + 4, "text-anchor": "end" }, g).textContent = v; }
+  for (let v = 0; v <= 140; v += 20) s("text", { x: x(v), y: Ht - 12, "text-anchor": "middle" }, g).textContent = v;
+  s("text", { x: W - R, y: Ht - 1, "text-anchor": "end" }, g).textContent = "mean of camera and mocap ROM (°)";
+  s("line", { x1: L, x2: W - R, y1: y(0), y2: y(0), stroke: C.muted, "stroke-width": 1 }, g);
+  pts.forEach(p => s("circle", { cx: x(Math.max(0, Math.min(140, p[0]))), cy: y(Math.max(-80, Math.min(60, p[1]))), r: 2.4, fill: col, opacity: .45 }, g));
+  const r = ALL[baMode === "app" ? "est3" : "shipped"];
+  [[r.romBias, "bias"], [r.romLoa[0], "−1.96 SD"], [r.romLoa[1], "+1.96 SD"]].forEach(([v, lab]) => { s("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: col, "stroke-dasharray": "6 4", "stroke-width": 1.4 }, g); s("text", { x: W - R - 2, y: y(v) - 4, "text-anchor": "end", style: `fill:${col}` }, g).textContent = `${lab} ${f1(v)}°`; });
+}
+drawBA();
+document.querySelectorAll("[data-ba]").forEach(b => b.addEventListener("click", () => { baMode = b.dataset.ba; document.querySelectorAll("[data-ba]").forEach(x => x.setAttribute("aria-pressed", x === b)); drawBA(); }));
+$("#byview-note").textContent = `${ALL.est3.n} reps. Facing: both knees; side-on and part-turned: the knee nearer the camera.`;
+$("#hy-n").textContent = `${H.people} people, ${ALL.est3.n} reps`;
+(function hyTable() {
+  const t = $("#hytable");
+  const rows = [["est3", "Pretrained, 3D angle (app before)", C.old], ["est2", "Pretrained, 2D angle", C.classic], ["rule", "Fixed rule: 2D side-on, else 3D", C.rule], ["blend", "Linear blend (ridge)", C.deep], ["gbm", "Learned trees", C.neu], ["shipped", "Learned trees + fallback (shipped)", C.neu]];
+  t.append(h("thead", {}, h("tr", {}, ["Method", "ROM error", "ICC", "Frame error"].map(x => h("th", { text: x })))));
+  t.append(h("tbody", {}, rows.map(([k, label, col]) => h("tr", {}, h("td", {}, h("span", { style: `display:inline-block;width:8px;height:8px;border-radius:50%;background:${col};margin-right:8px` }), label), h("td", { class: "num", text: `${f1(ALL[k].romMae)}°` }), h("td", { class: "num", text: ALL[k].romIcc }), h("td", { class: "num", text: `${f1(H.frame["all|all"][k])}°` })))));
+})();
+
+// ---------- Test 03: pulse ----------
+const pd = D.pulse.dataset;
+$("#pulse-intro").textContent = `${pd.name}: ${pd.people} people filmed by a 640 × 480 webcam at rest and again after 15 squats, with a finger pulse sensor as truth (${pd.cite}). ${pd.windows} windows of 30 seconds. Every method's pulse wave went through the same heart-rate estimator, so the differences come from the methods themselves.`;
+const reasons = Object.entries(D.pulse.oldRefusals || {}).map(([k, v]) => `${k} (${v})`).join(", ");
+$("#old-callout").innerHTML = `The app's previous face-colour method (POS with a strict 60 % peak-share gate) returned a heart rate for <b>${f0(100 - D.pulse.oldRefusedPct)} %</b> of real 30-second windows. Refusals: ${reasons || "none"}. On real webcam video its spectrum was almost never clean enough.`;
+(function wave() {
+  const cv = $("#wave"), ctx = cv.getContext("2d"), W = cv.width, Hh = cv.height, w = D.pulse.wave, n = w.finger.length, span = Math.round(6 * w.fps);
+  const win = D.pulse.windows.find(r => r.id === w.id && r.t0 === 0);
+  $("#wave-note").textContent = `${w.id.replace("mcd_", "person ").replace("_before", ", at rest")} · correlation r = ${w.r} (camera shifted ${w.lagSeconds} s for pulse transit) · this window: finger ${f1(win?.gt)} bpm, camera hybrid ${f1(win?.hybrid)} bpm`;
+  let off = 0, lt = null;
+  function draw(now) {
+    if (lt != null && !reduce) off = (off + (now - lt) / 1000 * w.fps) % (n - span);
+    lt = now;
+    ctx.clearRect(0, 0, W, Hh);
+    ctx.strokeStyle = "rgba(110,150,200,.08)"; for (let gx = 0; gx < W; gx += 50) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, Hh); ctx.stroke(); }
+    const line = (arr, col, y0, amp, lw) => { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath(); for (let k = 0; k <= span; k++) { const idx = Math.floor(off) + k, v = arr[idx] ?? 0, px = W * k / span, py = y0 - v * amp; k ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.stroke(); };
+    line(w.finger, "rgba(244,248,255,.9)", Hh * 0.3, 30, 3);
+    ctx.shadowColor = C.neu; ctx.shadowBlur = 12; line(w.camera, C.neu, Hh * 0.74, 30, 3.4); ctx.shadowBlur = 0;
+    ctx.font = "600 20px 'JetBrains Mono', monospace"; ctx.fillStyle = C.muted; ctx.fillText("FINGER PPG", 12, 26); ctx.fillText("CAMERA · ME-rPPG", 12, Hh * 0.5 + 18);
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+(function leader() {
+  const g = $("#leader"), ms = [...D.pulse.methods].sort((a, b) => a.mae - b.mae), W = 460, L = 150, R = 92, T = 4, rowH = 26;
+  g.setAttribute("viewBox", `0 0 ${W} ${T + rowH * ms.length + 24}`);
+  const max = Math.ceil(Math.max(...ms.map(m => m.mae)) / 5) * 5, x = v => L + (W - L - R) * v / max;
+  ms.forEach((m, i) => {
+    const y = T + i * rowH, col = m.kind === "hybrid" ? C.neu : m.kind === "deep" ? C.deep : m.kind === "first" ? C.old : C.classic;
+    s("text", { x: 0, y: y + 14, style: m.id === "Hybrid (app self-check)" ? `fill:${C.neu};font-weight:600` : "" }, g).textContent = m.label;
+    const r = s("rect", { x: L, y: y + 4, height: 13, width: reduce ? x(m.mae) - L : 0, rx: 3, fill: col }, g);
+    if (!reduce) { r.style.transition = `width .9s ease ${0.05 * i}s`; requestAnimationFrame(() => requestAnimationFrame(() => r.setAttribute("width", x(m.mae) - L))); }
+    s("text", { x: x(m.mae) + 6, y: y + 14 }, g).textContent = `${f1(m.mae)} bpm`;
+    s("text", { x: W, y: y + 14, "text-anchor": "end" }, g).textContent = `${f0(m.within5)} %≤5`;
+    const hit = s("rect", { x: 0, y, width: W, height: rowH, fill: "transparent" }, g);
+    hit.addEventListener("mousemove", ev => showTip(ev, `<b>${m.label}</b><br>${m.note}<br>MAE ${f1(m.mae)} bpm · RMSE ${f1(m.rmse)}<br>r ${m.r} · within 5 bpm ${f0(m.within5)} %<br>answered ${f0(m.coverage)} % of windows`));
+    hit.addEventListener("mouseleave", hideTip);
+  });
+  s("text", { x: L, y: T + rowH * ms.length + 16 }, g).textContent = "mean absolute error, all windows answered";
+})();
+(function sweep() {
+  const g = $("#sweep"), W = 460, Ht = 330, L = 40, R = 14, T = 10, B = 34;
+  const pick = [["Hybrid (app self-check)", C.neu, 2.6], ["POS live (app)", C.neu, 1.6, "5 4"], ["ME-rPPG + gates (app)", C.deep, 1.8], ["Fusion, equal weights (first design)", C.old, 1.6], ["POS (JS)", C.classic, 1.6]];
+  const lines = pick.map(([id, col, w, dash]) => ({ m: D.pulse.methods.find(m => m.id === id), col, w, dash })).filter(l => l.m);
+  const maxE = Math.max(4, ...lines.flatMap(l => l.m.sweep.map(p => p.mae ?? 0)).filter(Number.isFinite));
+  const yMax = Math.min(20, Math.ceil(maxE / 2) * 2);
+  const x = v => L + (W - L - R) * v / 100, y = v => T + (Ht - T - B) * (1 - Math.min(v, yMax) / yMax);
+  const grid = s("g", { class: "grid" }, g);
+  for (let v = 0; v <= 100; v += 20) { s("line", { x1: x(v), x2: x(v), y1: T, y2: Ht - B }, grid); s("text", { x: x(v), y: Ht - B + 16, "text-anchor": "middle" }, g).textContent = `${v} %`; }
+  const yStep = yMax <= 5 ? 1 : yMax <= 10 ? 2 : 4;
+  for (let v = 0; v <= yMax; v += yStep) { s("line", { x1: L, x2: W - R, y1: y(v), y2: y(v) }, grid); s("text", { x: L - 6, y: y(v) + 4, "text-anchor": "end" }, g).textContent = v; }
+  s("text", { x: W - R, y: Ht - 2, "text-anchor": "end" }, g).textContent = "windows answered →";
+  s("text", { x: L, y: T + 2 }, g).textContent = "MAE, bpm";
+  const labels = [];
+  lines.forEach(({ m, col, w, dash }) => {
+    const p = m.sweep.filter(q => q.mae != null && q.coverage != null);
+    s("path", { d: p.map((q, i) => `${i ? "L" : "M"}${x(q.coverage).toFixed(1)},${y(q.mae).toFixed(1)}`).join(""), fill: "none", stroke: col, "stroke-width": w, "stroke-dasharray": dash || "none" }, g);
+    p.forEach(q => { const c = s("circle", { cx: x(q.coverage), cy: y(q.mae), r: 3.5, fill: col }, g); c.addEventListener("mousemove", ev => showTip(ev, `<b>${m.label}</b><br>gate ${q.q}: MAE ${f1(q.mae)} bpm<br>answers ${f0(q.coverage)} % of windows`)); c.addEventListener("mouseleave", hideTip); });
+    const end = p[0]; if (end) labels.push({ x: x(end.coverage) - 6, y: y(end.mae) - 8, col, text: m.label });
+  });
+  // End labels, nudged apart vertically so neighbouring curves stay readable.
+  labels.sort((a, b) => a.y - b.y).forEach((l, i, all) => { if (i && l.y - all[i - 1].y < 14) l.y = all[i - 1].y + 14; });
+  labels.forEach(l => { s("text", { x: l.x, y: l.y, "text-anchor": "end", style: `fill:${l.col};paint-order:stroke;stroke:var(--panel-2);stroke-width:4px` }, g).textContent = l.text; });
+})();
+
+(function tune() {
+  const f = D.pulse.fusion, g = $("#tune"); if (!f) return;
+  const W = 460, Ht = 270, L = 34, R = 8, T = 18, B = 44, ws = f.posWeights, mae = ws.map(w => f.maeByPosWeight[w]);
+  const eq = D.pulse.methods.find(m => m.id === "Fusion, equal weights (first design)"), lo = D.pulse.methods.find(m => m.id === "Hybrid, weight chosen without this person");
+  const max = Math.ceil(Math.max(...mae, eq ? eq.mae : 0) + 0.5), y = v => T + (Ht - T - B) * (1 - v / max), bw = (W - L - R) / ws.length;
+  const grid = s("g", { class: "grid" }, g);
+  for (let v = 0; v <= max; v++) { s("line", { x1: L, x2: W - R, y1: y(v), y2: y(v) }, grid); s("text", { x: L - 6, y: y(v) + 4, "text-anchor": "end" }, g).textContent = v; }
+  ws.forEach((w, i) => {
+    const shipped = w === f.shipped.pos, x = L + i * bw + bw * 0.22, width = bw * 0.56, col = shipped ? C.neu : C.deep;
+    const r = s("rect", { x, width, y: y(mae[i]), height: y(0) - y(mae[i]), rx: 3, fill: col, opacity: shipped ? 1 : 0.5 }, g);
+    if (!reduce) { r.style.transformOrigin = `0 ${y(0)}px`; r.style.transform = "scaleY(0)"; r.style.transition = `transform .9s ease ${0.08 * i}s`; requestAnimationFrame(() => requestAnimationFrame(() => { r.style.transform = "scaleY(1)"; })); }
+    s("text", { x: x + width / 2, y: y(mae[i]) - 6, "text-anchor": "middle", style: shipped ? `fill:${C.neu};font-weight:600` : "" }, g).textContent = mae[i].toFixed(2);
+    s("text", { x: x + width / 2, y: Ht - B + 16, "text-anchor": "middle", style: shipped ? `fill:${C.neu}` : "" }, g).textContent = w === 0 ? "0 · deep only" : shipped ? `${w} · shipped` : w;
+  });
+  if (eq) {
+    s("line", { x1: L, x2: W - R, y1: y(eq.mae), y2: y(eq.mae), stroke: C.old, "stroke-width": 1.6, "stroke-dasharray": "6 4" }, g);
+    s("text", { x: W - R, y: y(eq.mae) - 6, "text-anchor": "end", style: `fill:${C.old}` }, g).textContent = `first design: equal weights + CHROM, ${eq.mae.toFixed(2)}`;
+  }
+  s("text", { x: L, y: Ht - 6 }, g).textContent = "weight of the POS wave (ME-rPPG = 1) · mean error, bpm";
+  const picked = f.picks[String(f.shipped.pos)] ?? 0, n = Object.values(f.picks).reduce((a, b) => a + b, 0);
+  $("#tune-note").textContent = `Each person was left out in turn and the weight chosen on the other ${n - 1}. It came out at ${f.shipped.pos} in ${picked} of ${n} cases. Scored only on the people left out, the tuned hybrid read ${f1(lo?.mae)} bpm, against ${f1(f.maeByPosWeight[0])} for the deep model alone.`;
+})();
+(function partsCard() {
+  const c = $("#parts-card"), M = id => D.pulse.methods.find(m => m.id === id), d = D.pulse.delta, at = (m, q) => m.sweep.find(x => x.q === q) || {};
+  c.append(h("h3", { text: "Is the hybrid better than its parts?" }));
+  const rows = [["Shipped hybrid", "Hybrid (app self-check)", C.neu], ["Tuned without the person", "Hybrid, weight chosen without this person", C.neu], ["ME-rPPG alone", "ME-rPPG + gates (app)", C.deep], ["First design", "Fusion, equal weights (first design)", C.old], ["POS alone", "POS (JS)", C.classic], ["CHROM alone", "CHROM (JS)", C.classic]].filter(r => M(r[1]));
+  const t = h("table", {}, h("thead", {}, h("tr", {}, ["Method", "Error", "Within 5 bpm", "Error at gate 0.3", "Change error"].map(x => h("th", { text: x })))));
+  t.append(h("tbody", {}, rows.map(([label, id, col]) => { const m = M(id), g = at(m, 0.3); return h("tr", {}, h("td", { style: `color:${col}`, text: label }), h("td", { class: "num", text: `${f1(m.mae)}` }), h("td", { class: "num", text: `${f0(m.within5)} %` }), h("td", { class: "num", text: `${f1(g.mae)} · ${f0(g.coverage)} %` }), h("td", { class: "num", text: d[id] ? f1(d[id].deltaMae) : "--" })); })));
+  c.append(h("div", { class: "scroll-x" }, t));
+  c.append(h("p", { class: "muted", style: "font-size:.9rem", text: "Errors in bpm against the finger sensor over every window answered. Every row uses the app's face crop, head-movement and lighting gates and estimator. First design: ME-rPPG + POS + CHROM at equal weights. Gate 0.3: error, then the share of windows answered. Change error: rest to after 15 squats, the same person." }));
+})();
+
+// ---------- Test 04: personal baseline ----------
+(function slope() {
+  const g = $("#slope"), d = D.pulse.delta["Hybrid (app self-check)"]; if (!d) return;
+  const W = 460, Ht = 340, T = 26, B = 30, panels = [["Finger sensor", "gt", C.truth, 30], ["Camera hybrid", "est", C.neu, 250]];
+  const vals = d.pairs.flatMap(p => [p.gtBefore, p.gtAfter, p.estBefore, p.estAfter]).filter(Number.isFinite);
+  const lo = Math.floor(Math.min(...vals) / 10) * 10, hi = Math.ceil(Math.max(...vals) / 10) * 10;
+  const y = v => T + (Ht - T - B) * (1 - (v - lo) / (hi - lo));
+  for (let v = lo; v <= hi; v += 10) s("text", { x: 0, y: y(v) + 4 }, g).textContent = v;
+  const lines = {};
+  panels.forEach(([title, key, col, x0]) => {
+    const x1 = x0 + 150;
+    s("text", { x: x0, y: 12, style: `fill:${col};font-weight:600` }, g).textContent = title;
+    s("text", { x: x0, y: Ht - 8 }, g).textContent = "rest"; s("text", { x: x1, y: Ht - 8, "text-anchor": "end" }, g).textContent = "after squats";
+    d.pairs.forEach(p => {
+      const a = p[`${key}Before`], b = p[`${key}After`]; if (!Number.isFinite(a) || !Number.isFinite(b)) return;
+      const rise = b - a >= 8;
+      const ln = s("line", { x1: x0 + 10, x2: x1 - 10, y1: y(a), y2: reduce ? y(b) : y(a), stroke: col, "stroke-width": 1.6, opacity: rise ? .9 : .45 }, g);
+      if (!reduce) { ln.style.transition = "y2 1s ease .2s"; requestAnimationFrame(() => requestAnimationFrame(() => ln.setAttribute("y2", y(b)))); }
+      s("circle", { cx: x0 + 10, cy: y(a), r: 2.5, fill: col }, g);
+      (lines[p.id] = lines[p.id] || []).push(ln);
+      const hit = s("line", { x1: x0 + 10, x2: x1 - 10, y1: y(a), y2: y(b), stroke: "transparent", "stroke-width": 10 }, g);
+      hit.addEventListener("mousemove", ev => { lines[p.id].forEach(l => { l.setAttribute("stroke-width", 4); l.setAttribute("opacity", 1); }); showTip(ev, `Person ${p.id}<br>finger ${f0(p.gtBefore)} → ${f0(p.gtAfter)} bpm<br>camera ${f0(p.estBefore)} → ${f0(p.estAfter)} bpm`); });
+      hit.addEventListener("mouseleave", () => { lines[p.id].forEach(l => { l.setAttribute("stroke-width", 1.6); }); hideTip(); });
+    });
+  });
+})();
+(function deltaCard() {
+  const c = $("#delta-card"), d = D.pulse.delta, hy = d["Hybrid (app self-check)"], me = d["ME-rPPG + gates (app)"], eq = d["Fusion, equal weights (first design)"], pos = d["POS (JS)"];
+  c.append(h("h3", { text: "Change from the person's own resting rate" }));
+  const t = h("table", {}, h("thead", {}, h("tr", {}, ["Method", "Change error", "r", "Same 8 bpm call"].map(x => h("th", { text: x })))));
+  t.append(h("tbody", {}, [["Camera hybrid (shipped)", hy, C.neu], ["ME-rPPG alone", me, C.deep], ["First design, equal weights", eq, C.old], ["POS alone", pos, C.classic]].filter(r => r[1]).map(([label, r, col]) => h("tr", {}, h("td", { style: `color:${col}`, text: label }), h("td", { class: "num", text: `${f1(r.deltaMae)} bpm` }), h("td", { class: "num", text: r.deltaR }), h("td", { class: "num", text: `${f0(r.flagAgreePct)} %` })))));
+  c.append(h("div", { class: "scroll-x" }, t));
+  c.append(h("p", { class: "muted", style: "font-size:.9rem", text: `"Same 8 bpm call": whether the camera and the finger sensor agree that the rate rose by at least 8 bpm, the app's review floor for resting heart rate. ${hy ? `${hy.n} people with both recordings.` : ""}` }));
+  c.append(h("div", { class: "callout new", text: "In AstroBone a rise like this would be compared with the person's own camera baseline, never with a wearable or a population norm, and reported as a trend for review." }));
+})();
+
+// ---------- Shipped + method ----------
+const changes = [
+  ["NEW", "Hybrid knee model", "kneeHybrid.js · kneeHybridModel.js", `MediaPipe angles + 100 learned trees, ported to JavaScript and tested to match the validated model. Falls back to a fixed rule outside its training range (${f0(H.inRangePct)} % of real frames were inside).`],
+  ["NEW", "Camera resting pulse in the daily self-check", "cameraPulse.js · meRppg.js · wavePulse.js", "ME-rPPG deep model (ONNX, WebAssembly, in a worker) leading a spectral fusion with the POS colour wave at a quarter weight, tuned leave-one-person-out. 45-second reading, head-movement and lighting gates, offline after the first visit."],
+  ["FIX", "Live Capture pulse answers on real video", "cameraPulse.js · rppg.js · healthLayers.js", "The strict 60 % peak gate refused every real webcam window. Live Capture now reads the POS colour wave through the validated estimator with a 0.3 quality gate, and still says when the signal is unclear."],
+  ["FIX", "Knee readings comparable only like for like", "functionalAssessment.js", "Captures measured with the hybrid get protocol v3, so they are never compared with older 3D-angle baselines."],
+  ["FIX", "Side-on is now the recommended position", "selfCheckPanel.js", "Real video showed side-on knee readings are the most accurate; the instructions say so."],
+  ["NEW", "Validation you can rerun", "scripts/validation/ · docs/real-video-validation.md", "The scripts that produced every number here, and the JavaScript scorer that runs the app's own pulse code on the real-video signals."],
+];
+changes.forEach(([tag, title, files, text]) => $("#changelist").append(h("li", {}, h("span", { class: "tag" + (tag === "FIX" ? " fix" : ""), text: tag }), h("div", {}, h("b", { text: title }), " ", h("code", { text: files }), h("p", { class: "muted", style: "font-size:.92rem", text })))));
+const method = [
+  ["Pose", [`${ds.name}: ${ds.people} people, squats and lunges, two synchronized cameras, Vicon motion capture. Videos are not redistributed; only derived numbers are shown.`, "Truth: the motion-capture knee interior angle in 3D; keypoints scored against motion-capture joints projected into each camera.", "Rep-level numbers use the app's own definitions: extension is the 95th percentile of the knee angle, range of motion the 95th minus the 5th.", "Every fitted model is scored leave-one-person-out: trained on eight people, tested on the ninth, nine times."]],
+  ["Pulse", [`${pd.name}: ${pd.people} people, webcam at 30 fps, at rest and after 15 squats, finger PPG as truth. Faces are never shown or stored here.`, "30-second windows every 10 seconds; a window's true rate is the finger sensor's spectral peak over the same 30 seconds.", "Deep models run with published weights (open-rppg); ME-rPPG also runs through the same ONNX file the browser loads, with the app's own crop.", "The hybrid's numbers come from the app's JavaScript code itself (scripts/validation/score-wave-pulse.mjs), not a reimplementation."]],
+  ["Limits", ["The knee hybrid was trained on squats and lunges; the self-check uses a seated knee extension. Side-on, both are motion in one plane, but the seated test itself still needs its own check with a goniometer.", "Nine people and one lab for pose; healthy adults on Earth for pulse. Neither group is astronauts.", "Pulse is reported as a trend against the person's own baseline, never as a diagnosis or a medical-grade reading."]],
+];
+method.forEach(([title, items]) => $("#method-body").append(h("div", { class: "card" }, h("h3", { text: title }), h("ul", { style: "margin:0;padding-left:18px;display:grid;gap:6px;color:var(--muted);font-size:.92rem" }, items.map(i => h("li", { text: i }))))));
+$("#foot").append(h("div", { text: `Generated ${D.generated} from the validation outputs. Pose: ${ds.cite}. Pulse: ${pd.cite}.` }), h("div", { text: "AstroBone is a NASA Space Apps 2026 project. Not a medical device." }));
+})();
+</script>
