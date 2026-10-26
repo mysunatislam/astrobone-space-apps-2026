@@ -15,7 +15,7 @@ const BEHAVIOR = {
   147: { sleepHours: 5.2, fatigue: 4, mood: 6, stress: 6, pvtSpeed: 3.0, pvtLapses: 9 },
 };
 
-const PROTOCOLS = { kneeExtension: "restrained-knee-extension-demo-v1", kneeRom: "restrained-knee-extension-demo-v1", pvtSpeed: "pvt-b-3min", pvtLapses: "pvt-b-3min", restingHr: "resting-restrained-demo-v1" };
+const PROTOCOLS = { kneeExtension: "restrained-knee-extension-demo-v1", kneeRom: "restrained-knee-extension-demo-v1", pvtSpeed: "pvt-b-3min-v2", pvtLapses: "pvt-b-3min-v2", restingHr: "resting-restrained-demo-v1" };
 
 function record(day, overrides = {}) {
   const row = ELENA.observations.find(r => r.day.value === day), behavior = BEHAVIOR[day];
@@ -33,7 +33,7 @@ export const ELENA_HISTORY = [1, 30, 60, 90, 120].map(day => record(day));
 // Day 147 demo session: a first movement capture that fails its quality gate, then a usable repeat.
 export const ELENA_POOR_CAPTURE = Object.freeze({ kneeExtension: 135, kneeRom: 40, trackingQuality: 0.35, sampleCount: 8 });
 export const ELENA_USABLE_CAPTURE = Object.freeze({ kneeExtension: 151, kneeRom: 62, trackingQuality: 0.94, sampleCount: 120 });
-export const ELENA_PVT = Object.freeze({ protocol: "pvt-b-3min", validResponses: 46, falseStarts: 1, lapses: 9, meanSpeed: 3.0, medianRtMs: 318, usable: true });
+export const ELENA_PVT = Object.freeze({ protocol: "pvt-b-3min-v2", validResponses: 46, falseStarts: 1, lapses: 9, meanSpeed: 3.0, medianRtMs: 318, usable: true });
 
 export function elenaDay147(capture = ELENA_USABLE_CAPTURE) {
   return record(147, {

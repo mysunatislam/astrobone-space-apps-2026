@@ -23,6 +23,26 @@ const JOINTS = Object.freeze(["hip", "knee", "ankle"]);
 
 export const ASSESSMENT_MIN_VISIBILITY = 0.62;
 export const ASSESSMENT_MIN_SAMPLES = 12;
+// Body yaw relative to the camera: below FRONT the person faces it, at or above SIDE they sit side-on.
+export const CAMERA_VIEW = Object.freeze({ front: 35, side: 60 });
+
+// Yaw of the body relative to the camera from the hip and shoulder lines in MediaPipe world coordinates,
+// which keep the camera's axes (z is depth; smaller is nearer). 0 deg = facing the camera, 90 deg = side-on.
+// Also names the leg nearer the camera, the only one a side-on camera sees.
+export function bodyYaw(worldLandmarks) {
+  const read = name => readLandmark(worldLandmarks, LANDMARK[name]);
+  const pairs = [["leftHip", "rightHip"], ["leftShoulder", "rightShoulder"]].map(([a, b]) => [read(a), read(b)]);
+  if (pairs.some(([a, b]) => !a || !b)) return null;
+  const dx = mean(pairs.map(([a, b]) => Math.abs(b.x - a.x))), dz = mean(pairs.map(([a, b]) => Math.abs(b.z - a.z)));
+  if (dx + dz <= Number.EPSILON) return null;
+  const [leftHip, rightHip] = pairs[0];
+  return { yawDeg: Math.atan2(dz, dx) * 180 / Math.PI, nearSide: leftHip.z <= rightHip.z ? "left" : "right" };
+}
+
+export function cameraViewFor(yawDeg) {
+  if (!Number.isFinite(yawDeg)) return null;
+  return yawDeg < CAMERA_VIEW.front ? "front" : yawDeg < CAMERA_VIEW.side ? "oblique" : "side";
+}
 
 export function calculateJointAngle(first, vertex, third) {
   const a = toVector(first, vertex);
@@ -90,6 +110,7 @@ export function analyzePoseLandmarks(
   const shoulderDy = imageLandmarks[12].y - imageLandmarks[11].y;
   const shoulderDx = imageLandmarks[12].x - imageLandmarks[11].x;
   const shoulderAlignmentDegrees = Math.atan2(Math.abs(shoulderDy), Math.abs(shoulderDx)) * 180 / Math.PI;
+  const yaw = bodyYaw(landmarks);
   return {
     ...retargetFrame,
     ...metadata,
@@ -100,6 +121,8 @@ export function analyzePoseLandmarks(
     sideVisibility,
     visibility,
     shoulderAlignmentDegrees,
+    bodyYawDeg: yaw ? yaw.yawDeg : null,
+    nearSide: yaw ? yaw.nearSide : null,
     usable:
       visibility >= ASSESSMENT_MIN_VISIBILITY
       && visibilityValues.every((value) => value >= ASSESSMENT_MIN_VISIBILITY)
@@ -189,14 +212,25 @@ export const KNEE_CAPTURE = Object.freeze({ minSamples: ASSESSMENT_MIN_SAMPLES, 
 
 export function summarizeKneeCapture(samples) {
   const frames = (samples || []).filter(Boolean);
+  // Camera view from the median body yaw. Side-on, the far leg is hidden behind the near one, so only
+  // the near knee counts even when the model reports the far one as visible.
+  const yaws = frames.map((frame) => frame.bodyYawDeg).filter(Number.isFinite);
+  const bodyYawDeg = yaws.length ? round(percentile(yaws, 0.5), 1) : null;
+  const cameraView = cameraViewFor(bodyYawDeg);
+  const nearVotes = frames.map((frame) => frame.nearSide).filter(Boolean);
+  const nearSide = cameraView === "side" && nearVotes.length
+    ? (nearVotes.filter((side) => side === "left").length * 2 >= nearVotes.length ? "left" : "right")
+    : null;
   const sides = {};
   SIDES.forEach((side) => {
     const usable = frames.filter((frame) => frame.sideUsable?.[side] && Number.isFinite(frame.angles?.[side]?.knee));
     const knees = usable.map((frame) => frame.angles[side].knee);
     const quality = usable.length ? mean(usable.map((frame) => frame.sideVisibility?.[side] ?? frame.visibility)) : 0;
-    const ok = usable.length >= KNEE_CAPTURE.minSamples && quality >= KNEE_CAPTURE.minQuality;
+    const hidden = nearSide !== null && side !== nearSide;
+    const ok = !hidden && usable.length >= KNEE_CAPTURE.minSamples && quality >= KNEE_CAPTURE.minQuality;
     sides[side] = {
       usable: ok,
+      hiddenSideOn: hidden,
       sampleCount: usable.length,
       trackingQuality: round(quality, 3),
       extension: ok ? round(percentile(knees, 0.95), 1) : null,
@@ -209,9 +243,15 @@ export function summarizeKneeCapture(samples) {
   const pick = view === "bilateral"
     ? (sides.left.extension <= sides.right.extension ? "left" : "right")
     : view;
+  // Turned partway, the reading sits between the facing and side-on error regimes and matches neither
+  // baseline (scripts/simulate-camera-view.mjs), so it is refused and repeated.
+  const oblique = cameraView === "oblique";
   return {
-    status: view ? "complete" : "insufficient",
+    status: view && !oblique ? "complete" : "insufficient",
+    reason: oblique ? "oblique" : view ? null : "tracking",
     view,
+    cameraView,
+    bodyYawDeg,
     worseSide: view === "bilateral" ? pick : null,
     sides,
     kneeExtension: pick ? sides[pick].extension : null,

@@ -6,6 +6,8 @@ export function initDensePose({ video, getSource, getMirror, beforeStart }) {
   const panel = document.createElement("section"); panel.className = "densepose-panel";
   panel.innerHTML = `<div class="densepose-heading"><strong>DensePose surface mapping</strong><span id="densepose-state">Off</span></div><div class="densepose-actions"><label><input id="densepose-consent" type="checkbox"> Process camera or uploaded-video frames in the private local DensePose service.</label><button id="densepose-start" type="button">Start DensePose</button><button id="densepose-stop" type="button" disabled>Stop</button><button id="densepose-export" type="button" disabled>Export IUV</button></div><p id="densepose-status" role="status">Optional / visible body surface only / no internal anatomy or clinical interpretation.</p>`;
   document.querySelector(".capture-source-bar").after(panel);
+  // The service runs only beside the local desktop app; on the public site the panel would be a dead control.
+  panel.hidden = !["localhost", "127.0.0.1"].includes(location.hostname);
   const $ = id => panel.querySelector(`#${id}`);
   const overlay = document.createElement("canvas"); overlay.className = "densepose-overlay"; overlay.hidden = true; video.parentElement.append(overlay);
   const label = document.createElement("div"); label.className = "densepose-frame-label"; label.hidden = true; video.parentElement.append(label);

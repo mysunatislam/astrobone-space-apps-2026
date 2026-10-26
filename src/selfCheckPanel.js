@@ -1,8 +1,9 @@
 import {
-  PVT_B, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
+  PVT_B, PVT_PROTOCOL, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, elenaDay147 } from "./elenaSelfCheck.js";
 import { createSelfCheckCamera } from "./selfCheckCamera.js";
+import { cameraViewFor } from "./functionalAssessment.js";
 import { sparklineSvg } from "./trendSpark.js";
 import { HOLD, REFERENCE_TYPES, summarizeHold, agreement, calibratedFloors, pairsToCsv, createAngleCheckStore } from "./angleCheck.js";
 import { ELENA } from "./elenaMissionScenario.js";
@@ -32,8 +33,10 @@ const fmt = (v, d = 1) => (Number.isFinite(v) ? Number(v).toFixed(d) : "--");
 const kneeView = cap => !cap.view ? "" : cap.view === "bilateral"
   ? ` · both knees seen, comparing the ${cap.worseSide} (left ${fmt(cap.sides.left.extension)}°, right ${fmt(cap.sides.right.extension)}°)`
   : ` · ${cap.view} knee only (side-on view); compared only with ${cap.view}-knee checks`;
+// Live position cue: the same position every day keeps the camera's error the same.
+const VIEW_CUE = { front: "facing camera", side: "side-on", oblique: "turned partway: face the camera or turn fully side-on" };
 
-export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} } = {}) {
+export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {}, onTimedTest = () => {} } = {}) {
   const store = createSelfCheckStore();
   const state = { profile: "elena", persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false };
   const element = el("div", { class: "sc" });
@@ -126,7 +129,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
     camera ??= createSelfCheckCamera({ video, overlay, onStatus: text => { camStatus.textContent = text; }, onFrame: frame => {
       // Show only knees the camera can see; a far knee in a side-on view is guesswork.
       const seen = frame?.angles ? ["left", "right"].filter(side => (frame.sideUsable ? frame.sideUsable[side] : true) && Number.isFinite(frame.angles[side]?.knee)) : [];
-      liveAngle.textContent = seen.length ? seen.map(side => `${side[0].toUpperCase()} ${Math.round(frame.angles[side].knee)}°`).join(" · ") : "--";
+      const view = cameraViewFor(frame?.bodyYawDeg), shown = view === "side" && frame.nearSide ? seen.filter(side => side === frame.nearSide) : seen;
+      liveAngle.textContent = view === "oblique" ? VIEW_CUE.oblique
+        : shown.length ? `${shown.map(side => `${side[0].toUpperCase()} ${Math.round(frame.angles[side].knee)}°`).join(" · ")}${view ? ` · ${VIEW_CUE[view]}` : ""}` : "--";
     } });
     try { await camera.start(); } catch (error) { camStatus.textContent = `Camera unavailable: ${error.message}`; }
     render();
@@ -150,7 +155,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   function savePair() {
     if (!check.hold?.usable || !Number.isFinite(check.reference)) return;
     check.pairs = [...check.pairs, { participant: check.participant.trim() || "P?", side: check.side, referenceType: check.referenceType, referenceFlexion: check.reference,
-      cameraFlexion: check.hold.flexion, holdSd: check.hold.sd, samples: check.hold.samples, at: new Date().toISOString() }];
+      cameraFlexion: check.hold.flexion, holdSd: check.hold.sd, samples: check.hold.samples, cameraView: check.hold.cameraView ?? null, bodyYawDeg: check.hold.bodyYawDeg ?? null, at: new Date().toISOString() }];
     angleStore.save(check.pairs, state.persist);
     check.hold = null; check.reference = null; render();
   }
@@ -190,24 +195,33 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   const pvtStage = el("button", { type: "button", class: "sc-pvt-stage", "aria-label": "Reaction test response area. Tap or press space when the counter appears." });
   function startPvt(duration) {
     Object.assign(pvt, { running: true, trials: [], onset: null, start: performance.now(), duration, feedback: "Wait for the counter, then tap or press space." });
-    render(); pvtStage.focus(); schedule();
+    // The host pauses its 3D rendering: a busy main thread delays the frame that shows the stimulus.
+    onTimedTest(true); render(); pvtStage.focus(); schedule();
   }
   function schedule() {
     clearTimeout(pvt.timer);
     if (performance.now() - pvt.start >= pvt.duration) { finishPvt(true); return; }
     const isi = PVT_B.isiMinMs + Math.random() * (PVT_B.isiMaxMs - PVT_B.isiMinMs);
     pvt.timer = setTimeout(() => {
-      // Onset is stamped when the stimulus is shown; animation frames only drive the counter,
-      // so throttled frames cannot turn real responses into early taps.
-      pvtStage.classList.add("sc-on"); pvt.onset = performance.now();
-      const tick = () => { if (pvt.onset === null) return; pvtStage.dataset.count = String(Math.round(performance.now() - pvt.onset)); pvt.raf = requestAnimationFrame(tick); };
-      tick();
+      // Onset is first stamped when the stimulus is set, so a tap can never count as early, then moved to
+      // the start of the frame that draws it: on a slow frame the stimulus appears later than it was set,
+      // and that wait is the device's, not the astronaut's. Animation frames also drive the counter.
+      pvtStage.classList.add("sc-on"); pvt.onset = performance.now(); pvt.onsetMethod = "set";
+      const shown = pvt.onset, tick = time => {
+        if (pvt.onset === null) return;
+        if (pvt.onsetMethod === "set" && time) { pvt.onset = Math.max(shown, time); pvt.onsetMethod = "frame"; }
+        pvtStage.dataset.count = String(Math.round(performance.now() - pvt.onset)); pvt.raf = requestAnimationFrame(tick);
+      };
+      pvt.raf = requestAnimationFrame(tick);
       pvt.timer = setTimeout(() => { if (pvt.onset !== null) record(PVT_B.timeoutMs); }, PVT_B.timeoutMs);
     }, isi);
   }
   function record(rtMs) {
     cancelAnimationFrame(pvt.raf); pvtStage.classList.remove("sc-on");
-    pvt.trials.push({ rtMs }); pvt.onset = null; pvt.feedback = `${Math.round(rtMs)} ms`; pvtStage.dataset.count = pvt.feedback; schedule();
+    pvt.trials.push({ rtMs, onset: pvt.onsetMethod }); pvt.onset = null; pvt.feedback = `${Math.round(rtMs)} ms`; pvtStage.dataset.count = pvt.feedback;
+    // The reaction time shows for the 1 s feedback period, which is part of the 1-4 s interval.
+    clearTimeout(pvt.feedbackTimer); pvt.feedbackTimer = setTimeout(() => { if (pvt.onset === null && pvt.running) pvtStage.dataset.count = ""; }, PVT_B.feedbackMs);
+    schedule();
   }
   function respond(event) {
     if (!pvt.running) return;
@@ -219,10 +233,10 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
   pvtStage.addEventListener("keydown", event => { if (event.code === "Space" || event.key === " ") respond(event); });
   function finishPvt(completed) {
     clearTimeout(pvt.timer); cancelAnimationFrame(pvt.raf); pvtStage.classList.remove("sc-on");
-    if (!pvt.running) return; pvt.running = false;
+    if (!pvt.running) return; pvt.running = false; onTimedTest(false);
     applyPvt(summarizePvt(pvt.trials, { durationMs: pvt.duration, completed }), "TEST · this device");
   }
-  function stopPvt(silent) { if (pvt.running) { if (silent) { pvt.running = false; clearTimeout(pvt.timer); cancelAnimationFrame(pvt.raf); } else finishPvt(false); } }
+  function stopPvt(silent) { if (pvt.running) { if (silent) { pvt.running = false; clearTimeout(pvt.timer); cancelAnimationFrame(pvt.raf); onTimedTest(false); } else finishPvt(false); } }
   function applyPvt(summary, source) {
     state.pvt = { ...summary, source };
     Object.assign(state.check.values, { pvtSpeed: summary.meanSpeed, pvtLapses: summary.lapses });
@@ -265,7 +279,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
       const cap = state.capture, usable = cap && !cap.capturing && c.quality.kneeExtension;
       const camOn = camera?.running;
       return [why("bone", "In spaceflight the legs lose the most bone, so this test comes first."),
-        el("p", { class: "sc-lead" }, "Seated knee extension, 10 seconds. Face the camera with both legs visible, or sit side-on to measure the near knee. Straighten and bend your knees slowly."),
+        el("p", { class: "sc-lead" }, "Seated knee extension, 10 seconds. Face the camera with both legs visible (best for extension), or sit fully side-on to measure the near knee. Use the same position every day. Straighten and bend your knees slowly."),
         demo ? el("div", { class: "sc-row" },
           el("button", { type: "button", class: "sc-secondary", "data-demo": "poor", onclick: () => demoCapture("poor") }, "Demo capture · poor framing"),
           el("button", { type: "button", class: "sc-secondary", "data-demo": "usable", onclick: () => demoCapture("usable") }, "Demo capture · usable"))
@@ -277,6 +291,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
         cap && !cap.capturing ? el("div", { class: `sc-result ${usable ? "" : "sc-bad"}` },
           el("strong", {}, usable ? "Capture usable" : "Comparison withheld · repeat the capture"),
           el("p", {}, usable ? `Knee extension ${fmt(cap.kneeExtension)}° · range of motion ${fmt(cap.kneeRom)}° · tracking quality ${fmt(cap.trackingQuality, 2)} · ${cap.sampleCount} samples${kneeView(cap)}`
+            : cap.reason === "oblique" ? `You were turned partway (${fmt(cap.bodyYawDeg, 0)}° from facing the camera). Face the camera, or turn fully side-on, and repeat: a part-turned reading matches neither position's baseline.`
             : `Tracking quality ${fmt(cap.trackingQuality, 2)} with ${cap.sampleCount} usable samples is below the quality rule (≥ 0.70 and ≥ 12 samples). A worse-looking number from a poor capture is not treated as a health change.`),
           el("small", {}, `${cap.source} · attempt ${state.captures}`)) : null,
         el("p", { class: "sc-note" }, "Video stays on this device. Only the summary angles are kept."),
@@ -293,7 +308,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {} 
             pvt.running ? el("p", { class: "sc-note", "aria-live": "polite" }, pvt.feedback) : null),
         result ? el("div", { class: `sc-result ${result.usable ? "" : "sc-bad"}` },
           el("strong", {}, result.usable ? `${result.lapses} lapses · speed ${fmt(result.meanSpeed, 2)}/s` : `Not compared · ${result.reason}`),
-          el("p", {}, `${result.validResponses} valid responses · ${result.falseStarts} early · median ${result.medianRtMs ?? "--"} ms · ${result.protocol === "pvt-b-3min" ? "3-minute protocol" : "practice length (only compared with practice runs)"}`),
+          el("p", {}, `${result.validResponses} valid responses · ${result.falseStarts} early · median ${result.medianRtMs ?? "--"} ms · ${Number.isFinite(result.performanceScore) ? `performance score ${result.performanceScore} % · ` : ""}${result.protocol === PVT_PROTOCOL.full ? "3-minute protocol" : "practice length (only compared with practice runs)"}`),
           el("small", {}, result.source)) : null,
         el("p", { class: "sc-note" }, "Browser timing adds about one display frame of uncertainty. Results are compared only with your own runs on the same protocol.")];
     }

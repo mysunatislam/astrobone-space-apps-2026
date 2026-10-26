@@ -56,7 +56,7 @@ Requires Node.js 20.19+ or 22.12+.
 ```bash
 npm install
 npm run dev        # http://127.0.0.1:5173/
-npm test           # 300 automated tests
+npm test           # 305 automated tests
 npm run build      # production build in dist/
 ```
 
@@ -83,7 +83,9 @@ Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osd
 
 ## Validation and Limits
 
-- **Tested:** 300 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
+- **Tested:** 305 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
+- **Reaction test timing:** the stimulus onset is timed to the frame that draws it and the 3D view pauses during the test. A browser check with a simulated 300 ms responder scores 300 ms; before, a software-rendered browser scored it 665 ms on average and turned 7 of 9 responses into lapses ([details](docs/core-analysis-2026-10-25.md#reaction-test-timing)).
+- **Camera position:** each frame records whether the person faces the camera or sits side-on. Side-on, only the near knee counts; a part-turned capture is refused. A simulation shows side-on reads up to several degrees low near full extension, so positions are never compared ([why](docs/core-analysis-2026-10-25.md#camera-position)).
 - **Not yet validated:** camera joint angles have not yet been compared with a reference measurement. The Self-Check now has a built-in **accuracy check** (camera vs goniometer, Bland–Altman bias, limits of agreement and detectable change); once 20+ pairs from 3+ people are recorded, the knee review trigger is raised to match the measured error. The [validation protocol](docs/functional-camera-validation-protocol.md) is written. No astronaut or analog-crew user study has been run.
 - **Data boundaries:** Elena and all her values are synthetic. The NASA cohorts are mice and a four-person, three-day flight; they inform what to watch, never a diagnosis or a personal threshold.
 - AstroBone is a research prototype, not a medical device.

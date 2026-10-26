@@ -45,8 +45,16 @@ test("agreement waits for at least two pairs", () => {
 });
 
 test("CSV export quotes free text and includes the difference", () => {
-  const csv = pairsToCsv([{ participant: 'A,"x"', side: "left", referenceType: "Goniometer", referenceFlexion: 30, cameraFlexion: 33.5, holdSd: 0.8, samples: 24, at: "t" }]);
-  assert.equal(csv.split("\n")[1], '"A,""x""",left,Goniometer,30,33.5,0.8,24,3.5,t');
+  const csv = pairsToCsv([{ participant: 'A,"x"', side: "left", cameraView: "side", bodyYawDeg: 81.5, referenceType: "Goniometer", referenceFlexion: 30, cameraFlexion: 33.5, holdSd: 0.8, samples: 24, at: "t" }]);
+  assert.equal(csv.split("\n")[1], '"A,""x""",left,side,81.5,Goniometer,30,33.5,0.8,24,3.5,t');
+});
+
+test("a hold records the camera position so facing and side-on accuracy can be reported apart", () => {
+  const frames = Array.from({ length: HOLD.minSamples }, (_, i) => ({ sideUsable: { left: true }, angles: { left: { knee: 150 } }, bodyYawDeg: 70 + (i % 3) }));
+  const hold = summarizeHold(frames, "left");
+  assert.equal(hold.usable, true);
+  assert.equal(hold.cameraView, "side");
+  assert.equal(hold.bodyYawDeg, 71);
 });
 
 test("pairs stay in memory unless saving is consented", () => {

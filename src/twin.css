@@ -319,6 +319,8 @@ body.twin-body { overflow: hidden; }
   #tw-canvas { position: sticky; top: 0; width: calc(100% + 32px); margin: 0 -16px; height: 56vh; order: 2; z-index: 0; }
   .tw-links, .tw-labels { display: none; }
   .tw-top { position: sticky; top: 0; order: 1; margin: 8px 0; left: auto; right: auto; grid-template-columns: auto 1fr auto; height: auto; padding: 10px 12px; gap: 10px; }
+  /* Panels scroll under the sticky header here, so it is near-opaque: text must not show through. */
+  .tw-top { background: linear-gradient(180deg, rgba(10, 22, 40, .97), rgba(4, 10, 22, .95)); }
   .tw-top .tw-nav { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
   .tw-top .tw-start { grid-column: 3; grid-row: 1; padding: 8px 10px; }
   .tw-top > .tw-live { grid-column: 1 / -1; grid-row: 3; justify-self: start; }

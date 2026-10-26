@@ -48,7 +48,7 @@ export function createTwinApp(root) {
   const tooltip = el("div", { class: "tw-tooltip", role: "status", hidden: true });
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.classList.add("tw-links"); svg.setAttribute("aria-hidden", "true");
   const nav = el("nav", { class: "tw-nav", "aria-label": "AstroBone experiences" }, EXPERIENCES.map(([key, label]) =>
-    el("button", { type: "button", "data-experience": key, onclick: () => { stopDemo(); setExperience(key); } }, label)));
+    el("button", { type: "button", "data-experience": key, onclick: () => { stopDemo(); setExperience(key); revealOnPhone(); } }, label)));
   const liveLink = el("a", { class: "tw-live", href: CAPTURE.href, title: "Camera movement capture, crew records and research tools" }, el("i", { "aria-hidden": "true" }), CAPTURE.label);
   const dayValue = el("strong", { id: "tw-day" }, String(state.day));
   const startButton = el("button", { type: "button", class: "tw-start", onclick: () => (state.demo ? stopDemo() : runDemo()) }, "Start mission simulation");
@@ -110,10 +110,12 @@ export function createTwinApp(root) {
   const selfCheck = createSelfCheckPanel({
     onStep: step => {
       state.selfStep = step; if (state.experience !== "selfcheck") return;
+      revealOnPhone({ onlyIfAbove: true });
       if (step !== "result") scene.setAlerts({});
       const [system, focus] = SELF_STEP_VIEW[step]; scene.setSystem(system, { focusTarget: focus }); render();
     },
     onEvaluate: evaluation => { scene.setAlerts(Object.fromEntries(evaluation.domains.map(d => [d.key, d.status === "changed"]))); render(); },
+    onTimedTest: active => scene.setPaused(active),
   });
 
   // Body as navigation: the structure clicked selects the analysis.
@@ -141,6 +143,19 @@ export function createTwinApp(root) {
     if (state.experience === "physiology") return PHYSIO_TABS.find(([key]) => key === state.physio)[3];
     if (state.experience === "selfcheck") return SELF_STEP_VIEW[state.selfStep][1];
     return SYSTEM_FOCUS[system] ?? "body";
+  }
+
+  // Phones stack the page: the section's panel sits below the 3D view, so a tap on a section (or a
+  // step change scrolled past the panel's top) brings it into view under the sticky header.
+  const phoneLayout = matchMedia("(max-width: 960px)");
+  function revealOnPhone({ onlyIfAbove = false } = {}) {
+    if (!phoneLayout.matches) return;
+    requestAnimationFrame(() => {
+      const target = drawer.hidden ? canvas : drawer, offset = header.getBoundingClientRect().bottom + 8;
+      if (onlyIfAbove && target.getBoundingClientRect().top >= offset) return;
+      target.style.scrollMarginTop = `${target === canvas ? 0 : offset}px`;
+      target.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    });
   }
 
   function setExperience(experience, { system, physio, focus = true } = {}) {
