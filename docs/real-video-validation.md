@@ -1,10 +1,11 @@
 # Real-video validation
 
-Generated 2026-10-26 by `scripts/validation/`. Every number below was measured on recorded video of real people against laboratory ground truth: Vicon motion capture for the knee and a finger pulse sensor (PPG) for heart rate. Fitted models are always scored on people they were not trained on. The interactive version of this report, with the replay and animated charts, is built from the same data (`scripts/validation/report/`).
+Generated 2026-10-27 by `scripts/validation/`. Every number below was measured on recorded video of real people against laboratory ground truth: Vicon motion capture for the knee and a finger pulse sensor (PPG) for heart rate. Fitted models are always scored on people they were not trained on. The interactive version of this report, with the replay and animated charts, is built from the same data (`scripts/validation/report/`).
 
 ## Summary
 
 - **Knee: the app's 3D knee angle missed squat depth.** Facing the camera, MediaPipe's 3D world-landmark angle made the knee's range of motion 29.9° too small on average in squats and 26.9° in lunges. Larger MediaPipe models did not fix it.
+- **8 pretrained pose models compared.** SynthPose-B placed the knee best (70.4 % within 10 % of the thigh, MediaPipe lite 53.8 %), but only MediaPipe gives a 3D angle, and side-on every model read squat range of motion with 4.9–8.7° error. A better keypoint model alone does not fix the facing-camera error; the hybrid does.
 - **The hybrid knee model fixes most of it.** MediaPipe plus 100 learned trees: knee range-of-motion error 21.7° → 13.2° per rep, ICC(2,1) 0.549 → 0.769, better for 9 of 9 people left out of training. Shipped in `src/kneeHybrid.js`.
 - **Pulse: the old method almost never answered on real webcam video.** POS with a 60 % peak-share gate refused 95 % of 30-second windows.
 - **The pulse hybrid reads within 2.1 bpm on average.** ME-rPPG (deep model) leading, POS at a quarter weight: 90 % of windows within 5 bpm of the finger sensor on 40 people at rest and after squats, 96 % of windows answered (the rest refused for head movement or lighting); with the shipped quality gate (0.3), 0.6 bpm on 77 % of windows.
@@ -19,9 +20,16 @@ Generated 2026-10-26 by `scripts/validation/`. Every number below was measured o
 
 | Model | In browser | Knee within 10 % of thigh | Side-on squat ROM error (2D angle) | ICC | CPU ms/frame |
 |---|---|---|---|---|---|
+| SynthPose-B | no | 70.4 % | 5.6° | 0.916 | 153 |
+| MoveNet Thunder | yes | 66.9 % | 5.0° | 0.938 | 28 |
+| ViTPose-B | no | 66.7 % | 5.2° | 0.922 | 167 |
+| RTMO-m | no | 66.6 % | 5.3° | 0.931 | 166 |
 | MediaPipe Pose heavy | yes | 63.1 % | 5.6° | 0.919 | 80 |
 | MediaPipe Pose full | yes | 55.9 % | 4.9° | 0.933 | 29 |
 | MediaPipe Pose lite | yes | 53.8 % | 5.9° | 0.917 | 24 |
+| YOLO11m-pose | no | 50.1 % | 8.7° | 0.922 | 294 |
+
+**Reading the table.** The research models (SynthPose, ViTPose, RTMO) put the knee point closer to the lab marker, and MoveNet Thunder matches them in the browser at 28 ms a frame. Side-on, their knee angles are no better than MediaPipe's, because the 2D angle is already close there. None of them outputs 3D, so none can read depth when the person faces the camera, which is where the app's error was. That is why the app keeps MediaPipe (2D and 3D, in the browser) and corrects it with the hybrid model below. MoveNet Thunder is the candidate keypoint input for a future hybrid.
 
 **Camera position.** The app's body-yaw rule read facing captures as facing 100 % of the time and side-on captures as side-on 100 %; part-turned captures were caught as part-turned 55 % of the time (the app refuses those). Side-on, it picked the knee nearer the camera 99.3 % of the time.
 

@@ -25,6 +25,10 @@ w("## Summary\n")
 w(f"- **Knee: the app's 3D knee angle missed squat depth.** Facing the camera, MediaPipe's 3D world-landmark angle made the knee's range of motion "
   f"{f1(abs(H['rep']['Ex6|front']['est3']['romBias']))}° too small on average in squats and {f1(abs(H['rep']['Ex5|front']['est3']['romBias']))}° in lunges. "
   "Larger MediaPipe models did not fix it.")
+_best = max(P["models"], key=lambda m: m["pck10"] or 0); _mp = next(m for m in P["models"] if m["label"] == "MediaPipe Pose lite")
+w(f"- **{len(P['models'])} pretrained pose models compared.** {_best['label']} placed the knee best ({f1(_best['pck10'])} % within 10 % of the thigh, "
+  f"MediaPipe lite {f1(_mp['pck10'])} %), but only MediaPipe gives a 3D angle, and side-on every model read squat range of motion with "
+  f"{f1(min(m['sideRomMaeSquat'] for m in P['models']))}–{f1(max(m["sideRomMaeSquat"] for m in P["models"]))}° error. A better keypoint model alone does not fix the facing-camera error; the hybrid does.")
 w(f"- **The hybrid knee model fixes most of it.** MediaPipe plus 100 learned trees: knee range-of-motion error {f1(A['est3']['romMae'])}° → {f1(A['shipped']['romMae'])}° "
   f"per rep, ICC(2,1) {A['est3']['romIcc']} → {A['shipped']['romIcc']}, better for {improved} of {len(H['perPerson'])} people left out of training. Shipped in `src/kneeHybrid.js`.")
 w(f"- **Pulse: the old method almost never answered on real webcam video.** POS with a 60 % peak-share gate refused {f0(U['oldRefusedPct'])} % of 30-second windows.")
@@ -54,6 +58,12 @@ w("|---|---|---|---|---|---|")
 for m in sorted(P["models"], key=lambda m: -(m["pck10"] or 0)):
     w(f"| {m['label']} | {'yes' if m['browser'] else 'no'} | {f1(m['pck10'])} % | {f1(m['sideRomMaeSquat'])}° | {m['sideRomIccSquat'] or '–'} | {f0(m['msPerFrame'])} |")
 w("")
+_mn = next((m for m in P["models"] if m["label"] == "MoveNet Thunder"), None)
+w(f"**Reading the table.** The research models (SynthPose, ViTPose, RTMO) put the knee point closer to the lab marker, and MoveNet Thunder matches them in the browser "
+  f"at {f0(_mn['msPerFrame']) if _mn else '–'} ms a frame. Side-on, their knee angles are no better than MediaPipe's, because the 2D angle is already close there. "
+  "None of them outputs 3D, so none can read depth when the person faces the camera, which is where the app's error was. "
+  "That is why the app keeps MediaPipe (2D and 3D, in the browser) and corrects it with the hybrid model below. "
+  "MoveNet Thunder is the candidate keypoint input for a future hybrid.\n")
 yaw = P["yaw"]
 w(f"**Camera position.** The app's body-yaw rule read facing captures as facing {f0(yaw['mp-lite|front']['class_pct']['front'])} % of the time and side-on captures as side-on "
   f"{f0(yaw['mp-lite|side']['class_pct']['side'])} %; part-turned captures were caught as part-turned {f0(yaw['mp-lite|half']['class_pct']['oblique'])} % of the time (the app refuses those). "
