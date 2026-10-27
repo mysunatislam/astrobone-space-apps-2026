@@ -59,7 +59,7 @@ export function createSelfCheckCamera({ video, overlay, onStatus = () => {}, onF
       if (filteredWorld?.[i]) filteredWorld[i].visibility = Math.min(filteredWorld[i].visibility, quality);
       if (filteredImage?.[i]) filteredImage[i].visibility = Math.min(filteredImage[i].visibility, quality);
     }
-    const frame = filteredWorld ? analyzePoseLandmarks(filteredWorld, filteredImage ?? filteredWorld, { timestamp: message.timestamp, inferenceMs: message.inferenceMs }) : null;
+    const frame = filteredWorld ? analyzePoseLandmarks(filteredWorld, filteredImage ?? filteredWorld, { timestamp: message.timestamp, inferenceMs: message.inferenceMs, aspect: video.videoWidth / video.videoHeight }) : null;
     draw(image, frame);
     if (recording && frame) recording.samples.push(frame);
     if (recording) recording.telemetry.push({ timestamp: message.timestamp, inferenceMs: message.inferenceMs, detected: Boolean(image) });
@@ -76,7 +76,7 @@ export function createSelfCheckCamera({ video, overlay, onStatus = () => {}, onF
     ctx.fillStyle = "#fff"; for (const i of [23, 24, 25, 26, 27, 28]) { const p = points[i]; if (p?.visibility >= .3) { ctx.beginPath(); ctx.arc(x(p), y(p), 4 * (devicePixelRatio || 1), 0, Math.PI * 2); ctx.fill(); } }
     if (frame?.angles) {
       ctx.font = `${12 * (devicePixelRatio || 1)}px monospace`; ctx.fillStyle = "#fff";
-      for (const [side, i] of [["left", 25], ["right", 26]]) { const p = points[i]; if (p) ctx.fillText(`${Math.round(frame.angles[side].knee)}°`, x(p) + 8, y(p)); }
+      for (const [side, i] of [["left", 25], ["right", 26]]) { const p = points[i]; if (p) ctx.fillText(`${Math.round(frame.kneeHybrid?.[side]?.angle ?? frame.angles[side].knee)}°`, x(p) + 8, y(p)); }
     }
   }
 

@@ -198,9 +198,10 @@ export function bandPass(signal, fs, lowHz, highHz) {
 
 // Collects skin colour from each frame of a camera or video source. Frames arrive with a time on
 // the source clock: the page clock for a live camera, the media time for a recorded video.
+// `estimate` turns the recent samples into a pulse result (estimatePulse by default).
 export class PulseCapture {
-  constructor({ onResult, reportEveryMs = 1000 }) {
-    Object.assign(this, { onResult, reportEveryMs });
+  constructor({ onResult, reportEveryMs = 1000, estimate = estimatePulse }) {
+    Object.assign(this, { onResult, reportEveryMs, estimate });
     // One 32 x 32 tile per skin region, downscaled with area averaging so every skin pixel counts.
     this.canvas = document.createElement("canvas"); this.canvas.width = 32; this.canvas.height = 96;
     this.ctx = this.canvas.getContext("2d", { willReadFrequently: true });
@@ -270,7 +271,7 @@ export class PulseCapture {
     if (t - this.lastReportT < this.reportEveryMs) return;
     this.lastReportT = t;
     const recent = this.samples.filter(s => t - s.t <= PULSE_WINDOW.pulseSeconds * 1000);
-    const pulse = estimatePulse(recent);
+    const pulse = this.estimate(recent);
     if (pulse.status === "estimated") pulse.stress = estimateStress(this.samples, pulse.bpm);
     this.report(pulse);
   }

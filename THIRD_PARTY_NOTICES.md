@@ -81,10 +81,34 @@ NASA public research pages and technical reports cited by AstroBone are listed i
 - Boundary: these models estimate landmarks and expression coefficients; the eye-closure cue is an unvalidated prototype rule and does not establish sleep or a health condition.
 - QA-only image: https://storage.googleapis.com/mediapipe-tasks/hand_landmarker/woman_hands.jpg, linked by the official MediaPipe sample notebook. Kept under `.artifacts`, not bundled or displayed as user data.
 
+### ME-rPPG (camera pulse model)
+
+- Paper: Kegang Wang et al., "Memory-efficient Low-latency Remote Photoplethysmography through Temporal-Spatial State Space Duality", arXiv 2504.01774 (2025)
+- Source: https://github.com/KegangWangCCNU/ME-rPPG at commit `bec0855162a032832cfb71670c8ca7c79e218cd3` (web ONNX export and initial state, weights unchanged), fetched from the pinned mirror https://huggingface.co/RabiatS/me-rppg-web
+- License: MIT (`public/models/me-rppg/LICENSE-ME-rPPG.txt`)
+- Files: `public/models/me-rppg/model.onnx` (SHA-256 `9e0277fa4c0fb486c52818775fc83450901fc4d76e0ff98da64124443211e093`), `state.bin` (SHA-256 `532cf0038ec5dc65235d7111660dbe46a4e8df4991245a906362d37ad6ce8cf8`), `state.json`
+- Runtime: onnxruntime-web 1.30.0 (https://github.com/microsoft/onnxruntime, MIT License), WebAssembly, single thread, in a module worker
+- Use: one pulse-wave sample per camera frame for the self-check's resting pulse, fused with the POS and CHROM colour methods (`src/cameraPulse.js`).
+- Boundary: a camera pulse estimate compared only with the same person's earlier camera readings; not a medical device.
+
+### Hybrid knee-angle model (trained by AstroBone on REHAB24-6)
+
+- Dataset: REHAB24-6, Černek et al. 2024, https://doi.org/10.5281/zenodo.13305826, CC BY-NC 4.0
+- File: `src/kneeHybridModel.js` (100 gradient-boosted trees fitted by `scripts/validation/export_knee_hybrid.py` on MediaPipe Pose lite outputs and the dataset's Vicon motion capture)
+- Terms: the fitted values are derived from REHAB24-6 and carry its attribution and non-commercial terms. Retrain on other data before any commercial use.
+- Use: knee angle for the self-check knee capture (`src/kneeHybrid.js`), validated leave-one-person-out in `docs/real-video-validation.md`. No REHAB24-6 video is bundled.
+
+### Validation datasets (offline only, not bundled)
+
+- MCD-rPPG (Egorov et al., arXiv 2508.17924, 2025), https://huggingface.co/datasets/kyegorov/mcd_rppg, CC BY 4.0: webcam face video with a finger PPG at rest and after exercise. Only derived heart-rate numbers and one normalized pulse trace are published in the validation report.
+- UBFC-rPPG (Bobbia et al., Pattern Recognition Letters 2019): used only if listed in `docs/real-video-validation.md`; derived numbers only.
+- open-rppg (https://github.com/KegangWangCCNU/open-rppg) published weights for FacePhys, ME-rPPG chunk, PhysNet and EfficientPhys, run offline for the comparison only.
+
 ## Main Software Libraries
 
 - Three.js: https://github.com/mrdoob/three.js, MIT License
 - Vite: https://github.com/vitejs/vite, MIT License
+- onnxruntime-web: https://github.com/microsoft/onnxruntime, MIT License
 - Playwright: https://github.com/microsoft/playwright, Apache License 2.0
 - Capacitor Core and Android: https://github.com/ionic-team/capacitor, MIT License
 - Capacitor Filesystem and Share plugins: https://github.com/ionic-team/capacitor-plugins, MIT License

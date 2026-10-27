@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { PulseCapture } from "./rppg.js";
+import { colourPulseFromSamples } from "./cameraPulse.js";
 
 export function initHealthLayers({ scene, rig, video, getFace, isLiveCamera, onCameraMeasuring = () => {} }) {
   let layer = "body", pulse = null, history = null, helper = null;
@@ -32,7 +33,8 @@ export function initHealthLayers({ scene, rig, video, getFace, isLiveCamera, onC
   const value = panel.querySelector("#pulse-value"), stressValue = panel.querySelector("#stress-value"), stressDetail = panel.querySelector("#stress-detail");
   const status = panel.querySelector("p"), chart = panel.querySelector("canvas"), start = panel.querySelector("button");
   let source = null, cameraMeasuring = false, cameraFrame = 0, cameraToken = 0, lastCameraTime = -1;
-  const capture = new PulseCapture({ onResult(result) {
+  // Validated on real webcam video (docs/real-video-validation.md): see colourPulseFromSamples.
+  const capture = new PulseCapture({ estimate: colourPulseFromSamples, onResult(result) {
     pulse = { ...result, source, receivedAt: performance.now() };
     const stress = result.stress?.status === "estimated" ? result.stress : null;
     value.textContent = result.bpm ? `${result.bpm} bpm` : "-- bpm";

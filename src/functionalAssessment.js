@@ -1,5 +1,6 @@
 import { buildPoseRetargetFrame } from "./poseRetargeting.js";
 import { summarizeMotionGuardSamples } from "./motionGuard.js";
+import { hybridKneeAngle } from "./kneeHybrid.js";
 
 const LANDMARK = Object.freeze({
   leftShoulder: 11,
@@ -70,6 +71,10 @@ export function analyzePoseLandmarks(
   const visibilityValues = [];
   const sideUsable = {};
   const sideVisibility = {};
+  const kneeHybrid = {};
+  const yaw = bodyYaw(landmarks);
+  // Image landmarks are normalized by width and height separately; the 2D knee angle needs square pixels.
+  const aspect = Number(metadata.aspect);
 
   SIDES.forEach((side) => {
     const shoulder = readLandmark(landmarks, LANDMARK[`${side}Shoulder`]);
@@ -91,6 +96,18 @@ export function analyzePoseLandmarks(
       knee: calculateJointAngle(hip, knee, ankle),
       ankle: calculateJointAngle(knee, ankle, foot),
     };
+    // Hybrid knee angle (src/kneeHybrid.js) from the 3D angle, the image-plane angle and the body yaw.
+    if (Number.isFinite(aspect) && aspect > 0 && yaw) {
+      const flat = name => { const p = readLandmark(imageLandmarks, LANDMARK[`${side}${name}`]); return p ? { x: p.x * aspect, y: p.y, z: 0 } : null; };
+      const [h2, k2, a2] = ["Hip", "Knee", "Ankle"].map(flat);
+      if (h2 && k2 && a2) {
+        kneeHybrid[side] = hybridKneeAngle({
+          angle3d: angles[side].knee, angle2d: calculateJointAngle(h2, k2, a2), yawDeg: yaw.yawDeg,
+          thigh2d: Math.hypot(h2.x - k2.x, h2.y - k2.y), shank2d: Math.hypot(a2.x - k2.x, a2.y - k2.y),
+          visibility: Math.min(hip.visibility, knee.visibility, ankle.visibility),
+        });
+      }
+    }
     upperAngles[side] = {
       shoulder: calculateJointAngle(elbow, shoulder, hip),
       elbow: calculateJointAngle(shoulder, elbow, wrist),
@@ -110,7 +127,6 @@ export function analyzePoseLandmarks(
   const shoulderDy = imageLandmarks[12].y - imageLandmarks[11].y;
   const shoulderDx = imageLandmarks[12].x - imageLandmarks[11].x;
   const shoulderAlignmentDegrees = Math.atan2(Math.abs(shoulderDy), Math.abs(shoulderDx)) * 180 / Math.PI;
-  const yaw = bodyYaw(landmarks);
   return {
     ...retargetFrame,
     ...metadata,
@@ -119,6 +135,7 @@ export function analyzePoseLandmarks(
     upperTracking,
     sideUsable,
     sideVisibility,
+    kneeHybrid: kneeHybrid.left && kneeHybrid.right ? kneeHybrid : null,
     visibility,
     shoulderAlignmentDegrees,
     bodyYawDeg: yaw ? yaw.yawDeg : null,
@@ -208,6 +225,8 @@ export function summarizeFunctionalAssessment(
 // Self-check knee capture: each knee is summarized from the frames where that knee was tracked,
 // so a side-on capture of one leg is usable and a loss in one knee is not hidden by the other.
 // Range of motion uses the 5th-95th percentile spread, which tracking jitter inflates far less than max - min.
+// Knee angles are the hybrid ones (src/kneeHybrid.js) when the capture has them, which changes the
+// protocol to v3: a v3 reading is never compared with a v2 baseline.
 export const KNEE_CAPTURE = Object.freeze({ minSamples: ASSESSMENT_MIN_SAMPLES, minQuality: 0.7 });
 
 export function summarizeKneeCapture(samples) {
@@ -221,10 +240,12 @@ export function summarizeKneeCapture(samples) {
   const nearSide = cameraView === "side" && nearVotes.length
     ? (nearVotes.filter((side) => side === "left").length * 2 >= nearVotes.length ? "left" : "right")
     : null;
+  const hybrid = frames.length > 0 && frames.every((frame) => Number.isFinite(frame.kneeHybrid?.left?.angle) && Number.isFinite(frame.kneeHybrid?.right?.angle));
+  const kneeOf = (frame, side) => (hybrid ? frame.kneeHybrid[side].angle : frame.angles?.[side]?.knee);
   const sides = {};
   SIDES.forEach((side) => {
-    const usable = frames.filter((frame) => frame.sideUsable?.[side] && Number.isFinite(frame.angles?.[side]?.knee));
-    const knees = usable.map((frame) => frame.angles[side].knee);
+    const usable = frames.filter((frame) => frame.sideUsable?.[side] && Number.isFinite(kneeOf(frame, side)));
+    const knees = usable.map((frame) => kneeOf(frame, side));
     const quality = usable.length ? mean(usable.map((frame) => frame.sideVisibility?.[side] ?? frame.visibility)) : 0;
     const hidden = nearSide !== null && side !== nearSide;
     const ok = !hidden && usable.length >= KNEE_CAPTURE.minSamples && quality >= KNEE_CAPTURE.minQuality;
@@ -259,7 +280,9 @@ export function summarizeKneeCapture(samples) {
     asymmetry: view === "bilateral" ? round(Math.abs(sides.left.extension - sides.right.extension), 1) : null,
     sampleCount: pick ? sides[pick].sampleCount : Math.max(sides.left.sampleCount, sides.right.sampleCount),
     trackingQuality: pick ? sides[pick].trackingQuality : Math.max(sides.left.trackingQuality, sides.right.trackingQuality),
-    protocol: view ? `self-check-seated-knee-extension-v2-${view}` : null,
+    angleMethod: hybrid ? "hybrid" : "3d",
+    hybridShare: hybrid && pick ? round(mean(frames.filter((frame) => frame.sideUsable?.[pick]).map((frame) => (frame.kneeHybrid[pick].method === "hybrid" ? 1 : 0))), 3) : null,
+    protocol: view ? `self-check-seated-knee-extension-${hybrid ? "v3" : "v2"}-${view}` : null,
   };
 }
 
