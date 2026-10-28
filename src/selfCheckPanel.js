@@ -11,6 +11,7 @@ import { createSelfCheckCamera } from "./selfCheckCamera.js";
 import { createCameraPulse, CAMERA_PULSE, RESTING_CAMERA_PROTOCOL } from "./cameraPulse.js";
 import { cameraViewFor } from "./functionalAssessment.js";
 import { sparklineSvg } from "./trendSpark.js";
+import { surgeonReport, byteSize } from "./surgeonReport.js";
 import { STATUS_MARKS, indicatorHistory, historyChartSvg, legendFor, chartableKeys, pointLabel } from "./historyChart.js";
 import { HOLD, REFERENCE_TYPES, summarizeHold, agreement, calibratedFloors, pairsToCsv, createAngleCheckStore } from "./angleCheck.js";
 import { ELENA } from "./elenaMissionScenario.js";
@@ -47,7 +48,7 @@ const VIEW_CUE = { front: "facing camera", side: "side-on", oblique: "turned par
 
 export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {}, onTimedTest = () => {} } = {}) {
   const store = createSelfCheckStore();
-  const state = { profile: "elena", environment: DEFAULT_ENVIRONMENT.elena, persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [], chartKey: null };
+  const state = { profile: "elena", environment: DEFAULT_ENVIRONMENT.elena, persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [], chartKey: null, report: false };
   const element = el("div", { class: "sc" });
   const video = el("video", { class: "sc-video", playsinline: true, muted: true, "aria-label": "Camera preview" });
   const overlay = el("canvas", { class: "sc-overlay", "aria-hidden": "true" });
@@ -106,7 +107,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   const history = () => (state.profile === "elena" ? [...ELENA_HISTORY, ...(store.load("DEMO-ELENA", false))] : store.load("you", state.persist));
   function reset() {
     stopCamera(); stopPvt(true);
-    state.step = 0; state.capture = null; state.pvt = null; state.evaluation = null; state.captures = 0; state.saved = false; state.failed = {}; state.earned = [];
+    state.step = 0; state.capture = null; state.pvt = null; state.evaluation = null; state.captures = 0; state.saved = false; state.failed = {}; state.earned = []; state.report = false;
     if (state.profile === "elena") {
       state.check = elenaDay147(); state.check.id = `DEMO-ELENA-day-147-${Date.now()}`;
       // Movement and reaction results arrive through the demo capture buttons.
@@ -323,11 +324,29 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     });
     state.saved = true; state.earned = newBadges(before, routine().status); render();
   }
-  function exportJson() {
-    const packet = { schema: "astrobone-self-check-export-v1", profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device", environment: environment(), check: state.check, evaluation: state.evaluation, followUps: state.followUps,
+  function exportPacket() {
+    return { schema: "astrobone-self-check-export-v1", profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device", environment: environment(), check: state.check, evaluation: state.evaluation, followUps: state.followUps,
       boundary: "Self-monitoring record. Review triggers are engineering defaults, not clinical thresholds. Not a diagnosis.", exportedAt: new Date().toISOString() };
-    const url = URL.createObjectURL(new Blob([JSON.stringify(packet, null, 2)], { type: "application/json" }));
-    const a = el("a", { href: url, download: `AstroBone-self-check-${state.profile}-${Date.now()}.json` }); a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function download(text, type, name) {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const a = el("a", { href: url, download: name }); a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function exportJson() { download(JSON.stringify(exportPacket(), null, 2), "application/json", `AstroBone-self-check-${state.profile}-${Date.now()}.json`); }
+
+  // The same result as a short plain-text message for the flight surgeon, readable without AstroBone.
+  function reportSection() {
+    const text = surgeonReport(state.evaluation, state.check, { environment: environment(), profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device",
+      followUps: state.saved ? state.followUps : null });
+    const kb = n => `${(n / 1024).toFixed(1)} kB`, size = byteSize(text), full = byteSize(JSON.stringify(exportPacket(), null, 2));
+    const copied = el("small", { role: "status" });
+    return el("section", { class: "sc-report", "aria-label": "Report for flight surgeon" },
+      el("header", {}, el("b", {}, "Report for flight surgeon"), el("small", {}, `${kb(size)} of plain text, ${Math.round(full / size)}× smaller than the full JSON record (${kb(full)}). Readable on any ground terminal.`)),
+      el("pre", { tabindex: "0" }, text),
+      el("div", { class: "sc-row" },
+        el("button", { type: "button", class: "sc-secondary", onclick: async () => { try { await navigator.clipboard.writeText(text); copied.textContent = "Copied."; } catch { copied.textContent = "Copy is blocked here; use Download."; } } }, "Copy"),
+        el("button", { type: "button", class: "sc-secondary", onclick: () => download(text, "text/plain;charset=utf-8", `AstroBone-report-${state.profile}-${Date.now()}.txt`) }, "Download .txt"),
+        copied));
   }
 
   // ---------- Vital signs ----------
@@ -486,7 +505,10 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         state.earned.length ? el("div", { class: "sc-badges", role: "status" }, state.earned.map(b => el("span", { class: "sc-badge sc-earned sc-new", title: b.detail }, `★ New badge: ${b.label}`))) : null,
         el("small", {}, state.profile === "elena" ? "Demo record kept in memory for this tab." : state.persist ? "Saved on this device." : "Kept in memory for this tab (saving on this device is off)."))
         : el("button", { type: "button", class: "sc-primary", onclick: saveCheck }, "Save check & selected actions"),
-      el("div", { class: "sc-row" }, el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
+      el("div", { class: "sc-row" },
+        el("button", { type: "button", class: "sc-secondary", "aria-expanded": String(state.report), onclick: () => { state.report = !state.report; render(); if (state.report) element.querySelector(".sc-report")?.scrollIntoView({ block: "nearest", behavior: "smooth" }); } }, "Report for flight surgeon"),
+        el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
+      state.report ? reportSection() : null,
       el("p", { class: "sc-note" }, "Review triggers: outside 2× your own spread or a minimum change, whichever is larger, after 3 usable checks; or a steady drift from your first checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
       state.profile === "elena" ? el("p", { class: "sc-note" }, ELENA_SELF_CHECK_BOUNDARY) : null];
   }

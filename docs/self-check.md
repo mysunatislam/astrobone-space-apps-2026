@@ -47,6 +47,18 @@ Video never leaves the device; only summary angles are kept.
 
 Actions are bounded: contact the crew medical officer now (red flags or an urgent limit), tell them today (a contact-today limit), repeat a failed measurement, re-check in 24 h and log for the flight surgeon, or keep building the baseline. AstroBone does not diagnose, prescribe exercise or recommend medication; a test enforces that wording. Selected actions are saved with due times. The full record exports as JSON for a reviewer.
 
+### Report for Flight Surgeon
+
+`src/surgeonReport.js`. **Report for flight surgeon** shows the same result as a short plain-text message, with Copy and Download .txt. It always has the same order so a reviewer can scan a whole crew quickly:
+1. Who, when and where (with the one-way delay to Earth).
+2. The overall status and any red flags.
+3. **NEEDS A LOOK**: every non-stable measurement, worst first, with its reason (safety limit, usual range, steady drift, building baseline, or quality check failed).
+4. One line of everything stable.
+5. The advice shown to the astronaut, or the actions they selected once saved.
+6. Quality and context (a repeated capture, the dosimeter).
+
+For Elena on Day 147 it is 1.6 kB, 13 times smaller than the JSON record. It needs no app to read and fits a constrained link. Tests check the order, the size, that a failed capture reads as "not compared" and never as a decline, and that the wording never diagnoses or names a treatment.
+
 ### Where You Are: The Escalation Ladder
 
 `src/missionEnvironment.js`. The astronaut picks where they are: space station (ISS), spacecraft (Orion, Earth-Moon transit), lunar base, rover, spacecraft (Earth-Mars transit) or Mars base. Each sets the gravity, the one-way message delay to Earth from light time (under 1 s for the ISS, 1.3 s for the Moon, 3–22 min for Mars), and how far definitive care is. The result shows a four-rung ladder, **self-care → logged for the flight surgeon → crew medical officer today → contact now**, with the active rung explained for that place. On the ISS the flight surgeon can join in real time and Earth is about a day away; on the way to Mars, advice from Earth arrives at least twice the delay later, so the crew decides first. The evaluation itself never changes with place; only who to tell and how.
@@ -82,6 +94,7 @@ Checks stay in memory unless the astronaut ticks **Save my checks on this device
 - 10 unit tests: PVT-B scoring, protocol separation, baseline readiness, direction and floor rules, red-flag priority, immune symptoms, bounded wording, Elena's Day 147 result, poor-capture refusal, consent-gated storage.
 - Browser: the full Elena flow, the reaction test with simulated taps (0 false starts, correct latency), and the camera path loading the pose model and detecting a person at 0.97 tracking quality from the project's squat test video.
 - Browser (2026-10-28, desktop 1440 px and phone 390 px): the Over time chart opens on knee extension with six points and a REVIEW/BASELINE/STABLE legend; clicking systolic blood pressure charts it with the off-scale limits named; typing 150 mmHg draws the 140 mmHg line and labels today CONTACT TODAY in the tested pink; every result row shows a status word; no console errors.
+- Browser (2026-10-28, both widths): Report for flight surgeon opens with the header, NEEDS A LOOK list and the repeated capture; Copy puts it on the clipboard; Download saves a .txt; after saving it lists the selected actions. axe-core 4.10 found no WCAG 2.1 A/AA violations on the six self-check steps or the body-part card (colour contrast on gradient panels is checked separately by `scripts/check-status-colours.mjs`).
 
 ## Accuracy Check (Camera vs Goniometer)
 

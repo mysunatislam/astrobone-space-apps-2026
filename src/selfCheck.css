@@ -237,3 +237,11 @@
 .sc-legend-limit i { width: 14px; border-top: 1.5px dashed var(--st-attention); }
 .sc-htable summary { cursor: pointer; font: 600 10px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-dim); }
 .sc-htable ol { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 2px; font: 11px var(--tw-mono); color: var(--tw-dim); }
+
+/* Report for flight surgeon: the result as plain text for a slow link */
+.sc-report { display: grid; gap: 8px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--tw-line-strong); background: rgba(4, 10, 22, .5); }
+.sc-report header, .tw-drawer .sc-report > header { display: grid; gap: 2px; margin-bottom: 0; }
+.sc-report header b { font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-cyan); }
+.sc-report header small { font-size: 11px; color: var(--tw-faint); }
+.sc-report pre { margin: 0; max-height: 280px; overflow: auto; padding: 10px; border-radius: 8px; border: 1px solid var(--tw-line); background: rgba(0, 0, 0, .35); font: 11px/1.5 var(--tw-mono); color: var(--tw-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.sc-report .sc-row small { align-self: center; font-size: 11px; color: var(--tw-dim); }
