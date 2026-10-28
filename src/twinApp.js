@@ -803,7 +803,10 @@ export function createTwinApp(root) {
   const linked = experienceFromHash(location.hash);
   if (linked) state.experience = linked;
   current = twinState(state.day); render();
-  scene.load().then(async () => {
+  const sceneLoad = scene.load();
+  // Settles when the 3D anatomy has loaded or failed; the offline pack waits for it (src/offline.js).
+  const loaded = sceneLoad.then(() => true, () => false);
+  sceneLoad.then(async () => {
     loading.classList.add("tw-done"); setTimeout(() => loading.remove(), 600);
     scene.setState(current, { bonesSolidity: current.bone.evidence.solidity }); scene.setSystem(sceneSystem(), { focusTarget: linked ? sceneFocus(sceneSystem()) : "body", animate: false });
     const positions = scene.tibiaPositions();
@@ -821,5 +824,5 @@ export function createTwinApp(root) {
     loading.classList.add("tw-error"); loading.querySelector("span").textContent = "3D anatomy unavailable. Values, timeline and evidence remain usable.";
     canvas.dataset.error = error.message; finishIntro(); console.error(error);
   });
-  return { scene, state, setDay, setExperience, selfCheck, showPart, get stressField() { return stressField; } };
+  return { scene, state, loaded, setDay, setExperience, selfCheck, showPart, get stressField() { return stressField; } };
 }

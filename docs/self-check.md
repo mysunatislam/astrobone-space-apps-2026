@@ -102,13 +102,23 @@ Added 2026-10-18 in the Movement step for **You · this device** (`src/angleChec
 
 ## Offline
 
-The service worker (`public/sw.js`) installs the offline pack on the first online visit, with nothing to press. The pack holds:
+The service worker (`public/sw.js`) installs the offline pack on the first online visit, with nothing to press. It starts once the page has what it needs (the twin's 3D anatomy, or Live Capture's rigged model) and the browser is idle, then reuses those downloads, so the pack never competes with the first view (`registerOffline` in `src/offline.js`). The pack holds:
 - both pages (the twin and Live Capture) and their bundles;
 - the anatomy models;
-- the pose, face and camera-pulse models and the MediaPipe runtime;
+- the pose, face and camera-pulse models and the one MediaPipe runtime the vision workers load (the module build; the other two builds in `public/mediapipe` are never requested);
 - every NASA data file, including the Inspiration4 crew blood data behind the "tested on real crew" card.
 
-That is 35 files, 73 MB measured in Chromium. Three optional Live Capture extras load on demand and are cached once used: the hand and object models and the clothed body (26 MB). `src/offlinePack.test.js` checks that every file in `public/data` is in the pack, that every listed file exists, and that the page and the service worker use the same cache name. Before 2026-10-28 the crew data was missing from the pack, and the page looked in an old cache name.
+That is 31 files, 50 MB measured in Chromium (35 files and 73 MB before the unused runtimes were dropped). Three optional Live Capture extras load on demand and are cached once used: the hand and object models and the clothed body (26 MB). `src/offlinePack.test.js` checks that every file in `public/data` is in the pack, that every listed file exists, and that the page and the service worker use the same cache name. Before 2026-10-28 the crew data was missing from the pack, and the page looked in an old cache name.
+
+First load on a phone link, measured 2026-10-28 on the Pages build through a server limited to 9 Mbit/s with a 60 ms round trip (`scripts/throttled-server.mjs` and `scripts/qa-first-load.mjs`), two runs each, 390 px phone view:
+
+| Build | 3D twin ready | Offline pack complete |
+| --- | --- | --- |
+| Before: pack installs at once | 61 s | 80 s, 73 MB |
+| After: pack waits for the twin | 14 s | 60 s, 50 MB |
+| Either build, service worker blocked | 14 s | none |
+
+The self-check itself appeared after 1.4 s in every run. The test also checks that every vision worker asks for the module build, so the pack cannot silently miss the runtime the camera uses.
 
 Verified 2026-10-28 on the same build GitHub Pages deploys, served under `/astrobone-space-apps-2026/`, at laptop (1366 px) and phone (390 px) sizes. After one online visit, with the network off, the self-check ran the whole Elena demo with no script errors: the chart, the flight surgeon report, saving with the streak, and the body-part card.
 
