@@ -102,7 +102,15 @@ Added 2026-10-18 in the Movement step for **You · this device** (`src/angleChec
 
 ## Offline
 
-`npm run build` and `npm run build:github` generate `sw.js` and `offline-manifest.json` (`scripts/write-offline-cache.mjs`). **Save for offline** in the twin's systems rail stores the twin, self-check, anatomy, pose model and data (about 35 MB). Verified in Chromium: after saving, a reload with the network off renders the twin and starts the camera pose model.
+The service worker (`public/sw.js`) installs the offline pack on the first online visit, with nothing to press. The pack holds:
+- both pages (the twin and Live Capture) and their bundles;
+- the anatomy models;
+- the pose, face and camera-pulse models and the MediaPipe runtime;
+- every NASA data file, including the Inspiration4 crew blood data behind the "tested on real crew" card.
+
+That is 35 files, 73 MB measured in Chromium. Three optional Live Capture extras load on demand and are cached once used: the hand and object models and the clothed body (26 MB). `src/offlinePack.test.js` checks that every file in `public/data` is in the pack, that every listed file exists, and that the page and the service worker use the same cache name. Before 2026-10-28 the crew data was missing from the pack, and the page looked in an old cache name.
+
+Verified 2026-10-28 on the same build GitHub Pages deploys, served under `/astrobone-space-apps-2026/`, at laptop (1366 px) and phone (390 px) sizes. After one online visit, with the network off, the self-check ran the whole Elena demo with no script errors: the chart, the flight surgeon report, saving with the streak, and the body-part card.
 
 ## Not Yet Verified
 

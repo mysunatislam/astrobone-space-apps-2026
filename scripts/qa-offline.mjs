@@ -1,4 +1,5 @@
 import { chromium } from "playwright";
+import { OFFLINE_CACHE } from "../src/offline.js";
 
 // Verifies the offline pack: load once online, cut the network, reload, and check the
 // twin and Live Capture still start. Run against a production build (vite preview).
@@ -15,10 +16,10 @@ await page.goto(`${base}`, { waitUntil: "load" });
 await page.waitForFunction(() => navigator.serviceWorker?.controller || navigator.serviceWorker?.ready, null, { timeout: 30000 });
 await page.evaluate(() => navigator.serviceWorker.ready);
 // Wait until the install step has cached the core pack.
-await page.waitForFunction(async () => (await (await caches.open("astrobone-offline-v5")).keys()).length >= 20, null, { timeout: 120000, polling: 1000 });
+await page.waitForFunction(async name => (await (await caches.open(name)).keys()).length >= 20, OFFLINE_CACHE, { timeout: 120000, polling: 1000 });
 await page.reload({ waitUntil: "load" });
 await page.waitForFunction(() => window.__astroboneTwin?.scene?.ready, null, { timeout: 120000 });
-const cachedKeys = await page.evaluate(async () => (await (await caches.open("astrobone-offline-v5")).keys()).map(r => r.url.replace(location.origin, "")));
+const cachedKeys = await page.evaluate(async name => (await (await caches.open(name)).keys()).map(r => r.url.replace(location.origin, "")), OFFLINE_CACHE);
 const cached = cachedKeys.length;
 console.log(cachedKeys.filter(k => /assets|mediapipe|task/.test(k)).join(" | "));
 await context.setOffline(true);

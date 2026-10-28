@@ -117,6 +117,13 @@ NASA public research pages and technical reports cited by AstroBone are listed i
 - torchvision: https://github.com/pytorch/vision, BSD-style license
 - segmentation-models-pytorch: https://github.com/qubvel-org/segmentation_models.pytorch, MIT License
 
+Used during development only, not shipped:
+- axe-core (https://github.com/dequelabs/axe-core, MPL 2.0) for the WCAG 2.1 accessibility scan in `docs/self-check.md`.
+
+Published methods implemented in AstroBone's own code:
+- Machado, Oliveira and Fernandes 2009 colour-vision-deficiency matrices.
+- The Sharma, Wu and Dalal 2005 CIEDE2000 formula (`scripts/check-status-colours.mjs`).
+
 Consult `package-lock.json`, `requirements-api.txt`, and `requirements-ml.txt` for the complete dependency set and versions installed for a given build.
 
 ## Optional Local Vision Runtime
