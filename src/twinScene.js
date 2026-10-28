@@ -578,7 +578,7 @@ export function createTwinScene(canvas, { onPick, onHover, onProgress, onFrame }
   function onPointerDown(event) { downAt = { x: event.clientX, y: event.clientY }; }
   function onPointerUp(event) {
     if (!downAt || !ready) return; const moved = Math.hypot(event.clientX - downAt.x, event.clientY - downAt.y); downAt = null;
-    if (moved > 5) return; const name = pick(event); if (name) onPick?.(name);
+    if (moved > 5) return; const name = pick(event); if (name) onPick?.(name, { x: event.clientX, y: event.clientY });
   }
   function onPointerMove(event) {
     if (!ready || event.buttons || performance.now() - lastHover < 90) return; lastHover = performance.now();

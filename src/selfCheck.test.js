@@ -73,7 +73,7 @@ test("actions stay bounded: no diagnosis, treatment or exercise prescription", (
 test("Elena's demo day 147 flags bone/muscle, cardiovascular and behavioral changes, not immune", () => {
   const evaluation = evaluateSelfCheck(elenaDay147(), ELENA_HISTORY);
   const status = Object.fromEntries(evaluation.domains.map(d => [d.key, d.status]));
-  assert.deepEqual(status, { musculoskeletal: "changed", cardiovascular: "changed", behavioral: "changed", immune: "stable" });
+  assert.deepEqual(status, { musculoskeletal: "changed", cardiovascular: "changed", metabolic: "stable", behavioral: "changed", immune: "stable" });
   const behavioral = evaluation.domains.find(d => d.key === "behavioral").indicators.filter(r => r.status === "changed").map(r => r.key);
   assert.deepEqual(behavioral.sort(), ["pvtLapses", "pvtSpeed", "sleepHours"]);
 });

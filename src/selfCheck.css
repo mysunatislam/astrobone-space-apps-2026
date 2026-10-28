@@ -116,3 +116,77 @@
 .sc-src span, .sc-why b { font: 700 9px var(--tw-mono); letter-spacing: .08em; color: var(--tw-green); }
 .sc-src span { padding: 2px 6px; border-radius: 5px; background: rgba(109, 255, 176, .08); }
 .sc-why { margin: 0; padding: 7px 10px; border-left: 2px solid var(--tw-green); background: rgba(109, 255, 176, .05); font-size: 11.5px; line-height: 1.45; color: var(--tw-dim); }
+
+/* Where the astronaut is: sets the escalation ladder */
+.sc-env { display: flex; align-items: center; gap: 8px; font: 600 10px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-dim); }
+.sc-env select, .sc-vital select { flex: 1; min-width: 0; padding: 7px 9px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 13px var(--tw-sans); }
+
+/* Fixed safety limit crossed: tell the crew medical officer today */
+.sc-overall.sc-attention { border-color: rgba(255, 140, 66, .7); background: rgba(255, 140, 66, .1); }
+.sc-overall.sc-attention strong, .sc-domain.sc-attention header em, .sc-domain li.sc-attention b { color: #ff9a4d; }
+.tw-drawer .sc-domain.sc-attention { border-color: rgba(255, 140, 66, .55); }
+.tw-drawer .sc-domain.sc-urgent { border-color: rgba(255, 90, 79, .6); }
+.sc-domain.sc-urgent header em, .sc-domain li.sc-urgent b { color: #ff7a6b; }
+.sc-action.sc-attention { border-color: rgba(255, 140, 66, .55); background: rgba(255, 140, 66, .07); }
+
+/* Vital signs */
+.sc-vitals { gap: 12px; }
+.sc-vital { display: grid; gap: 6px; padding-bottom: 10px; border-bottom: 1px solid var(--tw-line); }
+.sc-vital > b { font-size: 12.5px; color: #fff; }
+.sc-bp { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.sc-bp input { width: 84px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 14px var(--tw-mono); }
+.sc-bp input[aria-invalid] { border-color: #ff9a4d; }
+.sc-bp i { font-style: normal; color: var(--tw-dim); font: 600 11px var(--tw-mono); }
+.sc-bp select { flex: none; width: auto; }
+.sc-vital > small:not(.sc-limit):not(.sc-about) { font-size: 11px; color: var(--tw-faint); }
+.sc-limit { font: 600 10.5px var(--tw-mono); letter-spacing: .04em; }
+.sc-limit:empty { display: none; }
+.sc-limit::before { content: "● "; }
+.sc-limit.sc-ok { color: var(--tw-green); }
+.sc-limit.sc-attention { color: #ff9a4d; }
+.sc-limit.sc-urgent { color: #ff7a6b; }
+.sc-about { font-size: 11px; line-height: 1.45; color: var(--tw-faint); }
+
+/* Who to tell: escalation ladder */
+.sc-ladder { display: grid; gap: 8px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--tw-line-strong); background: rgba(4, 10, 22, .5); }
+.sc-ladder header { display: grid; gap: 2px; }
+.sc-ladder header b { font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-cyan); }
+.sc-ladder header small { font-size: 11px; color: var(--tw-dim); }
+.sc-ladder ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; counter-reset: rung; }
+.sc-ladder li { display: grid; align-content: start; gap: 2px; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--tw-line); color: var(--tw-faint); counter-increment: rung; }
+.sc-ladder li strong { font-size: 11px; line-height: 1.25; }
+.sc-ladder li strong::before { content: counter(rung) " · "; font-family: var(--tw-mono); }
+.sc-ladder li span { font-size: 10px; }
+.sc-ladder li.sc-active { grid-column: 1 / -1; order: -1; color: #fff; border-color: var(--tw-amber); background: rgba(255, 210, 122, .08); }
+.sc-ladder li.sc-active p { margin: 2px 0 0; font-size: 12px; line-height: 1.45; color: var(--tw-ink); }
+
+/* NASA HRP hazards behind each domain, and what helps */
+.sc-hazards { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.sc-hazards span { padding: 2px 6px; border-radius: 5px; background: rgba(127, 227, 255, .07); font: 700 8.5px var(--tw-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tw-cyan); }
+.sc-helps { margin-top: 8px; }
+.sc-helps summary { cursor: pointer; font: 600 10px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-green); }
+.sc-helps ul { list-style: disc; margin: 6px 0 4px; padding-left: 16px; display: grid; gap: 4px; }
+.sc-helps li { display: list-item; font-size: 11.5px; line-height: 1.45; color: var(--tw-ink); }
+.sc-helps small { display: block; font-size: 10px; line-height: 1.4; color: var(--tw-faint); }
+
+/* Mission routine, streak and badges */
+.sc-routine { display: grid; gap: 8px; padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 210, 122, .35); background: linear-gradient(180deg, rgba(255, 210, 122, .07), rgba(4, 10, 22, .4)); }
+.sc-routine header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.sc-routine header b { font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-amber); }
+.sc-routine header small { font-size: 11px; color: var(--tw-dim); }
+.sc-streak { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.sc-streak strong { font: 700 28px/1 var(--tw-mono); color: var(--tw-amber); font-variant-numeric: tabular-nums; }
+.sc-streak span { font-size: 12.5px; color: var(--tw-ink); }
+.sc-streak small { font: 10px var(--tw-mono); color: var(--tw-faint); }
+.sc-routine-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.sc-routine-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; font-size: 11.5px; color: var(--tw-dim); }
+.sc-routine-list b { grid-column: 1; font-size: 11.5px; color: #fff; }
+.sc-routine-list span { grid-column: 1; }
+.sc-routine-list .sc-link { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.sc-badges { display: flex; flex-wrap: wrap; gap: 5px; }
+.sc-badge { padding: 3px 8px; border-radius: 999px; border: 1px solid var(--tw-line); font: 600 9.5px var(--tw-mono); letter-spacing: .05em; color: var(--tw-faint); }
+.sc-badge.sc-earned { border-color: rgba(255, 210, 122, .55); color: var(--tw-amber); background: rgba(255, 210, 122, .07); }
+.sc-badge.sc-new { animation: sc-badge-in .6s ease-out both; }
+@keyframes sc-badge-in { from { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .sc-badge.sc-new { animation: none; } }
+@media (max-width: 420px) { .sc-ladder ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
