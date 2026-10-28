@@ -15,6 +15,13 @@
   --tw-orange: #ff9f43;
   --tw-red: #ff5a4f;
   --tw-green: #6dffb0;
+  /* Status colours, chosen with scripts/check-status-colours.mjs so no two statuses look alike to
+     red-green colour-blind viewers. Every status also shows a word and a shape. */
+  --st-urgent: #ff7a6b;
+  --st-attention: #ff6fb5;
+  --st-changed: #ffb347;
+  --st-wait: #a9c7ff;
+  --st-stable: #6dffb0;
   --tw-sans: "Inter", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
   --tw-mono: "JetBrains Mono", "Cascadia Code", "SFMono-Regular", Consolas, monospace;
   --tw-radius: 12px;
@@ -363,13 +370,15 @@ body.twin-body { overflow: hidden; }
 .tw-partcard-row { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: baseline; font-size: 11.5px; }
 .tw-partcard-row b { font-family: var(--tw-mono); color: #fff; }
 .tw-partcard-row small { font: 9px var(--tw-mono); letter-spacing: .08em; color: var(--tw-faint); }
-.tw-st-stable em, .tw-partcard-row.tw-st-stable small { color: var(--tw-green); }
-.tw-st-changed em, .tw-partcard-row.tw-st-changed small, .tw-partcard-row.tw-st-changed b { color: var(--tw-orange); }
-.tw-st-attention em, .tw-partcard-row.tw-st-attention small, .tw-partcard-row.tw-st-attention b { color: #ff9a4d; }
-.tw-st-urgent em, .tw-partcard-row.tw-st-urgent small, .tw-partcard-row.tw-st-urgent b { color: var(--tw-red); }
-.tw-st-baseline em, .tw-st-repeat em, .tw-st-notChecked em { color: var(--tw-amber); }
+.tw-st-stable em, .tw-partcard-row.tw-st-stable small { color: var(--st-stable); }
+.tw-st-changed em, .tw-partcard-row.tw-st-changed small, .tw-partcard-row.tw-st-changed b { color: var(--st-changed); }
+.tw-st-attention em, .tw-partcard-row.tw-st-attention small, .tw-partcard-row.tw-st-attention b { color: var(--st-attention); }
+.tw-st-urgent em, .tw-partcard-row.tw-st-urgent small, .tw-partcard-row.tw-st-urgent b { color: var(--st-urgent); }
+.tw-st-baseline em, .tw-st-repeat em, .tw-partcard-row.tw-st-baseline small, .tw-partcard-row.tw-st-repeat small { color: var(--st-wait); }
+.tw-st-notChecked em { color: var(--tw-dim); }
 .tw-partcard-status.tw-st-changed { border-color: rgba(255, 159, 67, .45); }
-.tw-partcard-status.tw-st-attention, .tw-partcard-status.tw-st-urgent { border-color: rgba(255, 90, 79, .5); }
+.tw-partcard-status.tw-st-attention { border-color: rgba(255, 111, 181, .5); }
+.tw-partcard-status.tw-st-urgent { border-color: rgba(255, 90, 79, .5); }
 .tw-partcard-helps { padding-left: 8px; border-left: 2px solid var(--tw-green); }
 .tw-partcard-src { font-size: 10px; color: var(--tw-faint); }
 .tw-partcard-actions { display: flex; gap: 8px; }

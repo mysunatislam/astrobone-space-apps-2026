@@ -73,7 +73,7 @@ export function createTwinApp(root) {
   const legend = el("div", { class: "tw-legend" });
   const labels = el("div", { class: "tw-labels", "aria-hidden": "true" });
   const caption = el("div", { class: "tw-caption", role: "status", "aria-live": "assertive", hidden: true });
-  const partCard = el("aside", { class: "tw-partcard", role: "dialog", "aria-label": "Body part", hidden: true });
+  const partCard = el("div", { class: "tw-partcard", role: "dialog", "aria-label": "Body part", hidden: true });
   const loading = el("div", { class: "tw-loading" }, el("span", {}, "Loading reference anatomy"), el("div", { class: "tw-progress" }, el("i", {})));
 
   // Timeline

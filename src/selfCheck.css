@@ -56,41 +56,41 @@
 .sc-overall strong { font: 700 15px var(--tw-mono); letter-spacing: .14em; }
 .sc-overall span { font-size: 12.5px; color: var(--tw-dim); }
 .sc-overall.sc-changed { border-color: rgba(255, 179, 71, .6); background: rgba(255, 179, 71, .08); }
-.sc-overall.sc-changed strong { color: #ffb347; }
+.sc-overall.sc-changed strong { color: var(--st-changed); }
 .sc-overall.sc-urgent { border-color: rgba(255, 90, 79, .7); background: rgba(255, 90, 79, .12); }
-.sc-overall.sc-urgent strong { color: #ff7a6b; }
-.sc-overall.sc-repeat strong, .sc-overall.sc-baseline strong { color: var(--tw-amber); }
-.sc-overall.sc-stable strong { color: var(--tw-green); }
+.sc-overall.sc-urgent strong { color: var(--st-urgent); }
+.sc-overall.sc-repeat strong, .sc-overall.sc-baseline strong { color: var(--st-wait); }
+.sc-overall.sc-stable strong { color: var(--st-stable); }
 .sc-domains { display: grid; gap: 8px; }
 .tw-drawer .sc-domain { margin: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--tw-line); background: rgba(4, 10, 22, .45); }
 .sc-domain header { display: flex; justify-content: space-between; align-items: center; }
 .sc-domain header b { font-size: 13px; }
 .sc-domain header em { font: 700 9px var(--tw-mono); font-style: normal; letter-spacing: .12em; padding: 3px 6px; border-radius: 4px; border: 1px solid currentColor; color: var(--tw-dim); }
 .tw-drawer .sc-domain.sc-changed { border-color: rgba(255, 179, 71, .5); }
-.sc-domain.sc-changed header em { color: #ffb347; }
-.sc-domain.sc-stable header em { color: var(--tw-green); }
-.sc-domain.sc-repeat header em, .sc-domain.sc-baseline header em { color: var(--tw-amber); }
+.sc-domain.sc-changed header em { color: var(--st-changed); }
+.sc-domain.sc-stable header em { color: var(--st-stable); }
+.sc-domain.sc-repeat header em, .sc-domain.sc-baseline header em { color: var(--st-wait); }
 .sc-domain > small { display: block; margin-top: 2px; font-size: 10.5px; color: var(--tw-faint); }
 .sc-domain p { margin: 6px 0 0; font-size: 12px; color: var(--tw-dim); }
 .sc-domain ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
 .sc-domain li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: baseline; font-size: 12px; color: var(--tw-dim); }
 .sc-domain li b { color: #fff; font-family: var(--tw-mono); font-variant-numeric: tabular-nums; }
 .sc-domain li small { font: 10px var(--tw-mono); color: var(--tw-faint); }
-.sc-domain li.sc-changed b { color: #ffb347; }
+.sc-domain li.sc-changed b { color: var(--st-changed); }
 .sc-trend { grid-column: 1 / -1; margin: 1px 0 4px; }
 .sc-spark { display: block; width: 100%; max-width: 220px; height: auto; overflow: visible; }
 .sc-spark-band { fill: rgba(127, 227, 255, .1); }
 .sc-spark-start { stroke: var(--tw-faint); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
 .sc-spark-line { fill: none; stroke: #7fe3ff; stroke-width: 1.5; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .sc-spark-now { fill: #7fe3ff; }
-.sc-spark-now.sc-spark-changed { fill: #ffb347; }
-.sc-domain li.sc-repeat b { color: var(--tw-amber); text-decoration: line-through; }
+.sc-spark-now.sc-spark-changed { fill: var(--st-changed); }
+.sc-domain li.sc-repeat b { color: var(--st-wait); text-decoration: line-through; }
 .tw-drawer .sc-actions { display: grid; gap: 6px; margin: 0; padding: 0; border: 0; }
 .sc-actions h3 { margin-bottom: 2px; }
 .sc-action { display: flex; gap: 9px; align-items: flex-start; padding: 9px 11px; border-radius: 9px; border: 1px solid var(--tw-line); font-size: 12.5px; line-height: 1.45; }
 .sc-action.sc-urgent { border-color: rgba(255, 90, 79, .6); background: rgba(255, 90, 79, .1); color: #ffd2cc; }
 .sc-action.sc-review { border-color: rgba(255, 179, 71, .45); }
-.sc-action.sc-repeat { border-color: rgba(255, 210, 122, .45); }
+.sc-action.sc-repeat { border-color: rgba(169, 199, 255, .45); }
 
 /* Today's checks: what NASA life-science data asks this check to watch, and when */
 .sc-plan { display: grid; gap: 8px; padding: 12px; border-radius: 12px; border: 1px solid rgba(109, 255, 176, .28); background: linear-gradient(180deg, rgba(109, 255, 176, .06), rgba(4, 10, 22, .4)); }
@@ -122,12 +122,12 @@
 .sc-env select, .sc-vital select { flex: 1; min-width: 0; padding: 7px 9px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 13px var(--tw-sans); }
 
 /* Fixed safety limit crossed: tell the crew medical officer today */
-.sc-overall.sc-attention { border-color: rgba(255, 140, 66, .7); background: rgba(255, 140, 66, .1); }
-.sc-overall.sc-attention strong, .sc-domain.sc-attention header em, .sc-domain li.sc-attention b { color: #ff9a4d; }
-.tw-drawer .sc-domain.sc-attention { border-color: rgba(255, 140, 66, .55); }
+.sc-overall.sc-attention { border-color: rgba(255, 111, 181, .7); background: rgba(255, 111, 181, .1); }
+.sc-overall.sc-attention strong, .sc-domain.sc-attention header em, .sc-domain li.sc-attention b { color: var(--st-attention); }
+.tw-drawer .sc-domain.sc-attention { border-color: rgba(255, 111, 181, .55); }
 .tw-drawer .sc-domain.sc-urgent { border-color: rgba(255, 90, 79, .6); }
-.sc-domain.sc-urgent header em, .sc-domain li.sc-urgent b { color: #ff7a6b; }
-.sc-action.sc-attention { border-color: rgba(255, 140, 66, .55); background: rgba(255, 140, 66, .07); }
+.sc-domain.sc-urgent header em, .sc-domain li.sc-urgent b { color: var(--st-urgent); }
+.sc-action.sc-attention { border-color: rgba(255, 111, 181, .55); background: rgba(255, 111, 181, .07); }
 
 /* Vital signs */
 .sc-vitals { gap: 12px; }
@@ -135,16 +135,16 @@
 .sc-vital > b { font-size: 12.5px; color: #fff; }
 .sc-bp { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .sc-bp input { width: 84px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 14px var(--tw-mono); }
-.sc-bp input[aria-invalid] { border-color: #ff9a4d; }
+.sc-bp input[aria-invalid] { border-color: var(--st-attention); }
 .sc-bp i { font-style: normal; color: var(--tw-dim); font: 600 11px var(--tw-mono); }
 .sc-bp select { flex: none; width: auto; }
 .sc-vital > small:not(.sc-limit):not(.sc-about) { font-size: 11px; color: var(--tw-faint); }
 .sc-limit { font: 600 10.5px var(--tw-mono); letter-spacing: .04em; }
 .sc-limit:empty { display: none; }
 .sc-limit::before { content: "● "; }
-.sc-limit.sc-ok { color: var(--tw-green); }
-.sc-limit.sc-attention { color: #ff9a4d; }
-.sc-limit.sc-urgent { color: #ff7a6b; }
+.sc-limit.sc-ok { color: var(--st-stable); }
+.sc-limit.sc-attention { color: var(--st-attention); }
+.sc-limit.sc-urgent { color: var(--st-urgent); }
 .sc-about { font-size: 11px; line-height: 1.45; color: var(--tw-faint); }
 
 /* Who to tell: escalation ladder */
@@ -190,3 +190,58 @@
 @keyframes sc-badge-in { from { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } to { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .sc-badge.sc-new { animation: none; } }
 @media (max-width: 420px) { .sc-ladder ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Status word and shape on every result row, so colour is never the only cue */
+.sc-domain li > span { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 7px; }
+.sc-word { font: 700 8.5px var(--tw-mono); font-style: normal; letter-spacing: .1em; color: var(--tw-faint); white-space: nowrap; }
+.sc-word.sc-stable { color: var(--st-stable); } .sc-word.sc-changed { color: var(--st-changed); } .sc-word.sc-attention { color: var(--st-attention); }
+.sc-word.sc-urgent { color: var(--st-urgent); } .sc-word.sc-baseline, .sc-word.sc-repeat { color: var(--st-wait); }
+.sc-rowlink { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; text-decoration: underline dotted rgba(127, 227, 255, .5); text-underline-offset: 3px; }
+.sc-rowlink:hover { color: var(--tw-cyan); }
+
+/* Over time: full-size chart for one indicator */
+.sc-over { display: grid; gap: 8px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--tw-line-strong); background: rgba(4, 10, 22, .5); }
+.sc-over header { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sc-over header b { font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-cyan); }
+.sc-over header label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--tw-dim); }
+.sc-over select { max-width: 220px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--tw-line-strong); background: rgba(4, 10, 22, .8); color: var(--tw-ink); font: 12px var(--tw-sans); }
+.sc-over > small { font-size: 11px; line-height: 1.4; color: var(--tw-faint); }
+.sc-hchart { display: block; width: 100%; height: auto; overflow: visible; }
+.sc-h-grid { stroke: rgba(110, 190, 255, .1); stroke-width: 1; }
+.sc-h-tick, .sc-h-unit { font: 10px var(--tw-mono); fill: var(--tw-faint); }
+.sc-h-band { fill: rgba(127, 227, 255, .1); }
+.sc-h-start { stroke: var(--tw-faint); stroke-width: 1; stroke-dasharray: 4 4; }
+.sc-h-limit { stroke-width: 1.2; stroke-dasharray: 7 4; }
+.sc-h-limit.sc-h-urgent { stroke: var(--st-urgent); } .sc-h-limit.sc-h-attention { stroke: var(--st-attention); }
+.sc-h-note { font: 600 9.5px var(--tw-mono); fill: var(--tw-dim); }
+.sc-h-note.sc-h-urgent { fill: var(--st-urgent); } .sc-h-note.sc-h-attention { fill: var(--st-attention); }
+.sc-h-line { fill: none; stroke: var(--tw-cyan); stroke-width: 1.6; stroke-linejoin: round; }
+.sc-h-pt { stroke-width: 1.6; }
+.sc-h-stable { fill: var(--st-stable); stroke: var(--st-stable); }
+.sc-h-baseline { fill: var(--tw-bg); stroke: var(--st-wait); }
+.sc-h-repeat { fill: none; stroke: var(--st-wait); stroke-width: 2.2; }
+.sc-h-changed { fill: var(--st-changed); stroke: var(--st-changed); }
+.sc-h-attention { fill: var(--st-attention); stroke: var(--st-attention); }
+.sc-h-urgent { fill: var(--st-urgent); stroke: var(--st-urgent); }
+.sc-h-today { stroke: #fff; }
+.sc-h-now { font: 700 10px var(--tw-mono); letter-spacing: .06em; }
+/* A dark halo keeps labels readable where they cross a line or a band */
+.sc-hchart text { paint-order: stroke; stroke: #050c18; stroke-width: 3px; stroke-linejoin: round; }
+.sc-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 12px; font: 600 9.5px var(--tw-mono); letter-spacing: .06em; color: var(--tw-dim); }
+.sc-legend li { display: flex; align-items: center; gap: 5px; }
+.sc-legend i { font-style: normal; font-size: 11px; }
+.sc-legend .sc-stable i { color: var(--st-stable); } .sc-legend .sc-baseline i, .sc-legend .sc-repeat i { color: var(--st-wait); }
+.sc-legend .sc-changed i { color: var(--st-changed); } .sc-legend .sc-attention i { color: var(--st-attention); } .sc-legend .sc-urgent i { color: var(--st-urgent); }
+.sc-legend-band i { width: 14px; height: 9px; background: rgba(127, 227, 255, .18); }
+.sc-legend-start i { width: 14px; border-top: 1px dashed var(--tw-faint); }
+.sc-legend-limit i { width: 14px; border-top: 1.5px dashed var(--st-attention); }
+.sc-htable summary { cursor: pointer; font: 600 10px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-dim); }
+.sc-htable ol { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 2px; font: 11px var(--tw-mono); color: var(--tw-dim); }
+
+/* Report for flight surgeon: the result as plain text for a slow link */
+.sc-report { display: grid; gap: 8px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--tw-line-strong); background: rgba(4, 10, 22, .5); }
+.sc-report header, .tw-drawer .sc-report > header { display: grid; gap: 2px; margin-bottom: 0; }
+.sc-report header b { font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-cyan); }
+.sc-report header small { font-size: 11px; color: var(--tw-faint); }
+.sc-report pre { margin: 0; max-height: 280px; overflow: auto; padding: 10px; border-radius: 8px; border: 1px solid var(--tw-line); background: rgba(0, 0, 0, .35); font: 11px/1.5 var(--tw-mono); color: var(--tw-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.sc-report .sc-row small { align-self: center; font-size: 11px; color: var(--tw-dim); }

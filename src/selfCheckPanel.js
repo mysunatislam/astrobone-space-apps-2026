@@ -1,6 +1,6 @@
 import {
   PVT_B, PVT_PROTOCOL, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
-  safetyLimit, applyVitals, vitalsFromValues, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES,
+  safetyLimit, applyVitals, vitalsFromValues, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
 import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
@@ -11,6 +11,8 @@ import { createSelfCheckCamera } from "./selfCheckCamera.js";
 import { createCameraPulse, CAMERA_PULSE, RESTING_CAMERA_PROTOCOL } from "./cameraPulse.js";
 import { cameraViewFor } from "./functionalAssessment.js";
 import { sparklineSvg } from "./trendSpark.js";
+import { surgeonReport, byteSize } from "./surgeonReport.js";
+import { STATUS_MARKS, indicatorHistory, historyChartSvg, legendFor, chartableKeys, pointLabel } from "./historyChart.js";
 import { HOLD, REFERENCE_TYPES, summarizeHold, agreement, calibratedFloors, pairsToCsv, createAngleCheckStore } from "./angleCheck.js";
 import { ELENA } from "./elenaMissionScenario.js";
 import { loadNasaEvidence, nasaWatchPlan } from "./nasaWatch.js";
@@ -46,7 +48,7 @@ const VIEW_CUE = { front: "facing camera", side: "side-on", oblique: "turned par
 
 export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {}, onTimedTest = () => {} } = {}) {
   const store = createSelfCheckStore();
-  const state = { profile: "elena", environment: DEFAULT_ENVIRONMENT.elena, persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [] };
+  const state = { profile: "elena", environment: DEFAULT_ENVIRONMENT.elena, persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [], chartKey: null, report: false };
   const element = el("div", { class: "sc" });
   const video = el("video", { class: "sc-video", playsinline: true, muted: true, "aria-label": "Camera preview" });
   const overlay = el("canvas", { class: "sc-overlay", "aria-hidden": "true" });
@@ -105,7 +107,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   const history = () => (state.profile === "elena" ? [...ELENA_HISTORY, ...(store.load("DEMO-ELENA", false))] : store.load("you", state.persist));
   function reset() {
     stopCamera(); stopPvt(true);
-    state.step = 0; state.capture = null; state.pvt = null; state.evaluation = null; state.captures = 0; state.saved = false; state.failed = {}; state.earned = [];
+    state.step = 0; state.capture = null; state.pvt = null; state.evaluation = null; state.captures = 0; state.saved = false; state.failed = {}; state.earned = []; state.report = false;
     if (state.profile === "elena") {
       state.check = elenaDay147(); state.check.id = `DEMO-ELENA-day-147-${Date.now()}`;
       // Movement and reaction results arrive through the demo capture buttons.
@@ -322,11 +324,29 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     });
     state.saved = true; state.earned = newBadges(before, routine().status); render();
   }
-  function exportJson() {
-    const packet = { schema: "astrobone-self-check-export-v1", profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device", environment: environment(), check: state.check, evaluation: state.evaluation, followUps: state.followUps,
+  function exportPacket() {
+    return { schema: "astrobone-self-check-export-v1", profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device", environment: environment(), check: state.check, evaluation: state.evaluation, followUps: state.followUps,
       boundary: "Self-monitoring record. Review triggers are engineering defaults, not clinical thresholds. Not a diagnosis.", exportedAt: new Date().toISOString() };
-    const url = URL.createObjectURL(new Blob([JSON.stringify(packet, null, 2)], { type: "application/json" }));
-    const a = el("a", { href: url, download: `AstroBone-self-check-${state.profile}-${Date.now()}.json` }); a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function download(text, type, name) {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const a = el("a", { href: url, download: name }); a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function exportJson() { download(JSON.stringify(exportPacket(), null, 2), "application/json", `AstroBone-self-check-${state.profile}-${Date.now()}.json`); }
+
+  // The same result as a short plain-text message for the flight surgeon, readable without AstroBone.
+  function reportSection() {
+    const text = surgeonReport(state.evaluation, state.check, { environment: environment(), profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device",
+      followUps: state.saved ? state.followUps : null });
+    const kb = n => `${(n / 1024).toFixed(1)} kB`, size = byteSize(text), full = byteSize(JSON.stringify(exportPacket(), null, 2));
+    const copied = el("small", { role: "status" });
+    return el("section", { class: "sc-report", "aria-label": "Report for flight surgeon" },
+      el("header", {}, el("b", {}, "Report for flight surgeon"), el("small", {}, `${kb(size)} of plain text, ${Math.round(full / size)}× smaller than the full JSON record (${kb(full)}). Readable on any ground terminal.`)),
+      el("pre", { tabindex: "0" }, text),
+      el("div", { class: "sc-row" },
+        el("button", { type: "button", class: "sc-secondary", onclick: async () => { try { await navigator.clipboard.writeText(text); copied.textContent = "Copied."; } catch { copied.textContent = "Copy is blocked here; use Download."; } } }, "Copy"),
+        el("button", { type: "button", class: "sc-secondary", onclick: () => download(text, "text/plain;charset=utf-8", `AstroBone-report-${state.profile}-${Date.now()}.txt`) }, "Download .txt"),
+        copied));
   }
 
   // ---------- Vital signs ----------
@@ -463,6 +483,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const ev = state.evaluation; if (!ev) return [];
     const [label, detail] = STATUS[ev.overall];
     const measured = d => d.indicators.filter(r => r.status !== "notChecked");
+    const charted = chartableKeys(history(), state.check);
     return [el("div", { class: `sc-overall sc-${ev.overall}` }, el("strong", {}, label), el("span", {}, ev.overall === "stable" ? "No change outside your usual range" : detail)),
       ev.redFlags.length ? el("p", { class: "sc-urgent", role: "alert" }, `Reported: ${ev.redFlags.join("; ")}.`) : null,
       ladder(ev),
@@ -471,18 +492,23 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         el("div", { class: "sc-hazards" }, hazardsForDomain(d.key).map(h => el("span", { title: h.effect }, h.name))),
         d.key === "immune" ? el("p", {}, d.status === "notChecked" && !measured(d).length ? "Symptoms not answered." : d.symptoms.length ? d.symptoms.join(", ") : "No new symptoms reported.") : null,
         measured(d).length ? el("ul", {}, measured(d).map(r => el("li", { class: `sc-${r.status}`, title: r.def.about },
-            el("span", {}, r.def.label), el("b", {}, `${fmt(r.value, r.def.digits ?? 0)}${r.def.unit === "°" || !r.def.unit ? r.def.unit : ` ${r.def.unit}`}`),
+            el("span", {}, charted.includes(r.key) ? el("button", { type: "button", class: "sc-rowlink", "aria-label": `Chart ${r.def.label} over time`, onclick: () => showChart(r.key) }, r.def.label) : r.def.label,
+              el("em", { class: `sc-word sc-${r.status}` }, `${STATUS_MARKS[r.status].glyph} ${STATUS[r.status][0]}`)), el("b", {}, `${fmt(r.value, r.def.digits ?? 0)}${r.def.unit === "°" || !r.def.unit ? r.def.unit : ` ${r.def.unit}`}`),
             el("small", {}, r.limit ? `safety limit: ${r.limit.text}` : r.status === "baseline" ? `baseline ${r.ref.count}/${r.ref.needed}` : r.status === "repeat" ? "quality failed"
               : r.reason === "drift" ? `gradual drift · start ${fmt(r.drift.lockedMean, r.def.digits ?? 0)}` : `usual ${fmt(r.ref.mean, r.def.digits ?? 0)} ± ${fmt(r.tolerance, r.def.digits ?? 1)}`),
             trend(r)))) : d.key !== "immune" ? el("p", {}, "Not checked.") : null,
         helps(d)))),
+      overTime(ev, charted),
       el("section", { class: "sc-actions" }, el("h3", {}, "Your next step"),
         ev.actions.map(a => el("label", { class: `sc-action sc-${a.priority}` }, el("input", { type: "checkbox", "data-action": a.id, checked: (a.priority !== "info" || a.id === "routine") || undefined, disabled: state.saved || undefined }), el("span", {}, a.text)))),
       state.saved ? el("div", { class: "sc-result" }, el("strong", {}, `Saved · ${routine().status.streak}-day streak`), el("p", {}, state.followUps.length ? state.followUps.map(f => `${f.text.split(".")[0]}${f.dueAt ? ` · due ${new Date(f.dueAt).toLocaleString()}` : ""}`).join(" | ") : "No follow-up selected."),
         state.earned.length ? el("div", { class: "sc-badges", role: "status" }, state.earned.map(b => el("span", { class: "sc-badge sc-earned sc-new", title: b.detail }, `★ New badge: ${b.label}`))) : null,
         el("small", {}, state.profile === "elena" ? "Demo record kept in memory for this tab." : state.persist ? "Saved on this device." : "Kept in memory for this tab (saving on this device is off)."))
         : el("button", { type: "button", class: "sc-primary", onclick: saveCheck }, "Save check & selected actions"),
-      el("div", { class: "sc-row" }, el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
+      el("div", { class: "sc-row" },
+        el("button", { type: "button", class: "sc-secondary", "aria-expanded": String(state.report), onclick: () => { state.report = !state.report; render(); if (state.report) element.querySelector(".sc-report")?.scrollIntoView({ block: "nearest", behavior: "smooth" }); } }, "Report for flight surgeon"),
+        el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
+      state.report ? reportSection() : null,
       el("p", { class: "sc-note" }, "Review triggers: outside 2× your own spread or a minimum change, whichever is larger, after 3 usable checks; or a steady drift from your first checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
       state.profile === "elena" ? el("p", { class: "sc-note" }, ELENA_SELF_CHECK_BOUNDARY) : null];
   }
@@ -495,6 +521,36 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       el("ol", {}, plan.steps.map(step => el("li", { class: step.active ? "sc-active" : undefined, "aria-current": step.active ? "step" : undefined, title: step.detail },
         el("strong", {}, step.title), el("span", {}, step.who), step.active ? el("p", {}, step.detail) : null))));
   }
+  // Over time: the full-size chart for one indicator, every check re-judged as it was on its own day.
+  function overTime(ev, charted) {
+    if (!charted.length) return null;
+    const rows = ev.domains.flatMap(d => d.indicators);
+    // Default: the most serious measured indicator.
+    const pick = charted.includes(state.chartKey) ? state.chartKey
+      : (rows.filter(r => charted.includes(r.key)).sort((a, b) => STATUS_RANK[b.status] - STATUS_RANK[a.status])[0]?.key ?? charted[0]);
+    const floors = state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor);
+    const hist = indicatorHistory(pick, history(), state.saved ? null : state.check, { floors });
+    const box = el("div", { class: "sc-hchart-box" }); box.innerHTML = historyChartSvg(hist);
+    const d = hist.def;
+    return el("section", { class: "sc-over", "aria-label": "Over time" },
+      el("header", {}, el("b", {}, "Over time"),
+        el("label", {}, el("span", {}, "Measure"), el("select", { "aria-label": "Measurement to chart", onchange: e => { state.chartKey = e.target.value; render(); } },
+          charted.map(key => el("option", { value: key, selected: key === pick || undefined }, INDICATORS[key].label))))),
+      el("small", {}, `${d.about ?? ""} Each point is judged against the checks before it, as it was on that day.`),
+      box,
+      el("ul", { class: "sc-legend", "aria-label": "Legend" },
+        legendFor(hist).map(m => el("li", { class: `sc-${m.status}` }, el("i", {}, m.glyph), m.word)),
+        hist.points.some(p => p.band) ? el("li", { class: "sc-legend-band" }, el("i", {}), "usual range that day") : null,
+        Number.isFinite(hist.start) ? el("li", { class: "sc-legend-start" }, el("i", {}), "starting level") : null,
+        hist.limitLines.length ? el("li", { class: "sc-legend-limit" }, el("i", {}), "safety limit") : null),
+      el("details", { class: "sc-htable" }, el("summary", {}, "Show as a table"),
+        el("ol", {}, hist.points.map(p => el("li", {}, pointLabel(p, d))))));
+  }
+  function showChart(key) {
+    state.chartKey = key; render();
+    element.querySelector(".sc-over")?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
   // What helps: general guidance for the domain, open when the domain needs attention.
   function helps(d) {
     const g = guidanceFor(d.key); if (!g) return null;
