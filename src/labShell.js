@@ -5,7 +5,12 @@ import { registerOffline } from "./offline.js";
 
 // Live Capture uses the twin's header, menu and palette, so the two pages read as one app. The page's
 // own (older) top bar stays in the DOM for the code that reads it, hidden by labTheme.css.
-registerOffline();
+// The offline pack downloads after the rigged model (main.js sets data-rig-ready when it loads or fails).
+const rig = document.querySelector("#twin-canvas");
+registerOffline(rig && new Promise(resolve => {
+  const observer = new MutationObserver(() => { if ("rigReady" in rig.dataset) { observer.disconnect(); resolve(); } });
+  observer.observe(rig, { attributes: true, attributeFilter: ["data-rig-ready"] });
+}));
 document.documentElement.dataset.theme = "dark";
 document.body.classList.add("lab-body");
 

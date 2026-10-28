@@ -1,14 +1,14 @@
 // AstroBone offline pack. After one online visit, the twin (home), Live Capture and their models,
 // NASA summaries and pose runtime are served from this device's cache.
-const CACHE = "astrobone-offline-v7";
+const CACHE = "astrobone-offline-v8";
 const CORE = [
   "./", "lab.html",
   "models/anatomy/musculoskeletal.glb", "models/anatomy/musculoskeletal-rigged.glb", "models/anatomy/cardiovascular.glb", "models/anatomy/SOURCE-LICENSE.txt",
   "models/pose_landmarker_lite.task",
   "models/face_landmarker.task",
   "models/me-rppg/model.onnx", "models/me-rppg/state.json", "models/me-rppg/state.bin",
-  "mediapipe/vision_wasm_internal.js", "mediapipe/vision_wasm_internal.wasm",
-  "mediapipe/vision_wasm_nosimd_internal.js", "mediapipe/vision_wasm_nosimd_internal.wasm",
+  // Every vision worker calls FilesetResolver.forVisionTasks(url, true), which loads only the module
+  // build. The other two builds in public/mediapipe (23 MB) are never requested (src/offlinePack.test.js).
   "mediapipe/vision_wasm_module_internal.js", "mediapipe/vision_wasm_module_internal.wasm",
   "simulations/astrobone-level-a-v1.json",
   // Every file in public/data (src/offlinePack.test.js checks): the self-check's "tested on real crew"
