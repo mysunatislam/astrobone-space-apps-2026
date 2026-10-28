@@ -1,7 +1,12 @@
 import {
   PVT_B, PVT_PROTOCOL, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
+  safetyLimit, applyVitals, vitalsFromValues, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES,
 } from "./selfCheck.js";
-import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, elenaDay147 } from "./elenaSelfCheck.js";
+import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
+import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
+import { guidanceFor, GUIDANCE_BOUNDARY } from "./countermeasures.js";
+import { hazardsForDomain } from "./hazards.js";
+import { ROUTINE, routineStatus, nextDue, dayNumber, newBadges } from "./routine.js";
 import { createSelfCheckCamera } from "./selfCheckCamera.js";
 import { createCameraPulse, CAMERA_PULSE, RESTING_CAMERA_PROTOCOL } from "./cameraPulse.js";
 import { cameraViewFor } from "./functionalAssessment.js";
@@ -13,7 +18,7 @@ import { loadCrewBlood, replayCrew, crewReplayCard } from "./crewReplay.js";
 
 const STEPS = [["safety", "Safety"], ["movement", "Movement"], ["reaction", "Reaction"], ["mind", "Sleep & mood"], ["body", "Body"], ["result", "Result & action"]];
 const STATUS = {
-  urgent: ["URGENT", "Contact now"], changed: ["REVIEW", "Outside your usual range"], repeat: ["REPEAT", "Quality check failed · not compared"],
+  urgent: ["URGENT", "Contact now"], attention: ["CONTACT TODAY", "Outside a safety limit"], changed: ["REVIEW", "Outside your usual range"], repeat: ["REPEAT", "Quality check failed · not compared"],
   baseline: ["BASELINE", "Building your baseline"], stable: ["STABLE", "Within your usual range"], notChecked: ["NOT CHECKED", "No data this check"],
 };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -41,7 +46,7 @@ const VIEW_CUE = { front: "facing camera", side: "side-on", oblique: "turned par
 
 export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {}, onTimedTest = () => {} } = {}) {
   const store = createSelfCheckStore();
-  const state = { profile: "elena", persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false };
+  const state = { profile: "elena", environment: DEFAULT_ENVIRONMENT.elena, persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [] };
   const element = el("div", { class: "sc" });
   const video = el("video", { class: "sc-video", playsinline: true, muted: true, "aria-label": "Camera preview" });
   const overlay = el("canvas", { class: "sc-overlay", "aria-hidden": "true" });
@@ -100,7 +105,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   const history = () => (state.profile === "elena" ? [...ELENA_HISTORY, ...(store.load("DEMO-ELENA", false))] : store.load("you", state.persist));
   function reset() {
     stopCamera(); stopPvt(true);
-    state.step = 0; state.capture = null; state.pvt = null; state.evaluation = null; state.captures = 0; state.saved = false;
+    state.step = 0; state.capture = null; state.pvt = null; state.evaluation = null; state.captures = 0; state.saved = false; state.failed = {}; state.earned = [];
     if (state.profile === "elena") {
       state.check = elenaDay147(); state.check.id = `DEMO-ELENA-day-147-${Date.now()}`;
       // Movement and reaction results arrive through the demo capture buttons.
@@ -108,13 +113,16 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       // Elena's authored answers: no red flags and no new symptoms on Day 147.
       state.check.redFlags = {}; state.check.symptoms = {};
       state.check.dosimeter = ELENA.observations.find(r => r.day.value === 147).absorbedDose.value;
-    } else state.check = newCheck("you");
+      state.check.vitals = { ...vitalsFromValues(state.check.values, state.check.protocols), source: "SYNTHETIC DEMO" };
+    } else { state.check = newCheck("you"); state.check.vitals = {}; }
     render(); onStep(STEPS[0][0]);
   }
+  function switchProfile(profile) { if (state.profile === profile) return; state.profile = profile; state.environment = DEFAULT_ENVIRONMENT[profile]; reset(); }
+  const environment = () => environmentFor(state.environment);
   function go(step) { state.step = Math.max(0, Math.min(STEPS.length - 1, step)); if (STEPS[state.step][0] !== "movement") stopCamera(); if (STEPS[state.step][0] !== "body") stopPulse(); if (STEPS[state.step][0] === "result") evaluate(); render(); onStep(STEPS[state.step][0]); }
 
   function evaluate() {
-    state.evaluation = evaluateSelfCheck(state.check, history(), { floors: state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor) });
+    state.evaluation = evaluateSelfCheck(state.check, history(), { floors: state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor), environment: environment() });
     onEvaluate(state.evaluation, state.profile);
   }
 
@@ -122,6 +130,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   function applyCapture(capture, source) {
     state.capture = { ...capture, source }; state.captures++;
     const usable = capture.status !== "insufficient" && capture.trackingQuality >= 0.7 && capture.sampleCount >= 12 && Number.isFinite(capture.kneeExtension);
+    noteRepeat("movement", usable);
     Object.assign(state.check.values, { kneeExtension: capture.kneeExtension, kneeRom: capture.kneeRom });
     Object.assign(state.check.quality, { kneeExtension: usable, kneeRom: usable });
     const protocol = state.profile === "elena" ? "restrained-knee-extension-demo-v1" : capture.protocol;
@@ -267,39 +276,111 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   }
   function stopPvt(silent) { if (pvt.running) { if (silent) { pvt.running = false; clearTimeout(pvt.timer); cancelAnimationFrame(pvt.raf); onTimedTest(false); } else finishPvt(false); } }
   function applyPvt(summary, source) {
-    state.pvt = { ...summary, source };
+    state.pvt = { ...summary, source }; noteRepeat("reaction", summary.usable);
     Object.assign(state.check.values, { pvtSpeed: summary.meanSpeed, pvtLapses: summary.lapses });
     Object.assign(state.check.quality, { pvtSpeed: summary.usable, pvtLapses: summary.usable });
     Object.assign(state.check.protocols, { pvtSpeed: summary.protocol, pvtLapses: summary.protocol });
     state.check.sources.reaction = source; render();
   }
 
+  // A usable result after one that failed its quality gate earns the "Quality first" badge on saving.
+  function noteRepeat(kind, usable) { if (!usable) state.failed[kind] = true; else if (state.failed[kind]) state.check.repeatedAfterFail = true; }
+
+  // ---------- Routine ----------
+  const isComplete = evaluation => evaluation.domains.every(d => d.status !== "notChecked");
+  function routine() {
+    if (state.profile === "elena") {
+      const saved = store.load("DEMO-ELENA", false).map(c => ({ day: 147, complete: Boolean(c.complete), repeatedAfterFail: Boolean(c.repeatedAfterFail) }));
+      return { status: routineStatus([...ELENA_CHECK_DAYS.map(day => ({ day, complete: ELENA_HISTORY.some(r => r.missionDay === day) })), ...saved], 147), due: null };
+    }
+    const checks = history();
+    return { status: routineStatus(checks.map(c => ({ day: dayNumber(c.at), complete: Boolean(c.complete), repeatedAfterFail: Boolean(c.repeatedAfterFail) })), dayNumber()), due: nextDue(checks.at(-1)?.at) };
+  }
+  function routineCard() {
+    const { status, due } = routine();
+    return el("section", { class: "sc-routine", "aria-label": "Mission routine" },
+      el("header", {}, el("b", {}, "Mission routine"), el("small", {}, state.profile === "elena" ? `Mission day 147 · ${status.doneToday ? "today's check saved" : "today's check not saved yet"}` : due.label)),
+      el("div", { class: "sc-streak" }, el("strong", {}, String(status.streak)), el("span", {}, `day streak${status.doneToday ? "" : " · check today to keep it"}`),
+        el("small", {}, `longest ${status.longest} · ${status.total} ${status.total === 1 ? "check" : "checks"}${state.profile === "elena" ? " · synthetic log" : ""}`)),
+      el("ol", { class: "sc-routine-list" }, ROUTINE.map(slot => el("li", {}, el("b", {}, slot.when), el("span", {}, slot.items.join(" · ")),
+        el("button", { type: "button", class: "sc-link", onclick: () => go(STEPS.findIndex(([key]) => key === slot.step)) }, "Go")))),
+      el("div", { class: "sc-badges", role: "list", "aria-label": "Badges" }, status.badges.map(b => el("span", { role: "listitem", class: `sc-badge ${b.earned ? "sc-earned" : ""}`, title: b.detail }, b.earned ? "★ " : "☆ ", b.label))),
+      el("small", { class: "sc-note" }, "Badges reward doing the checks, never a health value."));
+  }
+
   // ---------- Save & follow-up ----------
   function saveCheck() {
     if (state.saved || !state.evaluation) return;
     const profileId = state.profile === "elena" ? "DEMO-ELENA" : "you";
-    const checks = state.profile === "elena" ? store.load(profileId, false) : history();
-    checks.push({ ...state.check, at: new Date().toISOString(), evaluation: { overall: state.evaluation.overall, domains: state.evaluation.domains.map(d => ({ key: d.key, status: d.status })) } });
+    const checks = state.profile === "elena" ? store.load(profileId, false) : history(), before = routine().status;
+    checks.push({ ...state.check, at: new Date().toISOString(), complete: isComplete(state.evaluation), evaluation: { overall: state.evaluation.overall, domains: state.evaluation.domains.map(d => ({ key: d.key, status: d.status })) } });
     store.save(profileId, checks, state.profile === "elena" ? false : state.persist);
     const now = Date.now();
     state.followUps = [...element.querySelectorAll("[data-action]:checked")].map(input => {
       const action = state.evaluation.actions.find(a => a.id === input.dataset.action);
       return { ...action, recordedAt: new Date(now).toISOString(), dueAt: action.due === null ? null : new Date(now + action.due * 3600e3).toISOString(), status: "open" };
     });
-    state.saved = true; render();
+    state.saved = true; state.earned = newBadges(before, routine().status); render();
   }
   function exportJson() {
-    const packet = { schema: "astrobone-self-check-export-v1", profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device", check: state.check, evaluation: state.evaluation, followUps: state.followUps,
+    const packet = { schema: "astrobone-self-check-export-v1", profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device", environment: environment(), check: state.check, evaluation: state.evaluation, followUps: state.followUps,
       boundary: "Self-monitoring record. Review triggers are engineering defaults, not clinical thresholds. Not a diagnosis.", exportedAt: new Date().toISOString() };
     const url = URL.createObjectURL(new Blob([JSON.stringify(packet, null, 2)], { type: "application/json" }));
     const a = el("a", { href: url, download: `AstroBone-self-check-${state.profile}-${Date.now()}.json` }); a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  // ---------- Vital signs ----------
+  // Typed readings from a cuff, finger clip, glucose meter and thermometer. A live note under each one
+  // says at once whether it crosses a fixed safety limit, before the check is evaluated.
+  function vitalsBlock() {
+    const c = state.check, vt = c.vitals ??= {}, chips = [];
+    const sync = () => { applyVitals(c, vt); chips.forEach(update => update()); };
+    const num = (value, min, max, step, aria, onValue) => el("input", { type: "number", min, max, step, inputmode: "decimal", "aria-label": aria, value: Number.isFinite(value) ? value : "",
+      oninput: e => { const n = e.target.value === "" ? null : Number(e.target.value); const ok = n === null || (Number.isFinite(n) && n >= min && n <= max); e.target.toggleAttribute("aria-invalid", !ok); onValue(ok ? n : null); sync(); } });
+    const chip = keys => {
+      const node = el("small", { class: "sc-limit", role: "status" });
+      const update = () => {
+        const hits = keys.filter(k => Number.isFinite(c.values[k])).map(k => ({ k, limit: safetyLimit(k, c.values[k]) }));
+        const hit = hits.find(h => h.limit?.level === "urgent") ?? hits.find(h => h.limit);
+        node.className = `sc-limit${hits.length ? ` sc-${hit ? hit.limit.level : "ok"}` : ""}`;
+        node.textContent = !hits.length ? "" : !hit ? "Within the safety limits"
+          : `${INDICATORS[hit.k].short ?? INDICATORS[hit.k].label} ${hit.limit.text}: ${hit.limit.level === "urgent" ? "urgent safety limit" : "tell your crew medical officer today"}`;
+        if (keys.some(k => k === "systolicBp") && hits.length && c.quality.systolicBp === false) node.textContent += " · sit for 5 minutes first, or it will be repeated";
+      };
+      chips.push(update); update(); return node;
+    };
+    const about = key => el("small", { class: "sc-about" }, INDICATORS[key].about);
+    const bp = vt.bp ??= { readings: [], rested: false };
+    const reading = (i, label) => el("span", { class: "sc-bp" },
+      num(bp.readings[i]?.[0], 50, 260, 1, `${label} systolic`, n => { (bp.readings[i] ??= [null, null])[0] = n; }), el("i", {}, "/"),
+      num(bp.readings[i]?.[1], 30, 160, 1, `${label} diastolic`, n => { (bp.readings[i] ??= [null, null])[1] = n; }), el("i", {}, "mmHg"));
+    const glucose = vt.glucose ??= { value: null, unit: "mg/dL", fasting: true }, temp = vt.temp ??= { value: null, unit: "°C", site: "oral" }, spo2 = vt.spo2 ??= { value: null };
+    const gRange = () => (glucose.unit === "mmol/L" ? [1, 33, 0.1] : [20, 600, 1]), tRange = () => (temp.unit === "°F" ? [86, 113, 0.1] : [30, 45, 0.1]);
+    return el("fieldset", { class: "sc-fieldset sc-vitals" }, el("legend", {}, "Vital signs · type what you measured today, leave blank to skip"),
+      el("div", { class: "sc-vital" }, el("b", {}, "Blood pressure"), reading(0, "Reading 1"), el("small", {}, "Second reading a minute later (optional, averaged)"), reading(1, "Reading 2"),
+        checkbox("sc-bp-rested", "Seated with my back supported, rested for 5 minutes", bp.rested, value => { bp.rested = value; sync(); }), chip(["systolicBp", "diastolicBp"]), about("systolicBp")),
+      el("div", { class: "sc-vital" }, el("b", {}, "Oxygen saturation"), el("span", { class: "sc-bp" }, num(spo2.value, 50, 100, 1, "Oxygen saturation", n => { spo2.value = n; }), el("i", {}, "%")), chip(["spo2"]), about("spo2")),
+      el("div", { class: "sc-vital" }, el("b", {}, "Blood sugar"),
+        el("span", { class: "sc-bp" }, num(glucose.value, ...gRange(), "Blood sugar", n => { glucose.value = n; }),
+          el("select", { "aria-label": "Blood sugar unit", onchange: e => { const was = glucose.unit; glucose.unit = e.target.value; if (Number.isFinite(glucose.value) && was !== glucose.unit) glucose.value = Number((was === "mg/dL" ? glucose.value / GLUCOSE_MG_PER_MMOL : glucose.value * GLUCOSE_MG_PER_MMOL).toFixed(glucose.unit === "mg/dL" ? 0 : 1)); sync(); render(); } },
+            ["mg/dL", "mmol/L"].map(u => el("option", { selected: glucose.unit === u || undefined }, u)))),
+        el("span", { class: "sc-row" }, [[true, "Fasting (before breakfast)"], [false, "Not fasting"]].map(([fasting, label]) => el("label", { class: "sc-radio" },
+          el("input", { type: "radio", name: "sc-glucose-fasting", checked: glucose.fasting === fasting || undefined, onchange: () => { glucose.fasting = fasting; sync(); } }), label))),
+        chip(["glucose"]), about("glucose")),
+      el("div", { class: "sc-vital" }, el("b", {}, "Body temperature"),
+        el("span", { class: "sc-bp" }, num(temp.value, ...tRange(), "Body temperature", n => { temp.value = n; }),
+          el("select", { "aria-label": "Temperature unit", onchange: e => { const was = temp.unit; temp.unit = e.target.value; if (Number.isFinite(temp.value) && was !== temp.unit) temp.value = Number((was === "°C" ? temp.value * 9 / 5 + 32 : (temp.value - 32) * 5 / 9).toFixed(1)); sync(); render(); } },
+            ["°C", "°F"].map(u => el("option", { selected: temp.unit === u || undefined }, u))),
+          el("select", { "aria-label": "Thermometer site", onchange: e => { temp.site = e.target.value; sync(); } }, TEMP_SITES.map(([k, label]) => el("option", { value: k, selected: temp.site === k || undefined }, label)))),
+        chip(["bodyTemp"]), about("bodyTemp")),
+      el("small", { class: "sc-note" }, `Safety limits apply from the first reading and follow public guidance (${SAFETY_LIMIT_SOURCES.join("; ")}). Your flight surgeon can set their own. Each value is also compared with your own usual range once you have 3 checks.`));
   }
 
   // ---------- Rendering ----------
   function stepBody() {
     const [key] = STEPS[state.step], c = state.check, demo = state.profile === "elena";
     if (key === "safety") {
-      return [planCard(), el("p", { class: "sc-lead" }, "Right now, do you have any of these?"),
+      return [routineCard(), planCard(), el("p", { class: "sc-lead" }, "Right now, do you have any of these?"),
         el("div", { class: "sc-checks" }, RED_FLAGS.map(([k, label]) => checkbox(`rf-${k}`, label, Boolean(c.redFlags?.[k]), value => { c.redFlags = { ...(c.redFlags || {}), [k]: value }; render(); }))),
         Object.values(c.redFlags || {}).some(Boolean) ? el("p", { class: "sc-urgent", role: "alert" }, "Contact your crew medical officer now. Finish the check only if it is safe to do so.") : null,
         el("button", { type: "button", class: "sc-secondary", onclick: () => { c.redFlags = {}; go(1); } }, "None of these · continue")];
@@ -370,6 +451,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         number("Resting heart rate", "bpm", v.restingHr, 30, 200, 1, value => { v.restingHr = value; c.protocols.restingHr = c.protocols.restingHr === RESTING_CAMERA_PROTOCOL ? "resting-self-reported-v1" : c.protocols.restingHr ?? "resting-self-reported-v1"; c.sources.restingHr = c.sources.restingHr === "Camera (rPPG hybrid)" ? "Manual pulse count" : c.sources.restingHr; }),
         el("label", { class: "sc-text" }, "Heart-rate source",
           el("select", { onchange: e => { c.sources.restingHr = e.target.value; } }, ["Wearable or chest strap", "Pulse oximeter", "Manual pulse count", "Camera (rPPG hybrid)", "Synthetic demo"].map(s => el("option", { selected: (c.sources.restingHr ?? (demo ? "Synthetic demo" : "Wearable or chest strap")) === s || undefined }, s)))),
+        vitalsBlock(),
         number("Personal dosimeter, cumulative (context only)", "mGy", c.dosimeter, 0, 10000, 0.01, value => { c.dosimeter = value; }),
         why("heart", "showed no consistent heart effect from radiation, so dose never raises an alarm. It is logged beside heart rate for the medical reviewer.")
           ?? el("p", { class: "sc-note" }, "Radiation dose is recorded as mission context. It is never turned into a health status.")];
@@ -380,25 +462,45 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   function resultBody() {
     const ev = state.evaluation; if (!ev) return [];
     const [label, detail] = STATUS[ev.overall];
+    const measured = d => d.indicators.filter(r => r.status !== "notChecked");
     return [el("div", { class: `sc-overall sc-${ev.overall}` }, el("strong", {}, label), el("span", {}, ev.overall === "stable" ? "No change outside your usual range" : detail)),
       ev.redFlags.length ? el("p", { class: "sc-urgent", role: "alert" }, `Reported: ${ev.redFlags.join("; ")}.`) : null,
+      ladder(ev),
       el("div", { class: "sc-domains" }, ev.domains.map(d => el("section", { class: `sc-domain sc-${d.status}` },
         el("header", {}, el("b", {}, d.label), el("em", {}, STATUS[d.status][0])), el("small", {}, d.hazard),
-        d.key === "immune" ? el("p", {}, d.status === "notChecked" ? "Symptoms not answered." : d.symptoms.length ? d.symptoms.join(", ") : "No new symptoms reported.")
-          : el("ul", {}, d.indicators.filter(r => r.status !== "notChecked").map(r => el("li", { class: `sc-${r.status}` },
-            el("span", {}, r.def.label), el("b", {}, `${fmt(r.value, r.def.digits ?? 0)}${r.def.unit}`),
-            el("small", {}, r.status === "baseline" ? `baseline ${r.ref.count}/${r.ref.needed}` : r.status === "repeat" ? "quality failed"
+        el("div", { class: "sc-hazards" }, hazardsForDomain(d.key).map(h => el("span", { title: h.effect }, h.name))),
+        d.key === "immune" ? el("p", {}, d.status === "notChecked" && !measured(d).length ? "Symptoms not answered." : d.symptoms.length ? d.symptoms.join(", ") : "No new symptoms reported.") : null,
+        measured(d).length ? el("ul", {}, measured(d).map(r => el("li", { class: `sc-${r.status}`, title: r.def.about },
+            el("span", {}, r.def.label), el("b", {}, `${fmt(r.value, r.def.digits ?? 0)}${r.def.unit === "°" || !r.def.unit ? r.def.unit : ` ${r.def.unit}`}`),
+            el("small", {}, r.limit ? `safety limit: ${r.limit.text}` : r.status === "baseline" ? `baseline ${r.ref.count}/${r.ref.needed}` : r.status === "repeat" ? "quality failed"
               : r.reason === "drift" ? `gradual drift · start ${fmt(r.drift.lockedMean, r.def.digits ?? 0)}` : `usual ${fmt(r.ref.mean, r.def.digits ?? 0)} ± ${fmt(r.tolerance, r.def.digits ?? 1)}`),
-            trend(r)))),
-        d.key !== "immune" && !d.indicators.some(r => r.status !== "notChecked") ? el("p", {}, "Not checked.") : null))),
+            trend(r)))) : d.key !== "immune" ? el("p", {}, "Not checked.") : null,
+        helps(d)))),
       el("section", { class: "sc-actions" }, el("h3", {}, "Your next step"),
         ev.actions.map(a => el("label", { class: `sc-action sc-${a.priority}` }, el("input", { type: "checkbox", "data-action": a.id, checked: (a.priority !== "info" || a.id === "routine") || undefined, disabled: state.saved || undefined }), el("span", {}, a.text)))),
-      state.saved ? el("div", { class: "sc-result" }, el("strong", {}, "Saved"), el("p", {}, state.followUps.length ? state.followUps.map(f => `${f.text.split(".")[0]}${f.dueAt ? ` · due ${new Date(f.dueAt).toLocaleString()}` : ""}`).join(" | ") : "No follow-up selected."),
+      state.saved ? el("div", { class: "sc-result" }, el("strong", {}, `Saved · ${routine().status.streak}-day streak`), el("p", {}, state.followUps.length ? state.followUps.map(f => `${f.text.split(".")[0]}${f.dueAt ? ` · due ${new Date(f.dueAt).toLocaleString()}` : ""}`).join(" | ") : "No follow-up selected."),
+        state.earned.length ? el("div", { class: "sc-badges", role: "status" }, state.earned.map(b => el("span", { class: "sc-badge sc-earned sc-new", title: b.detail }, `★ New badge: ${b.label}`))) : null,
         el("small", {}, state.profile === "elena" ? "Demo record kept in memory for this tab." : state.persist ? "Saved on this device." : "Kept in memory for this tab (saving on this device is off)."))
         : el("button", { type: "button", class: "sc-primary", onclick: saveCheck }, "Save check & selected actions"),
       el("div", { class: "sc-row" }, el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
       el("p", { class: "sc-note" }, "Review triggers: outside 2× your own spread or a minimum change, whichever is larger, after 3 usable checks; or a steady drift from your first checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
       state.profile === "elena" ? el("p", { class: "sc-note" }, ELENA_SELF_CHECK_BOUNDARY) : null];
+  }
+
+  // Who to tell, for this result in this place: the escalation ladder with the active rung explained.
+  function ladder(ev) {
+    const env = environment(), plan = escalationPlan(ev.overall, env);
+    return el("section", { class: "sc-ladder", "aria-label": "Who to tell" },
+      el("header", {}, el("b", {}, "Who to tell"), el("small", {}, `${env.label} · ${env.place} · ${env.gravity} · message to Earth ${env.delayText} one way`)),
+      el("ol", {}, plan.steps.map(step => el("li", { class: step.active ? "sc-active" : undefined, "aria-current": step.active ? "step" : undefined, title: step.detail },
+        el("strong", {}, step.title), el("span", {}, step.who), step.active ? el("p", {}, step.detail) : null))));
+  }
+  // What helps: general guidance for the domain, open when the domain needs attention.
+  function helps(d) {
+    const g = guidanceFor(d.key); if (!g) return null;
+    return el("details", { class: "sc-helps", open: ["changed", "attention", "urgent"].includes(d.status) || undefined },
+      el("summary", {}, g.title), el("ul", {}, g.helps.map(text => el("li", {}, text))),
+      el("small", {}, `${g.sources.join(" · ")}. ${GUIDANCE_BOUNDARY}`));
   }
 
   // Trend under each compared indicator: shaded usual range, dashed starting level, today's dot.
@@ -428,8 +530,11 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   function render() {
     const steps = el("ol", { class: "sc-steps" }, STEPS.map(([key, label], i) => el("li", {}, el("button", { type: "button", "aria-current": i === state.step ? "step" : undefined, onclick: () => go(i) }, `${i + 1} ${label}`))));
     const profile = el("div", { class: "sc-profile", role: "group", "aria-label": "Whose check" },
-      el("button", { type: "button", "aria-pressed": String(state.profile === "elena"), onclick: () => { if (state.profile !== "elena") { state.profile = "elena"; reset(); } } }, "Elena · synthetic demo"),
-      el("button", { type: "button", "aria-pressed": String(state.profile === "you"), onclick: () => { if (state.profile !== "you") { state.profile = "you"; reset(); } } }, "You · this device"));
+      el("button", { type: "button", "aria-pressed": String(state.profile === "elena"), onclick: () => switchProfile("elena") }, "Elena · synthetic demo"),
+      el("button", { type: "button", "aria-pressed": String(state.profile === "you"), onclick: () => switchProfile("you") }, "You · this device"));
+    // Where the astronaut is: sets the escalation ladder and who reviews a logged change.
+    const where = el("label", { class: "sc-env" }, el("span", {}, "Where"), el("select", { "aria-label": "Mission environment", onchange: e => { state.environment = e.target.value; if (state.evaluation) evaluate(); render(); } },
+      ENVIRONMENTS.map(env => el("option", { value: env.key, selected: env.key === state.environment || undefined }, `${env.label} · ${env.place}`))));
     const consent = state.profile === "you" ? el("label", { class: "sc-consent" }, el("input", { type: "checkbox", checked: state.persist || undefined, onchange: e => {
       state.persist = e.target.checked; try { localStorage.setItem("astrobone-self-check-consent", state.persist ? "1" : "0"); } catch { /* storage unavailable */ }
       angleStore.save(check.pairs, state.persist); render();
@@ -437,7 +542,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const nav = STEPS[state.step][0] === "result" ? null : el("div", { class: "sc-nav" },
       state.step > 0 ? el("button", { type: "button", class: "sc-secondary", onclick: () => go(state.step - 1) }, "Back") : el("span"),
       el("button", { type: "button", class: "sc-primary", "data-next": true, onclick: () => go(state.step + 1) }, state.step === STEPS.length - 2 ? "Evaluate" : "Next"));
-    element.replaceChildren(...[profile, consent, steps, el("div", { class: "sc-body" }, stepBody()), nav].filter(Boolean));
+    element.replaceChildren(...[profile, where, consent, steps, el("div", { class: "sc-body" }, stepBody()), nav].filter(Boolean));
     // Re-inserting a media element pauses it; resume the live preview.
     if (camera?.running && video.paused) video.play().catch(() => {});
     if (!pvt.running && !pvtStage.dataset.count) pvtStage.dataset.count = "Ready";
@@ -446,12 +551,14 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   reset();
   return {
     element, reset, go, demoCapture, applyDemoPvt: () => applyPvt(ELENA_PVT, "SYNTHETIC DEMO"), saveCheck,
-    setProfile(profile) { if (state.profile !== profile) { state.profile = profile; reset(); } },
+    setProfile: switchProfile,
+    setEnvironment(key) { if (environmentFor(key)) { state.environment = key; if (state.evaluation) evaluate(); render(); } },
+    openStep(key) { go(Math.max(0, STEPS.findIndex(([k]) => k === key))); },
     stop() { stopCamera(); stopPulse(); stopPvt(true); },
     get state() { return state; },
     latestEvaluation(profile = state.profile) {
       if (state.evaluation && state.profile === profile) return state.evaluation;
-      return profile === "elena" ? evaluateSelfCheck(elenaDay147(), ELENA_HISTORY) : null;
+      return profile === "elena" ? evaluateSelfCheck(elenaDay147(), ELENA_HISTORY, { environment: environmentFor(DEFAULT_ENVIRONMENT.elena) }) : null;
     },
   };
 }

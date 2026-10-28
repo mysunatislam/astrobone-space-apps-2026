@@ -8,6 +8,10 @@ import { RISK_THRESHOLDS } from "./riskModel.js";
 import { createSelfCheckPanel } from "./selfCheckPanel.js";
 import { ELENA_HISTORY } from "./elenaSelfCheck.js";
 import { EXPERIENCES, CAPTURE, experienceFromHash } from "./siteNav.js";
+import { BODY_PARTS, bodyPartFor, bodyPartStatus } from "./bodyParts.js";
+import { guidanceFor } from "./countermeasures.js";
+import { HRP_HAZARDS } from "./hazards.js";
+import { INDICATORS, SAFETY_LIMITS, SAFETY_LIMIT_SOURCES, describeBound } from "./selfCheck.js";
 
 const SYSTEMS = [["body", "Body"], ["skeleton", "Skeleton"], ["muscle", "Muscle"], ["cardiovascular", "Cardiovascular"], ["renal", "Renal"], ["radiation", "Radiation"], ["multisystem", "Multisystem"]];
 const SYSTEM_FOCUS = { body: "body", skeleton: "body", muscle: "body", cardiovascular: "thorax", renal: "kidneys", radiation: "body", multisystem: "body", functional: "legs", impact: "leftLeg" };
@@ -69,6 +73,7 @@ export function createTwinApp(root) {
   const legend = el("div", { class: "tw-legend" });
   const labels = el("div", { class: "tw-labels", "aria-hidden": "true" });
   const caption = el("div", { class: "tw-caption", role: "status", "aria-live": "assertive", hidden: true });
+  const partCard = el("aside", { class: "tw-partcard", role: "dialog", "aria-label": "Body part", hidden: true });
   const loading = el("div", { class: "tw-loading" }, el("span", {}, "Loading reference anatomy"), el("div", { class: "tw-progress" }, el("i", {})));
 
   // Timeline
@@ -93,11 +98,11 @@ export function createTwinApp(root) {
   const closing = el("div", { class: "tw-closing", hidden: true }, el("b", {}, "ASTROBONE"), el("p", {}, ["PREDICT.", "OBSERVE.", "UPDATE.", "PROTECT."].map(w => el("span", {}, w))),
     el("small", {}, "Synthetic demonstration · research models · human medical review required"));
 
-  root.append(canvas, svg, labels, header, systemRail, panels, nodes, drawer, legend, timeline, tooltip, caption, closing, intro, loading);
+  root.append(canvas, svg, labels, header, systemRail, panels, nodes, drawer, legend, timeline, tooltip, partCard, caption, closing, intro, loading);
   document.body.classList.add("tw-booting");
 
   const scene = createTwinScene(canvas, {
-    onPick: name => { stopDemo(); navigateFromBody(name); },
+    onPick: (name, at) => { stopDemo(); showPart(name, at); },
     onHover: info => {
       if (!info) { tooltip.hidden = true; return; }
       tooltip.hidden = false; tooltip.textContent = info.label; tooltip.style.transform = `translate(${info.x + 14}px, ${info.y + 12}px)`;
@@ -130,6 +135,39 @@ export function createTwinApp(root) {
     else if (["femurL", "femurR", "tibiaR"].includes(name)) { setExperience("twin", { system: "skeleton" }); scene.focus("legs"); }
   }
 
+  // Clicking the body opens a card for that part: what it does, how spaceflight affects it, and its
+  // status from the latest self-check, with a shortcut to measure it or open its analysis.
+  const PART_STATUS = { urgent: "URGENT", attention: "CONTACT TODAY", changed: "REVIEW", repeat: "REPEAT", baseline: "BASELINE", stable: "STABLE", notChecked: "NOT CHECKED" };
+  function showPart(name, at) {
+    const key = bodyPartFor(name);
+    if (!key) { navigateFromBody(name); return; }
+    const profile = selfCheck.state.profile, evaluation = selfCheck.latestEvaluation(profile), info = bodyPartStatus(key, evaluation), part = BODY_PARTS[key];
+    const helps = part.domain ? guidanceFor(part.domain)?.helps[0] : null;
+    const unit = def => (def.unit === "°" || !def.unit ? def.unit : ` ${def.unit}`);
+    fill(partCard,
+      el("header", {}, el("span", { class: "tw-eyebrow" }, "BODY PART"), el("button", { type: "button", class: "tw-partcard-close", "aria-label": "Close", onclick: hidePart }, "×")),
+      el("h3", {}, part.name),
+      el("p", {}, el("b", {}, "What it does "), part.does),
+      el("p", {}, el("b", {}, "In space "), part.space),
+      info.status ? el("div", { class: `tw-partcard-status tw-st-${info.status}` },
+        el("span", {}, el("em", {}, PART_STATUS[info.status]), ` ${info.domainLabel} · ${profile === "elena" ? "Elena, mission day 147 (synthetic)" : "your latest self-check"}`),
+        info.rows.filter(r => r.status !== "notChecked").map(r => el("div", { class: `tw-partcard-row tw-st-${r.status}` }, el("span", {}, r.def.label), el("b", {}, `${fmt(r.value, r.def.digits ?? 0)}${unit(r.def)}`), el("small", {}, PART_STATUS[r.status]))),
+        !evaluation ? el("small", {}, "No self-check yet on this device.") : null)
+        : el("p", { class: "tw-note" }, "Not measured by the daily self-check."),
+      helps ? el("p", { class: "tw-partcard-helps" }, el("b", {}, "What helps "), helps) : null,
+      el("small", { class: "tw-partcard-src" }, part.sources.join(" · ")),
+      el("div", { class: "tw-partcard-actions" },
+        part.domain ? el("button", { type: "button", class: "tw-primary", onclick: () => { hidePart(); setExperience("selfcheck"); selfCheck.openStep(part.step); revealOnPhone(); } }, "Measure now") : null,
+        el("button", { type: "button", class: "tw-secondary", onclick: () => { hidePart(); navigateFromBody(name); revealOnPhone(); } }, "Open analysis")));
+    partCard.hidden = false;
+    // Beside the click on a wide screen; phones show it as a sheet at the bottom (CSS).
+    const box = partCard.getBoundingClientRect(), x = Math.min(innerWidth - box.width - 12, Math.max(12, (at?.x ?? innerWidth / 2) + 16)), y = Math.min(innerHeight - box.height - 12, Math.max(76, (at?.y ?? 120) - 40));
+    partCard.style.setProperty("--x", `${Math.round(x)}px`); partCard.style.setProperty("--y", `${Math.round(y)}px`);
+    partCard.querySelector(".tw-partcard-close").focus({ preventScroll: true });
+  }
+  function hidePart() { partCard.hidden = true; }
+  window.addEventListener("keydown", event => { if (event.key === "Escape" && !partCard.hidden) hidePart(); });
+
   function sceneSystem() {
     if (state.compare) return "skeleton";
     if (state.experience === "mission" || state.experience === "evidence") return "multisystem";
@@ -159,7 +197,7 @@ export function createTwinApp(root) {
   }
 
   function setExperience(experience, { system, physio, focus = true } = {}) {
-    const previous = state.experience;
+    const previous = state.experience; hidePart();
     state.experience = experience;
     if (system) state.system = system;
     if (physio) state.physio = physio;
@@ -635,14 +673,24 @@ export function createTwinApp(root) {
         sources.length ? el("ul", {}, sources.map(src => el("li", {}, el("a", { href: src.url, target: "_blank", rel: "noopener noreferrer" }, `${src.accession} · ${src.title}`), el("small", {}, `${src.population}. Never Elena's data.`))))
           : el("p", { class: "tw-note" }, research === false ? "Prepared research summaries unavailable." : "Loading prepared summaries…")),
       section("Self-check instruments", [
-        "Reaction test: PVT-B, 3 minutes, 2–5 s intervals, 355 ms lapse threshold (Basner, Mollicone & Dinges, Acta Astronautica 2011). Browser timing adds about one display frame.",
+        "Reaction test: PVT-B, 3 minutes, 1–4 s intervals including 1 s of feedback, 355 ms lapse threshold (Basner, Mollicone & Dinges, Acta Astronautica 2011). Stimulus onset is timed to the frame that draws it.",
         "Fatigue: Samn–Perelli 7-point checklist (USAF School of Aerospace Medicine, 1982). Mood and stress: single 0–10 self-ratings.",
         "Movement: the same MediaPipe pose model, filter and knee-extension definition as the Movement capture workspace; quality ≥ 0.70 and ≥ 12 samples before any comparison.",
         "Review trigger: outside 2× the person's own spread or a minimum change, after 3 usable checks of the same protocol. Engineering default, not a clinical threshold.",
       ]),
+      hazardMap(),
+      section("Vital-sign safety limits", [...Object.entries(SAFETY_LIMITS).map(([key, rule]) => `${INDICATORS[key].label}: urgent ${rule.urgent.map(b => describeBound(b, INDICATORS[key].unit)).join(" or ")}; tell the crew medical officer today ${rule.attention.map(b => describeBound(b, INDICATORS[key].unit)).join(" or ")}.`),
+        `Sources: ${SAFETY_LIMIT_SOURCES.join("; ")}. Fixed limits apply from the first reading; the personal baseline still runs alongside.`]),
       section("Anatomy", ["Z-Anatomy / BodyParts3D atlas, CC BY-SA 4.0 (public/models/anatomy/SOURCE-LICENSE.txt). Reference geometry, not Elena's anatomy.", "Cardiovascular groups are vessels only: kidney and lung tissue are not in the atlas."]),
       section("Not used here", ["No LLM or retrieval model runs in this view; citations are a fixed local index.", "No live sensors: the live camera twin is in the Movement capture workspace.", "No clinical validation. Human medical review is required for any decision."]),
       el("a", { class: "tw-secondary tw-link", href: `${import.meta.env.BASE_URL}#mission-demo` }, "Open Mission Intelligence review ↗"));
+  }
+  // NASA HRP's five hazards and what the self-check watches for each.
+  function hazardMap() {
+    return el("section", { class: "tw-ev tw-hazards" }, el("h3", {}, "NASA's five hazards → what AstroBone watches"),
+      el("ul", {}, HRP_HAZARDS.map(h => el("li", {}, el("b", {}, h.name), el("span", {}, h.effect),
+        el("small", {}, [h.indicators.map(key => INDICATORS[key].label).join(", "), h.context].filter(Boolean).join(" · "))))),
+      el("p", { class: "tw-note" }, "Source: NASA Human Research Program, nasa.gov/hrp/hazards."));
   }
   const section = (title, items) => el("section", { class: "tw-ev" }, el("h3", {}, title), el("ul", {}, items.map(t => el("li", {}, t))));
   async function loadResearch() {
@@ -728,8 +776,9 @@ export function createTwinApp(root) {
       await step(() => selfCheck.demoCapture("usable"), "REPEAT · usable capture · knee extension 151°", 3400);
       await step(() => { selfCheck.go(2); selfCheck.applyDemoPvt(); }, "REACTION TEST (PVT-B) · 9 attention lapses · her usual is 2–4", 3800);
       await step(() => selfCheck.go(3), "SLEEP & MOOD · 5.2 h sleep · fatigue 4/7 (synthetic answers)", 3200);
-      await step(() => selfCheck.go(4), "BODY · no new immune symptoms · resting heart rate 76 bpm", 3000);
-      await step(() => selfCheck.go(5), "EVALUATE · bone & muscle, cardiovascular and behavioral health are outside her usual range", 5400);
+      await step(() => selfCheck.go(4), "BODY · no new symptoms · heart rate 76 bpm · blood pressure 112/72 · 37.3 °C · SpO2 97 % · blood sugar 97 mg/dL", 3400);
+      await step(() => selfCheck.go(5), "EVALUATE · bone & muscle, cardiovascular and behavioral health are outside her usual range · vital signs inside the safety limits", 5400);
+      await step(null, "WHO TO TELL · on the way to Mars, Earth is 3–22 min away, so the crew medical officer acts first", 4200);
       await step(() => selfCheck.saveCheck(), "ACT · re-check in 24 h and log for medical review at the next communication window", 4400);
       await step(async () => { setExperience("impact"); }, "UNEXPECTED EVENT · reconstructed from authored inputs", 1600);
       await step(() => runImpact(), null, 900);
@@ -772,5 +821,5 @@ export function createTwinApp(root) {
     loading.classList.add("tw-error"); loading.querySelector("span").textContent = "3D anatomy unavailable. Values, timeline and evidence remain usable.";
     canvas.dataset.error = error.message; finishIntro(); console.error(error);
   });
-  return { scene, state, setDay, setExperience, selfCheck, get stressField() { return stressField; } };
+  return { scene, state, setDay, setExperience, selfCheck, showPart, get stressField() { return stressField; } };
 }

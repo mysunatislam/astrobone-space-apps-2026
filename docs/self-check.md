@@ -15,7 +15,11 @@ The 2026 challenge asks for software that **gathers health indicators** and **en
 | Behavioral health | Reaction speed and lapses | PVT-B: 3 minutes, 1–4 s from a response to the next stimulus including 1 s of feedback, 355 ms lapse threshold, Basner performance score (Basner, Mollicone & Dinges, Acta Astronautica 2011, 69:949–959); stimulus onset timed to the frame that draws it, 3D view paused during the test; 1-minute practice is labeled and never compared with 3-minute runs | Test |
 | Behavioral health | Sleep hours, fatigue, mood, stress | Sleep entry; Samn–Perelli 7-point fatigue checklist; 0–10 mood and stress ratings | Self-report |
 | Immune | New fever or chills, respiratory symptoms, rash or cold sores, slow-healing wounds, unusual tiredness | Checklist | Self-report |
-| Cardiovascular | Resting heart rate | Entered from a wearable, pulse oximeter or manual count; the source is recorded | Device / self-report |
+| Cardiovascular | Resting heart rate | Entered from a wearable, pulse oximeter or manual count, or measured from the face camera; the source is recorded | Device / self-report |
+| Cardiovascular | Blood pressure (systolic, diastolic) | Typed from a cuff; up to two readings a minute apart are averaged; a reading without 5 minutes' seated rest fails quality and is repeated | Device |
+| Cardiovascular | Oxygen saturation | Typed from a finger clip | Device |
+| Metabolic | Blood sugar | Typed from a finger-prick meter in mg/dL or mmol/L (stored as mg/dL); fasting and non-fasting are separate protocols | Device |
+| Immune | Body temperature | Typed in °C or °F (stored as °C); each thermometer site (mouth, ear, forehead, armpit) is its own protocol | Device |
 | Context | Cumulative personal dosimeter reading | Optional entry | Context only, never a health status |
 
 Video never leaves the device; only summary angles are kept.
@@ -27,11 +31,37 @@ Video never leaves the device; only summary angles are kept.
 - **Review trigger.** A result is **REVIEW** when it moves in the worsening direction by more than 2× the person's own spread, or by a minimum change (for example 5° knee extension, 8 bpm, 3 lapses, 1.5 h sleep), whichever is larger. These are engineering defaults for prompting a re-check, **not clinical thresholds**.
 - **Slow drift.** A rolling baseline follows a slow decline, which is how bone and muscle are lost in flight, so a steady loss never leaves it. Each indicator therefore also keeps a **locked baseline** (its first 5 usable checks) and runs a one-sided CUSUM (Page, 1954) of worsening against it, with k = 1 SD and h = 6 SD. A result that crosses it is **REVIEW · gradual drift**. In a 1,000-run simulation with 2° daily noise, a 4°/month knee-extension decline was confirmed on two consecutive checks in 99.8% of runs (median 36 days after onset) versus 1.0% with the rolling rule alone, for 0.7% versus 0.3% confirmed false alarms in stable runs over 180 days. See `core-analysis-2026-10-25.md`.
 - **Trigger tied to measured accuracy.** Once the camera accuracy check has at least 20 pairs from 3 or more people, the knee review trigger is raised to the measured detectable change (MDC95) if that is larger than 5°. It is never lowered.
+- **Fixed safety limits** apply to the vital signs from the first reading, before any baseline exists, because a dangerous value is dangerous without one. **URGENT** (contact now) or **CONTACT TODAY** (tell the crew medical officer today):
+
+  | Indicator | Urgent | Contact today | Source |
+  | --- | --- | --- | --- |
+  | Blood pressure | above 180 / 120 mmHg | 140 / 90 or higher; below 90 / 60 | AHA categories and low blood pressure |
+  | Blood sugar | below 54 or above 240 mg/dL | 200 mg/dL or higher | ADA (clinically significant low; check ketones above 240; random-glucose threshold) |
+  | Body temperature | 39.4 °C or higher; below 35 °C | 37.8 °C or higher | Mayo Clinic fever and hypothermia |
+  | Oxygen saturation | 92 % or less | 93–94 % | NHS England pulse oximetry guidance |
+
+  The ADA's 70 mg/dL alert level is for people treated for diabetes. Replayed on the real Inspiration4 crew glucose (OSD-575, 28 draws), it fired on 4 of 12 healthy pre-flight draws, so it is not used; with 54 mg/dL the limit fires only on the three R+45 draws that the crew replay already treats as a handling suspect, and the personal baseline flags the same three (`scripts/replay-i4-glucose-limits.mjs`). Every limit action asks for a repeat first (5 minutes' rest for blood pressure, a fresh finger prick in 15 minutes for blood sugar) and points to the mission's own procedure, never a dose. A flight surgeon can set their own limits.
 - **Red flags override everything** and make the check **URGENT**.
 
 ## Act
 
-Actions are bounded: contact the crew medical officer now (red flags), repeat a failed measurement, re-check in 24 h and log for medical review at the next communication window, or keep building the baseline. AstroBone does not diagnose, prescribe exercise or recommend medication; a test enforces that wording. Selected actions are saved with due times. The full record exports as JSON for a reviewer.
+Actions are bounded: contact the crew medical officer now (red flags or an urgent limit), tell them today (a contact-today limit), repeat a failed measurement, re-check in 24 h and log for the flight surgeon, or keep building the baseline. AstroBone does not diagnose, prescribe exercise or recommend medication; a test enforces that wording. Selected actions are saved with due times. The full record exports as JSON for a reviewer.
+
+### Where You Are: The Escalation Ladder
+
+`src/missionEnvironment.js`. The astronaut picks where they are: space station (ISS), spacecraft (Orion, Earth-Moon transit), lunar base, rover, spacecraft (Earth-Mars transit) or Mars base. Each sets the gravity, the one-way message delay to Earth from light time (under 1 s for the ISS, 1.3 s for the Moon, 3–22 min for Mars), and how far definitive care is. The result shows a four-rung ladder, **self-care → logged for the flight surgeon → crew medical officer today → contact now**, with the active rung explained for that place. On the ISS the flight surgeon can join in real time and Earth is about a day away; on the way to Mars, advice from Earth arrives at least twice the delay later, so the crew decides first. The evaluation itself never changes with place; only who to tell and how.
+
+### What Helps
+
+`src/countermeasures.js`. Each domain has three short points on what supports it (for example, every scheduled resistance session for bone, fluid loading and standing up slowly before a return to gravity, a protected sleep window), each with its source: Smith et al. 2012, Moore et al. 2014, Lee et al. 2020, Hughson et al. 2016, Barger et al. 2014, Crucian et al. 2018 and NASA HRP evidence. The points open automatically for a domain that needs attention. A test rejects any medicine, dose or amount: the crew medical officer decides on treatment.
+
+### Routine, Streak and Badges
+
+`src/routine.js`. The first step shows the mission routine (blood sugar and temperature on waking, blood pressure and pulse after 5 minutes seated, the knee and reaction tests at the same time each day), when the next check is due (24 h after the last), the current and longest daily streak, and six badges: first check, baseline built, full check (every domain measured), quality first (repeated a measurement that failed its quality check instead of skipping it), 7-day and 30-day streaks. Badges reward doing the checks, never a health value, so nobody is nudged to report a better number. Elena's streak comes from an authored, synthetic adherence log.
+
+### Body-Part Cards and NASA's Five Hazards
+
+`src/bodyParts.js`, `src/hazards.js`. Clicking a structure on the 3D twin opens a card: what it does, how spaceflight affects it (cited), today's status from the latest self-check, and **Measure now**, which opens the matching self-check step. A test reads the scene's pickable structures, so a new one cannot be added without a card. Evidence maps NASA's five hazards (Space Radiation, Isolation and Confinement, Distance from Earth, Gravity Fields, Hostile/Closed Environments) to the indicators that watch for them; radiation is logged as context only, and distance sets the escalation ladder.
 
 ## Storage And Privacy
 
@@ -39,7 +69,7 @@ Checks stay in memory unless the astronaut ticks **Save my checks on this device
 
 ## Demo Profile
 
-**Elena · synthetic demo** reuses the knee and heart-rate checkpoint values from `elenaMissionScenario.js` and adds authored sleep, fatigue, mood, stress and reaction-test values for Days 1–120 and Day 147. In the demo, the first movement capture fails its quality gate and is withheld; the repeat is usable. The Day 147 evaluation flags bone & muscle, cardiovascular and behavioral health for review and keeps immune stable. None of these values come from a real person.
+**Elena · synthetic demo** reuses the knee and heart-rate checkpoint values from `elenaMissionScenario.js` and adds authored sleep, fatigue, mood, stress, reaction-test and vital-sign values for Days 1–120 and Day 147. The vital signs follow the direction of published findings, not their size for any one person: blood pressure a little lower in flight (Norsk et al. 2015), fasting blood sugar creeping up (Hughson et al. 2016), resting temperature rising (Stahn et al. 2017); all stay inside the safety limits and her usual range on Day 147. In the demo, the first movement capture fails its quality gate and is withheld; the repeat is usable. The Day 147 evaluation flags bone & muscle, cardiovascular and behavioral health for review and keeps immune stable. None of these values come from a real person.
 
 ## Verified
 
