@@ -1,6 +1,6 @@
 import {
   PVT_B, PVT_PROTOCOL, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
-  safetyLimit, applyVitals, vitalsFromValues, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES,
+  safetyLimit, applyVitals, vitalsFromValues, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
 import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
@@ -11,6 +11,7 @@ import { createSelfCheckCamera } from "./selfCheckCamera.js";
 import { createCameraPulse, CAMERA_PULSE, RESTING_CAMERA_PROTOCOL } from "./cameraPulse.js";
 import { cameraViewFor } from "./functionalAssessment.js";
 import { sparklineSvg } from "./trendSpark.js";
+import { STATUS_MARKS, indicatorHistory, historyChartSvg, legendFor, chartableKeys, pointLabel } from "./historyChart.js";
 import { HOLD, REFERENCE_TYPES, summarizeHold, agreement, calibratedFloors, pairsToCsv, createAngleCheckStore } from "./angleCheck.js";
 import { ELENA } from "./elenaMissionScenario.js";
 import { loadNasaEvidence, nasaWatchPlan } from "./nasaWatch.js";
@@ -46,7 +47,7 @@ const VIEW_CUE = { front: "facing camera", side: "side-on", oblique: "turned par
 
 export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {}, onTimedTest = () => {} } = {}) {
   const store = createSelfCheckStore();
-  const state = { profile: "elena", environment: DEFAULT_ENVIRONMENT.elena, persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [] };
+  const state = { profile: "elena", environment: DEFAULT_ENVIRONMENT.elena, persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [], chartKey: null };
   const element = el("div", { class: "sc" });
   const video = el("video", { class: "sc-video", playsinline: true, muted: true, "aria-label": "Camera preview" });
   const overlay = el("canvas", { class: "sc-overlay", "aria-hidden": "true" });
@@ -463,6 +464,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const ev = state.evaluation; if (!ev) return [];
     const [label, detail] = STATUS[ev.overall];
     const measured = d => d.indicators.filter(r => r.status !== "notChecked");
+    const charted = chartableKeys(history(), state.check);
     return [el("div", { class: `sc-overall sc-${ev.overall}` }, el("strong", {}, label), el("span", {}, ev.overall === "stable" ? "No change outside your usual range" : detail)),
       ev.redFlags.length ? el("p", { class: "sc-urgent", role: "alert" }, `Reported: ${ev.redFlags.join("; ")}.`) : null,
       ladder(ev),
@@ -471,11 +473,13 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         el("div", { class: "sc-hazards" }, hazardsForDomain(d.key).map(h => el("span", { title: h.effect }, h.name))),
         d.key === "immune" ? el("p", {}, d.status === "notChecked" && !measured(d).length ? "Symptoms not answered." : d.symptoms.length ? d.symptoms.join(", ") : "No new symptoms reported.") : null,
         measured(d).length ? el("ul", {}, measured(d).map(r => el("li", { class: `sc-${r.status}`, title: r.def.about },
-            el("span", {}, r.def.label), el("b", {}, `${fmt(r.value, r.def.digits ?? 0)}${r.def.unit === "°" || !r.def.unit ? r.def.unit : ` ${r.def.unit}`}`),
+            el("span", {}, charted.includes(r.key) ? el("button", { type: "button", class: "sc-rowlink", "aria-label": `Chart ${r.def.label} over time`, onclick: () => showChart(r.key) }, r.def.label) : r.def.label,
+              el("em", { class: `sc-word sc-${r.status}` }, `${STATUS_MARKS[r.status].glyph} ${STATUS[r.status][0]}`)), el("b", {}, `${fmt(r.value, r.def.digits ?? 0)}${r.def.unit === "°" || !r.def.unit ? r.def.unit : ` ${r.def.unit}`}`),
             el("small", {}, r.limit ? `safety limit: ${r.limit.text}` : r.status === "baseline" ? `baseline ${r.ref.count}/${r.ref.needed}` : r.status === "repeat" ? "quality failed"
               : r.reason === "drift" ? `gradual drift · start ${fmt(r.drift.lockedMean, r.def.digits ?? 0)}` : `usual ${fmt(r.ref.mean, r.def.digits ?? 0)} ± ${fmt(r.tolerance, r.def.digits ?? 1)}`),
             trend(r)))) : d.key !== "immune" ? el("p", {}, "Not checked.") : null,
         helps(d)))),
+      overTime(ev, charted),
       el("section", { class: "sc-actions" }, el("h3", {}, "Your next step"),
         ev.actions.map(a => el("label", { class: `sc-action sc-${a.priority}` }, el("input", { type: "checkbox", "data-action": a.id, checked: (a.priority !== "info" || a.id === "routine") || undefined, disabled: state.saved || undefined }), el("span", {}, a.text)))),
       state.saved ? el("div", { class: "sc-result" }, el("strong", {}, `Saved · ${routine().status.streak}-day streak`), el("p", {}, state.followUps.length ? state.followUps.map(f => `${f.text.split(".")[0]}${f.dueAt ? ` · due ${new Date(f.dueAt).toLocaleString()}` : ""}`).join(" | ") : "No follow-up selected."),
@@ -495,6 +499,36 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       el("ol", {}, plan.steps.map(step => el("li", { class: step.active ? "sc-active" : undefined, "aria-current": step.active ? "step" : undefined, title: step.detail },
         el("strong", {}, step.title), el("span", {}, step.who), step.active ? el("p", {}, step.detail) : null))));
   }
+  // Over time: the full-size chart for one indicator, every check re-judged as it was on its own day.
+  function overTime(ev, charted) {
+    if (!charted.length) return null;
+    const rows = ev.domains.flatMap(d => d.indicators);
+    // Default: the most serious measured indicator.
+    const pick = charted.includes(state.chartKey) ? state.chartKey
+      : (rows.filter(r => charted.includes(r.key)).sort((a, b) => STATUS_RANK[b.status] - STATUS_RANK[a.status])[0]?.key ?? charted[0]);
+    const floors = state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor);
+    const hist = indicatorHistory(pick, history(), state.saved ? null : state.check, { floors });
+    const box = el("div", { class: "sc-hchart-box" }); box.innerHTML = historyChartSvg(hist);
+    const d = hist.def;
+    return el("section", { class: "sc-over", "aria-label": "Over time" },
+      el("header", {}, el("b", {}, "Over time"),
+        el("label", {}, el("span", {}, "Measure"), el("select", { "aria-label": "Measurement to chart", onchange: e => { state.chartKey = e.target.value; render(); } },
+          charted.map(key => el("option", { value: key, selected: key === pick || undefined }, INDICATORS[key].label))))),
+      el("small", {}, `${d.about ?? ""} Each point is judged against the checks before it, as it was on that day.`),
+      box,
+      el("ul", { class: "sc-legend", "aria-label": "Legend" },
+        legendFor(hist).map(m => el("li", { class: `sc-${m.status}` }, el("i", {}, m.glyph), m.word)),
+        hist.points.some(p => p.band) ? el("li", { class: "sc-legend-band" }, el("i", {}), "usual range that day") : null,
+        Number.isFinite(hist.start) ? el("li", { class: "sc-legend-start" }, el("i", {}), "starting level") : null,
+        hist.limitLines.length ? el("li", { class: "sc-legend-limit" }, el("i", {}), "safety limit") : null),
+      el("details", { class: "sc-htable" }, el("summary", {}, "Show as a table"),
+        el("ol", {}, hist.points.map(p => el("li", {}, pointLabel(p, d))))));
+  }
+  function showChart(key) {
+    state.chartKey = key; render();
+    element.querySelector(".sc-over")?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
   // What helps: general guidance for the domain, open when the domain needs attention.
   function helps(d) {
     const g = guidanceFor(d.key); if (!g) return null;

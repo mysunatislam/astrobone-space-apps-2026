@@ -59,6 +59,12 @@ Actions are bounded: contact the crew medical officer now (red flags or an urgen
 
 `src/routine.js`. The first step shows the mission routine (blood sugar and temperature on waking, blood pressure and pulse after 5 minutes seated, the knee and reaction tests at the same time each day), when the next check is due (24 h after the last), the current and longest daily streak, and six badges: first check, baseline built, full check (every domain measured), quality first (repeated a measurement that failed its quality check instead of skipping it), 7-day and 30-day streaks. Badges reward doing the checks, never a health value, so nobody is nudged to report a better number. Elena's streak comes from an authored, synthetic adherence log.
 
+### Over Time: Charts and Colour
+
+`src/historyChart.js`. Under the results, **Over time** charts one measurement across every saved check plus today's. It opens on the most serious measured indicator; clicking any underlined indicator name in the results charts that one. Each point is re-evaluated against only the checks before it, so the chart shows the status it had on its own day (for Elena, knee extension was already **REVIEW** on Day 120). It draws the usual range that each check was judged against, the locked starting level used for drift, and the safety limits: a limit inside the scale is a labelled dashed line, and limits further away are named above or below the plot instead of squashing the data flat. A failed capture is shown as **REPEAT** and left off the line. **Show as a table** lists every point in words.
+
+Colour is never the only cue. Every status has its own word and marker shape (● STABLE, ○ BASELINE, ✕ REPEAT, ▲ REVIEW, ◆ CONTACT TODAY, ■ URGENT), on each result row and in the chart. `scripts/check-status-colours.mjs` simulates protanopia, deuteranopia and tritanopia (Machado et al. 2009) and measures how far apart each pair of status colours is (CIEDE2000). The old palette failed it: under deuteranopia, CONTACT TODAY (orange) and REVIEW were 3.9 apart, close to identical. CONTACT TODAY is now pink and BASELINE/REPEAT soft blue, which leaves no two result statuses closer than 10 for normal, protan or deutan vision. Every status colour has at least 7.5:1 text contrast on the panel (WCAG AA needs 4.5). The remaining close pair is URGENT and CONTACT TODAY under tritanopia (4.7), which is rare; both mean contact the crew medical officer, and their words and shapes differ. A test keeps the colours in `src/twin.css` in step with the ones the check measured.
+
 ### Body-Part Cards and NASA's Five Hazards
 
 `src/bodyParts.js`, `src/hazards.js`. Clicking a structure on the 3D twin opens a card: what it does, how spaceflight affects it (cited), today's status from the latest self-check, and **Measure now**, which opens the matching self-check step. A test reads the scene's pickable structures, so a new one cannot be added without a card. Evidence maps NASA's five hazards (Space Radiation, Isolation and Confinement, Distance from Earth, Gravity Fields, Hostile/Closed Environments) to the indicators that watch for them; radiation is logged as context only, and distance sets the escalation ladder.
@@ -75,6 +81,7 @@ Checks stay in memory unless the astronaut ticks **Save my checks on this device
 
 - 10 unit tests: PVT-B scoring, protocol separation, baseline readiness, direction and floor rules, red-flag priority, immune symptoms, bounded wording, Elena's Day 147 result, poor-capture refusal, consent-gated storage.
 - Browser: the full Elena flow, the reaction test with simulated taps (0 false starts, correct latency), and the camera path loading the pose model and detecting a person at 0.97 tracking quality from the project's squat test video.
+- Browser (2026-10-28, desktop 1440 px and phone 390 px): the Over time chart opens on knee extension with six points and a REVIEW/BASELINE/STABLE legend; clicking systolic blood pressure charts it with the off-scale limits named; typing 150 mmHg draws the 140 mmHg line and labels today CONTACT TODAY in the tested pink; every result row shows a status word; no console errors.
 
 ## Accuracy Check (Camera vs Goniometer)
 
