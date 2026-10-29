@@ -6,11 +6,13 @@
 // --assumed-knee uses the knee spreads assumed before they were measured on real video, and
 // --previous-spreads the heart rate, blood pressure, sleep and temperature spreads guessed before the published ones.
 // --change=key:shift adds a step change on day 31 to the detection list (e.g. --change=sleepHours:-1).
-// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--assumed-knee] [--previous-spreads] [--change=key:shift] [--json]
+// --seed=N runs a different set of simulated astronauts (0 is the set the app's numbers come from), to see
+// how much the figures move by chance.
+// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--assumed-knee] [--previous-spreads] [--change=key:shift] [--seed=N] [--json]
 import { evaluateSelfCheck, INDICATORS, KNEE_REPEAT_NOISE } from "../src/selfCheck.js";
 
 const arg = (name, fallback) => { const hit = process.argv.find(a => a.startsWith(`--${name}=`)); return hit ? Number(hit.split("=")[1]) : fallback; };
-const RUNS = arg("runs", 1000), DAYS = arg("days", 60), SPREAD = arg("spread", 1);
+const RUNS = arg("runs", 1000), DAYS = arg("days", 60), SPREAD = arg("spread", 1), SEED = arg("seed", 0);
 export const singleValueRule = (check, history) => evaluateSelfCheck(check, history, { multirule: false });
 
 // Usual level and day-to-day spread (1 SD) of a healthy astronaut, stated so they can be argued with.
@@ -26,8 +28,13 @@ export const singleValueRule = (check, history) => evaluateSelfCheck(check, hist
 // - temperature: SD of seven morning home oral readings over two weeks, 0.31 °C (Diamond et al., PLoS ONE
 //   2021;16:e0245257, 96 adults; a later correction notice, e0259428, could not be read here).
 // Oxygen saturation is an assumption that fits the 1.2 % change needed to show a real change in 10 healthy
-// adults at rest (Wagener and Hendricker, Chest 1987;92:1047-9). The reaction test and the ratings are
-// assumptions: the PVT-B validation (Basner et al., Acta Astronaut 2011;69:949-59) gives no within-person spread.
+// adults at rest (Wagener and Hendricker, Chest 1987;92:1047-9). The reaction test's usual levels are the
+// PVT-B means of 45 adults from a "high performing astronaut surrogate population" who took it 16 times
+// (Basner et al., Sleep 2018;41:zsx187, Table 2: response speed 4.52/s, 0.98 lapses), with no systematic change
+// in either over the 16 tests. Its within-person spread is still an assumption: that paper's SDs (0.41/s, 1.61
+// lapses) are across all its tests and people together, and lapses are taken as Poisson. The ratings are
+// assumptions too: the pooled daily-life studies checked (Scott et al., Assessment 2020; Kraft et al., Emotion
+// 2026) give shares of variance or within-day spreads, not a day-to-day spread in scale points.
 // PREVIOUS_SPREADS are the guesses these replaced (--previous-spreads). `round` mimics how each value is entered.
 export const ASSUMED_KNEE_SD = Object.freeze({ kneeExtension: 3, kneeRom: 4 });
 export const PREVIOUS_SPREADS = Object.freeze({ restingHr: 4, systolicBp: 6, diastolicBp: 4.5, sleepHours: 0.9, bodyTemp: 0.25 });
@@ -40,8 +47,8 @@ export const STABLE_PERSON = Object.freeze({
   spo2: { mean: 98, sd: 0.8, round: 1, max: 100 },
   glucose: { mean: 90, sd: 5.7, round: 1 },
   bodyTemp: { mean: 36.7, sd: 0.31, round: 0.1 },
-  pvtSpeed: { mean: 3.6, sd: 0.15, round: 0.01 },
-  pvtLapses: { poisson: 2 },
+  pvtSpeed: { mean: 4.52, sd: 0.15, round: 0.01 },
+  pvtLapses: { poisson: 0.98 },
   sleepHours: { mean: 6.8, sd: 85.8 / 60, round: 0.5, min: 0 },
   fatigue: { mean: 3, sd: 0.8, round: 1, min: 1, max: 7 },
   mood: { mean: 7, sd: 1, round: 1, min: 0, max: 10 },
@@ -64,11 +71,13 @@ function sample(spec, random, spread, shift = 0) {
 }
 
 // One astronaut's daily checks. `change` = { key, day, shift } adds a real step change from that day.
+// Each indicator draws from its own random stream, so changing how one indicator is simulated does not
+// reshuffle the values of the others.
 export function simulateAstronaut(seed, { days = DAYS, spread = SPREAD, change = null, evaluate = evaluateSelfCheck, person = STABLE_PERSON } = {}) {
-  const random = rng(seed), history = [], out = [];
+  const streams = Object.fromEntries(Object.keys(person).map((key, j) => [key, rng(seed * 64 + j + 1)])), history = [], out = [];
   for (let day = 1; day <= days; day++) {
     const values = {};
-    for (const [key, spec] of Object.entries(person)) values[key] = sample(spec, random, spread, change && key === change.key && day >= change.day ? change.shift : 0);
+    for (const [key, spec] of Object.entries(person)) values[key] = sample(spec, streams[key], spread, change && key === change.key && day >= change.day ? change.shift : 0);
     const keys = Object.keys(values);
     const check = { id: `sim-${seed}-${day}`, missionDay: day, at: `day ${day}`, values, protocols: Object.fromEntries(keys.map(k => [k, "sim"])), quality: Object.fromEntries(keys.map(k => [k, true])), redFlags: {}, symptoms: {} };
     const ev = evaluate(check, history);
@@ -82,12 +91,12 @@ const rows = ev => ev.domains.flatMap(d => d.indicators);
 const REVIEW_OR_WORSE = new Set(["changed", "attention", "urgent"]);
 const RECHECK_OR_WORSE = new Set(["recheck", ...REVIEW_OR_WORSE]);
 
-export function falseAlarmSummary({ runs = RUNS, days = DAYS, spread = SPREAD, evaluate, person } = {}) {
+export function falseAlarmSummary({ runs = RUNS, days = DAYS, spread = SPREAD, evaluate, person, seed = SEED } = {}) {
   let checks = 0, review = 0, recheck = 0, changedRows = 0, limitChecks = 0, driftRuns = 0, debtRuns = 0;
   const byKey = Object.fromEntries(Object.keys(INDICATORS).map(k => [k, 0]));
   for (let i = 0; i < runs; i++) {
     let drifted = false, indebted = false;
-    for (const { day, ev } of simulateAstronaut(1000 + i, { days, spread, evaluate, person })) {
+    for (const { day, ev } of simulateAstronaut(1000 + 10000 * seed + i, { days, spread, evaluate, person })) {
       if (day <= 5) continue; // baselines are still being built
       checks++;
       if (REVIEW_OR_WORSE.has(ev.overall)) review++;
@@ -113,10 +122,10 @@ export function falseAlarmSummary({ runs = RUNS, days = DAYS, spread = SPREAD, e
 
 // Share of astronauts whose changed indicator is flagged on the first check after a real step change,
 // within the first three checks, and within two weeks of daily checks.
-export function detectionSummary(change, { runs = RUNS, days = DAYS, spread = SPREAD, evaluate, person } = {}) {
+export function detectionSummary(change, { runs = RUNS, days = DAYS, spread = SPREAD, evaluate, person, seed = SEED } = {}) {
   let first = 0, within3 = 0, within14 = 0;
   for (let i = 0; i < runs; i++) {
-    const flagged = simulateAstronaut(5000 + i, { days, spread, change, evaluate, person })
+    const flagged = simulateAstronaut(5000 + 10000 * seed + i, { days, spread, change, evaluate, person })
       .filter(({ day }) => day >= change.day && day < change.day + 14)
       .map(({ ev }) => rows(ev).find(r => r.key === change.key)?.status)
       .map(s => REVIEW_OR_WORSE.has(s));
