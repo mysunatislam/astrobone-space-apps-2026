@@ -132,8 +132,11 @@ const sd = values => { if (values.length < 2) return 0; const m = mean(values); 
 const round = (value, digits = 1) => Number(value.toFixed(digits));
 
 // How the responses were given. A touch screen, a mouse and a keyboard each add their own delay to every
-// response, and the delay differs between devices (INPUT_LAG_NOTE), so a test is compared only with
-// earlier tests answered the same way. A test that switches between them is repeated, never compared.
+// response, and the delay differs between devices: NASA Ames found a touch-screen PVT's reaction times
+// "80+-20 milliseconds longer than our best estimate of the actual touch time" (Mulligan, Arsintescu and
+// Flynn-Evans, NTRS 20160000581). A constant delay cancels against the person's own baseline only if every
+// test has it, so a test is compared only with earlier tests answered the same way, and one that switches
+// between them is repeated, never compared.
 export const PVT_INPUTS = Object.freeze({ touch: "touch", mouse: "mouse click", pen: "pen", key: "space bar" });
 const ONE_INPUT_SHARE = 0.9;
 function responseInput(responses) {
