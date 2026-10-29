@@ -1,6 +1,6 @@
 import {
   PVT_B, PVT_PROTOCOL, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
-  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
+  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
 import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
@@ -534,7 +534,19 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
       state.report ? reportSection() : null,
       el("p", { class: "sc-note" }, "Review triggers: one value outside your usual range (2× your own spread or a minimum change, whichever is larger, after 3 usable checks) asks for a re-check; two in a row, or one far outside, is logged for review, and so is a steady drift from your first checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
+      reliabilityNote(),
       state.profile === "elena" ? el("p", { class: "sc-note" }, ELENA_SELF_CHECK_BOUNDARY) : null];
+  }
+
+  // How often the flags are wrong, in the simulation's own numbers, so nobody has to take them on trust.
+  function reliabilityNote() {
+    const r = SIMULATED_RELIABILITY, pct = v => `${v} %`;
+    return el("details", { class: "sc-reliability" }, el("summary", {}, "How often is this wrong?"),
+      el("p", {}, `In a simulation of ${r.astronauts.toLocaleString("en")} healthy astronauts doing all 14 checks every day for ${r.days} days, REVIEW came up on ${pct(r.reviewPct)} of days (${pct(r.singleRuleReviewPct)} before the re-check rule) and RE-CHECK on ${pct(r.recheckPct)}.`),
+      el("table", {}, el("caption", {}, "A real change, flagged REVIEW within"),
+        el("thead", {}, el("tr", {}, el("th", { scope: "col" }, "Change"), el("th", { scope: "col" }, "3 checks"), el("th", { scope: "col" }, "14 checks"))),
+        el("tbody", {}, r.detected.map(d => el("tr", {}, el("th", { scope: "row" }, d.label), el("td", {}, pct(d.withinThree)), el("td", {}, pct(d.withinTwoWeeks)))))),
+      el("small", {}, "The day-to-day spreads in the simulation are assumptions until they are measured on volunteers. Method: scripts/simulate-false-alarms.mjs."));
   }
 
   // Who to tell, for this result in this place: the escalation ladder with the active rung explained.

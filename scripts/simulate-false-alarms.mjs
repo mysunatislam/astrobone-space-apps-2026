@@ -93,18 +93,20 @@ export function falseAlarmSummary({ runs = RUNS, days = DAYS, spread = SPREAD, e
 }
 
 // Share of astronauts whose changed indicator is flagged on the first check after a real step change,
-// and within the first three checks.
+// within the first three checks, and within two weeks of daily checks.
 export function detectionSummary(change, { runs = RUNS, days = DAYS, spread = SPREAD, evaluate } = {}) {
-  let first = 0, within3 = 0;
+  let first = 0, within3 = 0, within14 = 0;
   for (let i = 0; i < runs; i++) {
     const flagged = simulateAstronaut(5000 + i, { days, spread, change, evaluate })
-      .filter(({ day }) => day >= change.day && day < change.day + 3)
+      .filter(({ day }) => day >= change.day && day < change.day + 14)
       .map(({ ev }) => rows(ev).find(r => r.key === change.key)?.status)
       .map(s => REVIEW_OR_WORSE.has(s));
     if (flagged[0]) first++;
-    if (flagged.some(Boolean)) within3++;
+    if (flagged.slice(0, 3).some(Boolean)) within3++;
+    if (flagged.some(Boolean)) within14++;
   }
-  return { ...change, firstCheckPct: Number((100 * first / runs).toFixed(1)), withinThreeChecksPct: Number((100 * within3 / runs).toFixed(1)) };
+  const pct = n => Number((100 * n / runs).toFixed(1));
+  return { ...change, firstCheckPct: pct(first), withinThreeChecksPct: pct(within3), withinTwoWeeksPct: pct(within14) };
 }
 
 export const STEP_CHANGES = Object.freeze([
@@ -124,6 +126,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(`Rule: ${result.rule}. Stable astronauts: ${s.runs} x ${s.days} days, spread x${s.spread}, ${s.checksJudged} checks judged after the first 5`);
     console.log(`  REVIEW or worse: ${s.reviewOrWorsePct}% of checks (RE-CHECK or worse ${s.recheckOrWorsePct}%); ${s.changedRowsPerCheck} changed rows per check; fixed limit crossed on ${s.fixedLimitPct}%; drift alarm in ${s.astronautsWithDriftAlarmPct}% of astronauts`);
     console.log(`  Changed rows by indicator (% of checks): ${Object.entries(s.changedPctByIndicator).map(([k, v]) => `${k} ${v}`).join(", ")}`);
-    for (const d of result.detection) console.log(`  Real change, ${d.label}: flagged on the first check ${d.firstCheckPct}%, within 3 checks ${d.withinThreeChecksPct}%`);
+    for (const d of result.detection) console.log(`  Real change, ${d.label}: flagged on the first check ${d.firstCheckPct}%, within 3 checks ${d.withinThreeChecksPct}%, within 14 ${d.withinTwoWeeksPct}%`);
   }
 }
