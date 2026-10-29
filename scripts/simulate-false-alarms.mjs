@@ -3,32 +3,41 @@
 // spread) and runs the app's own evaluateSelfCheck on them. A real step change is then added to one
 // indicator to see whether the rules still catch it.
 // --single runs the original single-value rule instead, for comparison.
-// --assumed-knee uses the knee spreads assumed before they were measured on real video.
-// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--assumed-knee] [--json]
+// --assumed-knee uses the knee spreads assumed before they were measured on real video, and
+// --previous-spreads the heart rate, blood pressure and sleep spreads guessed before the published ones.
+// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--assumed-knee] [--previous-spreads] [--json]
 import { evaluateSelfCheck, INDICATORS, KNEE_REPEAT_NOISE } from "../src/selfCheck.js";
 
 const arg = (name, fallback) => { const hit = process.argv.find(a => a.startsWith(`--${name}=`)); return hit ? Number(hit.split("=")[1]) : fallback; };
 const RUNS = arg("runs", 1000), DAYS = arg("days", 60), SPREAD = arg("spread", 1);
 export const singleValueRule = (check, history) => evaluateSelfCheck(check, history, { multirule: false });
 
-// Usual level and day-to-day spread (1 SD) of a healthy astronaut. These are assumptions, stated so they
-// can be argued with: glucose uses the EFLM within-person CV of 4.9 % plus about 4 % for a home meter;
-// blood pressure is the mean of two seated home readings; the knee spreads are the camera's repeat noise
-// measured on real video (KNEE_REPEAT_NOISE; ASSUMED_KNEE_SD is what was assumed before that).
-// `round` mimics how each value is entered.
+// Usual level and day-to-day spread (1 SD) of a healthy astronaut, stated so they can be argued with.
+// Measured or published:
+// - knee: the camera's repeat noise on real video (KNEE_REPEAT_NOISE; ASSUMED_KNEE_SD was assumed before);
+// - heart rate and blood pressure: within-person SD of one seated home reading each morning, Ohasama study
+//   (Kikuya et al., Hypertension 2008;52:1045-50, 2,455 adults): systolic 8.6 and diastolic 6.4 mmHg (means),
+//   heart rate 5.4 bpm (the middle cut-off of its Figure 1). The app averages two readings, so these are cautious;
+//   wearables read resting heart rate steadier (about 3 bpm, Quer et al., PLoS ONE 2020;15:e0227709);
+// - sleep: night-to-night SD of diary sleep duration, 85.8 min (Messman et al., J Sleep Res 2022;31:e13680,
+//   8 studies, 2,404 people);
+// - glucose: the EFLM within-person CV of 4.9 % plus about 4 % for a home meter.
+// Oxygen saturation, temperature, the reaction test and the ratings are assumptions.
+// PREVIOUS_SPREADS are the guesses these replaced (--previous-spreads). `round` mimics how each value is entered.
 export const ASSUMED_KNEE_SD = Object.freeze({ kneeExtension: 3, kneeRom: 4 });
+export const PREVIOUS_SPREADS = Object.freeze({ restingHr: 4, systolicBp: 6, diastolicBp: 4.5, sleepHours: 0.9 });
 export const STABLE_PERSON = Object.freeze({
   kneeExtension: { mean: 165, sd: KNEE_REPEAT_NOISE.kneeExtension.sd, round: 1 },
   kneeRom: { mean: 65, sd: KNEE_REPEAT_NOISE.kneeRom.sd, round: 1 },
-  restingHr: { mean: 62, sd: 4, round: 1 },
-  systolicBp: { mean: 116, sd: 6, round: 1 },
-  diastolicBp: { mean: 75, sd: 4.5, round: 1 },
+  restingHr: { mean: 62, sd: 5.4, round: 1 },
+  systolicBp: { mean: 116, sd: 8.6, round: 1 },
+  diastolicBp: { mean: 75, sd: 6.4, round: 1 },
   spo2: { mean: 98, sd: 0.8, round: 1, max: 100 },
   glucose: { mean: 90, sd: 5.7, round: 1 },
   bodyTemp: { mean: 36.7, sd: 0.25, round: 0.1 },
   pvtSpeed: { mean: 3.6, sd: 0.15, round: 0.01 },
   pvtLapses: { poisson: 2 },
-  sleepHours: { mean: 6.8, sd: 0.9, round: 0.5, min: 0 },
+  sleepHours: { mean: 6.8, sd: 85.8 / 60, round: 0.5, min: 0 },
   fatigue: { mean: 3, sd: 0.8, round: 1, min: 1, max: 7 },
   mood: { mean: 7, sd: 1, round: 1, min: 0, max: 10 },
   stress: { mean: 4, sd: 1.2, round: 1, min: 0, max: 10 },
@@ -122,12 +131,14 @@ export const STEP_CHANGES = Object.freeze([
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const evaluate = process.argv.includes("--single") ? singleValueRule : evaluateSelfCheck;
-  const person = process.argv.includes("--assumed-knee") ? { ...STABLE_PERSON, ...Object.fromEntries(Object.entries(ASSUMED_KNEE_SD).map(([k, sd]) => [k, { ...STABLE_PERSON[k], sd }])) } : STABLE_PERSON;
+  const withSpreads = spreads => Object.fromEntries(Object.entries(spreads).map(([k, sd]) => [k, { ...STABLE_PERSON[k], sd }]));
+  const person = { ...STABLE_PERSON, ...(process.argv.includes("--assumed-knee") ? withSpreads(ASSUMED_KNEE_SD) : {}), ...(process.argv.includes("--previous-spreads") ? withSpreads(PREVIOUS_SPREADS) : {}) };
+  const changed = Object.keys(person).filter(k => person[k] !== STABLE_PERSON[k]);
   const result = { rule: evaluate === singleValueRule ? "single value" : "multirule", stable: falseAlarmSummary({ evaluate, person }), detection: STEP_CHANGES.map(c => detectionSummary(c, { runs: Math.min(RUNS, 400), evaluate, person })) };
   if (process.argv.includes("--json")) console.log(JSON.stringify(result, null, 2));
   else {
     const s = result.stable;
-    console.log(`Rule: ${result.rule}${person === STABLE_PERSON ? "" : ", assumed knee spreads"}. Stable astronauts: ${s.runs} x ${s.days} days, spread x${s.spread}, ${s.checksJudged} checks judged after the first 5`);
+    console.log(`Rule: ${result.rule}${changed.length ? `, earlier guessed spreads for ${changed.join(", ")}` : ""}. Stable astronauts: ${s.runs} x ${s.days} days, spread x${s.spread}, ${s.checksJudged} checks judged after the first 5`);
     console.log(`  REVIEW or worse: ${s.reviewOrWorsePct}% of checks (RE-CHECK or worse ${s.recheckOrWorsePct}%); ${s.changedRowsPerCheck} changed rows per check; fixed limit crossed on ${s.fixedLimitPct}%; drift alarm in ${s.astronautsWithDriftAlarmPct}% of astronauts`);
     console.log(`  Changed rows by indicator (% of checks): ${Object.entries(s.changedPctByIndicator).map(([k, v]) => `${k} ${v}`).join(", ")}`);
     for (const d of result.detection) console.log(`  Real change, ${d.label}: flagged on the first check ${d.firstCheckPct}%, within 3 checks ${d.withinThreeChecksPct}%, within 14 ${d.withinTwoWeeksPct}%`);
