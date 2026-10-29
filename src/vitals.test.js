@@ -98,6 +98,20 @@ test("an upper-arm and a wrist cuff are separate baselines, and a wrist reading 
   assert.equal(high.text, "at or above 140 mmHg", "a wrist reading names no different limit");
 });
 
+test("a glucose sensor is its own baseline, and a sensor reading over a limit is checked with a finger prick", () => {
+  const meter = vitalsCheck({ glucose: { value: 96, fasting: true } }), cgm = vitalsCheck({ glucose: { value: 96, fasting: true, source: "cgm" } });
+  assert.equal(meter.protocols.glucose, "glucose-fasting-v1", "a meter keeps the protocol saved readings already have");
+  assert.equal(cgm.protocols.glucose, "glucose-cgm-fasting-v1");
+  assert.equal(vitalsCheck({ glucose: { value: 140, fasting: false, source: "cgm" } }).protocols.glucose, "glucose-cgm-random-v1");
+  assert.deepEqual(applyVitals(newCheck("you"), vitalsFromValues(cgm.values, cgm.protocols)).protocols, cgm.protocols);
+  const history = [90, 92, 91, 93].map(v => ({ values: { glucose: v }, protocols: { glucose: "glucose-fasting-v1" } }));
+  assert.equal(evaluateIndicator("glucose", 115, history, { protocol: "glucose-cgm-fasting-v1" }).status, "baseline");
+  const high = safetyLimit("glucose", 210, SAFETY_LIMITS, "glucose-cgm-fasting-v1");
+  assert.deepEqual([high.level, high.text], ["attention", "at or above 200 mg/dL"]);
+  assert.match(high.recheck, /finger-prick meter/);
+  assert.match(safetyLimit("glucose", 50, SAFETY_LIMITS, "glucose-cgm-fasting-v1").first, /low blood sugar procedure/, "a low sensor reading still starts the procedure first");
+});
+
 test("one blood pressure reading over a limit gives one action, urgent before attention", () => {
   const check = vitalsCheck({ bp: { readings: [[186, 124]], rested: true }, temp: { value: 38.1 } });
   const result = evaluateSelfCheck(check, []);

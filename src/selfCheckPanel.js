@@ -1,6 +1,6 @@
 import {
   PVT_B, PVT_PROTOCOL, PVT_INPUTS, PVT_DEVICE_WORDS, pvtDeviceClass, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
-  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, BP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
+  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, BP_SITES, GLUCOSE_SOURCES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
 import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
@@ -403,7 +403,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       return el("span", { class: "sc-bp" }, pair[0], el("i", {}, "/"), pair[1], el("i", {}, "mmHg"));
     };
     const bpProblem = () => bpInputs.map(([s, d]) => vitalEntryProblem("systolic", typed(s), { diastolic: typed(d) }) ?? vitalEntryProblem("diastolic", typed(d))).find(Boolean);
-    const glucose = vt.glucose ??= { value: null, unit: "mg/dL", fasting: true }, temp = vt.temp ??= { value: null, unit: "°C", site: "oral" }, spo2 = vt.spo2 ??= { value: null };
+    const glucose = vt.glucose ??= { value: null, unit: "mg/dL", fasting: true, source: "meter" }, temp = vt.temp ??= { value: null, unit: "°C", site: "oral" }, spo2 = vt.spo2 ??= { value: null };
     const gRange = () => (glucose.unit === "mmol/L" ? [1, 33, 0.1] : [20, 600, 1]), tRange = () => (temp.unit === "°F" ? [86, 113, 0.1] : [30, 45, 0.1]);
     const spo2Input = num(spo2.value, 50, 100, 1, "Oxygen saturation", n => { spo2.value = n; });
     const glucoseInput = num(glucose.value, ...gRange(), "Blood sugar", n => { glucose.value = n; });
@@ -420,6 +420,8 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
             ["mg/dL", "mmol/L"].map(u => el("option", { selected: glucose.unit === u || undefined }, u)))),
         el("span", { class: "sc-row" }, [[true, "Fasting (before breakfast)"], [false, "Not fasting"]].map(([fasting, label]) => el("label", { class: "sc-radio" },
           el("input", { type: "radio", name: "sc-glucose-fasting", checked: glucose.fasting === fasting || undefined, onchange: () => { glucose.fasting = fasting; sync(); } }), label))),
+        el("span", { class: "sc-row", role: "radiogroup", "aria-label": "Blood sugar measured with" }, GLUCOSE_SOURCES.map(([source, label]) => el("label", { class: "sc-radio" },
+          el("input", { type: "radio", name: "sc-glucose-source", checked: (glucose.source ?? "meter") === source || undefined, onchange: () => { glucose.source = source; sync(); } }), label))),
         problem(() => vitalEntryProblem("glucose", typed(glucoseInput), { unit: glucose.unit })), chip(["glucose"]), about("glucose")),
       el("div", { class: "sc-vital" }, el("b", {}, "Body temperature"),
         el("span", { class: "sc-bp" }, tempInput,

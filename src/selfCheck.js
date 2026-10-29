@@ -52,7 +52,7 @@ export const INDICATORS = Object.freeze({
     about: "How much of your blood's oxygen-carrying capacity is in use, from a finger clip. It should stay steady; a drop can come from the cabin air, the lungs or the sensor. Cold fingers, nail polish and skin pigmentation can affect the reading (FDA)." },
   // Floor 15 mg/dL: the EFLM reference change value for glucose (15.2 %, CVI 4.89 %) near 95 mg/dL.
   glucose: { domain: "metabolic", label: "Blood sugar", unit: "mg/dL", floor: 15, direction: "both", source: "DEVICE",
-    about: "Sugar in your blood from a finger-prick meter. Six-month ISS flights showed signs of insulin resistance (Hughson et al., Am J Physiol 2016), so it is worth watching over months. Fasting readings are compared only with fasting readings." },
+    about: "Sugar in your blood from a finger-prick meter. Six-month ISS flights showed signs of insulin resistance (Hughson et al., Am J Physiol 2016), so it is worth watching over months. Fasting readings are compared only with fasting readings, and a glucose sensor (CGM) only with the sensor." },
   bodyTemp: { domain: "immune", label: "Body temperature", unit: "°C", floor: 0.6, direction: "both", source: "DEVICE", digits: 1,
     about: "Resting core temperature rose about 1 °C over 2.5 months on the ISS (Stahn et al., Sci Rep 2017), so your own trend matters as well as the fever limit. Use the same thermometer and site each day." },
   pvtSpeed: { domain: "behavioral", label: "Reaction speed", unit: "/s", floor: 0.3, direction: "down", source: "TEST", digits: 2,
@@ -93,7 +93,8 @@ const WRIST_RECHECK = "Sit quietly for 5 minutes and measure again with your wri
 export const SAFETY_LIMITS = Object.freeze({
   systolicBp: { urgent: [[">", 180]], attention: [[">=", 140], ["<", 90]], recheck: "Sit quietly for 5 minutes and measure again.", sites: { wrist: { recheck: WRIST_RECHECK } } },
   diastolicBp: { urgent: [[">", 120]], attention: [[">=", 90], ["<", 60]], recheck: "Sit quietly for 5 minutes and measure again.", sites: { wrist: { recheck: WRIST_RECHECK } } },
-  glucose: { urgent: [["<", 54, "Follow your mission's low blood sugar procedure now."], [">", 240]], attention: [[">=", 200]], recheck: "Recheck in 15 minutes with a fresh finger prick." },
+  glucose: { urgent: [["<", 54, "Follow your mission's low blood sugar procedure now."], [">", 240]], attention: [[">=", 200]], recheck: "Recheck in 15 minutes with a fresh finger prick.",
+    sites: { cgm: { recheck: "Check it with a finger-prick meter: a sensor reads the fluid between cells and lags blood sugar by 5 to 10 minutes." } } },
   bodyTemp: { urgent: [[">=", 39.4], ["<", 35]], attention: [[">=", 37.8]], recheck: "Measure again in 30 minutes at the same site.",
     sites: { armpit: { attention: [[">=", 37.2]] }, ear: { attention: [[">=", 38]] }, forehead: { attention: [[">=", 38]] } } },
   spo2: { urgent: [["<=", 92]], attention: [["<=", 94]], recheck: "Warm your hands, sit still and measure again on another finger." },
@@ -109,7 +110,7 @@ export const describeBound = ([op, value], unit = "") => `${OP_WORDS[op]} ${valu
 
 // The most serious fixed limit a value crosses, or null. A protocol naming a measurement site
 // ("temp-armpit-v1") picks that site's bounds where the rule has them.
-const siteOf = protocol => /^(?:temp|bp-seated-5min)-(\w+)-v1$/.exec(protocol ?? "")?.[1];
+const siteOf = protocol => /^(?:temp|bp-seated-5min)-(\w+)-v1$/.exec(protocol ?? "")?.[1] ?? (/^glucose-cgm-/.test(protocol ?? "") ? "cgm" : undefined);
 export function safetyLimit(key, value, limits = SAFETY_LIMITS, protocol = null) {
   const base = limits[key];
   if (!base || !Number.isFinite(value)) return null;
@@ -428,6 +429,12 @@ export function recommendActions(domains, redFlags, check = {}, environment = nu
 export const GLUCOSE_MG_PER_MMOL = 18.016;
 export const TEMP_SITES = Object.freeze([["oral", "Mouth"], ["ear", "Ear"], ["forehead", "Forehead"], ["armpit", "Armpit"]]);
 export const BP_SITES = Object.freeze([["arm", "Upper arm"], ["wrist", "Wrist, at heart level"]]);
+// A glucose sensor (CGM) reads the fluid between cells, not blood: "There is a 5 to 10 minute delay in ISF
+// glucose response to changes in blood glucose", and "Finger prick blood glucose readings and sensor glucose
+// reading won't always match and in fact are likely to be different" (Abbott, FreeStyle Libre). So sensor and
+// finger-prick readings, like fasting and non-fasting ones, are separate protocols.
+export const GLUCOSE_SOURCES = Object.freeze([["meter", "Finger-prick meter"], ["cgm", "Glucose sensor (CGM)"]]);
+const glucoseProtocol = ({ fasting, source } = {}) => `glucose-${source === "cgm" ? "cgm-" : ""}${fasting === false ? "random" : "fasting"}-v1`;
 const bpProtocol = site => (site === "wrist" ? "bp-seated-5min-wrist-v1" : "bp-seated-5min-v1");
 const VITAL_KEYS = ["systolicBp", "diastolicBp", "spo2", "glucose", "bodyTemp"];
 const finite = v => (typeof v === "number" && Number.isFinite(v) ? v : null);
@@ -461,7 +468,7 @@ export function applyVitals(check, vitals = {}) {
   set("diastolicBp", avg(1), bpProtocol(vitals.bp?.site), vitals.bp?.rested === true);
   set("spo2", finite(vitals.spo2?.value), "spo2-rest-v1");
   const g = finite(vitals.glucose?.value);
-  set("glucose", g === null ? null : Math.round(vitals.glucose.unit === "mmol/L" ? g * GLUCOSE_MG_PER_MMOL : g), vitals.glucose?.fasting === false ? "glucose-random-v1" : "glucose-fasting-v1");
+  set("glucose", g === null ? null : Math.round(vitals.glucose.unit === "mmol/L" ? g * GLUCOSE_MG_PER_MMOL : g), glucoseProtocol(vitals.glucose));
   const t = finite(vitals.temp?.value), site = TEMP_SITES.some(([k]) => k === vitals.temp?.site) ? vitals.temp.site : "oral";
   set("bodyTemp", t === null ? null : Number((vitals.temp.unit === "°F" ? (t - 32) * 5 / 9 : t).toFixed(1)), `temp-${site}-v1`);
   if (VITAL_KEYS.some(key => key in check.values)) check.sources = { ...check.sources, vitals: vitals.source ?? "Typed readings" };
@@ -473,7 +480,7 @@ export function vitalsFromValues(values = {}, protocols = {}) {
   return {
     bp: { readings: Number.isFinite(values.systolicBp) ? [[values.systolicBp, values.diastolicBp]] : [], rested: true, site: siteOf(protocols.systolicBp) === "wrist" ? "wrist" : "arm" },
     spo2: { value: values.spo2 ?? null },
-    glucose: { value: values.glucose ?? null, unit: "mg/dL", fasting: protocols.glucose !== "glucose-random-v1" },
+    glucose: { value: values.glucose ?? null, unit: "mg/dL", fasting: !/random/.test(protocols.glucose ?? ""), source: /^glucose-cgm-/.test(protocols.glucose ?? "") ? "cgm" : "meter" },
     temp: { value: values.bodyTemp ?? null, unit: "°C", site: /^temp-(\w+)-v1$/.exec(protocols.bodyTemp ?? "")?.[1] ?? "oral" },
   };
 }
