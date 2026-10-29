@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { falseAlarmSummary, detectionSummary, singleValueRule, STEP_CHANGES, STABLE_PERSON, ASSUMED_KNEE_SD, PREVIOUS_SPREADS } from "../scripts/simulate-false-alarms.mjs";
+import { falseAlarmSummary, detectionSummary, singleValueRule, simulateAstronaut, STEP_CHANGES, STABLE_PERSON, ASSUMED_KNEE_SD, PREVIOUS_SPREADS } from "../scripts/simulate-false-alarms.mjs";
 import { SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE } from "./selfCheck.js";
 
 // Simulated healthy astronauts checking every indicator daily (scripts/simulate-false-alarms.mjs; the
@@ -47,4 +47,18 @@ test("heart rate, blood pressure, sleep and temperature spreads are the publishe
   // Adding up 14 nights (sleep debt) is what catches it within two weeks.
   const sleep = SIMULATED_RELIABILITY.detected.find(d => d.key === "sleepHours");
   assert.ok(sleep.withinThree < 40 && sleep.withinTwoWeeks > 85, JSON.stringify(sleep));
+});
+
+test("the reaction test's usual levels are the published PVT-B means, and each reading has its own random stream", () => {
+  // Basner et al., Sleep 2018;41:zsx187, Table 2: 45 adults, 16 tests each.
+  assert.equal(STABLE_PERSON.pvtSpeed.mean, 4.52);
+  assert.equal(STABLE_PERSON.pvtLapses.poisson, 0.98);
+  // Simulating lapses differently must not change anyone's knee, blood pressure or sleep values.
+  const recorded = person => { const seen = []; simulateAstronaut(7, { days: 20, person, evaluate: check => { seen.push(check.values); return {}; } }); return seen; };
+  const a = recorded(STABLE_PERSON), b = recorded({ ...STABLE_PERSON, pvtLapses: { poisson: 4 } });
+  for (const key of Object.keys(STABLE_PERSON).filter(k => k !== "pvtLapses")) assert.deepEqual(a.map(v => v[key]), b.map(v => v[key]), key);
+  assert.notDeepEqual(a.map(v => v.pvtLapses), b.map(v => v.pvtLapses));
+  assert.equal(a.length, 20);
+  // The screen says how far other simulated astronauts move the figures.
+  assert.ok(SIMULATED_RELIABILITY.chance.sets >= 3 && SIMULATED_RELIABILITY.chance.maxShift > 0);
 });

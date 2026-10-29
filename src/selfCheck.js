@@ -211,8 +211,8 @@ export function personalReference(history, key, protocol) {
 // textbook k = 0.5, h = 4 raised a confirmed alarm in about 1 in 5 stable astronauts over 180 days. Sigma is floored at half the review floor so a
 // suspiciously tight baseline does not turn noise into alarms. The locked baseline is the first `baseline`
 // usable checks (fewer while there are fewer), as laboratory quality control sets its limits from 20 or
-// more results: locked from 5, its mean was off by enough that 17.4 % of stable simulated astronauts got
-// a drift alarm within 60 days with the published day-to-day spreads, against 1.6 % from 20
+// more results: locked from 5, its mean was off by enough that 17.3 % of stable simulated astronauts got
+// a drift alarm within 60 days with the published day-to-day spreads, against 1.2 % from 20
 // (scripts/simulate-false-alarms.mjs), and a 2°/month knee decline was caught more often, not less
 // (93 % of 1,000 runs within 180 days, median 88 days, scripts/simulate-detection.mjs).
 export const DRIFT = Object.freeze({ k: 1, h: 6, reset: false, baseline: 20 });
@@ -255,7 +255,7 @@ export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRI
 // a change for review only when it is far beyond the range (more than `big` times it, about 3 SD) or the
 // previous usable check was also beyond its own range on the same side. With the original rule (one value
 // beyond the 5-check range), a healthy astronaut who checked all 14 indicators daily was told something
-// changed on 46 % of checks (scripts/simulate-false-alarms.mjs, measured and published spreads).
+// changed on 45 % of checks (scripts/simulate-false-alarms.mjs, measured and published spreads).
 export const MULTIRULE = Object.freeze({ big: 1.5 });
 
 // How much the camera's knee reading moves between repeats when the knee did not change, measured on
@@ -277,17 +277,20 @@ export const KNEE_REPEAT_NOISE = Object.freeze({
 // What scripts/simulate-false-alarms.mjs measured for these rules: 1,000 simulated healthy astronauts
 // doing all 14 checks daily for 60 days, then a real step change on day 31 (400 astronauts each). The
 // knee spreads are KNEE_REPEAT_NOISE, measured on real video; heart rate, blood pressure, sleep and
-// temperature use published day-to-day spreads; oxygen, the reaction test and the ratings are assumptions
-// until measured on volunteers. With the spreads guessed before (--assumed-knee --previous-spreads) the
-// same rules gave REVIEW 5 % and caught 2 h less sleep within 14 checks in 100 %: the guesses made the
-// checks look steadier than people are. The app shows these numbers; src/falseAlarms.test.js keeps them
-// in step with the code.
+// temperature use published day-to-day spreads; the reaction test's usual levels are published (Basner et
+// al. 2018), its spread, oxygen and the ratings are assumptions until measured on volunteers. With the
+// spreads guessed before (--assumed-knee --previous-spreads) the same rules gave REVIEW 4.4 % and caught
+// 2 h less sleep within 14 checks in 100 %: the guesses made the checks look steadier than people are.
+// `chance`: the same run with --seed=1 and --seed=2 (other simulated astronauts) moved the shown figures
+// by up to 6 points (systolic within 3 checks, 76 to 82 %). The app shows these numbers;
+// src/falseAlarms.test.js keeps them in step with the code.
 export const SIMULATED_RELIABILITY = Object.freeze({
-  astronauts: 1000, days: 60, reviewPct: 12.3, singleRuleReviewPct: 46.3, recheckPct: 43.6,
+  astronauts: 1000, days: 60, reviewPct: 11.4, singleRuleReviewPct: 44.8, recheckPct: 42.1,
+  chance: Object.freeze({ sets: 3, maxShift: 6 }),
   detected: Object.freeze([
-    ["kneeExtension", "knee extension 10° lower", 64.5, 99.5], ["pvtLapses", "6 more attention lapses", 95.8, 100],
-    ["systolicBp", "systolic 20 mmHg higher", 81, 100], ["glucose", "fasting blood sugar 20 mg/dL higher", 75.5, 100],
-    ["sleepHours", "2 h less sleep", 24.8, 93.3],
+    ["kneeExtension", "knee extension 10° lower", 60.3, 98], ["pvtLapses", "6 more attention lapses", 97.5, 100],
+    ["systolicBp", "systolic 20 mmHg higher", 82, 99.5], ["glucose", "fasting blood sugar 20 mg/dL higher", 79.5, 100],
+    ["sleepHours", "2 h less sleep", 29.8, 91.3],
   ].map(([key, label, withinThree, withinTwoWeeks]) => Object.freeze({ key, label, withinThree, withinTwoWeeks }))),
 });
 
@@ -320,7 +323,7 @@ function dayJudgement(values, value, def, floor, longSpread = false) {
 
 // Sleep debt. One short night is ordinary: people's sleep varies by about 1.4 h from night to night
 // (Messman 2022), so the daily rule needs about 3 h less sleep before it says anything, and it caught a
-// 2 h loss within 14 checks in only 59 % of simulated runs. A run of short nights is what matters:
+// 2 h loss within 14 checks in only 58 % of simulated runs. A run of short nights is what matters:
 // holding sleep to 6 h or less for 14 nights built up deficits "equivalent to up to 2 nights of total
 // sleep deprivation", and the sleepiness ratings suggest people were "largely unaware" of them (Van
 // Dongen et al., Sleep 2003;26:117-26, doi 10.1093/sleep/26.2.117). So sleep also adds up the shortfall
@@ -329,7 +332,7 @@ function dayJudgement(values, value, def, floor, longSpread = false) {
 // night-to-night change adds up to: z x sigma x sqrt(nights + nights^2 / earlier nights), sigma the
 // moving-range spread. It needs `nights` + SPREAD.min usable nights. 14 nights rather than 7: in
 // scripts/simulate-false-alarms.mjs, 7 nights caught a 2 h loss within 14 checks in 86 % of runs and gave
-// 6.7 % of stable astronauts a sleep-debt review within 60 days; 14 nights caught 93 % and gave 3.7 %.
+// 7.6 % of stable astronauts a sleep-debt review within 60 days; 14 nights caught 91 % and gave 4 %.
 export const SLEEP_DEBT = Object.freeze({ key: "sleepHours", nights: 14, z: 3 });
 
 export function sleepDebt(series, value, { nights = SLEEP_DEBT.nights, z = SLEEP_DEBT.z, def = INDICATORS.sleepHours } = {}) {
