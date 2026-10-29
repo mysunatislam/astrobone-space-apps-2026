@@ -1,6 +1,6 @@
 import {
   PVT_B, PVT_PROTOCOL, PVT_INPUTS, PVT_DEVICE_WORDS, pvtDeviceClass, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
-  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
+  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, BP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
 import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
@@ -395,7 +395,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       chips.push(update); update(); return node;
     };
     const about = key => el("small", { class: "sc-about" }, INDICATORS[key].about);
-    const bp = vt.bp ??= { readings: [], rested: false };
+    const bp = vt.bp ??= { readings: [], rested: false, site: "arm" };
     const bpInputs = [];
     const reading = (i, label) => {
       const pair = bpInputs[i] = [num(bp.readings[i]?.[0], 50, 260, 1, `${label} systolic`, n => { (bp.readings[i] ??= [null, null])[0] = n; }),
@@ -410,7 +410,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const tempInput = num(temp.value, ...tRange(), "Body temperature", n => { temp.value = n; });
     return el("fieldset", { class: "sc-fieldset sc-vitals" }, el("legend", {}, "Vital signs · type what you measured today, leave blank to skip"),
       el("div", { class: "sc-vital" }, el("b", {}, "Blood pressure"), reading(0, "Reading 1"), el("small", {}, "Second reading a minute later (optional, averaged)"), reading(1, "Reading 2"),
-        checkbox("sc-bp-rested", "Seated with my back supported, rested for 5 minutes", bp.rested, value => { bp.rested = value; sync(); }), problem(bpProblem), chip(["systolicBp", "diastolicBp"]), about("systolicBp")),
+        el("span", { class: "sc-row", role: "radiogroup", "aria-label": "Cuff position" }, BP_SITES.map(([site, label]) => el("label", { class: "sc-radio" },
+          el("input", { type: "radio", name: "sc-bp-site", checked: (bp.site ?? "arm") === site || undefined, onchange: () => { bp.site = site; sync(); } }), label))),
+        checkbox("sc-bp-rested", "Seated with my back supported, rested for 5 minutes", bp.rested, value => { bp.rested = value; sync(); }), problem(bpProblem), chip(["systolicBp", "diastolicBp"]), about("systolicBp"), about("diastolicBp")),
       el("div", { class: "sc-vital" }, el("b", {}, "Oxygen saturation"), el("span", { class: "sc-bp" }, spo2Input, el("i", {}, "%")), problem(() => vitalEntryProblem("spo2", typed(spo2Input))), chip(["spo2"]), about("spo2")),
       el("div", { class: "sc-vital" }, el("b", {}, "Blood sugar"),
         el("span", { class: "sc-bp" }, glucoseInput,

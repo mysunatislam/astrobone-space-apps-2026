@@ -47,7 +47,7 @@ export const INDICATORS = Object.freeze({
   systolicBp: { domain: "cardiovascular", label: "Blood pressure, systolic", short: "Systolic", unit: "mmHg", floor: 15, direction: "both", source: "DEVICE",
     about: "The top number: the pressure while the heart beats. In weightlessness fluid moves toward the head, and 24-hour blood pressure fell on long ISS flights (Norsk et al., J Physiol 2015)." },
   diastolicBp: { domain: "cardiovascular", label: "Blood pressure, diastolic", short: "Diastolic", unit: "mmHg", floor: 10, direction: "both", source: "DEVICE",
-    about: "The bottom number: the pressure between beats. Measure seated after 5 minutes of rest, at the same time each day." },
+    about: "The bottom number: the pressure between beats. Measure seated after 5 minutes of rest, at the same time each day, with an upper-arm cuff if you can (AHA); a wrist cuff is compared only with wrist readings." },
   spo2: { domain: "cardiovascular", label: "Oxygen saturation", unit: "%", floor: 3, direction: "down", source: "DEVICE",
     about: "How much of your blood's oxygen-carrying capacity is in use, from a finger clip. It should stay steady; a drop can come from the cabin air, the lungs or the sensor. Cold fingers, nail polish and skin pigmentation can affect the reading (FDA)." },
   // Floor 15 mg/dL: the EFLM reference change value for glucose (15.2 %, CVI 4.89 %) near 95 mg/dL.
@@ -86,9 +86,13 @@ export const INDICATORS = Object.freeze({
 //    artery (forehead) use 38 °C (100.4 °F). Mayo's first-aid page gives 38 °C for oral too; the
 //    stricter 37.8 °C is kept.
 //  - Oxygen saturation: 93-94 % contact a clinician, 92 % or less urgent (NHS England pulse oximetry).
+// A wrist cuff "often gives falsely high readings due to poor positioning" (Mayo Clinic, wrist blood pressure
+// monitors), and the AHA recommends an upper-arm cuff: "Wrist and finger monitors are not recommended. They
+// give less reliable readings." A wrist reading still meets the same limits, but its re-check fixes the position.
+const WRIST_RECHECK = "Sit quietly for 5 minutes and measure again with your wrist still, unbent and at heart level, or use an upper-arm cuff.";
 export const SAFETY_LIMITS = Object.freeze({
-  systolicBp: { urgent: [[">", 180]], attention: [[">=", 140], ["<", 90]], recheck: "Sit quietly for 5 minutes and measure again." },
-  diastolicBp: { urgent: [[">", 120]], attention: [[">=", 90], ["<", 60]], recheck: "Sit quietly for 5 minutes and measure again." },
+  systolicBp: { urgent: [[">", 180]], attention: [[">=", 140], ["<", 90]], recheck: "Sit quietly for 5 minutes and measure again.", sites: { wrist: { recheck: WRIST_RECHECK } } },
+  diastolicBp: { urgent: [[">", 120]], attention: [[">=", 90], ["<", 60]], recheck: "Sit quietly for 5 minutes and measure again.", sites: { wrist: { recheck: WRIST_RECHECK } } },
   glucose: { urgent: [["<", 54, "Follow your mission's low blood sugar procedure now."], [">", 240]], attention: [[">=", 200]], recheck: "Recheck in 15 minutes with a fresh finger prick." },
   bodyTemp: { urgent: [[">=", 39.4], ["<", 35]], attention: [[">=", 37.8]], recheck: "Measure again in 30 minutes at the same site.",
     sites: { armpit: { attention: [[">=", 37.2]] }, ear: { attention: [[">=", 38]] }, forehead: { attention: [[">=", 38]] } } },
@@ -105,7 +109,7 @@ export const describeBound = ([op, value], unit = "") => `${OP_WORDS[op]} ${valu
 
 // The most serious fixed limit a value crosses, or null. A protocol naming a measurement site
 // ("temp-armpit-v1") picks that site's bounds where the rule has them.
-const siteOf = protocol => /^temp-(\w+)-v1$/.exec(protocol ?? "")?.[1];
+const siteOf = protocol => /^(?:temp|bp-seated-5min)-(\w+)-v1$/.exec(protocol ?? "")?.[1];
 export function safetyLimit(key, value, limits = SAFETY_LIMITS, protocol = null) {
   const base = limits[key];
   if (!base || !Number.isFinite(value)) return null;
@@ -419,9 +423,12 @@ export function recommendActions(domains, redFlags, check = {}, environment = nu
 // Typed vital signs -> indicator values, protocols and quality. Blood pressure is the mean of the
 // readings given (AHA: two readings about a minute apart); one taken without 5 minutes' seated rest
 // fails quality, so it is repeated, never compared. Blood sugar is stored in mg/dL and temperature in
-// °C; fasting and non-fasting blood sugar, and each thermometer site, are separate protocols.
+// °C; fasting and non-fasting blood sugar, each thermometer site, and an upper-arm and a wrist cuff are
+// separate protocols. Readings saved before the cuff was asked keep the upper-arm protocol, the AHA default.
 export const GLUCOSE_MG_PER_MMOL = 18.016;
 export const TEMP_SITES = Object.freeze([["oral", "Mouth"], ["ear", "Ear"], ["forehead", "Forehead"], ["armpit", "Armpit"]]);
+export const BP_SITES = Object.freeze([["arm", "Upper arm"], ["wrist", "Wrist, at heart level"]]);
+const bpProtocol = site => (site === "wrist" ? "bp-seated-5min-wrist-v1" : "bp-seated-5min-v1");
 const VITAL_KEYS = ["systolicBp", "diastolicBp", "spo2", "glucose", "bodyTemp"];
 const finite = v => (typeof v === "number" && Number.isFinite(v) ? v : null);
 
@@ -450,8 +457,8 @@ export function applyVitals(check, vitals = {}) {
   };
   const readings = (vitals.bp?.readings ?? []).filter(([s, d] = []) => finite(s) !== null && finite(d) !== null && s > d);
   const avg = i => (readings.length ? Math.round(readings.reduce((sum, r) => sum + r[i], 0) / readings.length) : null);
-  set("systolicBp", avg(0), "bp-seated-5min-v1", vitals.bp?.rested === true);
-  set("diastolicBp", avg(1), "bp-seated-5min-v1", vitals.bp?.rested === true);
+  set("systolicBp", avg(0), bpProtocol(vitals.bp?.site), vitals.bp?.rested === true);
+  set("diastolicBp", avg(1), bpProtocol(vitals.bp?.site), vitals.bp?.rested === true);
   set("spo2", finite(vitals.spo2?.value), "spo2-rest-v1");
   const g = finite(vitals.glucose?.value);
   set("glucose", g === null ? null : Math.round(vitals.glucose.unit === "mmol/L" ? g * GLUCOSE_MG_PER_MMOL : g), vitals.glucose?.fasting === false ? "glucose-random-v1" : "glucose-fasting-v1");
@@ -464,7 +471,7 @@ export function applyVitals(check, vitals = {}) {
 // The raw entries that reproduce a record's vital-sign values (to pre-fill a form).
 export function vitalsFromValues(values = {}, protocols = {}) {
   return {
-    bp: { readings: Number.isFinite(values.systolicBp) ? [[values.systolicBp, values.diastolicBp]] : [], rested: true },
+    bp: { readings: Number.isFinite(values.systolicBp) ? [[values.systolicBp, values.diastolicBp]] : [], rested: true, site: siteOf(protocols.systolicBp) === "wrist" ? "wrist" : "arm" },
     spo2: { value: values.spo2 ?? null },
     glucose: { value: values.glucose ?? null, unit: "mg/dL", fasting: protocols.glucose !== "glucose-random-v1" },
     temp: { value: values.bodyTemp ?? null, unit: "°C", site: /^temp-(\w+)-v1$/.exec(protocols.bodyTemp ?? "")?.[1] ?? "oral" },

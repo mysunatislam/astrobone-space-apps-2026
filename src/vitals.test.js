@@ -83,6 +83,21 @@ test("typed vitals convert units, average readings and gate blood pressure on re
   assert.equal("systolicBp" in cleared.values, false, "clearing a field removes the value");
 });
 
+test("an upper-arm and a wrist cuff are separate baselines, and a wrist reading over a limit re-checks the position", () => {
+  const arm = vitalsCheck({ bp: { readings: [[118, 76]], rested: true } }), wrist = vitalsCheck({ bp: { readings: [[118, 76]], rested: true, site: "wrist" } });
+  assert.equal(arm.protocols.systolicBp, "bp-seated-5min-v1", "the upper arm keeps the protocol saved readings already have");
+  assert.equal(wrist.protocols.systolicBp, "bp-seated-5min-wrist-v1");
+  assert.deepEqual(applyVitals(newCheck("you"), vitalsFromValues(wrist.values, wrist.protocols)).protocols, wrist.protocols, "a saved wrist reading pre-fills as wrist");
+  const history = [116, 118, 117, 119].map(v => ({ values: { systolicBp: v }, protocols: { systolicBp: "bp-seated-5min-v1" } }));
+  assert.equal(evaluateIndicator("systolicBp", 134, history, { protocol: "bp-seated-5min-wrist-v1" }).status, "baseline", "a first wrist reading is not judged against the arm");
+  assert.equal(evaluateIndicator("systolicBp", 134, history, { protocol: "bp-seated-5min-v1" }).status, "recheck", "the same number on the arm is outside the usual range");
+  const high = safetyLimit("systolicBp", 150, SAFETY_LIMITS, "bp-seated-5min-wrist-v1");
+  assert.equal(high.level, "attention", "the same limits apply at the wrist");
+  assert.match(high.recheck, /heart level/);
+  assert.doesNotMatch(safetyLimit("systolicBp", 150, SAFETY_LIMITS, "bp-seated-5min-v1").recheck, /wrist/);
+  assert.equal(high.text, "at or above 140 mmHg", "a wrist reading names no different limit");
+});
+
 test("one blood pressure reading over a limit gives one action, urgent before attention", () => {
   const check = vitalsCheck({ bp: { readings: [[186, 124]], rested: true }, temp: { value: 38.1 } });
   const result = evaluateSelfCheck(check, []);
