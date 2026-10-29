@@ -200,6 +200,19 @@ export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRI
 // (scripts/simulate-false-alarms.mjs).
 export const MULTIRULE = Object.freeze({ big: 1.5 });
 
+// What scripts/simulate-false-alarms.mjs measured for these rules: 1,000 simulated healthy astronauts
+// doing all 14 checks daily for 60 days, then a real step change on day 31 (400 astronauts each). The
+// day-to-day spreads behind it are assumptions until measured on volunteers. The app shows these
+// numbers; src/falseAlarms.test.js keeps them in step with the code.
+export const SIMULATED_RELIABILITY = Object.freeze({
+  astronauts: 1000, days: 60, reviewPct: 7.2, singleRuleReviewPct: 31.2, recheckPct: 31.5,
+  detected: Object.freeze([
+    ["kneeExtension", "knee extension 10° lower", 91, 100], ["pvtLapses", "6 more attention lapses", 94.5, 100],
+    ["systolicBp", "systolic 20 mmHg higher", 82.5, 100], ["glucose", "fasting blood sugar 20 mg/dL higher", 74.3, 99.5],
+    ["sleepHours", "2 h less sleep", 56.8, 93],
+  ].map(([key, label, withinThree, withinTwoWeeks]) => Object.freeze({ key, label, withinThree, withinTwoWeeks }))),
+});
+
 // Day-to-day spread from consecutive differences: mean |x[i] - x[i-1]| / 1.128, the individuals-chart
 // estimate (Montgomery, Introduction to Statistical Quality Control). A slow drift barely moves it.
 function movingRangeSd(values) {

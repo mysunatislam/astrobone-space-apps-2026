@@ -1,5 +1,5 @@
 /* Daily self-check (rendered inside the twin drawer). */
-.sc { display: grid; gap: 12px; }
+.sc { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 .sc-profile { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .sc-profile button, .sc-steps button { border: 1px solid var(--tw-line); background: rgba(4, 10, 22, .45); border-radius: 8px; padding: 8px 9px; font: 600 10px var(--tw-mono) !important; letter-spacing: .08em; text-transform: uppercase; color: var(--tw-dim); }
 .sc-profile button[aria-pressed="true"] { color: #fff; border-color: var(--tw-line-strong); background: rgba(127, 227, 255, .1); }
@@ -7,9 +7,19 @@
 .sc-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
 .sc-steps button { width: 100%; padding: 6px 4px; font-size: 9px !important; }
 .sc-steps button[aria-current="step"] { color: #fff; border-color: var(--tw-amber); background: rgba(255, 210, 122, .1); }
-.sc-body { display: grid; gap: 10px; }
+.sc-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
 .sc-lead { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--tw-ink); }
 .sc-note { margin: 0; font-size: 11.5px; line-height: 1.45; color: var(--tw-faint); }
+.sc-reliability { font-size: 11.5px; line-height: 1.45; color: var(--tw-dim); }
+.sc-reliability summary { cursor: pointer; font: 700 10.5px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-dim); }
+.sc-reliability p { margin: 6px 0; }
+.sc-reliability table { width: 100%; border-collapse: collapse; margin: 4px 0 6px; font-variant-numeric: tabular-nums; }
+.sc-reliability caption { text-align: left; color: var(--tw-faint); padding-bottom: 2px; }
+.sc-reliability th, .sc-reliability td { padding: 3px 6px 3px 0; border-bottom: 1px solid var(--tw-line); text-align: left; font-weight: 400; }
+.sc-reliability td { text-align: right; font-family: var(--tw-mono); white-space: nowrap; padding-left: 8px; }
+.sc-reliability thead th { color: var(--tw-faint); font-size: 10.5px; }
+.sc-reliability thead th:not(:first-child) { text-align: right; }
+.sc-reliability small { color: var(--tw-faint); }
 .sc-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .sc-backup { align-items: center; }
 .sc-backup small { font-size: 11px; color: var(--tw-dim); }
