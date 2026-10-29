@@ -56,4 +56,6 @@ test("reasons stay descriptive: no diagnosis, no treatment", () => {
   assert.match(text, /Blood sugar 250 mg\/dL \(safety limit: above 240 mg\/dL\)/);
   assert.doesNotMatch(text.replace(REPORT_BOUNDARY, ""), /diagnos|prescri|insulin|dose of/i);
   assert.equal(rowReason({ status: "baseline", def: {}, ref: { count: 1, needed: 3 } }), "building baseline 1/3");
+  assert.equal(rowReason({ status: "changed", reason: "debt", def: { digits: 1 }, ref: { ready: true, mean: 5.2 }, tolerance: 2.9, debt: { nights: 14, debt: 28, usual: 7, limit: 24.1 } }),
+    "sleep debt 28.0 h over the last 14 nights against usual 7.0 h a night, review above 24.1 h; usual 5.2 ± 2.9");
 });

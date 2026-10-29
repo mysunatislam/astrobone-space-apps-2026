@@ -5,7 +5,8 @@
 // --single runs the original single-value rule instead, for comparison.
 // --assumed-knee uses the knee spreads assumed before they were measured on real video, and
 // --previous-spreads the heart rate, blood pressure, sleep and temperature spreads guessed before the published ones.
-// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--assumed-knee] [--previous-spreads] [--json]
+// --change=key:shift adds a step change on day 31 to the detection list (e.g. --change=sleepHours:-1).
+// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--assumed-knee] [--previous-spreads] [--change=key:shift] [--json]
 import { evaluateSelfCheck, INDICATORS, KNEE_REPEAT_NOISE } from "../src/selfCheck.js";
 
 const arg = (name, fallback) => { const hit = process.argv.find(a => a.startsWith(`--${name}=`)); return hit ? Number(hit.split("=")[1]) : fallback; };
@@ -82,19 +83,20 @@ const REVIEW_OR_WORSE = new Set(["changed", "attention", "urgent"]);
 const RECHECK_OR_WORSE = new Set(["recheck", ...REVIEW_OR_WORSE]);
 
 export function falseAlarmSummary({ runs = RUNS, days = DAYS, spread = SPREAD, evaluate, person } = {}) {
-  let checks = 0, review = 0, recheck = 0, changedRows = 0, limitChecks = 0, driftRuns = 0;
+  let checks = 0, review = 0, recheck = 0, changedRows = 0, limitChecks = 0, driftRuns = 0, debtRuns = 0;
   const byKey = Object.fromEntries(Object.keys(INDICATORS).map(k => [k, 0]));
   for (let i = 0; i < runs; i++) {
-    let drifted = false;
+    let drifted = false, indebted = false;
     for (const { day, ev } of simulateAstronaut(1000 + i, { days, spread, evaluate, person })) {
       if (day <= 5) continue; // baselines are still being built
       checks++;
       if (REVIEW_OR_WORSE.has(ev.overall)) review++;
       if (RECHECK_OR_WORSE.has(ev.overall)) recheck++;
       if (rows(ev).some(r => r.limit)) limitChecks++;
-      for (const r of rows(ev)) if (r.status === "changed") { changedRows++; byKey[r.key]++; if (r.reason === "drift") drifted = true; }
+      for (const r of rows(ev)) if (r.status === "changed") { changedRows++; byKey[r.key]++; if (r.reason === "drift") drifted = true; if (r.reason === "debt") indebted = true; }
     }
     if (drifted) driftRuns++;
+    if (indebted) debtRuns++;
   }
   const pct = x => Number((100 * x).toFixed(1));
   return {
@@ -104,6 +106,7 @@ export function falseAlarmSummary({ runs = RUNS, days = DAYS, spread = SPREAD, e
     changedRowsPerCheck: Number((changedRows / checks).toFixed(2)),
     fixedLimitPct: pct(limitChecks / checks),
     astronautsWithDriftAlarmPct: pct(driftRuns / runs),
+    astronautsWithSleepDebtReviewPct: pct(debtRuns / runs),
     changedPctByIndicator: Object.fromEntries(Object.entries(byKey).map(([k, n]) => [k, pct(n / checks)])),
   };
 }
@@ -138,12 +141,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const withSpreads = spreads => Object.fromEntries(Object.entries(spreads).map(([k, sd]) => [k, { ...STABLE_PERSON[k], sd }]));
   const person = { ...STABLE_PERSON, ...(process.argv.includes("--assumed-knee") ? withSpreads(ASSUMED_KNEE_SD) : {}), ...(process.argv.includes("--previous-spreads") ? withSpreads(PREVIOUS_SPREADS) : {}) };
   const changed = Object.keys(person).filter(k => person[k] !== STABLE_PERSON[k]);
-  const result = { rule: evaluate === singleValueRule ? "single value" : "multirule", stable: falseAlarmSummary({ evaluate, person }), detection: STEP_CHANGES.map(c => detectionSummary(c, { runs: Math.min(RUNS, 400), evaluate, person })) };
+  const extra = process.argv.filter(a => a.startsWith("--change=")).map(a => { const [key, shift] = a.slice(9).split(":"); return { key, day: 31, shift: Number(shift), label: `${key} ${shift}` }; });
+  const result = { rule: evaluate === singleValueRule ? "single value" : "multirule", stable: falseAlarmSummary({ evaluate, person }), detection: [...STEP_CHANGES, ...extra].map(c => detectionSummary(c, { runs: Math.min(RUNS, 400), evaluate, person })) };
   if (process.argv.includes("--json")) console.log(JSON.stringify(result, null, 2));
   else {
     const s = result.stable;
     console.log(`Rule: ${result.rule}${changed.length ? `, earlier guessed spreads for ${changed.join(", ")}` : ""}. Stable astronauts: ${s.runs} x ${s.days} days, spread x${s.spread}, ${s.checksJudged} checks judged after the first 5`);
-    console.log(`  REVIEW or worse: ${s.reviewOrWorsePct}% of checks (RE-CHECK or worse ${s.recheckOrWorsePct}%); ${s.changedRowsPerCheck} changed rows per check; fixed limit crossed on ${s.fixedLimitPct}%; drift alarm in ${s.astronautsWithDriftAlarmPct}% of astronauts`);
+    console.log(`  REVIEW or worse: ${s.reviewOrWorsePct}% of checks (RE-CHECK or worse ${s.recheckOrWorsePct}%); ${s.changedRowsPerCheck} changed rows per check; fixed limit crossed on ${s.fixedLimitPct}%; drift alarm in ${s.astronautsWithDriftAlarmPct}% of astronauts; sleep-debt review in ${s.astronautsWithSleepDebtReviewPct}%`);
     console.log(`  Changed rows by indicator (% of checks): ${Object.entries(s.changedPctByIndicator).map(([k, v]) => `${k} ${v}`).join(", ")}`);
     for (const d of result.detection) console.log(`  Real change, ${d.label}: flagged on the first check ${d.firstCheckPct}%, within 3 checks ${d.withinThreeChecksPct}%, within 14 ${d.withinTwoWeeksPct}%`);
   }

@@ -17,6 +17,7 @@ export function rowReason(row) {
   if (row.status === "repeat") return "quality check failed, not compared";
   if (row.status === "baseline") return `building baseline ${row.ref?.count ?? 0}/${row.ref?.needed ?? 3}`;
   const usual = row.ref?.ready ? `usual ${num(row.ref.mean, d)} ± ${num(row.tolerance, Math.max(d, 1))}` : "";
+  if (row.reason === "debt") return `sleep debt ${num(row.debt.debt, 1)} h over the last ${row.debt.nights} nights against usual ${num(row.debt.usual, 1)} h a night, review above ${num(row.debt.limit, 1)} h${usual ? `; ${usual}` : ""}`;
   if (row.reason === "drift") return `steady drift from starting level ${num(row.drift.lockedMean, d)}${usual ? `; ${usual}` : ""}`;
   if (row.status === "recheck") return `outside once, measure again next check; ${usual}`;
   return usual;

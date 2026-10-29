@@ -14,6 +14,7 @@ test("a healthy astronaut is told to log a change on far fewer daily checks than
   assert.ok(multirule.reviewOrWorsePct < 20 && multirule.reviewOrWorsePct < single.reviewOrWorsePct / 2.5, `multirule ${multirule.reviewOrWorsePct} %`);
   assert.ok(multirule.astronautsWithDriftAlarmPct <= single.astronautsWithDriftAlarmPct);
   assert.ok(multirule.astronautsWithDriftAlarmPct < 5, `drift alarm in ${multirule.astronautsWithDriftAlarmPct} % of stable astronauts`);
+  assert.ok(multirule.astronautsWithSleepDebtReviewPct < 8 && single.astronautsWithSleepDebtReviewPct === 0, `sleep-debt review in ${multirule.astronautsWithSleepDebtReviewPct} % of stable astronauts`);
   assert.ok(Math.abs(multirule.reviewOrWorsePct - SIMULATED_RELIABILITY.reviewPct) < 2, `${multirule.reviewOrWorsePct} vs ${SIMULATED_RELIABILITY.reviewPct}`);
   assert.ok(Math.abs(multirule.recheckOrWorsePct - SIMULATED_RELIABILITY.recheckPct) < 3, `${multirule.recheckOrWorsePct} vs ${SIMULATED_RELIABILITY.recheckPct}`);
   assert.ok(Math.abs(single.reviewOrWorsePct - SIMULATED_RELIABILITY.singleRuleReviewPct) < 3);
@@ -43,6 +44,7 @@ test("heart rate, blood pressure, sleep and temperature spreads are the publishe
   assert.deepEqual([STABLE_PERSON.restingHr.sd, STABLE_PERSON.systolicBp.sd, STABLE_PERSON.diastolicBp.sd, Number((STABLE_PERSON.sleepHours.sd * 60).toFixed(1)), STABLE_PERSON.bodyTemp.sd], [5.4, 8.6, 6.4, 85.8, 0.31]);
   for (const [key, sd] of Object.entries(PREVIOUS_SPREADS)) assert.ok(STABLE_PERSON[key].sd > sd, key);
   // Sleep varies too much from night to night for a 2 h drop to show in a few checks; the app says so.
+  // Adding up 14 nights (sleep debt) is what catches it within two weeks.
   const sleep = SIMULATED_RELIABILITY.detected.find(d => d.key === "sleepHours");
-  assert.ok(sleep.withinThree < 40 && sleep.withinTwoWeeks > 50, JSON.stringify(sleep));
+  assert.ok(sleep.withinThree < 40 && sleep.withinTwoWeeks > 85, JSON.stringify(sleep));
 });

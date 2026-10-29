@@ -279,15 +279,15 @@ export const KNEE_REPEAT_NOISE = Object.freeze({
 // knee spreads are KNEE_REPEAT_NOISE, measured on real video; heart rate, blood pressure, sleep and
 // temperature use published day-to-day spreads; oxygen, the reaction test and the ratings are assumptions
 // until measured on volunteers. With the spreads guessed before (--assumed-knee --previous-spreads) the
-// same rules gave REVIEW 4.9 % and caught 2 h less sleep within 14 checks in 98 %: the guesses made the
+// same rules gave REVIEW 5 % and caught 2 h less sleep within 14 checks in 100 %: the guesses made the
 // checks look steadier than people are. The app shows these numbers; src/falseAlarms.test.js keeps them
 // in step with the code.
 export const SIMULATED_RELIABILITY = Object.freeze({
-  astronauts: 1000, days: 60, reviewPct: 12.2, singleRuleReviewPct: 46.3, recheckPct: 43.5,
+  astronauts: 1000, days: 60, reviewPct: 12.3, singleRuleReviewPct: 46.3, recheckPct: 43.6,
   detected: Object.freeze([
     ["kneeExtension", "knee extension 10° lower", 64.5, 99.5], ["pvtLapses", "6 more attention lapses", 95.8, 100],
     ["systolicBp", "systolic 20 mmHg higher", 81, 100], ["glucose", "fasting blood sugar 20 mg/dL higher", 75.5, 100],
-    ["sleepHours", "2 h less sleep", 23.5, 59],
+    ["sleepHours", "2 h less sleep", 24.8, 93.3],
   ].map(([key, label, withinThree, withinTwoWeeks]) => Object.freeze({ key, label, withinThree, withinTwoWeeks }))),
 });
 
@@ -318,6 +318,28 @@ function dayJudgement(values, value, def, floor, longSpread = false) {
   return { mean: m, tolerance, delta, side };
 }
 
+// Sleep debt. One short night is ordinary: people's sleep varies by about 1.4 h from night to night
+// (Messman 2022), so the daily rule needs about 3 h less sleep before it says anything, and it caught a
+// 2 h loss within 14 checks in only 59 % of simulated runs. A run of short nights is what matters:
+// holding sleep to 6 h or less for 14 nights built up deficits "equivalent to up to 2 nights of total
+// sleep deprivation", and the sleepiness ratings suggest people were "largely unaware" of them (Van
+// Dongen et al., Sleep 2003;26:117-26, doi 10.1093/sleep/26.2.117). So sleep also adds up the shortfall
+// of the last `nights` logged nights against the person's usual (the mean of up to SPREAD.window usable
+// nights before them) and logs it for review when the total is more than `z` times what ordinary
+// night-to-night change adds up to: z x sigma x sqrt(nights + nights^2 / earlier nights), sigma the
+// moving-range spread. It needs `nights` + SPREAD.min usable nights. 14 nights rather than 7: in
+// scripts/simulate-false-alarms.mjs, 7 nights caught a 2 h loss within 14 checks in 86 % of runs and gave
+// 6.7 % of stable astronauts a sleep-debt review within 60 days; 14 nights caught 93 % and gave 3.7 %.
+export const SLEEP_DEBT = Object.freeze({ key: "sleepHours", nights: 14, z: 3 });
+
+export function sleepDebt(series, value, { nights = SLEEP_DEBT.nights, z = SLEEP_DEBT.z, def = INDICATORS.sleepHours } = {}) {
+  const all = [...series, value], recent = all.slice(-nights), before = all.slice(0, -nights).slice(-SPREAD.window);
+  if (recent.length < nights || before.length < SPREAD.min) return { ready: false, needed: nights + SPREAD.min, count: all.length };
+  const usual = mean(before), sigma = Math.max(movingRangeSd([...before, ...recent]), def.floor / 4);
+  const debt = recent.reduce((sum, x) => sum + usual - x, 0), limit = z * sigma * Math.sqrt(nights + nights ** 2 / before.length);
+  return { ready: true, nights, usual: round(usual, 2), debt: round(debt, 2), limit: round(limit, 2), flagged: debt > limit };
+}
+
 function usableValues(history, key, protocol) {
   return history.filter(check => check.values?.[key] !== undefined && check.values[key] !== null && (!protocol || protocolOf(check, key) === protocol) && check.quality?.[key] !== false)
     .map(check => check.values[key]);
@@ -341,9 +363,10 @@ export function evaluateIndicator(key, value, history, { protocol, usable = true
   const twice = Boolean(previous?.side) && dayJudgement(series.slice(0, -1), value, def, floor, true)?.side === previous.side;
   const confirmed = (today.side !== 0 && (!multirule || Math.abs(delta) > MULTIRULE.big * tolerance)) || twice;
   const drift = driftCheck(key, value, history, protocol, { floor, def, movingRange: multirule, ...driftParams });
-  const reason = limit ? "limit" : confirmed ? "day" : drift.drift ? "drift" : today.side ? "once" : null;
+  const debt = multirule && key === SLEEP_DEBT.key ? sleepDebt(series, value, { def }) : null;
+  const reason = limit ? "limit" : confirmed ? "day" : debt?.flagged ? "debt" : drift.drift ? "drift" : today.side ? "once" : null;
   const status = limit ? limit.level : reason === "once" ? "recheck" : reason ? "changed" : "stable";
-  return { key, value, status, reason, limit, ref, delta, tolerance, drift, series, def };
+  return { key, value, status, reason, limit, ref, delta, tolerance, drift, debt, series, def };
 }
 
 // "attention" = a fixed safety limit crossed: tell the crew medical officer today. "recheck" = beyond the
@@ -412,10 +435,12 @@ export function recommendActions(domains, redFlags, check = {}, environment = nu
     const changed = domain.indicators.filter(r => r.status === "changed");
     const symptoms = domain.key === "immune" ? domain.symptoms ?? [] : [];
     if (!changed.length && !symptoms.length) continue;
-    const day = changed.filter(r => r.reason !== "drift").map(r => r.def.label.toLowerCase());
+    const day = changed.filter(r => r.reason !== "drift" && r.reason !== "debt").map(r => r.def.label.toLowerCase());
     const drift = changed.filter(r => r.reason === "drift").map(r => r.def.label.toLowerCase());
+    const debt = changed.find(r => r.reason === "debt")?.debt;
     const parts = [symptoms.length ? `new symptoms reported (${symptoms.join(", ").toLowerCase()})` : null,
       day.length ? `${join(day)} ${day.length > 1 ? "are" : "is"} outside your usual range` : null,
+      debt ? `your last ${debt.nights} nights add up to ${round(debt.debt)} h less sleep than your usual` : null,
       drift.length ? `${join(drift)} ${drift.length > 1 ? "have" : "has"} drifted steadily from your starting baseline` : null].filter(Boolean);
     actions.push({ id: `review-${domain.key}`, priority: "review", text: `${domain.label}: ${parts.join("; ")}. Re-check in 24 h at the same time and ${review}.`, due: 24 });
   }
