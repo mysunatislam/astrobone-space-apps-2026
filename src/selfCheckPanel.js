@@ -383,7 +383,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const chip = keys => {
       const node = el("small", { class: "sc-limit", role: "status" });
       const update = () => {
-        const hits = keys.filter(k => Number.isFinite(c.values[k])).map(k => ({ k, limit: safetyLimit(k, c.values[k]) }));
+        const hits = keys.filter(k => Number.isFinite(c.values[k])).map(k => ({ k, limit: safetyLimit(k, c.values[k], undefined, c.protocols[k]) }));
         const hit = hits.find(h => h.limit?.level === "urgent") ?? hits.find(h => h.limit);
         node.className = `sc-limit${hits.length ? ` sc-${hit ? hit.limit.level : "ok"}` : ""}`;
         node.textContent = !hits.length ? "" : !hit ? "Within the safety limits"
