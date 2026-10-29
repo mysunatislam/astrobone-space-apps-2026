@@ -35,6 +35,7 @@ Five datasets from the NASA Open Science Data Repository / Ames Life Sciences Da
 | [OSD-804](https://osdr.nasa.gov/bio/repo/data/studies/OSD-804) · LSDS-130, spaceflight bone micro-CT (mice) | After 37 days in space, bone structure moved toward loss above the knee (distal femur, p = 0.004) and at the hip (p = 0.007), corrected across 5 sites; bone volume fraction above the knee −55 % (95% CI −68 to −30 %). No clear change in the spine | The knee movement test comes first in every daily check |
 | [OSD-656](https://osdr.nasa.gov/bio/repo/data/studies/OSD-656) · LSDS-64 and [OSD-569](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) · LSDS-7, Inspiration4 crew | Urine immune protein VCAM1 stayed above every pre-flight visit for 45 days after return, back by day 82 (group medians of 4 people); white blood cells stayed within the pre-flight range | Immune checklist every day for 45 days after any return to gravity |
 | [OSD-435](https://osdr.nasa.gov/bio/repo/data/studies/OSD-435) · LSDS-22 (mice) and [OSD-575](https://osdr.nasa.gov/bio/repo/data/studies/OSD-575) · LSDS-8, Inspiration4 crew | No consistent change in heart ejection fraction after 0.1–3 Gy; CRP already varied 1.9–19.9 mg/L before launch | No radiation alarm; dose is logged beside heart rate for the medical reviewer |
+| [NASA DONKI](https://ccmc.gsfc.nasa.gov/DONKI/) solar energetic particle events, Oct 2023 to Oct 2026 | 40 measured solar particle events (218 DONKI rows, one per instrument channel; 87 model-forecast rows left out); 31 seen near Earth, 9 with >100 MeV protons at GOES | The radiation panel lists the latest real events with their DONKI links, as context beside the crew's dose. It never turns an event into a dose |
 
 **The rule itself, tested on real astronauts.** AstroBone's own personal-baseline and drift code, unchanged, was replayed on the four Inspiration4 crew members' raw blood results ([OSD-569](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) and [OSD-575](https://osdr.nasa.gov/bio/repo/data/studies/OSD-575), 27 clinical measures, each person against their own three pre-flight draws, review floor from the EFLM biological variation database). It found mean cell volume down in all four crew the day after landing (−3.4 to −5.2 %, all inside the lab's population range), recognised a one-draw glucose drop at R+45 as a sample-handling suspect, and 23 of its 31 flags were changes the population range would have missed. The same glucose draws also set the blood-sugar safety limit: the ADA's 70 mg/dL alert level, meant for people treated for diabetes, fired on 4 of 12 healthy pre-flight draws, so the app uses 54 mg/dL ([`scripts/replay-i4-glucose-limits.mjs`](scripts/replay-i4-glucose-limits.mjs)). Method and full results: [crew replay](docs/crew-replay.md) ([`src/crewReplay.js`](src/crewReplay.js)); the Self-Check shows it as a "Tested" card.
 
@@ -60,7 +61,7 @@ npm test           # 390 automated tests
 npm run build      # production build in dist/
 ```
 
-Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osdr`, `npm run data:mission`, `npm run data:mission:extended`.
+Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osdr`, `npm run data:mission`, `npm run data:mission:extended`, `npm run data:dosimetry`, `npm run data:donki`.
 
 ## How It Is Built
 
