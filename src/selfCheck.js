@@ -166,8 +166,8 @@ export function personalReference(history, key, protocol) {
 // textbook k = 0.5, h = 4 raised a confirmed alarm in about 1 in 5 stable astronauts over 180 days. Sigma is floored at half the review floor so a
 // suspiciously tight baseline does not turn noise into alarms. The locked baseline is the first `baseline`
 // usable checks (fewer while there are fewer), as laboratory quality control sets its limits from 20 or
-// more results: locked from 5, its mean was off by enough that 15.9 % of stable simulated astronauts got
-// a drift alarm within 60 days with the published day-to-day spreads, against 1.3 % from 20
+// more results: locked from 5, its mean was off by enough that 17.4 % of stable simulated astronauts got
+// a drift alarm within 60 days with the published day-to-day spreads, against 1.6 % from 20
 // (scripts/simulate-false-alarms.mjs), and a 2°/month knee decline was caught more often, not less
 // (93 % of 1,000 runs within 180 days, median 88 days, scripts/simulate-detection.mjs).
 export const DRIFT = Object.freeze({ k: 1, h: 6, reset: false, baseline: 20 });
@@ -210,7 +210,7 @@ export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRI
 // a change for review only when it is far beyond the range (more than `big` times it, about 3 SD) or the
 // previous usable check was also beyond its own range on the same side. With the original rule (one value
 // beyond the 5-check range), a healthy astronaut who checked all 14 indicators daily was told something
-// changed on 44 % of checks (scripts/simulate-false-alarms.mjs, measured and published spreads).
+// changed on 46 % of checks (scripts/simulate-false-alarms.mjs, measured and published spreads).
 export const MULTIRULE = Object.freeze({ big: 1.5 });
 
 // How much the camera's knee reading moves between repeats when the knee did not change, measured on
@@ -231,14 +231,14 @@ export const KNEE_REPEAT_NOISE = Object.freeze({
 
 // What scripts/simulate-false-alarms.mjs measured for these rules: 1,000 simulated healthy astronauts
 // doing all 14 checks daily for 60 days, then a real step change on day 31 (400 astronauts each). The
-// knee spreads are KNEE_REPEAT_NOISE, measured on real video; heart rate, blood pressure and sleep use
-// published day-to-day spreads; oxygen, temperature, the reaction test and the ratings are assumptions
+// knee spreads are KNEE_REPEAT_NOISE, measured on real video; heart rate, blood pressure, sleep and
+// temperature use published day-to-day spreads; oxygen, the reaction test and the ratings are assumptions
 // until measured on volunteers. With the spreads guessed before (--assumed-knee --previous-spreads) the
 // same rules gave REVIEW 4.9 % and caught 2 h less sleep within 14 checks in 98 %: the guesses made the
 // checks look steadier than people are. The app shows these numbers; src/falseAlarms.test.js keeps them
 // in step with the code.
 export const SIMULATED_RELIABILITY = Object.freeze({
-  astronauts: 1000, days: 60, reviewPct: 11.5, singleRuleReviewPct: 44.4, recheckPct: 41.4,
+  astronauts: 1000, days: 60, reviewPct: 12.2, singleRuleReviewPct: 46.3, recheckPct: 43.5,
   detected: Object.freeze([
     ["kneeExtension", "knee extension 10° lower", 64.5, 99.5], ["pvtLapses", "6 more attention lapses", 95.8, 100],
     ["systolicBp", "systolic 20 mmHg higher", 81, 100], ["glucose", "fasting blood sugar 20 mg/dL higher", 75.5, 100],
