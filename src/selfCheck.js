@@ -131,6 +131,13 @@ export const DOMAINS = Object.freeze([
 ]);
 
 const MIN_BASELINE = 3;
+// Sleep hours were saved without a protocol before a tracker could be named; those are the person's own
+// estimate. A sleep tracker is its own protocol: in 669 adults, self-reported sleep averaged 6.8 h where
+// wrist actigraphy measured 6.0 h, and "persons sleeping 5 hours over-reported their sleep duration by 1.2
+// hours" (Lauderdale et al., Epidemiology 2008;19:838-45), so switching between them is not a change in sleep.
+export const SLEEP_SOURCES = Object.freeze([["sleep-estimate-v1", "My own estimate"], ["sleep-tracker-v1", "Sleep tracker or watch"]]);
+const DEFAULT_PROTOCOLS = Object.freeze({ sleepHours: "sleep-estimate-v1" });
+const protocolOf = (check, key) => check.protocols?.[key] ?? DEFAULT_PROTOCOLS[key];
 const BASELINE_WINDOW = 5;
 const mean = values => values.reduce((sum, v) => sum + v, 0) / values.length;
 const sd = values => { if (values.length < 2) return 0; const m = mean(values); return Math.sqrt(values.reduce((s, v) => s + (v - m) ** 2, 0) / (values.length - 1)); };
@@ -191,7 +198,7 @@ export function summarizePvt(trials = [], { durationMs = PVT_B.durationMs, compl
 
 // Personal reference from the most recent usable earlier checks of the same protocol.
 export function personalReference(history, key, protocol) {
-  const values = history.filter(check => check.values?.[key] !== undefined && check.values[key] !== null && (!protocol || check.protocols?.[key] === protocol) && check.quality?.[key] !== false)
+  const values = history.filter(check => check.values?.[key] !== undefined && check.values[key] !== null && (!protocol || protocolOf(check, key) === protocol) && check.quality?.[key] !== false)
     .map(check => check.values[key]).slice(-BASELINE_WINDOW);
   if (values.length < MIN_BASELINE) return { ready: false, count: values.length, needed: MIN_BASELINE };
   return { ready: true, count: values.length, mean: mean(values), sd: sd(values) };
@@ -312,7 +319,7 @@ function dayJudgement(values, value, def, floor, longSpread = false) {
 }
 
 function usableValues(history, key, protocol) {
-  return history.filter(check => check.values?.[key] !== undefined && check.values[key] !== null && (!protocol || check.protocols?.[key] === protocol) && check.quality?.[key] !== false)
+  return history.filter(check => check.values?.[key] !== undefined && check.values[key] !== null && (!protocol || protocolOf(check, key) === protocol) && check.quality?.[key] !== false)
     .map(check => check.values[key]);
 }
 
@@ -349,7 +356,7 @@ const worst = statuses => statuses.reduce((best, status) => (STATUS_RANK[status]
 export function evaluateSelfCheck(check, history = [], { floors = {}, limits = SAFETY_LIMITS, environment = null, multirule = true } = {}) {
   const prior = history.filter(h => h.id !== check.id);
   const values = check.values || {}, protocols = check.protocols || {}, quality = check.quality || {};
-  const indicators = Object.keys(INDICATORS).map(key => evaluateIndicator(key, values[key], prior, { protocol: protocols[key], usable: quality[key] !== false, floor: floors[key], limits, multirule }));
+  const indicators = Object.keys(INDICATORS).map(key => evaluateIndicator(key, values[key], prior, { protocol: protocolOf(check, key), usable: quality[key] !== false, floor: floors[key], limits, multirule }));
   const redFlags = RED_FLAGS.filter(([key]) => check.redFlags?.[key]).map(([, label]) => label);
   const symptoms = IMMUNE_SYMPTOMS.filter(([key]) => check.symptoms?.[key]).map(([, label]) => label);
   const domains = DOMAINS.map(([key, label, hazard]) => {
