@@ -4,7 +4,7 @@
 // indicator to see whether the rules still catch it.
 // --single runs the original single-value rule instead, for comparison.
 // --assumed-knee uses the knee spreads assumed before they were measured on real video, and
-// --previous-spreads the heart rate, blood pressure and sleep spreads guessed before the published ones.
+// --previous-spreads the heart rate, blood pressure, sleep and temperature spreads guessed before the published ones.
 // Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--assumed-knee] [--previous-spreads] [--json]
 import { evaluateSelfCheck, INDICATORS, KNEE_REPEAT_NOISE } from "../src/selfCheck.js";
 
@@ -21,11 +21,15 @@ export const singleValueRule = (check, history) => evaluateSelfCheck(check, hist
 //   wearables read resting heart rate steadier (about 3 bpm, Quer et al., PLoS ONE 2020;15:e0227709);
 // - sleep: night-to-night SD of diary sleep duration, 85.8 min (Messman et al., J Sleep Res 2022;31:e13680,
 //   8 studies, 2,404 people);
-// - glucose: the EFLM within-person CV of 4.9 % plus about 4 % for a home meter.
-// Oxygen saturation, temperature, the reaction test and the ratings are assumptions.
+// - glucose: the EFLM within-person CV of 4.9 % plus about 4 % for a home meter;
+// - temperature: SD of seven morning home oral readings over two weeks, 0.31 °C (Diamond et al., PLoS ONE
+//   2021;16:e0245257, 96 adults; a later correction notice, e0259428, could not be read here).
+// Oxygen saturation is an assumption that fits the 1.2 % change needed to show a real change in 10 healthy
+// adults at rest (Wagener and Hendricker, Chest 1987;92:1047-9). The reaction test and the ratings are
+// assumptions: the PVT-B validation (Basner et al., Acta Astronaut 2011;69:949-59) gives no within-person spread.
 // PREVIOUS_SPREADS are the guesses these replaced (--previous-spreads). `round` mimics how each value is entered.
 export const ASSUMED_KNEE_SD = Object.freeze({ kneeExtension: 3, kneeRom: 4 });
-export const PREVIOUS_SPREADS = Object.freeze({ restingHr: 4, systolicBp: 6, diastolicBp: 4.5, sleepHours: 0.9 });
+export const PREVIOUS_SPREADS = Object.freeze({ restingHr: 4, systolicBp: 6, diastolicBp: 4.5, sleepHours: 0.9, bodyTemp: 0.25 });
 export const STABLE_PERSON = Object.freeze({
   kneeExtension: { mean: 165, sd: KNEE_REPEAT_NOISE.kneeExtension.sd, round: 1 },
   kneeRom: { mean: 65, sd: KNEE_REPEAT_NOISE.kneeRom.sd, round: 1 },
@@ -34,7 +38,7 @@ export const STABLE_PERSON = Object.freeze({
   diastolicBp: { mean: 75, sd: 6.4, round: 1 },
   spo2: { mean: 98, sd: 0.8, round: 1, max: 100 },
   glucose: { mean: 90, sd: 5.7, round: 1 },
-  bodyTemp: { mean: 36.7, sd: 0.25, round: 0.1 },
+  bodyTemp: { mean: 36.7, sd: 0.31, round: 0.1 },
   pvtSpeed: { mean: 3.6, sd: 0.15, round: 0.01 },
   pvtLapses: { poisson: 2 },
   sleepHours: { mean: 6.8, sd: 85.8 / 60, round: 0.5, min: 0 },

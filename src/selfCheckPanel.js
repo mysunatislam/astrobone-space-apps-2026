@@ -560,7 +560,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       el("table", {}, el("caption", {}, "A real change, flagged REVIEW within"),
         el("thead", {}, el("tr", {}, el("th", { scope: "col" }, "Change"), el("th", { scope: "col" }, "3 checks"), el("th", { scope: "col" }, "14 checks"))),
         el("tbody", {}, r.detected.map(d => el("tr", {}, el("th", { scope: "row" }, d.label), el("td", {}, pct(d.withinThree)), el("td", {}, pct(d.withinTwoWeeks)))))),
-      el("small", {}, `The knee spreads are the camera's repeat noise measured on real video (${KNEE_REPEAT_NOISE.source}). Heart rate, blood pressure and sleep vary from day to day as much as published home studies found (Ohasama study; Messman et al. 2022), which is why a 2 h drop in sleep is hard to see in a few days. Oxygen, temperature, the reaction test and the ratings use assumed spreads until measured on volunteers. Method: scripts/simulate-false-alarms.mjs.`));
+      el("small", {}, `The knee spreads are the camera's repeat noise measured on real video (${KNEE_REPEAT_NOISE.source}). Heart rate, blood pressure, sleep and temperature vary from day to day as much as published home studies found (Ohasama study; Messman et al. 2022; Diamond et al. 2021), which is why a 2 h drop in sleep is hard to see in a few days. Oxygen, the reaction test and the ratings use assumed spreads until measured on volunteers. Method: scripts/simulate-false-alarms.mjs.`));
   }
 
   // Who to tell, for this result in this place: the escalation ladder with the active rung explained.

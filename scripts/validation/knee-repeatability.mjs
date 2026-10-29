@@ -48,7 +48,7 @@ export function kneeRepeatabilityMarkdown(r = kneeRepeatability()) {
   w(`**What the app now uses.** Side-on squats are the closest match to the side-on seated test: range of motion ±${e.romSd}° (MDC95 ${e.romMdc95}°, ${e.pairs} pairs). The per-repetition table ` +
     `holds range of motion only, so extension is scaled by the side-on ratio of extension error to range-of-motion error on the same repetitions (${e.extensionToRomError}): ±${e.extensionSd}° ` +
     `(MDC95 ${e.extensionMdc95}°). These are \`KNEE_REPEAT_NOISE\` in \`src/selfCheck.js\`, and they replace the 3° and 4° that \`scripts/simulate-false-alarms.mjs\` used to assume. ` +
-    `With them, and published day-to-day spreads for heart rate, blood pressure and sleep ([self-check method](self-check.md)), a healthy astronaut doing all 14 checks daily is told REVIEW on ${SIMULATED_RELIABILITY.reviewPct} % of days, and a real 10° drop in knee extension ` +
+    `With them, and published day-to-day spreads for heart rate, blood pressure, sleep and temperature ([self-check method](self-check.md)), a healthy astronaut doing all 14 checks daily is told REVIEW on ${SIMULATED_RELIABILITY.reviewPct} % of days, and a real 10° drop in knee extension ` +
     `is flagged within three checks in ${knee.withinThree} % of runs and within 14 checks in ${knee.withinTwoWeeks} %. The knee is one of the noisiest daily checks, and the app says so: ` +
     "the result shows the measured noise beside each knee capture, and **How often is this wrong?** shows the simulated figures.\n");
   w("**What this does not prove.** These are repeats within one session, of squats and lunges, by nine healthy adults in one lab. Day-to-day repeatability of the seated test (new camera " +

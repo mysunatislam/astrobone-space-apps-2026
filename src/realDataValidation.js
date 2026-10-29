@@ -39,14 +39,14 @@ export function testedOnRealData(v = REAL_DATA_VALIDATION, noise = KNEE_REPEAT_N
       `Knee angle against motion capture (${v.knee.dataset}, ${v.knee.people} people, ${v.knee.reps} repetitions of squats and lunges): range-of-motion error ${v.knee.romErrorBefore}° → ${v.knee.romErrorAfter}° with the hybrid knee model, ICC ${v.knee.iccBefore} → ${v.knee.iccAfter}, better for ${v.knee.improvedPeople} of ${v.knee.people} people it was not trained on; ${v.knee.sideOnSquatError}° side-on in squats.`,
       `Knee repeat noise on the same videos: the side-on reading moved ±${noise.kneeExtension.sd}° (extension) and ±${noise.kneeRom.sd}° (range) between repetitions with no change in the knee, so two checks must differ by about ${Math.round(noise.kneeExtension.mdc95)}° before noise is an unlikely cause.`,
       `Camera pulse against a finger sensor (${v.pulse.dataset}, ${v.pulse.people} people at rest and after squats): ${v.pulse.mae} bpm average error on ${v.pulse.windows} 30-second windows; ${v.pulse.gatedMae} bpm on the ${Math.round(v.pulse.gatedAnsweredPct)} % the quality gate passes; the rise from rest tracked within ${v.pulse.changeError} bpm in ${v.pulse.changePeople} people.`,
-      `False alarms, simulated with the measured knee noise and published day-to-day spreads for heart rate, blood pressure and sleep: a healthy astronaut doing all 14 checks daily sees REVIEW on ${sim.reviewPct} % of days; a real 10° knee drop is flagged within 3 checks in ${knee.withinThree} % of runs and within 14 in ${knee.withinTwoWeeks} %.`,
+      `False alarms, simulated with the measured knee noise and published day-to-day spreads for heart rate, blood pressure, sleep and temperature: a healthy astronaut doing all 14 checks daily sees REVIEW on ${sim.reviewPct} % of days; a real 10° knee drop is flagged within 3 checks in ${knee.withinThree} % of runs and within 14 in ${knee.withinTwoWeeks} %.`,
       "Real spaceflight: the personal-baseline rule replayed on the four Inspiration4 crew members' blood (NASA OSDR OSD-569 and OSD-575), each against their own pre-flight draws; ISS area-dosimeter rates from OSDR set the radiation comparison band.",
     ],
     notYet: [
       "No astronaut has used the camera checks; every camera test above is healthy adults on Earth.",
       "The seated knee test has not been compared with a goniometer on different days; the in-app angle check records exactly those pairs.",
       "The pulse is untested on darker skin tones, dim light and moving subjects, and on a real phone next to a pulse oximeter.",
-      "Heart rate, blood pressure and sleep spreads in the false-alarm simulation come from studies of adults on Earth, not astronauts; oxygen, temperature, the reaction test and the ratings use stated assumptions.",
+      "Heart rate, blood pressure, sleep and temperature spreads in the false-alarm simulation come from studies of adults on Earth, not astronauts; oxygen, the reaction test and the ratings use stated assumptions.",
     ],
   };
 }

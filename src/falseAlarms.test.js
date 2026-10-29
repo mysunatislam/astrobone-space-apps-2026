@@ -4,7 +4,7 @@ import { falseAlarmSummary, detectionSummary, singleValueRule, STEP_CHANGES, STA
 import { SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE } from "./selfCheck.js";
 
 // Simulated healthy astronauts checking every indicator daily (scripts/simulate-false-alarms.mjs; the
-// knee spreads are measured on real video, heart rate, blood pressure and sleep are published, the others
+// knee spreads are measured on real video, heart rate, blood pressure, sleep and temperature are published, the others
 // are stated assumptions). Small runs here; the script's 1000-astronaut run is in docs/self-check.md.
 // The numbers the app shows (SIMULATED_RELIABILITY) come from the full run; a small run with the same
 // seeds must land near them, so a rule change that moves them fails here until they are re-measured.
@@ -39,8 +39,8 @@ test("the knee spreads in the simulation are the measured ones, and they are lar
   }
 });
 
-test("heart rate, blood pressure and sleep spreads are the published ones, wider than the guesses they replaced", () => {
-  assert.deepEqual([STABLE_PERSON.restingHr.sd, STABLE_PERSON.systolicBp.sd, STABLE_PERSON.diastolicBp.sd, Number((STABLE_PERSON.sleepHours.sd * 60).toFixed(1))], [5.4, 8.6, 6.4, 85.8]);
+test("heart rate, blood pressure, sleep and temperature spreads are the published ones, wider than the guesses they replaced", () => {
+  assert.deepEqual([STABLE_PERSON.restingHr.sd, STABLE_PERSON.systolicBp.sd, STABLE_PERSON.diastolicBp.sd, Number((STABLE_PERSON.sleepHours.sd * 60).toFixed(1)), STABLE_PERSON.bodyTemp.sd], [5.4, 8.6, 6.4, 85.8, 0.31]);
   for (const [key, sd] of Object.entries(PREVIOUS_SPREADS)) assert.ok(STABLE_PERSON[key].sd > sd, key);
   // Sleep varies too much from night to night for a 2 h drop to show in a few checks; the app says so.
   const sleep = SIMULATED_RELIABILITY.detected.find(d => d.key === "sleepHours");
