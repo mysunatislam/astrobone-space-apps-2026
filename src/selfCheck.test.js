@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   summarizePvt, PVT_PROTOCOL, personalReference, evaluateIndicator, lockedReference, driftCheck, evaluateSelfCheck, recommendActions, newCheck, createSelfCheckStore, PVT_B, INDICATORS,
-  backupPacket, restoreBackup, SPREAD,
+  backupPacket, restoreBackup, SPREAD, pvtDeviceClass,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, elenaDay147, ELENA_POOR_CAPTURE } from "./elenaSelfCheck.js";
 
@@ -25,6 +25,39 @@ test("PVT-B scoring counts lapses at 355 ms and early taps as false starts", () 
 test("PVT-B timing follows Basner 2011: 1-4 s intervals with 1 s feedback, 30 s response window", () => {
   assert.deepEqual([PVT_B.isiMinMs, PVT_B.isiMaxMs, PVT_B.feedbackMs, PVT_B.timeoutMs, PVT_B.lapseMs, PVT_B.falseStartMs], [1000, 4000, 1000, 30000, 355, 100]);
   assert.notEqual(PVT_PROTOCOL.full, "pvt-b-3min", "results from the old 2-5 s timing are never mixed with the new ones");
+});
+
+test("a reaction test is compared only with tests answered the same way, and one that switches is repeated", () => {
+  const answered = (input, n = 40, other = null, k = 0) => [...Array(n - k).fill({ rtMs: 300, input }), ...Array(k).fill({ rtMs: 300, input: other })];
+  const touch = summarizePvt(answered("touch")), key = summarizePvt(answered("key"));
+  assert.deepEqual([touch.input, touch.compareAs, touch.usable], ["touch", `${PVT_PROTOCOL.full}:touch`, true]);
+  assert.equal(key.compareAs, `${PVT_PROTOCOL.full}:key`);
+  assert.equal(summarizePvt(answered("touch", 40, "key", 2)).input, "touch", "a stray key press or two does not spoil a tapped test");
+  const mixed = summarizePvt(answered("touch", 40, "key", 10));
+  assert.deepEqual([mixed.input, mixed.usable], ["mixed", false]);
+  assert.match(mixed.reason, /one way/);
+  assert.equal(summarizePvt([...answered("touch", 30), { rtMs: PVT_B.timeoutMs }]).input, "touch", "a 30 s timeout has no input and does not count against the main one");
+  const legacy = summarizePvt(trials(Array(40).fill(300)));
+  assert.deepEqual([legacy.input, legacy.compareAs], [null, PVT_PROTOCOL.full], "results without input keep the plain protocol");
+  const onMac = summarizePvt(answered("key"), { device: "macos-safari" });
+  assert.equal(onMac.compareAs, `${PVT_PROTOCOL.full}:key:macos-safari`, "the device and browser family join the protocol");
+  const history = [3.3, 3.4, 3.3, 3.35].map(v => ({ values: { pvtSpeed: v }, protocols: { pvtSpeed: key.compareAs } }));
+  assert.equal(evaluateIndicator("pvtSpeed", 2.6, history, { protocol: touch.compareAs }).status, "baseline", "tapping after weeks of the space bar starts a new baseline");
+  assert.equal(evaluateIndicator("pvtSpeed", 2.6, history, { protocol: key.compareAs }).status, "changed");
+});
+
+test("the device class keeps only the operating system and browser family", () => {
+  const cases = [
+    ["Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1", 5, "ios-safari"],
+    ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15", 5, "ios-safari"],
+    ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15", 0, "macos-safari"],
+    ["Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36", 5, "android-chrome"],
+    ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0", 0, "windows-edge"],
+    ["Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0", 0, "windows-firefox"],
+    ["Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36", 0, "linux-chrome"],
+  ];
+  for (const [ua, touch, expected] of cases) assert.equal(pvtDeviceClass(ua, touch), expected, ua);
+  assert.equal(pvtDeviceClass(), "other-other");
 });
 
 test("an unfinished or practice-length test is labeled and gated", () => {

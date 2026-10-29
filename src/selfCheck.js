@@ -131,23 +131,56 @@ const mean = values => values.reduce((sum, v) => sum + v, 0) / values.length;
 const sd = values => { if (values.length < 2) return 0; const m = mean(values); return Math.sqrt(values.reduce((s, v) => s + (v - m) ** 2, 0) / (values.length - 1)); };
 const round = (value, digits = 1) => Number(value.toFixed(digits));
 
+// How the responses were given, and on what. A touch screen, a mouse and a keyboard each add their own delay
+// to every response: NASA Ames found a touch-screen PVT's reaction times "80+-20 milliseconds longer than our
+// best estimate of the actual touch time" (Mulligan, Arsintescu and Flynn-Evans, NTRS 20160000581). In web
+// apps the delay depends on the device and browser too: a solenoid tapping four devices measured mean
+// overestimates from 57.6 ms (iOS Safari) to 132.9 ms (macOS Safari) (Pronk et al., Behav Res Methods
+// 2020;52:1371-82, Table 4). A constant delay cancels against the person's own baseline only if every test
+// has it, so a test is compared only with earlier tests answered the same way on the same kind of device and
+// browser, and one that switches input is repeated, never compared.
+export const PVT_INPUTS = Object.freeze({ touch: "touch", mouse: "mouse click", pen: "pen", key: "space bar" });
+const ONE_INPUT_SHARE = 0.9;
+function responseInput(responses) {
+  const given = responses.filter(t => t.input), counts = {};
+  for (const t of given) counts[t.input] = (counts[t.input] ?? 0) + 1;
+  const [main, n] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0] ?? [];
+  return !main ? null : n / given.length >= ONE_INPUT_SHARE ? main : "mixed";
+}
+
+// The operating system and browser family from a user-agent string, for example "ios-safari". Only the
+// family is kept, never the version or the device model. iPadOS reports itself as a Mac; touch gives it away.
+export function pvtDeviceClass(userAgent = "", maxTouchPoints = 0) {
+  const ua = String(userAgent);
+  const os = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && maxTouchPoints > 1) ? "ios" : /Android/.test(ua) ? "android" : /CrOS/.test(ua) ? "chromeos"
+    : /Windows/.test(ua) ? "windows" : /Macintosh|Mac OS X/.test(ua) ? "macos" : /Linux/.test(ua) ? "linux" : "other";
+  const browser = /Edg(e|A|iOS)?\//.test(ua) ? "edge" : /SamsungBrowser/.test(ua) ? "samsung" : /Firefox|FxiOS/.test(ua) ? "firefox"
+    : /Chrome|CriOS|Chromium/.test(ua) ? "chrome" : /Safari/.test(ua) ? "safari" : "other";
+  return `${os}-${browser}`;
+}
+export const PVT_DEVICE_WORDS = Object.freeze({ ios: "iOS", android: "Android", chromeos: "ChromeOS", windows: "Windows", macos: "macOS", linux: "Linux", edge: "Edge", samsung: "Samsung Internet", firefox: "Firefox", chrome: "Chrome", safari: "Safari", other: "other" });
+
 // PVT scoring: valid responses are >= 100 ms after stimulus onset; earlier taps are false starts.
-export function summarizePvt(trials = [], { durationMs = PVT_B.durationMs, completed = true } = {}) {
+// `device` (pvtDeviceClass) joins the input in the protocol a result is compared under.
+export function summarizePvt(trials = [], { durationMs = PVT_B.durationMs, completed = true, device = null } = {}) {
   const responses = trials.filter(t => Number.isFinite(t.rtMs));
   const valid = responses.filter(t => t.rtMs >= PVT_B.falseStartMs);
   const falseStarts = trials.filter(t => t.falseStart).length + responses.filter(t => t.rtMs < PVT_B.falseStartMs).length;
   const rts = valid.map(t => t.rtMs).sort((a, b) => a - b);
   const protocol = durationMs >= PVT_B.durationMs ? PVT_PROTOCOL.full : PVT_PROTOCOL.practice;
-  const usable = completed && valid.length >= (protocol === PVT_PROTOCOL.full ? 20 : 8) && falseStarts <= 10;
+  const input = responseInput(valid), enough = valid.length >= (protocol === PVT_PROTOCOL.full ? 20 : 8);
+  const usable = completed && enough && falseStarts <= 10 && input !== "mixed";
   const stimuli = trials.filter(t => !t.falseStart).length, lapses = valid.filter(t => t.rtMs >= PVT_B.lapseMs).length;
   return {
-    protocol, durationMs, completed, stimuli, validResponses: valid.length, falseStarts, lapses,
+    // `compareAs` is the protocol a result is stored and compared under: the test length and the input.
+    protocol, input, device, compareAs: input && input !== "mixed" ? [protocol, input, device].filter(Boolean).join(":") : protocol, durationMs, completed, stimuli, validResponses: valid.length, falseStarts, lapses,
     // Basner 2011: 100 % minus lapses and false starts relative to valid stimuli plus false starts.
     performanceScore: stimuli + falseStarts ? round(100 * (1 - (lapses + falseStarts) / (stimuli + falseStarts)), 1) : null,
     meanSpeed: valid.length ? round(mean(valid.map(t => 1000 / t.rtMs)), 3) : null,
     medianRtMs: rts.length ? round(rts[Math.floor((rts.length - 1) / 2)], 0) : null,
     usable,
-    reason: usable ? null : !completed ? "Test stopped before the end." : falseStarts > 10 ? "Too many early responses." : "Too few valid responses.",
+    reason: usable ? null : !completed ? "Test stopped before the end." : falseStarts > 10 ? "Too many early responses." : !enough ? "Too few valid responses."
+      : "Responses switched between tapping, clicking and the space bar. Use one way for the whole test.",
   };
 }
 
