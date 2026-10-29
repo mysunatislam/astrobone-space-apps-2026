@@ -5,6 +5,7 @@ import { createMultisystemPanel } from "./multisystemPanel.js";
 import { createMissionCasePanel } from "./missionCasePanel.js";
 import { captureUsable } from "./missionCase.js";
 import { ISS_DOSIMETRY_FILE, validateIssDosimetry, doseRateContext } from "./issDosimetry.js";
+import { SPACE_WEATHER_FILE, validateSpaceWeather, spaceWeatherContext, describeEpisode } from "./spaceWeather.js";
 
 const API = "http://127.0.0.1:8010/api/companion";
 const node = (tag, text = "", className = "") => {
@@ -48,7 +49,7 @@ export function initCompanion({ getAssessment, getPulse = () => null }) {
   panel.querySelector("#crew-create-form h3").after(node("p", "Use a pseudonym. Browser profiles are stored unencrypted on this device when the private service is unavailable."));
   const radiationPanel = document.createElement("details");
   radiationPanel.className = "companion-radiation";
-  radiationPanel.innerHTML = `<summary>Radiation context</summary><p id="crew-radiation-status">No personal dosimeter record</p><p id="crew-radiation-iss" hidden></p><form id="crew-dose-form"><label for="crew-dose-day">Reading mission day</label><input id="crew-dose-day" type="number" min="0" max="2000" required /><label for="crew-dose-mgy">Cumulative personal absorbed dose (mGy)</label><input id="crew-dose-mgy" type="number" min="0" max="100000" step="any" required /><label for="crew-instrument-id">Dosimeter ID (manual entry)</label><input id="crew-instrument-id" maxlength="40" pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,39}" required /><label class="companion-dose-consent"><input id="crew-dose-consent" type="checkbox" required /> I consent to storing this instrument reading locally.</label><button id="crew-save-dose" type="submit" disabled>Record reading</button></form><small>Manual entry is unverified. No bone dose or combined risk score is inferred.</small>`;
+  radiationPanel.innerHTML = `<summary>Radiation context</summary><p id="crew-radiation-status">No personal dosimeter record</p><p id="crew-radiation-iss" hidden></p><div id="crew-radiation-weather" class="companion-space-weather" hidden></div><form id="crew-dose-form"><label for="crew-dose-day">Reading mission day</label><input id="crew-dose-day" type="number" min="0" max="2000" required /><label for="crew-dose-mgy">Cumulative personal absorbed dose (mGy)</label><input id="crew-dose-mgy" type="number" min="0" max="100000" step="any" required /><label for="crew-instrument-id">Dosimeter ID (manual entry)</label><input id="crew-instrument-id" maxlength="40" pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,39}" required /><label class="companion-dose-consent"><input id="crew-dose-consent" type="checkbox" required /> I consent to storing this instrument reading locally.</label><button id="crew-save-dose" type="submit" disabled>Record reading</button></form><small>Manual entry is unverified. No bone dose or combined risk score is inferred.</small>`;
   panel.querySelector("#crew-camera").after(radiationPanel);
   const healthOverview = document.createElement("section");
   healthOverview.className = "health-overview";
@@ -73,6 +74,18 @@ export function initCompanion({ getAssessment, getPulse = () => null }) {
   let issDosimetry = null;
   fetch(`${import.meta.env.BASE_URL}${ISS_DOSIMETRY_FILE}`).then(r => r.ok ? r.json() : null)
     .then(value => { if (value) { issDosimetry = validateIssDosimetry(value); renderProfile(); } }).catch(() => { issDosimetry = null; });
+  // Real solar particle events from NASA DONKI; shown whether or not a crew is selected.
+  fetch(`${import.meta.env.BASE_URL}${SPACE_WEATHER_FILE}`).then(r => r.ok ? r.json() : null)
+    .then(value => { if (value) renderSpaceWeather(spaceWeatherContext(validateSpaceWeather(value))); }).catch(() => { $("crew-radiation-weather").hidden = true; });
+  function renderSpaceWeather(context) {
+    const list = node("ul");
+    list.append(...context.recent.map(e => {
+      const li = node("li"), a = node("a", describeEpisode(e));
+      a.href = e.link; a.target = "_blank"; a.rel = "noopener"; li.append(a); return li;
+    }));
+    $("crew-radiation-weather").replaceChildren(node("strong", "Real space weather (NASA DONKI)"), node("span", context.text), node("small", "Latest measured events:"), list, node("small", context.note));
+    $("crew-radiation-weather").hidden = false;
+  }
   let reviewRevision = 0;
   let missionDemo = location.hash === "#mission-demo";
   const browserCompanion = createBrowserCompanion();

@@ -25,6 +25,11 @@ html[data-theme] .companion-tabs button[aria-selected="true"] { background:#0e75
 .companion-radiation form label {display:block;font-size:12px;color:var(--cp-muted);margin:12px 0 6px;}
 .companion-radiation form .companion-dose-consent {line-height:1.4;}
 .companion-radiation form button {width:100%;margin:10px 0;}
+.companion-space-weather {font-size:13px;line-height:1.45;margin:10px 0;padding:10px;border:1px solid var(--cp-line);border-radius:4px;}
+.companion-space-weather strong {display:block;margin-bottom:4px;}
+.companion-space-weather small {display:block;color:var(--cp-muted);margin-top:6px;}
+.companion-space-weather ul {margin:4px 0 0;padding-left:18px;}
+.companion-space-weather a {color:inherit;overflow-wrap:anywhere;}
 .companion-environment {border-top:1px solid var(--cp-line);border-bottom:1px solid var(--cp-line);margin:18px 0;padding:10px 0 16px;}
 .companion-environment p {margin:7px 0;}
 .companion-environment a {display:inline-block;margin-top:8px;color:#087765;font-size:12px;}
