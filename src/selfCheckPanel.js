@@ -1,5 +1,5 @@
 import {
-  PVT_B, PVT_PROTOCOL, PVT_INPUTS, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
+  PVT_B, PVT_PROTOCOL, PVT_INPUTS, PVT_DEVICE_WORDS, pvtDeviceClass, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
   safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
@@ -279,7 +279,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   function finishPvt(completed) {
     clearTimeout(pvt.timer); cancelAnimationFrame(pvt.raf); pvtStage.classList.remove("sc-on");
     if (!pvt.running) return; pvt.running = false; onTimedTest(false);
-    applyPvt(summarizePvt(pvt.trials, { durationMs: pvt.duration, completed }), "TEST · this device");
+    applyPvt(summarizePvt(pvt.trials, { durationMs: pvt.duration, completed, device: pvtDeviceClass(navigator.userAgent, navigator.maxTouchPoints) }), "TEST · this device");
   }
   function stopPvt(silent) { if (pvt.running) { if (silent) { pvt.running = false; clearTimeout(pvt.timer); cancelAnimationFrame(pvt.raf); onTimedTest(false); } else finishPvt(false); } }
   function applyPvt(summary, source) {
@@ -471,9 +471,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
             pvt.running ? el("p", { class: "sc-note", "aria-live": "polite" }, pvt.feedback) : null),
         result ? el("div", { class: `sc-result ${result.usable ? "" : "sc-bad"}` },
           el("strong", {}, result.usable ? `${result.lapses} lapses · speed ${fmt(result.meanSpeed, 2)}/s` : `Not compared · ${result.reason}`),
-          el("p", {}, `${result.validResponses} valid responses · ${result.falseStarts} early · median ${result.medianRtMs ?? "--"} ms · ${Number.isFinite(result.performanceScore) ? `performance score ${result.performanceScore} % · ` : ""}${result.protocol === PVT_PROTOCOL.full ? "3-minute protocol" : "practice length (only compared with practice runs)"}${PVT_INPUTS[result.input] ? ` · answered by ${PVT_INPUTS[result.input]}` : ""}`),
+          el("p", {}, `${result.validResponses} valid responses · ${result.falseStarts} early · median ${result.medianRtMs ?? "--"} ms · ${Number.isFinite(result.performanceScore) ? `performance score ${result.performanceScore} % · ` : ""}${result.protocol === PVT_PROTOCOL.full ? "3-minute protocol" : "practice length (only compared with practice runs)"}${PVT_INPUTS[result.input] ? ` · answered by ${PVT_INPUTS[result.input]}${result.device ? ` on ${result.device.split("-").map(w => PVT_DEVICE_WORDS[w] ?? w).join(" ")}` : ""}` : ""}`),
           el("small", {}, result.source)) : null,
-        el("p", { class: "sc-note" }, "A touch screen, a mouse and a keyboard each add their own delay to every response, and browser timing adds about one display frame. Results are compared only with your own runs on the same protocol, answered the same way on the same device.")];
+        el("p", { class: "sc-note" }, "A touch screen, a mouse and a keyboard each add their own delay to every response, and the delay differs between phones, laptops and browsers by up to about 75 ms. Results are compared only with your own runs on the same protocol, answered the same way on the same kind of device and browser. Use the same device every day.")];
     }
     if (key === "mind") {
       const v = c.values;

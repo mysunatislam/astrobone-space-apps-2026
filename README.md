@@ -57,7 +57,7 @@ Requires Node.js 20.19+ or 22.12+.
 ```bash
 npm install
 npm run dev        # http://127.0.0.1:5173/
-npm test           # 410 automated tests
+npm test           # 411 automated tests
 npm run build      # production build in dist/
 ```
 
@@ -85,7 +85,7 @@ Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osd
 
 ## Validation and Limits
 
-- **Tested:** 410 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)). An axe-core scan of every view at desktop and phone width finds no WCAG 2.1 A/AA violations (`scripts/qa-a11y.mjs`).
+- **Tested:** 411 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)). An axe-core scan of every view at desktop and phone width finds no WCAG 2.1 A/AA violations (`scripts/qa-a11y.mjs`).
 - **Validated on real video:** the knee and the camera pulse were scored on recorded video of real people against lab ground truth ([report](docs/real-video-validation.md)). Knee: MediaPipe's 3D angle under-read squat range of motion by about 30° facing the camera; AstroBone's hybrid knee model (MediaPipe + learned trees) cut the error per rep from 21.7° to 13.2° and was better for 9 of 9 people it never saw (motion capture, REHAB24-6). Pulse: on 40 people at rest and after squats, the old method refused 95 % of real webcam windows; the hybrid was within 2.1 bpm of a finger sensor on average and tracked each person's rise from rest within 4.2 bpm (MCD-rPPG). Knee repeat noise, from the same saved data: side-on, the reading moved ±5.8° (range of motion) and about ±4.4° (extension) between repetitions with no change in the knee, so the false-alarm simulation and the result screen now use those measured figures instead of a guess ([section 5](docs/real-video-validation.md#5-repeat-noise-what-one-knee-check-can-tell)). The twin's Evidence view lists what was tested on real data and what was not, from the same tables.
 - **Reaction test timing:** the stimulus onset is timed to the frame that draws it and the 3D view pauses during the test. A browser check with a simulated 300 ms responder scores 300 ms; before, a software-rendered browser scored it 665 ms on average and turned 7 of 9 responses into lapses ([details](docs/core-analysis-2026-10-25.md#reaction-test-timing)).
 - **Camera position:** each frame records whether the person faces the camera or sits side-on. Side-on, only the near knee counts; a part-turned capture is refused. On real video, side-on readings were the most accurate, so the self-check now recommends sitting side-on; positions are never compared ([why](docs/core-analysis-2026-10-25.md#camera-position)).

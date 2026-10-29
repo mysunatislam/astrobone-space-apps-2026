@@ -46,6 +46,7 @@ export function testedOnRealData(v = REAL_DATA_VALIDATION, noise = KNEE_REPEAT_N
       "No astronaut has used the camera checks; every camera test above is healthy adults on Earth.",
       "The seated knee test has not been compared with a goniometer on different days; the in-app angle check records exactly those pairs.",
       "The pulse is untested on darker skin tones, dim light and moving subjects, and on a real phone next to a pulse oximeter.",
+      "The reaction test has not been timed with a robot finger on a real phone. Published measurements put the delay a touch screen or keyboard adds at 58–133 ms depending on the device and browser, so each result is compared only with tests answered the same way on the same kind of device.",
       "Heart rate, blood pressure, sleep and temperature spreads in the false-alarm simulation come from studies of adults on Earth, not astronauts; oxygen, the reaction test and the ratings use stated assumptions.",
     ],
   };
