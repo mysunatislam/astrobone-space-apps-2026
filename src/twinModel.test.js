@@ -50,7 +50,8 @@ test("heart animation frequency follows heart rate", () => {
 
 test("radiation track count scales with cumulative dose and is capped", () => {
   assert.equal(radiationTrackCount(0), 0);
-  assert.equal(radiationTrackCount(22.05), Math.round(22.05 * TRACKS_PER_MGY));
+  assert.equal(radiationTrackCount(66.87), Math.round(66.87 * TRACKS_PER_MGY));
+  assert.ok(radiationTrackCount(109.46 + 10) < MAX_TRACKS, "the Day 240 dose with the tabletop event still fits under the cap");
   assert.equal(radiationTrackCount(1e6), MAX_TRACKS);
 });
 
@@ -84,7 +85,7 @@ test("predicted vs observed only uses earlier observations", () => {
 test("twin state adds the event increment only on and after the event day", () => {
   assert.equal(twinState(146, { eventDay: 147 }).radiation.eventIncluded, false);
   const after = twinState(147, { eventDay: 147 });
-  assert.equal(after.radiation.doseMgy, 32.05);
+  assert.equal(after.radiation.doseMgy, 76.87);
   assert.equal(after.heart.delta, 12);
   assert.equal(after.knee.delta, -14);
   assert.equal(twinState(0).day, 1);

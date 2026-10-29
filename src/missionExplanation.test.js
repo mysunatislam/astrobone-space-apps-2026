@@ -11,8 +11,8 @@ test("explanation uses selected observations and never attributes changes to rad
   const scenario = { astronaut_id: profile.astronaut_id, day: 180, additionalDoseMgy: 10, synthetic: true };
   const report = explainMission(current, demo.health, external, scenario);
   assert.match(report.observation, /165 to 151/); assert.match(report.cardiovascular, /76 bpm/);
-  assert.match(report.radiation, /27 mGy/); assert.match(report.interpretation, /not inferred/);
-  assert.equal(report.scenario.additionalDoseMgy, 10); assert.equal(current.dose.cumulative_personal_absorbed_dose_mgy, 27);
+  assert.match(report.radiation, /81\.98 mGy/); assert.match(report.interpretation, /not inferred/);
+  assert.equal(report.scenario.additionalDoseMgy, 10); assert.equal(current.dose.cumulative_personal_absorbed_dose_mgy, 81.98);
   assert.match(report.imaging, /not assigned/); assert.match(report.engine, /no LLM/);
   assert.equal(explainMission({ ...current, day: 182 }, demo.health, external, scenario).scenario, null);
   assert.equal(explainMission({ ...current, synthetic: false }, demo.health, external, scenario).scenario, null);

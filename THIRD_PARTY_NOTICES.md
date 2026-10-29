@@ -124,6 +124,7 @@ Published methods implemented in AstroBone's own code:
 - Machado, Oliveira and Fernandes 2009 colour-vision-deficiency matrices.
 - The Sharma, Wu and Dalal 2005 CIEDE2000 formula (`scripts/check-status-colours.mjs`).
 - The Westgard et al. 1981 quality-control multirule (one value past 2 SD warns; past 3 SD, or two in a row past 2 SD, rejects), the moving-range estimate of spread (Montgomery, Introduction to Statistical Quality Control) and Page's 1954 CUSUM, in the self-check's review rules (`src/selfCheck.js`).
+- The MSL/RAD mean absorbed dose rate in water during the 2011-2012 Mars cruise, 458 ± 32 µGy/day (Guo et al., "Variations of dose rate observed by MSL/RAD in transit to Mars", A&A 577, A58, 2015, doi:10.1051/0004-6361/201525680), used to author the synthetic dosimeter histories in `src/elenaMissionScenario.js` and `src/demoMission.json`.
 
 Consult `package-lock.json`, `requirements-api.txt`, and `requirements-ml.txt` for the complete dependency set and versions installed for a given build.
 

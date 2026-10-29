@@ -9,7 +9,7 @@ test("one synthetic case advances baseline, change, refusal, and usable follow-u
   assert.equal(buildMissionCase({...input,day:1}).status,"baseline_recorded");
   const changed=buildMissionCase({...input,day:180});
   assert.equal(changed.comparison.changes.find(r=>r.metric==="knee_extension_deg").delta,-14);
-  assert.equal(changed.dose.cumulative_personal_absorbed_dose_mgy,27);
+  assert.equal(changed.dose.cumulative_personal_absorbed_dose_mgy,81.98);
   const poor=buildMissionCase({...input,day:182});
   assert.equal(poor.status,"insufficient_evidence"); assert.deepEqual(poor.comparison.changes,[]); assert.equal(poor.followup,null);
   const repeat=buildMissionCase({...input,day:194});

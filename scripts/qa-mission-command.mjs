@@ -43,12 +43,12 @@ try {
     await page.locator("#mission-dialog-close").click();
     await page.locator("#mission-event").click();
     assert.match(await page.locator(".scenario-notice").innerText(), /hypothetical \+10 mGy/);
-    assert.match(await page.locator("#case-dose").innerText(), /^27 mGy/);
+    assert.match(await page.locator("#case-dose").innerText(), /^81.98 mGy/);
     await page.locator("#mission-dialog-close").click();
     await page.locator("#mission-handoff").click();
     const wait = page.waitForEvent("download"); await page.locator("#mission-dialog-export").click();
     const download = await wait, report = JSON.parse(await readFile(await download.path(), "utf8"));
-    assert.equal(report.dose.cumulative_personal_absorbed_dose_mgy, 27);
+    assert.equal(report.dose.cumulative_personal_absorbed_dose_mgy, 81.98);
     assert.equal(report.scenario.additionalDoseMgy, 10); assert.equal(report.explanation.day, 180);
     assert.equal(report.cardiovascular.length, 4); assert.equal(report.externalEvidence.xray.patientLinked, false);
     await page.screenshot({ path: `${out}/handoff-${viewport.width}.png`, fullPage: true });

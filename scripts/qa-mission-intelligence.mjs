@@ -45,9 +45,9 @@ try {
     await page.getByRole("button", { name: "Inspect external X-ray / MODEL OUTPUT" }).click(); assert.match(await page.locator("#mi-dialog-body").innerText(), /not live inference/);
     assert.equal(await page.locator("#mi-dialog-body img").evaluate(i => i.complete && i.naturalWidth > 0), true); await page.locator("#mi-close").click();
     await page.locator("#mi-origin").click(); assert.match(await page.locator("#mi-dialog-body").innerText(), /not authenticated/); assert.equal(await page.locator("#mi-dialog-body code").count(), 6); await page.locator("#mi-close").click();
-    await page.locator("#mi-event").click(); assert.match(await page.locator('[data-domain="radiation"]').innerText(), /32.05 mGy/);
+    await page.locator("#mi-event").click(); assert.match(await page.locator('[data-domain="radiation"]').innerText(), /76.87 mGy/);
     await page.locator("#mi-handoff").click(); const downloadPromise = page.waitForEvent("download"); await page.locator("#mi-export").click(); const download = await downloadPromise;
-    const report = JSON.parse(await readFile(await download.path(), "utf8")); assert.equal(report.dose, 22.05); assert.equal(report.doseWithEvent, 32.05); assert.equal(report.externalEvidence.xray.patientLinked, false); assert.equal(report.gates.length, 8);
+    const report = JSON.parse(await readFile(await download.path(), "utf8")); assert.equal(report.dose, 66.87); assert.equal(report.doseWithEvent, 76.87); assert.equal(report.externalEvidence.xray.patientLinked, false); assert.equal(report.gates.length, 8);
     await page.locator("#mi-close").click(); await page.locator("#mi-lab").click(); await page.locator("#mi-low-quality").check(); await page.locator("#mi-no-sensor").check(); await page.locator("#mi-no-evidence").check();
     assert.match(await page.locator("#mi-dialog-body").innerText(), /INSUFFICIENT DATA/); await page.locator("#mi-close").click(); assert.match(await page.locator("#mi-observation").innerText(), /withheld/);
     await page.locator('[data-astra="evidence"]').click(); assert.match(await page.locator("#mi-astra-response").innerText(), /INSUFFICIENT EVIDENCE/);

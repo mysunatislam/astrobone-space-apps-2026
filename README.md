@@ -42,7 +42,7 @@ The data sets priority and timing only. It never sets a personal threshold: mice
 
 ## Try It in 3 Minutes
 
-1. Open the [live app](https://mysunatislam.github.io/astrobone-space-apps-2026/). Mission Control shows Commander Elena Torres, a fictional astronaut on Day 147 of a Mars transit.
+1. Open the [live app](https://mysunatislam.github.io/astrobone-space-apps-2026/). Mission Control shows Commander Elena Torres, a fictional astronaut on Day 147 of a Mars transit. Her synthetic dosimeter accrues at 0.458 mGy/day, the absorbed dose rate the RAD instrument measured inside NASA's Curiosity cruise stage on the way to Mars ([Guo et al. 2015](https://doi.org/10.1051/0004-6361/201525680)).
 2. Select **Self-Check**. The first step lists today's checks and the NASA evidence behind each. With **Elena · synthetic demo**, step through using the demo capture buttons: a poorly framed capture is refused and the repeat is accepted; then the reaction test, sleep and mood, and body. **Evaluate** shows which domains moved outside her own range and her next step; the twin highlights them.
 3. Select **You · this device** to do the check yourself: the camera measures your knee extension, and the reaction test runs for 3 minutes.
 4. Open **Live Capture** and start your camera or upload a video. The 3D musculoskeletal model follows your movement; joint angles and tracking quality update live. With a clearly visible, still face, the pulse appears after about 12 s.
@@ -56,7 +56,7 @@ Requires Node.js 20.19+ or 22.12+.
 ```bash
 npm install
 npm run dev        # http://127.0.0.1:5173/
-npm test           # 376 automated tests
+npm test           # 384 automated tests
 npm run build      # production build in dist/
 ```
 
@@ -83,7 +83,7 @@ Rebuild the NASA summaries from NASA's servers (Python 3.10+): `npm run data:osd
 
 ## Validation and Limits
 
-- **Tested:** 376 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
+- **Tested:** 384 automated tests cover the review rules, quality gates, NASA rules, pose analysis, video synchronization, the camera pulse and the models. The Monte Carlo reproduces a stored Simulink reference. Video sync and the camera pulse were measured in the browser ([method and results](docs/video-sync-and-camera-pulse.md)).
 - **Validated on real video:** the knee and the camera pulse were scored on recorded video of real people against lab ground truth ([report](docs/real-video-validation.md)). Knee: MediaPipe's 3D angle under-read squat range of motion by about 30° facing the camera; AstroBone's hybrid knee model (MediaPipe + learned trees) cut the error per rep from 21.7° to 13.2° and was better for 9 of 9 people it never saw (motion capture, REHAB24-6). Pulse: on 40 people at rest and after squats, the old method refused 95 % of real webcam windows; the hybrid was within 2.1 bpm of a finger sensor on average and tracked each person's rise from rest within 4.2 bpm (MCD-rPPG).
 - **Reaction test timing:** the stimulus onset is timed to the frame that draws it and the 3D view pauses during the test. A browser check with a simulated 300 ms responder scores 300 ms; before, a software-rendered browser scored it 665 ms on average and turned 7 of 9 responses into lapses ([details](docs/core-analysis-2026-10-25.md#reaction-test-timing)).
 - **Camera position:** each frame records whether the person faces the camera or sits side-on. Side-on, only the near knee counts; a part-turned capture is refused. On real video, side-on readings were the most accurate, so the self-check now recommends sitting side-on; positions are never compared ([why](docs/core-analysis-2026-10-25.md#camera-position)).
