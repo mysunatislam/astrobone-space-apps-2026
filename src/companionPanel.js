@@ -4,6 +4,7 @@ import { createBrowserCompanion } from "./browserCompanion.js";
 import { createMultisystemPanel } from "./multisystemPanel.js";
 import { createMissionCasePanel } from "./missionCasePanel.js";
 import { captureUsable } from "./missionCase.js";
+import { ISS_DOSIMETRY_FILE, validateIssDosimetry, doseRateContext } from "./issDosimetry.js";
 
 const API = "http://127.0.0.1:8010/api/companion";
 const node = (tag, text = "", className = "") => {
@@ -47,7 +48,7 @@ export function initCompanion({ getAssessment, getPulse = () => null }) {
   panel.querySelector("#crew-create-form h3").after(node("p", "Use a pseudonym. Browser profiles are stored unencrypted on this device when the private service is unavailable."));
   const radiationPanel = document.createElement("details");
   radiationPanel.className = "companion-radiation";
-  radiationPanel.innerHTML = `<summary>Radiation context</summary><p id="crew-radiation-status">No personal dosimeter record</p><form id="crew-dose-form"><label for="crew-dose-day">Reading mission day</label><input id="crew-dose-day" type="number" min="0" max="2000" required /><label for="crew-dose-mgy">Cumulative personal absorbed dose (mGy)</label><input id="crew-dose-mgy" type="number" min="0" max="100000" step="any" required /><label for="crew-instrument-id">Dosimeter ID (manual entry)</label><input id="crew-instrument-id" maxlength="40" pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,39}" required /><label class="companion-dose-consent"><input id="crew-dose-consent" type="checkbox" required /> I consent to storing this instrument reading locally.</label><button id="crew-save-dose" type="submit" disabled>Record reading</button></form><small>Manual entry is unverified. No bone dose or combined risk score is inferred.</small>`;
+  radiationPanel.innerHTML = `<summary>Radiation context</summary><p id="crew-radiation-status">No personal dosimeter record</p><p id="crew-radiation-iss" hidden></p><form id="crew-dose-form"><label for="crew-dose-day">Reading mission day</label><input id="crew-dose-day" type="number" min="0" max="2000" required /><label for="crew-dose-mgy">Cumulative personal absorbed dose (mGy)</label><input id="crew-dose-mgy" type="number" min="0" max="100000" step="any" required /><label for="crew-instrument-id">Dosimeter ID (manual entry)</label><input id="crew-instrument-id" maxlength="40" pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,39}" required /><label class="companion-dose-consent"><input id="crew-dose-consent" type="checkbox" required /> I consent to storing this instrument reading locally.</label><button id="crew-save-dose" type="submit" disabled>Record reading</button></form><small>Manual entry is unverified. No bone dose or combined risk score is inferred.</small>`;
   panel.querySelector("#crew-camera").after(radiationPanel);
   const healthOverview = document.createElement("section");
   healthOverview.className = "health-overview";
@@ -68,6 +69,10 @@ export function initCompanion({ getAssessment, getPulse = () => null }) {
   document.querySelector(".topbar").after(tabs);
   const $ = (id) => panel.querySelector(`#${id}`);
   let profile = null, history = [], radiationHistory = [], healthHistory = [], followups = [], reviewDay = Infinity, report = null, busy = false, connected = false, profileRequest = 0;
+  // Measured ISS dose rates from NASA OSDR; if the file is missing or inconsistent, no comparison is shown.
+  let issDosimetry = null;
+  fetch(`${import.meta.env.BASE_URL}${ISS_DOSIMETRY_FILE}`).then(r => r.ok ? r.json() : null)
+    .then(value => { if (value) { issDosimetry = validateIssDosimetry(value); renderProfile(); } }).catch(() => { issDosimetry = null; });
   let reviewRevision = 0;
   let missionDemo = location.hash === "#mission-demo";
   const browserCompanion = createBrowserCompanion();
@@ -286,6 +291,9 @@ export function initCompanion({ getAssessment, getPulse = () => null }) {
     $("crew-radiation-status").textContent = dose
       ? `Day ${dose.mission_day}: ${dose.cumulative_personal_absorbed_dose_mgy} mGy ${profile?.is_demo ? "SYNTHETIC" : "entered"} for ${dose.instrument_id}. Context only.`
       : "No personal dosimeter record";
+    const iss = issDosimetry && doseRateContext(radiationHistory.filter(row => row.mission_day <= reviewDay), issDosimetry);
+    $("crew-radiation-iss").hidden = !iss;
+    $("crew-radiation-iss").replaceChildren(...(iss ? [node("span", iss.text), node("small", ` ${iss.note}`)] : []));
     $("crew-dose-day").value = dose?.mission_day ?? history.at(-1)?.mission_day ?? 1;
     $("crew-instrument-id").value = dose?.instrument_id ?? "";
     $("crew-dose-mgy").value = "";

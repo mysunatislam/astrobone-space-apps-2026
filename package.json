@@ -11,6 +11,7 @@
     "data:crew": "python scripts/build_crew_blood.py",
     "data:mission": "python scripts/build_mission_research.py",
     "data:mission:extended": "python scripts/build_extended_nasa_research.py",
+    "data:dosimetry": "python scripts/build_iss_dosimetry.py",
     "data:circulation": "python scripts/build_circulation_reference.py",
     "dev": "vite --host 127.0.0.1",
     "build": "vite build && node scripts/write-sites-worker.mjs",
