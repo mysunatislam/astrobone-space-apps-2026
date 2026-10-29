@@ -1,5 +1,5 @@
 import {
-  PVT_B, PVT_PROTOCOL, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
+  PVT_B, PVT_PROTOCOL, PVT_INPUTS, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
   safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
@@ -260,9 +260,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       pvt.timer = setTimeout(() => { if (pvt.onset !== null) record(PVT_B.timeoutMs); }, PVT_B.timeoutMs);
     }, isi);
   }
-  function record(rtMs) {
+  function record(rtMs, input) {
     cancelAnimationFrame(pvt.raf); pvtStage.classList.remove("sc-on");
-    pvt.trials.push({ rtMs, onset: pvt.onsetMethod }); pvt.onset = null; pvt.feedback = `${Math.round(rtMs)} ms`; pvtStage.dataset.count = pvt.feedback;
+    pvt.trials.push({ rtMs, onset: pvt.onsetMethod, input }); pvt.onset = null; pvt.feedback = `${Math.round(rtMs)} ms`; pvtStage.dataset.count = pvt.feedback;
     // The reaction time shows for the 1 s feedback period, which is part of the 1-4 s interval.
     clearTimeout(pvt.feedbackTimer); pvt.feedbackTimer = setTimeout(() => { if (pvt.onset === null && pvt.running) pvtStage.dataset.count = ""; }, PVT_B.feedbackMs);
     schedule();
@@ -270,8 +270,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   function respond(event) {
     if (!pvt.running) return;
     event.preventDefault();
-    if (pvt.onset === null) { pvt.trials.push({ falseStart: true }); pvtStage.dataset.count = "Too early"; return; }
-    record(Math.max(0, event.timeStamp - pvt.onset));
+    const input = event.type === "keydown" ? "key" : PVT_INPUTS[event.pointerType] ? event.pointerType : "mouse";
+    if (pvt.onset === null) { pvt.trials.push({ falseStart: true, input }); pvtStage.dataset.count = "Too early"; return; }
+    record(Math.max(0, event.timeStamp - pvt.onset), input);
   }
   pvtStage.addEventListener("pointerdown", respond);
   pvtStage.addEventListener("keydown", event => { if (event.code === "Space" || event.key === " ") respond(event); });
@@ -285,7 +286,8 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     state.pvt = { ...summary, source }; noteRepeat("reaction", summary.usable);
     Object.assign(state.check.values, { pvtSpeed: summary.meanSpeed, pvtLapses: summary.lapses });
     Object.assign(state.check.quality, { pvtSpeed: summary.usable, pvtLapses: summary.usable });
-    Object.assign(state.check.protocols, { pvtSpeed: summary.protocol, pvtLapses: summary.protocol });
+    const protocol = summary.compareAs ?? summary.protocol;
+    Object.assign(state.check.protocols, { pvtSpeed: protocol, pvtLapses: protocol });
     state.check.sources.reaction = source; render();
   }
 
@@ -460,7 +462,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     }
     if (key === "reaction") {
       const result = state.pvt;
-      return [el("p", { class: "sc-lead" }, "Reaction test (PVT-B): a counter appears at random intervals. Tap or press space as soon as you see it. Sensitive to sleep loss and fatigue."),
+      return [el("p", { class: "sc-lead" }, "Reaction test (PVT-B): a counter appears at random intervals. Tap, click or press space as soon as you see it, the same way every day. Sensitive to sleep loss and fatigue."),
         demo ? el("button", { type: "button", class: "sc-secondary", "data-demo": "pvt", onclick: () => applyPvt(ELENA_PVT, "SYNTHETIC DEMO") }, "Use demo result (3-minute test)")
           : el("div", {}, pvtStage, el("div", { class: "sc-row" },
             pvt.running ? el("button", { type: "button", class: "sc-secondary", onclick: () => stopPvt(false) }, "Stop test")
@@ -469,9 +471,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
             pvt.running ? el("p", { class: "sc-note", "aria-live": "polite" }, pvt.feedback) : null),
         result ? el("div", { class: `sc-result ${result.usable ? "" : "sc-bad"}` },
           el("strong", {}, result.usable ? `${result.lapses} lapses · speed ${fmt(result.meanSpeed, 2)}/s` : `Not compared · ${result.reason}`),
-          el("p", {}, `${result.validResponses} valid responses · ${result.falseStarts} early · median ${result.medianRtMs ?? "--"} ms · ${Number.isFinite(result.performanceScore) ? `performance score ${result.performanceScore} % · ` : ""}${result.protocol === PVT_PROTOCOL.full ? "3-minute protocol" : "practice length (only compared with practice runs)"}`),
+          el("p", {}, `${result.validResponses} valid responses · ${result.falseStarts} early · median ${result.medianRtMs ?? "--"} ms · ${Number.isFinite(result.performanceScore) ? `performance score ${result.performanceScore} % · ` : ""}${result.protocol === PVT_PROTOCOL.full ? "3-minute protocol" : "practice length (only compared with practice runs)"}${PVT_INPUTS[result.input] ? ` · answered by ${PVT_INPUTS[result.input]}` : ""}`),
           el("small", {}, result.source)) : null,
-        el("p", { class: "sc-note" }, "Browser timing adds about one display frame of uncertainty. Results are compared only with your own runs on the same protocol.")];
+        el("p", { class: "sc-note" }, "A touch screen, a mouse and a keyboard each add their own delay to every response, and browser timing adds about one display frame. Results are compared only with your own runs on the same protocol, answered the same way on the same device.")];
     }
     if (key === "mind") {
       const v = c.values;

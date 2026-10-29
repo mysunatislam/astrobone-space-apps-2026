@@ -131,6 +131,18 @@ const mean = values => values.reduce((sum, v) => sum + v, 0) / values.length;
 const sd = values => { if (values.length < 2) return 0; const m = mean(values); return Math.sqrt(values.reduce((s, v) => s + (v - m) ** 2, 0) / (values.length - 1)); };
 const round = (value, digits = 1) => Number(value.toFixed(digits));
 
+// How the responses were given. A touch screen, a mouse and a keyboard each add their own delay to every
+// response, and the delay differs between devices (INPUT_LAG_NOTE), so a test is compared only with
+// earlier tests answered the same way. A test that switches between them is repeated, never compared.
+export const PVT_INPUTS = Object.freeze({ touch: "touch", mouse: "mouse click", pen: "pen", key: "space bar" });
+const ONE_INPUT_SHARE = 0.9;
+function responseInput(responses) {
+  const given = responses.filter(t => t.input), counts = {};
+  for (const t of given) counts[t.input] = (counts[t.input] ?? 0) + 1;
+  const [main, n] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0] ?? [];
+  return !main ? null : n / given.length >= ONE_INPUT_SHARE ? main : "mixed";
+}
+
 // PVT scoring: valid responses are >= 100 ms after stimulus onset; earlier taps are false starts.
 export function summarizePvt(trials = [], { durationMs = PVT_B.durationMs, completed = true } = {}) {
   const responses = trials.filter(t => Number.isFinite(t.rtMs));
@@ -138,16 +150,19 @@ export function summarizePvt(trials = [], { durationMs = PVT_B.durationMs, compl
   const falseStarts = trials.filter(t => t.falseStart).length + responses.filter(t => t.rtMs < PVT_B.falseStartMs).length;
   const rts = valid.map(t => t.rtMs).sort((a, b) => a - b);
   const protocol = durationMs >= PVT_B.durationMs ? PVT_PROTOCOL.full : PVT_PROTOCOL.practice;
-  const usable = completed && valid.length >= (protocol === PVT_PROTOCOL.full ? 20 : 8) && falseStarts <= 10;
+  const input = responseInput(valid), enough = valid.length >= (protocol === PVT_PROTOCOL.full ? 20 : 8);
+  const usable = completed && enough && falseStarts <= 10 && input !== "mixed";
   const stimuli = trials.filter(t => !t.falseStart).length, lapses = valid.filter(t => t.rtMs >= PVT_B.lapseMs).length;
   return {
-    protocol, durationMs, completed, stimuli, validResponses: valid.length, falseStarts, lapses,
+    // `compareAs` is the protocol a result is stored and compared under: the test length and the input.
+    protocol, input, compareAs: input && input !== "mixed" ? `${protocol}:${input}` : protocol, durationMs, completed, stimuli, validResponses: valid.length, falseStarts, lapses,
     // Basner 2011: 100 % minus lapses and false starts relative to valid stimuli plus false starts.
     performanceScore: stimuli + falseStarts ? round(100 * (1 - (lapses + falseStarts) / (stimuli + falseStarts)), 1) : null,
     meanSpeed: valid.length ? round(mean(valid.map(t => 1000 / t.rtMs)), 3) : null,
     medianRtMs: rts.length ? round(rts[Math.floor((rts.length - 1) / 2)], 0) : null,
     usable,
-    reason: usable ? null : !completed ? "Test stopped before the end." : falseStarts > 10 ? "Too many early responses." : "Too few valid responses.",
+    reason: usable ? null : !completed ? "Test stopped before the end." : falseStarts > 10 ? "Too many early responses." : !enough ? "Too few valid responses."
+      : "Responses switched between tapping, clicking and the space bar. Use one way for the whole test.",
   };
 }
 

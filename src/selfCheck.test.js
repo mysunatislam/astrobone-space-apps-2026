@@ -27,6 +27,23 @@ test("PVT-B timing follows Basner 2011: 1-4 s intervals with 1 s feedback, 30 s 
   assert.notEqual(PVT_PROTOCOL.full, "pvt-b-3min", "results from the old 2-5 s timing are never mixed with the new ones");
 });
 
+test("a reaction test is compared only with tests answered the same way, and one that switches is repeated", () => {
+  const answered = (input, n = 40, other = null, k = 0) => [...Array(n - k).fill({ rtMs: 300, input }), ...Array(k).fill({ rtMs: 300, input: other })];
+  const touch = summarizePvt(answered("touch")), key = summarizePvt(answered("key"));
+  assert.deepEqual([touch.input, touch.compareAs, touch.usable], ["touch", `${PVT_PROTOCOL.full}:touch`, true]);
+  assert.equal(key.compareAs, `${PVT_PROTOCOL.full}:key`);
+  assert.equal(summarizePvt(answered("touch", 40, "key", 2)).input, "touch", "a stray key press or two does not spoil a tapped test");
+  const mixed = summarizePvt(answered("touch", 40, "key", 10));
+  assert.deepEqual([mixed.input, mixed.usable], ["mixed", false]);
+  assert.match(mixed.reason, /one way/);
+  assert.equal(summarizePvt([...answered("touch", 30), { rtMs: PVT_B.timeoutMs }]).input, "touch", "a 30 s timeout has no input and does not count against the main one");
+  const legacy = summarizePvt(trials(Array(40).fill(300)));
+  assert.deepEqual([legacy.input, legacy.compareAs], [null, PVT_PROTOCOL.full], "results without input keep the plain protocol");
+  const history = [3.3, 3.4, 3.3, 3.35].map(v => ({ values: { pvtSpeed: v }, protocols: { pvtSpeed: key.compareAs } }));
+  assert.equal(evaluateIndicator("pvtSpeed", 2.6, history, { protocol: touch.compareAs }).status, "baseline", "tapping after weeks of the space bar starts a new baseline");
+  assert.equal(evaluateIndicator("pvtSpeed", 2.6, history, { protocol: key.compareAs }).status, "changed");
+});
+
 test("an unfinished or practice-length test is labeled and gated", () => {
   assert.equal(summarizePvt(trials(Array(40).fill(300)), { completed: false }).usable, false);
   assert.equal(summarizePvt(trials(Array(12).fill(300)), { durationMs: PVT_B.practiceDurationMs }).protocol, PVT_PROTOCOL.practice);
