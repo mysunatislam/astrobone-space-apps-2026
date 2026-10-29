@@ -2,7 +2,7 @@
 
 Usage: python write_validation_doc.py <report_data.json> <repo>
 """
-import json, sys
+import json, subprocess, sys
 
 d = json.load(open(sys.argv[1])); repo = sys.argv[2]
 P, U = d["pose"], d["pulse"]
@@ -15,6 +15,9 @@ gate = next((s for s in hyb["sweep"] if s["q"] == 0.3), None)
 dh = U["delta"].get("Hybrid (app self-check)")
 L = []
 w = L.append
+# Section 5 (knee repeat noise) comes from the committed files in data/validation/, through the app's own code.
+knee_md = subprocess.run(["node", f"{repo}/scripts/validation/knee-repeatability.mjs"], capture_output=True, text=True, check=True).stdout
+knee = json.loads(subprocess.run(["node", f"{repo}/scripts/validation/knee-repeatability.mjs", "--json"], capture_output=True, text=True, check=True).stdout)["estimate"]
 
 w("# Real-video validation\n")
 w(f"Generated {d['generated'][:10]} by `scripts/validation/`. Every number below was measured on recorded video of real people "
@@ -31,6 +34,9 @@ w(f"- **{len(P['models'])} pretrained pose models compared.** {_best['label']} p
   f"{f1(min(m['sideRomMaeSquat'] for m in P['models']))}–{f1(max(m["sideRomMaeSquat"] for m in P["models"]))}° error. A better keypoint model alone does not fix the facing-camera error; the hybrid does.")
 w(f"- **The hybrid knee model fixes most of it.** MediaPipe plus 100 learned trees: knee range-of-motion error {f1(A['est3']['romMae'])}° → {f1(A['shipped']['romMae'])}° "
   f"per rep, ICC(2,1) {A['est3']['romIcc']} → {A['shipped']['romIcc']}, better for {improved} of {len(H['perPerson'])} people left out of training. Shipped in `src/kneeHybrid.js`.")
+w(f"- **Knee repeat noise, measured.** With nothing about the knee changing, the camera's side-on squat reading moved ±{knee['romSd']}° (range of motion) between consecutive "
+  f"repetitions, so two single checks must differ by {knee['romMdc95']}° before noise is an unlikely cause (extension ±{knee['extensionSd']}°, {knee['extensionMdc95']}°). These now drive "
+  "the false-alarm simulation and are shown beside each knee result (section 5).")
 w(f"- **Pulse: the old method almost never answered on real webcam video.** POS with a 60 % peak-share gate refused {f0(U['oldRefusedPct'])} % of 30-second windows.")
 byid = {m["id"]: m for m in U["methods"]}
 me_g, eq, lo = byid.get("ME-rPPG + gates (app)"), byid.get("Fusion, equal weights (first design)"), byid.get("Hybrid, weight chosen without this person")
@@ -165,7 +171,8 @@ w("\n**Context.** Holter recordings of seven ISS crew members found night-time h
   "(Fraser, Hughson et al., IAC-11.A1.2.9, 2011). After flight, heart rate on standing or tilt rises (93 vs 74 bpm in six astronauts, Cox et al., J Physiol 2002; "
   "stand-test tachycardia in 11 ISS astronauts, Lee et al., Front Physiol 2020). A sustained change from a crew member's own resting baseline is therefore the signal worth "
   "watching; the app flags it for review past 8 bpm and never diagnoses.\n")
-w("## 5. Limits\n")
+w(knee_md.rstrip("\n") + "\n")
+w("## 6. Limits\n")
 w("- The knee hybrid was trained on squats and lunges; the self-check uses a seated knee extension. Side-on, both are motion in one plane, but the seated test needs its own "
   "goniometer check (the in-app angle check records exactly that).\n"
   "- Nine people in one lab for the knee; healthy adults on Earth for the pulse. None are astronauts.\n"
@@ -174,8 +181,9 @@ w("- The knee hybrid was trained on squats and lunges; the self-check uses a sea
   "graphics, the worker analysed only 7 frames a second, below the 15 the estimator needs, so the app refused with that reason instead of reporting a rate. A reading on a real "
   "phone or laptop camera, next to a finger pulse oximeter, is still needed.\n"
   "- REHAB24-6 is CC BY-NC 4.0, so the fitted trees are for non-commercial use.\n")
-w("## 6. Rerun\n")
+w("## 7. Rerun\n")
 w("See `scripts/validation/README.md`. In short: download the datasets, run `rppg_worker.py` and `pose_driver.sh`, then `eval_rppg.py`, `export_signals.py`, "
-  "`score-wave-pulse.mjs`, `eval_pose.py`, `hybrid_pose.py`, `export_knee_hybrid.py`, `report_data.py` and this file's generator `write_validation_doc.py`.\n")
+  "`score-wave-pulse.mjs`, `eval_pose.py`, `hybrid_pose.py`, `export_knee_hybrid.py`, `report_data.py` and this file's generator `write_validation_doc.py`. "
+  "Section 5 needs no download: `node scripts/validation/knee-repeatability.mjs` prints it from `data/validation/`.\n")
 open(f"{repo}/docs/real-video-validation.md", "w").write("\n".join(L))
 print("wrote docs/real-video-validation.md", len("\n".join(L)) // 1024, "KB")

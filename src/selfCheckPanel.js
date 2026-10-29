@@ -1,6 +1,6 @@
 import {
   PVT_B, PVT_PROTOCOL, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
-  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
+  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
 import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
@@ -454,6 +454,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
             : cap.reason === "oblique" ? `You were turned partway (${fmt(cap.bodyYawDeg, 0)}° from facing the camera). Face the camera, or turn fully side-on, and repeat: a part-turned reading matches neither position's baseline.`
             : `Tracking quality ${fmt(cap.trackingQuality, 2)} with ${cap.sampleCount} usable samples is below the quality rule (≥ 0.70 and ≥ 12 samples). A worse-looking number from a poor capture is not treated as a health change.`),
           el("small", {}, `${cap.source} · attempt ${state.captures}`)) : null,
+        usable ? el("p", { class: "sc-note" }, kneeNoiseNote()) : null,
         el("p", { class: "sc-note" }, "Video stays on this device. Only the summary angles are kept."),
         demo ? null : accuracyCheck()];
     }
@@ -545,6 +546,12 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       state.profile === "elena" ? el("p", { class: "sc-note" }, ELENA_SELF_CHECK_BOUNDARY) : null];
   }
 
+  // What one knee reading can and cannot tell, from the camera's repeat noise measured on real video.
+  function kneeNoiseNote() {
+    const n = KNEE_REPEAT_NOISE;
+    return `How sure is this? On real squat videos checked against motion capture, the camera's knee reading moved about ±${n.kneeExtension.sd}° (extension) and ±${n.kneeRom.sd}° (range) between repeats with no change in the knee. Two checks have to differ by about ${Math.round(n.kneeExtension.mdc95)}° before camera noise is an unlikely cause, so one check outside your range asks for a re-check and two in a row for review. Facing the camera, the same knee's range read about ${Math.round(n.facingMinusSideOn)}° lower than side-on, so each position keeps its own baseline.`;
+  }
+
   // How often the flags are wrong, in the simulation's own numbers, so nobody has to take them on trust.
   function reliabilityNote() {
     const r = SIMULATED_RELIABILITY, pct = v => `${v} %`;
@@ -553,7 +560,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       el("table", {}, el("caption", {}, "A real change, flagged REVIEW within"),
         el("thead", {}, el("tr", {}, el("th", { scope: "col" }, "Change"), el("th", { scope: "col" }, "3 checks"), el("th", { scope: "col" }, "14 checks"))),
         el("tbody", {}, r.detected.map(d => el("tr", {}, el("th", { scope: "row" }, d.label), el("td", {}, pct(d.withinThree)), el("td", {}, pct(d.withinTwoWeeks)))))),
-      el("small", {}, "The day-to-day spreads in the simulation are assumptions until they are measured on volunteers. Method: scripts/simulate-false-alarms.mjs."));
+      el("small", {}, `The knee spreads are the camera's repeat noise measured on real video (${KNEE_REPEAT_NOISE.source}); the other day-to-day spreads are assumptions until they are measured on volunteers. Method: scripts/simulate-false-alarms.mjs.`));
   }
 
   // Who to tell, for this result in this place: the escalation ladder with the active rung explained.

@@ -97,6 +97,7 @@ NASA public research pages and technical reports cited by AstroBone are listed i
 - File: `src/kneeHybridModel.js` (100 gradient-boosted trees fitted by `scripts/validation/export_knee_hybrid.py` on MediaPipe Pose lite outputs and the dataset's Vicon motion capture)
 - Terms: the fitted values are derived from REHAB24-6 and carry its attribution and non-commercial terms. Retrain on other data before any commercial use.
 - Use: knee angle for the self-check knee capture (`src/kneeHybrid.js`), validated leave-one-person-out in `docs/real-video-validation.md`. No REHAB24-6 video is bundled.
+- Derived tables: `data/validation/rehab24-*.csv` hold per-repetition knee angles (motion capture, the old 3D angle and the hybrid), per-method error summaries and one squat video's frame-by-frame angles, all computed from REHAB24-6 under the same attribution and non-commercial terms. They feed `scripts/validation/knee-repeatability.mjs`. No REHAB24-6 video or raw joint file is bundled.
 
 ### Validation datasets (offline only, not bundled)
 
