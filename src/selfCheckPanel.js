@@ -541,7 +541,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         el("button", { type: "button", class: "sc-secondary", "aria-expanded": String(state.report), onclick: () => { state.report = !state.report; render(); if (state.report) element.querySelector(".sc-report")?.scrollIntoView({ block: "nearest", behavior: "smooth" }); } }, "Report for flight surgeon"),
         el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
       state.report ? reportSection() : null,
-      el("p", { class: "sc-note" }, "Review triggers: one value outside your usual range (2× your own spread or a minimum change, whichever is larger, after 3 usable checks) asks for a re-check; two in a row, or one far outside, is logged for review, and so is a steady drift from your first checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
+      el("p", { class: "sc-note" }, "Review triggers: one value outside your usual range (your last 5 checks' average ± 2× your own spread, taken from up to 30 checks once you have 10, or a minimum change, whichever is larger; from 3 usable checks) asks for a re-check; two in a row, or one far outside, is logged for review, and so is a steady drift from your first checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
       reliabilityNote(),
       state.profile === "elena" ? el("p", { class: "sc-note" }, ELENA_SELF_CHECK_BOUNDARY) : null];
   }
@@ -556,11 +556,11 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   function reliabilityNote() {
     const r = SIMULATED_RELIABILITY, pct = v => `${v} %`;
     return el("details", { class: "sc-reliability" }, el("summary", {}, "How often is this wrong?"),
-      el("p", {}, `In a simulation of ${r.astronauts.toLocaleString("en")} healthy astronauts doing all 14 checks every day for ${r.days} days, REVIEW came up on ${pct(r.reviewPct)} of days (${pct(r.singleRuleReviewPct)} before the re-check rule) and RE-CHECK on ${pct(r.recheckPct)}.`),
+      el("p", {}, `In a simulation of ${r.astronauts.toLocaleString("en")} healthy astronauts doing all 14 checks every day for ${r.days} days, REVIEW came up on ${pct(r.reviewPct)} of days (${pct(r.singleRuleReviewPct)} with the original one-value rule) and RE-CHECK on ${pct(r.recheckPct)}.`),
       el("table", {}, el("caption", {}, "A real change, flagged REVIEW within"),
         el("thead", {}, el("tr", {}, el("th", { scope: "col" }, "Change"), el("th", { scope: "col" }, "3 checks"), el("th", { scope: "col" }, "14 checks"))),
         el("tbody", {}, r.detected.map(d => el("tr", {}, el("th", { scope: "row" }, d.label), el("td", {}, pct(d.withinThree)), el("td", {}, pct(d.withinTwoWeeks)))))),
-      el("small", {}, `The knee spreads are the camera's repeat noise measured on real video (${KNEE_REPEAT_NOISE.source}); the other day-to-day spreads are assumptions until they are measured on volunteers. Method: scripts/simulate-false-alarms.mjs.`));
+      el("small", {}, `The knee spreads are the camera's repeat noise measured on real video (${KNEE_REPEAT_NOISE.source}). Heart rate, blood pressure and sleep vary from day to day as much as published home studies found (Ohasama study; Messman et al. 2022), which is why a 2 h drop in sleep is hard to see in a few days. Oxygen, temperature, the reaction test and the ratings use assumed spreads until measured on volunteers. Method: scripts/simulate-false-alarms.mjs.`));
   }
 
   // Who to tell, for this result in this place: the escalation ladder with the active rung explained.

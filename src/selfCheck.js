@@ -203,9 +203,9 @@ export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRI
 // Daily-check multirule, after laboratory quality control (Westgard et al., Clin Chem 1981;27:493-501):
 // one value beyond the usual range is a warning, "recheck", measured again at the next check. It counts as
 // a change for review only when it is far beyond the range (more than `big` times it, about 3 SD) or the
-// previous usable check was also beyond its own range on the same side. With the single-value rule, a
-// healthy astronaut who checked all 14 indicators daily was told something changed on 36 % of checks
-// (scripts/simulate-false-alarms.mjs, measured knee noise).
+// previous usable check was also beyond its own range on the same side. With the original rule (one value
+// beyond the 5-check range), a healthy astronaut who checked all 14 indicators daily was told something
+// changed on half of checks (scripts/simulate-false-alarms.mjs, measured and published spreads).
 export const MULTIRULE = Object.freeze({ big: 1.5 });
 
 // How much the camera's knee reading moves between repeats when the knee did not change, measured on
@@ -226,16 +226,18 @@ export const KNEE_REPEAT_NOISE = Object.freeze({
 
 // What scripts/simulate-false-alarms.mjs measured for these rules: 1,000 simulated healthy astronauts
 // doing all 14 checks daily for 60 days, then a real step change on day 31 (400 astronauts each). The
-// knee spreads are KNEE_REPEAT_NOISE, measured on real video; the other day-to-day spreads are assumptions
-// until measured on volunteers. With the knee spreads assumed before (3° and 4°) the figures were REVIEW
-// 7.2 % and a 10° knee drop flagged within three checks in 91 % (--assumed-knee). The app shows these
-// numbers; src/falseAlarms.test.js keeps them in step with the code.
+// knee spreads are KNEE_REPEAT_NOISE, measured on real video; heart rate, blood pressure and sleep use
+// published day-to-day spreads; oxygen, temperature, the reaction test and the ratings are assumptions
+// until measured on volunteers. With the spreads guessed before (--assumed-knee --previous-spreads) the
+// same rules gave REVIEW 6.9 % and caught 2 h less sleep within 14 checks in 92 %: the guesses made the
+// checks look steadier than people are. The app shows these numbers; src/falseAlarms.test.js keeps them
+// in step with the code.
 export const SIMULATED_RELIABILITY = Object.freeze({
-  astronauts: 1000, days: 60, reviewPct: 10.5, singleRuleReviewPct: 36.1, recheckPct: 35.6,
+  astronauts: 1000, days: 60, reviewPct: 15, singleRuleReviewPct: 50.5, recheckPct: 43.7,
   detected: Object.freeze([
-    ["kneeExtension", "knee extension 10° lower", 68.8, 94.3], ["pvtLapses", "6 more attention lapses", 94.5, 100],
-    ["systolicBp", "systolic 20 mmHg higher", 82.5, 100], ["glucose", "fasting blood sugar 20 mg/dL higher", 74.3, 99.5],
-    ["sleepHours", "2 h less sleep", 56.8, 93],
+    ["kneeExtension", "knee extension 10° lower", 65, 91.8], ["pvtLapses", "6 more attention lapses", 96, 100],
+    ["systolicBp", "systolic 20 mmHg higher", 81.8, 100], ["glucose", "fasting blood sugar 20 mg/dL higher", 76.3, 99.8],
+    ["sleepHours", "2 h less sleep", 24.8, 57.3],
   ].map(([key, label, withinThree, withinTwoWeeks]) => Object.freeze({ key, label, withinThree, withinTwoWeeks }))),
 });
 
@@ -246,12 +248,22 @@ function movingRangeSd(values) {
   return ranges.length ? mean(ranges) / 1.128 : 0;
 }
 
+// Where the daily rule takes its spread from. The centre of the usual range is the mean of the last 5
+// usable checks, so it follows the person, but an SD from 5 checks is often far too tight by chance.
+// Laboratory quality control sets control limits from 20 or more results (Westgard), so once there are
+// `min` usable checks the spread is the moving-range SD of the last `window` of them. With published
+// day-to-day spreads (heart rate and blood pressure, Ohasama; sleep, Messman 2022) a healthy astronaut
+// was told REVIEW on about 19 % of days with the 5-check SD and 15 % with this (scripts/simulate-false-alarms.mjs).
+export const SPREAD = Object.freeze({ window: 30, min: 10 });
+
 // The day rule on its own: is `value` beyond the usual range of the last few usable values (mean ±
-// 2 SD, at least the floor), and on which side (-1 worse low, 1 worse high, 0 inside)?
-function dayJudgement(values, value, def, floor) {
+// 2 SD, at least the floor), and on which side (-1 worse low, 1 worse high, 0 inside)? `longSpread`
+// false keeps the original 5-check SD (the crew replay, and the original rule for comparison).
+function dayJudgement(values, value, def, floor, longSpread = false) {
   const window = values.slice(-BASELINE_WINDOW);
   if (window.length < MIN_BASELINE) return null;
-  const m = mean(window), tolerance = Math.max(2 * sd(window), floor ?? def.floor), delta = value - m;
+  const longer = values.slice(-SPREAD.window), spread = longSpread && longer.length >= SPREAD.min ? movingRangeSd(longer) : sd(window);
+  const m = mean(window), tolerance = Math.max(2 * spread, floor ?? def.floor), delta = value - m;
   const side = def.direction !== "up" && delta < -tolerance ? -1 : def.direction !== "down" && delta > tolerance ? 1 : 0;
   return { mean: m, tolerance, delta, side };
 }
@@ -271,12 +283,12 @@ export function evaluateIndicator(key, value, history, { protocol, usable = true
   if (!usable) return { key, value, status: "repeat", limit, def };
   const ref = personalReference(history, key, protocol);
   if (!ref.ready) return { key, value, status: limit ? limit.level : "baseline", limit, ref, def };
-  const series = usableValues(history, key, protocol), today = dayJudgement(series, value, def, floor);
+  const series = usableValues(history, key, protocol), today = dayJudgement(series, value, def, floor, multirule);
   const { tolerance, delta } = today;
   // Two in a row: the previous check and this one both beyond the range that held before the previous
   // check, on the same side, so a real change is not hidden by the rolling range moving towards it.
-  const previous = multirule && series.length ? dayJudgement(series.slice(0, -1), series.at(-1), def, floor) : null;
-  const twice = Boolean(previous?.side) && dayJudgement(series.slice(0, -1), value, def, floor)?.side === previous.side;
+  const previous = multirule && series.length ? dayJudgement(series.slice(0, -1), series.at(-1), def, floor, true) : null;
+  const twice = Boolean(previous?.side) && dayJudgement(series.slice(0, -1), value, def, floor, true)?.side === previous.side;
   const confirmed = (today.side !== 0 && (!multirule || Math.abs(delta) > MULTIRULE.big * tolerance)) || twice;
   const drift = driftCheck(key, value, history, protocol, { floor, def, movingRange: multirule, ...driftParams });
   const reason = limit ? "limit" : confirmed ? "day" : drift.drift ? "drift" : today.side ? "once" : null;
@@ -289,7 +301,8 @@ export function evaluateIndicator(key, value, history, { protocol, usable = true
 export const STATUS_RANK = Object.freeze({ urgent: 7, attention: 6, changed: 5, recheck: 4, repeat: 3, baseline: 2, stable: 1, notChecked: 0 });
 const worst = statuses => statuses.reduce((best, status) => (STATUS_RANK[status] > STATUS_RANK[best] ? status : best), "notChecked");
 
-// `multirule: false` gives the original single-value rule, for comparison (scripts/simulate-false-alarms.mjs).
+// `multirule: false` gives the original rule (one value beyond the 5-check range), for comparison
+// (scripts/simulate-false-alarms.mjs).
 export function evaluateSelfCheck(check, history = [], { floors = {}, limits = SAFETY_LIMITS, environment = null, multirule = true } = {}) {
   const prior = history.filter(h => h.id !== check.id);
   const values = check.values || {}, protocols = check.protocols || {}, quality = check.quality || {};

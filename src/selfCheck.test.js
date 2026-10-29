@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   summarizePvt, PVT_PROTOCOL, personalReference, evaluateIndicator, lockedReference, driftCheck, evaluateSelfCheck, recommendActions, newCheck, createSelfCheckStore, PVT_B, INDICATORS,
-  backupPacket, restoreBackup,
+  backupPacket, restoreBackup, SPREAD,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, elenaDay147, ELENA_POOR_CAPTURE } from "./elenaSelfCheck.js";
 
@@ -63,6 +63,18 @@ test("one value just outside the usual range asks for a re-check; two in a row o
   assert.deepEqual([twice.status, twice.reason], ["changed", "day"], "the second value outside in a row is a change, though the rolling range has moved towards it");
   const hr = [64, 65, 64, 66, 74].map(v => ({ values: { restingHr: v } }));
   assert.equal(evaluateIndicator("restingHr", 56, hr).status, "recheck", "outside on the other side is not two in a row");
+});
+
+test("once there are 10 checks the usual range takes its spread from up to 30 of them, so 5 lucky-tight checks cannot shrink it", () => {
+  const series = [55, 69, 57, 67, 54, 70, 56, 68, 55, 69, 62, 62, 62, 62, 62], history = series.map(v => ({ values: { restingHr: v } }));
+  const ranges = series.slice(1).map((v, i) => Math.abs(v - series[i]));
+  const now = evaluateIndicator("restingHr", 72, history), original = evaluateIndicator("restingHr", 72, history, { multirule: false });
+  assert.ok(Math.abs(now.tolerance - 2 * ranges.reduce((a, b) => a + b, 0) / ranges.length / 1.128) < 1e-9, "2 x the moving-range SD of every usable check");
+  assert.equal(now.status, "stable", "10 bpm is ordinary for this person");
+  assert.deepEqual([original.tolerance, original.status], [8, "changed"], "the last 5 checks alone have no spread, so the 8 bpm floor decided");
+  assert.equal(SPREAD.window, 30);
+  const short = [64, 65, 64, 66, 65, 64].map(v => ({ values: { restingHr: v } }));
+  assert.equal(evaluateIndicator("restingHr", 74, short).tolerance, 8, "under 10 checks: the 5-check SD, here below the floor");
 });
 
 test("a re-check is one bounded action and nothing is logged for review", () => {
