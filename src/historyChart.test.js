@@ -58,6 +58,14 @@ test("every status has its own word and its own shape, so colour is never the on
   assert.equal(pointLabel(hist.points.at(-1), hist.def), "Day 147: 9 · REVIEW");
 });
 
+test("a re-check is drawn as a hollow triangle in the review colour, with its own word", () => {
+  const hist = indicatorHistory("restingHr", ELENA_HISTORY, elenaDay147());
+  assert.equal(hist.points.at(-1).status, "recheck");
+  assert.ok(legendFor(hist).some(m => m.word === "RE-CHECK" && m.glyph === "△"));
+  assert.match(historyChartSvg(hist), /class="sc-h-pt sc-h-recheck sc-h-today"/);
+  assert.equal(STATUS_COLOURS.recheck, STATUS_COLOURS.changed, "same colour as REVIEW; told apart by word and shape");
+});
+
 test("checks without a mission day use days since the first check", () => {
   const rec = (at, v) => ({ id: at, at, values: { restingHr: v }, protocols: { restingHr: "p" }, quality: {} });
   const hist = indicatorHistory("restingHr", [rec("2026-11-01T08:00:00Z", 60), rec("2026-11-03T08:00:00Z", 62)]);

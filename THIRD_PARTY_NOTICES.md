@@ -123,6 +123,7 @@ Used during development only, not shipped:
 Published methods implemented in AstroBone's own code:
 - Machado, Oliveira and Fernandes 2009 colour-vision-deficiency matrices.
 - The Sharma, Wu and Dalal 2005 CIEDE2000 formula (`scripts/check-status-colours.mjs`).
+- The Westgard et al. 1981 quality-control multirule (one value past 2 SD warns; past 3 SD, or two in a row past 2 SD, rejects), the moving-range estimate of spread (Montgomery, Introduction to Statistical Quality Control) and Page's 1954 CUSUM, in the self-check's review rules (`src/selfCheck.js`).
 
 Consult `package-lock.json`, `requirements-api.txt`, and `requirements-ml.txt` for the complete dependency set and versions installed for a given build.
 

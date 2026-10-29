@@ -7,7 +7,7 @@ export const BACKGROUND = "#060e1c"; // .tw-drawer glass over --tw-bg
 // orange #ff9a4d and "baseline"/"repeat" amber #ffd27a: under deuteranopia "contact today" and "review"
 // were 3.9 apart, close to identical. Pink and soft blue fixed that (src/statusColours.test.js).
 export const STATUS_COLOURS = Object.freeze({
-  urgent: "#ff7a6b", attention: "#ff6fb5", changed: "#ffb347", repeat: "#a9c7ff", baseline: "#a9c7ff", stable: "#6dffb0", notChecked: "#8ea7c4",
+  urgent: "#ff7a6b", attention: "#ff6fb5", changed: "#ffb347", recheck: "#ffb347", repeat: "#a9c7ff", baseline: "#a9c7ff", stable: "#6dffb0", notChecked: "#8ea7c4",
 });
 
 const MACHADO = {
@@ -59,7 +59,8 @@ const luminance = lin => 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
 export const contrast = (fg, bg = BACKGROUND) => { const [a, b] = [luminance(simulate(fg, "normal")), luminance(simulate(bg, "normal"))].sort((x, y) => y - x); return (a + 0.05) / (b + 0.05); };
 
 // Smallest colour difference between two different statuses, per type of vision. Repeat and baseline
-// share a colour on purpose (both mean "not compared yet"), so that pair is skipped.
+// share a colour on purpose (both mean "not compared yet"), and so do review and re-check (a re-check is
+// a possible change, told apart by its word and hollow marker), so those pairs are skipped.
 export function statusColourReport(colours = STATUS_COLOURS) {
   const keys = Object.keys(colours), pairs = [];
   for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) if (colours[keys[i]] !== colours[keys[j]]) pairs.push([keys[i], keys[j]]);

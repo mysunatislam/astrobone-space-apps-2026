@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { INDICATORS, SAFETY_LIMITS, safetyLimit, describeBound, applyVitals, vitalsFromValues, evaluateIndicator, evaluateSelfCheck, newCheck, GLUCOSE_MG_PER_MMOL } from "./selfCheck.js";
+import { INDICATORS, SAFETY_LIMITS, safetyLimit, describeBound, applyVitals, vitalsFromValues, vitalEntryProblem, evaluateIndicator, evaluateSelfCheck, newCheck, GLUCOSE_MG_PER_MMOL } from "./selfCheck.js";
 import { ELENA_HISTORY, elenaDay147 } from "./elenaSelfCheck.js";
 import { replayGlucoseLimits } from "../scripts/replay-i4-glucose-limits.mjs";
 
@@ -35,6 +35,21 @@ test("a fixed limit applies from the first reading, before any baseline exists",
   const unrested = evaluateIndicator("systolicBp", 186, [], { usable: false });
   assert.equal(unrested.status, "repeat", "an unrested reading is repeated, not compared");
   assert.equal(unrested.limit.level, "urgent", "but the limit it crossed travels with it");
+});
+
+test("an impossible typed vital says why instead of being dropped, and spots a unit slip", () => {
+  assert.match(vitalEntryProblem("glucose", 5.5, { unit: "mg/dL" }), /looks like a mmol\/L reading/);
+  assert.match(vitalEntryProblem("glucose", 99, { unit: "mmol/L" }), /looks like a mg\/dL reading/);
+  assert.match(vitalEntryProblem("bodyTemp", 98.6, { unit: "°C" }), /looks like a °F reading/);
+  assert.match(vitalEntryProblem("spo2", 120), /outside 50–100 %/);
+  assert.equal(vitalEntryProblem("glucose", 95, { unit: "mg/dL" }), null);
+  assert.equal(vitalEntryProblem("glucose", null, { unit: "mg/dL" }), null, "a blank field is not a problem");
+  assert.match(vitalEntryProblem("systolic", 80, { diastolic: 120 }), /the top number \(systolic\) is the larger one/);
+  // Swapped, 80/120 would have read as low blood pressure and asked to tell the medical officer today.
+  const swapped = vitalsCheck({ bp: { readings: [[80, 120]], rested: true } });
+  assert.equal(swapped.values.systolicBp, undefined);
+  assert.equal(evaluateSelfCheck(swapped, []).overall, "notChecked");
+  assert.equal(vitalsCheck({ bp: { readings: [[80, 120], [118, 76]], rested: true } }).values.systolicBp, 118, "only the reading in the right order is used");
 });
 
 test("typed vitals convert units, average readings and gate blood pressure on rest", () => {
@@ -89,7 +104,9 @@ test("real Inspiration4 glucose: the fixed limit fires only on the suspect R+45 
   const rows = replayGlucoseLimits(data), fired = rows.filter(r => r.limit);
   assert.equal(rows.length, 28);
   assert.deepEqual(fired.map(r => `${r.crew} ${r.visit}`), ["C002 R+45", "C003 R+45", "C004 R+45"]);
-  assert.ok(fired.every(r => r.personal === "changed"), "the personal baseline agrees on every one");
+  // The personal baseline flags every one too: a change on C002, a re-check (one draw outside) on C003 and
+  // C004. The R+82 draws were back to usual, so a re-draw would have shown the drop was one draw.
+  assert.deepEqual(fired.map(r => r.personal), ["changed", "recheck", "recheck"]);
   // The ADA's 70 mg/dL alert level (for people treated for diabetes) would fire on 4 healthy pre-flight draws.
   const pre = rows.filter(r => r.visit.startsWith("L"));
   assert.equal(pre.filter(r => r.value < 70).length, 4);

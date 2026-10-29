@@ -25,7 +25,7 @@ test("the card shows today's status from the latest self-check", () => {
   assert.equal(tibia.status, "changed");
   assert.deepEqual(tibia.rows.map(r => r.key), ["kneeExtension", "kneeRom"]);
   const heart = bodyPartStatus("heart", evaluation);
-  assert.deepEqual(heart.rows.map(r => [r.key, r.status]), [["restingHr", "changed"], ["systolicBp", "stable"], ["diastolicBp", "stable"]]);
+  assert.deepEqual(heart.rows.map(r => [r.key, r.status]), [["restingHr", "recheck"], ["systolicBp", "stable"], ["diastolicBp", "stable"]]);
   assert.equal(bodyPartStatus("radiation", evaluation).status, null, "radiation is context, never a health status");
   assert.equal(bodyPartStatus("tibia", null).status, "notChecked");
 });

@@ -1,6 +1,6 @@
 import {
   PVT_B, PVT_PROTOCOL, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
-  safetyLimit, applyVitals, vitalsFromValues, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
+  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, TEMP_SITES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
 import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
@@ -20,7 +20,7 @@ import { loadCrewBlood, replayCrew, crewReplayCard } from "./crewReplay.js";
 
 const STEPS = [["safety", "Safety"], ["movement", "Movement"], ["reaction", "Reaction"], ["mind", "Sleep & mood"], ["body", "Body"], ["result", "Result & action"]];
 const STATUS = {
-  urgent: ["URGENT", "Contact now"], attention: ["CONTACT TODAY", "Outside a safety limit"], changed: ["REVIEW", "Outside your usual range"], repeat: ["REPEAT", "Quality check failed · not compared"],
+  urgent: ["URGENT", "Contact now"], attention: ["CONTACT TODAY", "Outside a safety limit"], changed: ["REVIEW", "Outside your usual range"], recheck: ["RE-CHECK", "Outside your usual range once · measure again"], repeat: ["REPEAT", "Quality check failed · not compared"],
   baseline: ["BASELINE", "Building your baseline"], stable: ["STABLE", "Within your usual range"], notChecked: ["NOT CHECKED", "No data this check"],
 };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -333,6 +333,16 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const a = el("a", { href: url, download: name }); a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   function exportJson() { download(JSON.stringify(exportPacket(), null, 2), "application/json", `AstroBone-self-check-${state.profile}-${Date.now()}.json`); }
+  function backupAll() { download(JSON.stringify(backupPacket(history()), null, 2), "application/json", `AstroBone-backup-${new Date().toISOString().slice(0, 10)}.json`); }
+  async function restoreFrom(e) {
+    const file = e.target.files?.[0]; if (!file) return;
+    try {
+      const result = restoreBackup(history(), JSON.parse(await file.text()));
+      store.save("you", result.checks, state.persist);
+      state.backupNote = `Restored ${result.added} check${result.added === 1 ? "" : "s"}${result.skipped ? ` (${result.skipped} already here or unreadable)` : ""}.${state.persist ? "" : " Tick saving on this device to keep them."}`;
+    } catch (err) { state.backupNote = err instanceof SyntaxError ? "That file is not readable JSON." : err.message; }
+    render();
+  }
 
   // The same result as a short plain-text message for the flight surgeon, readable without AstroBone.
   function reportSection() {
@@ -353,10 +363,17 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   // Typed readings from a cuff, finger clip, glucose meter and thermometer. A live note under each one
   // says at once whether it crosses a fixed safety limit, before the check is evaluated.
   function vitalsBlock() {
-    const c = state.check, vt = c.vitals ??= {}, chips = [];
-    const sync = () => { applyVitals(c, vt); chips.forEach(update => update()); };
+    const c = state.check, vt = c.vitals ??= {}, chips = [], problems = [];
+    const sync = () => { applyVitals(c, vt); chips.forEach(update => update()); problems.forEach(update => update()); };
     const num = (value, min, max, step, aria, onValue) => el("input", { type: "number", min, max, step, inputmode: "decimal", "aria-label": aria, value: Number.isFinite(value) ? value : "",
       oninput: e => { const n = e.target.value === "" ? null : Number(e.target.value); const ok = n === null || (Number.isFinite(n) && n >= min && n <= max); e.target.toggleAttribute("aria-invalid", !ok); onValue(ok ? n : null); sync(); } });
+    // A typed value that cannot be right says why, instead of quietly not counting.
+    const typed = input => (input.value === "" ? null : Number(input.value));
+    const problem = find => {
+      const node = el("small", { class: "sc-entry-problem", role: "alert" });
+      const update = () => { node.textContent = find() ?? ""; };
+      problems.push(update); return node;
+    };
     const chip = keys => {
       const node = el("small", { class: "sc-limit", role: "status" });
       const update = () => {
@@ -371,28 +388,35 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     };
     const about = key => el("small", { class: "sc-about" }, INDICATORS[key].about);
     const bp = vt.bp ??= { readings: [], rested: false };
-    const reading = (i, label) => el("span", { class: "sc-bp" },
-      num(bp.readings[i]?.[0], 50, 260, 1, `${label} systolic`, n => { (bp.readings[i] ??= [null, null])[0] = n; }), el("i", {}, "/"),
-      num(bp.readings[i]?.[1], 30, 160, 1, `${label} diastolic`, n => { (bp.readings[i] ??= [null, null])[1] = n; }), el("i", {}, "mmHg"));
+    const bpInputs = [];
+    const reading = (i, label) => {
+      const pair = bpInputs[i] = [num(bp.readings[i]?.[0], 50, 260, 1, `${label} systolic`, n => { (bp.readings[i] ??= [null, null])[0] = n; }),
+        num(bp.readings[i]?.[1], 30, 160, 1, `${label} diastolic`, n => { (bp.readings[i] ??= [null, null])[1] = n; })];
+      return el("span", { class: "sc-bp" }, pair[0], el("i", {}, "/"), pair[1], el("i", {}, "mmHg"));
+    };
+    const bpProblem = () => bpInputs.map(([s, d]) => vitalEntryProblem("systolic", typed(s), { diastolic: typed(d) }) ?? vitalEntryProblem("diastolic", typed(d))).find(Boolean);
     const glucose = vt.glucose ??= { value: null, unit: "mg/dL", fasting: true }, temp = vt.temp ??= { value: null, unit: "°C", site: "oral" }, spo2 = vt.spo2 ??= { value: null };
     const gRange = () => (glucose.unit === "mmol/L" ? [1, 33, 0.1] : [20, 600, 1]), tRange = () => (temp.unit === "°F" ? [86, 113, 0.1] : [30, 45, 0.1]);
+    const spo2Input = num(spo2.value, 50, 100, 1, "Oxygen saturation", n => { spo2.value = n; });
+    const glucoseInput = num(glucose.value, ...gRange(), "Blood sugar", n => { glucose.value = n; });
+    const tempInput = num(temp.value, ...tRange(), "Body temperature", n => { temp.value = n; });
     return el("fieldset", { class: "sc-fieldset sc-vitals" }, el("legend", {}, "Vital signs · type what you measured today, leave blank to skip"),
       el("div", { class: "sc-vital" }, el("b", {}, "Blood pressure"), reading(0, "Reading 1"), el("small", {}, "Second reading a minute later (optional, averaged)"), reading(1, "Reading 2"),
-        checkbox("sc-bp-rested", "Seated with my back supported, rested for 5 minutes", bp.rested, value => { bp.rested = value; sync(); }), chip(["systolicBp", "diastolicBp"]), about("systolicBp")),
-      el("div", { class: "sc-vital" }, el("b", {}, "Oxygen saturation"), el("span", { class: "sc-bp" }, num(spo2.value, 50, 100, 1, "Oxygen saturation", n => { spo2.value = n; }), el("i", {}, "%")), chip(["spo2"]), about("spo2")),
+        checkbox("sc-bp-rested", "Seated with my back supported, rested for 5 minutes", bp.rested, value => { bp.rested = value; sync(); }), problem(bpProblem), chip(["systolicBp", "diastolicBp"]), about("systolicBp")),
+      el("div", { class: "sc-vital" }, el("b", {}, "Oxygen saturation"), el("span", { class: "sc-bp" }, spo2Input, el("i", {}, "%")), problem(() => vitalEntryProblem("spo2", typed(spo2Input))), chip(["spo2"]), about("spo2")),
       el("div", { class: "sc-vital" }, el("b", {}, "Blood sugar"),
-        el("span", { class: "sc-bp" }, num(glucose.value, ...gRange(), "Blood sugar", n => { glucose.value = n; }),
+        el("span", { class: "sc-bp" }, glucoseInput,
           el("select", { "aria-label": "Blood sugar unit", onchange: e => { const was = glucose.unit; glucose.unit = e.target.value; if (Number.isFinite(glucose.value) && was !== glucose.unit) glucose.value = Number((was === "mg/dL" ? glucose.value / GLUCOSE_MG_PER_MMOL : glucose.value * GLUCOSE_MG_PER_MMOL).toFixed(glucose.unit === "mg/dL" ? 0 : 1)); sync(); render(); } },
             ["mg/dL", "mmol/L"].map(u => el("option", { selected: glucose.unit === u || undefined }, u)))),
         el("span", { class: "sc-row" }, [[true, "Fasting (before breakfast)"], [false, "Not fasting"]].map(([fasting, label]) => el("label", { class: "sc-radio" },
           el("input", { type: "radio", name: "sc-glucose-fasting", checked: glucose.fasting === fasting || undefined, onchange: () => { glucose.fasting = fasting; sync(); } }), label))),
-        chip(["glucose"]), about("glucose")),
+        problem(() => vitalEntryProblem("glucose", typed(glucoseInput), { unit: glucose.unit })), chip(["glucose"]), about("glucose")),
       el("div", { class: "sc-vital" }, el("b", {}, "Body temperature"),
-        el("span", { class: "sc-bp" }, num(temp.value, ...tRange(), "Body temperature", n => { temp.value = n; }),
+        el("span", { class: "sc-bp" }, tempInput,
           el("select", { "aria-label": "Temperature unit", onchange: e => { const was = temp.unit; temp.unit = e.target.value; if (Number.isFinite(temp.value) && was !== temp.unit) temp.value = Number((was === "°C" ? temp.value * 9 / 5 + 32 : (temp.value - 32) * 5 / 9).toFixed(1)); sync(); render(); } },
             ["°C", "°F"].map(u => el("option", { selected: temp.unit === u || undefined }, u))),
           el("select", { "aria-label": "Thermometer site", onchange: e => { temp.site = e.target.value; sync(); } }, TEMP_SITES.map(([k, label]) => el("option", { value: k, selected: temp.site === k || undefined }, label)))),
-        chip(["bodyTemp"]), about("bodyTemp")),
+        problem(() => vitalEntryProblem("bodyTemp", typed(tempInput), { unit: temp.unit })), chip(["bodyTemp"]), about("bodyTemp")),
       el("small", { class: "sc-note" }, `Safety limits apply from the first reading and follow public guidance (${SAFETY_LIMIT_SOURCES.join("; ")}). Your flight surgeon can set their own. Each value is also compared with your own usual range once you have 3 checks.`));
   }
 
@@ -509,7 +533,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         el("button", { type: "button", class: "sc-secondary", "aria-expanded": String(state.report), onclick: () => { state.report = !state.report; render(); if (state.report) element.querySelector(".sc-report")?.scrollIntoView({ block: "nearest", behavior: "smooth" }); } }, "Report for flight surgeon"),
         el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
       state.report ? reportSection() : null,
-      el("p", { class: "sc-note" }, "Review triggers: outside 2× your own spread or a minimum change, whichever is larger, after 3 usable checks; or a steady drift from your first checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
+      el("p", { class: "sc-note" }, "Review triggers: one value outside your usual range (2× your own spread or a minimum change, whichever is larger, after 3 usable checks) asks for a re-check; two in a row, or one far outside, is logged for review, and so is a steady drift from your first checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
       state.profile === "elena" ? el("p", { class: "sc-note" }, ELENA_SELF_CHECK_BOUNDARY) : null];
   }
 
@@ -561,9 +585,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
 
   // Trend under each compared indicator: shaded usual range, dashed starting level, today's dot.
   function trend(r) {
-    if (r.status !== "stable" && r.status !== "changed") return null;
+    if (!["stable", "changed", "recheck"].includes(r.status)) return null;
     const d = r.def.digits ?? 0, start = r.drift?.ready ? r.drift.lockedMean : null;
-    const svg = sparklineSvg({ series: r.series, value: r.value, band: [r.ref.mean - r.tolerance, r.ref.mean + r.tolerance], start, changed: r.status === "changed",
+    const svg = sparklineSvg({ series: r.series, value: r.value, band: [r.ref.mean - r.tolerance, r.ref.mean + r.tolerance], start, changed: r.status !== "stable",
       label: `${r.def.label}: ${r.series.length + 1} checks, ${start === null ? "" : `start ${fmt(start, d)}, `}today ${fmt(r.value, d)}${r.def.unit}` });
     if (!svg) return null;
     const box = el("div", { class: "sc-trend" }); box.innerHTML = svg; return box;
@@ -593,12 +617,18 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       ENVIRONMENTS.map(env => el("option", { value: env.key, selected: env.key === state.environment || undefined }, `${env.label} · ${env.place}`))));
     const consent = state.profile === "you" ? el("label", { class: "sc-consent" }, el("input", { type: "checkbox", checked: state.persist || undefined, onchange: e => {
       state.persist = e.target.checked; try { localStorage.setItem("astrobone-self-check-consent", state.persist ? "1" : "0"); } catch { /* storage unavailable */ }
+      // Ask the browser not to clear saved checks when space runs low (it may still say no).
+      if (state.persist) navigator.storage?.persist?.().catch(() => {});
       angleStore.save(check.pairs, state.persist); render();
     } }), `Save my checks on this device (${history().length} saved)`) : null;
+    const backup = state.profile === "you" ? el("div", { class: "sc-row sc-backup" },
+      el("button", { type: "button", class: "sc-secondary", disabled: history().length ? undefined : true, onclick: backupAll }, "Back up all checks"),
+      el("label", { class: "sc-secondary sc-file" }, "Restore from backup", el("input", { type: "file", accept: "application/json,.json", onchange: restoreFrom })),
+      state.backupNote ? el("small", { role: "status" }, state.backupNote) : null) : null;
     const nav = STEPS[state.step][0] === "result" ? null : el("div", { class: "sc-nav" },
       state.step > 0 ? el("button", { type: "button", class: "sc-secondary", onclick: () => go(state.step - 1) }, "Back") : el("span"),
       el("button", { type: "button", class: "sc-primary", "data-next": true, onclick: () => go(state.step + 1) }, state.step === STEPS.length - 2 ? "Evaluate" : "Next"));
-    element.replaceChildren(...[profile, where, consent, steps, el("div", { class: "sc-body" }, stepBody()), nav].filter(Boolean));
+    element.replaceChildren(...[profile, where, consent, backup, steps, el("div", { class: "sc-body" }, stepBody()), nav].filter(Boolean));
     // Re-inserting a media element pauses it; resume the live preview.
     if (camera?.running && video.paused) video.play().catch(() => {});
     if (!pvt.running && !pvtStage.dataset.count) pvtStage.dataset.count = "Ready";
