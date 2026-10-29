@@ -1,6 +1,6 @@
 // Registers the offline pack (public/sw.js) in production builds and reports its state.
 // Must match CACHE in public/sw.js (src/offlinePack.test.js).
-export const OFFLINE_CACHE = "astrobone-offline-v8";
+export const OFFLINE_CACHE = "astrobone-offline-v9";
 
 // Resolves once the page has finished its own first load (pageReady settled and the window loaded) and
 // the browser is idle, or after maxWait ms whatever happens, so a stalled download never blocks the pack.

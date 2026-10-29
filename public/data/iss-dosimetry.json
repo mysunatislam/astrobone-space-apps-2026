@@ -1,0 +1,1006 @@
+{
+ "schema": "astrobone-iss-dosimetry-v1",
+ "built": "2026-10-29",
+ "measure": "Absorbed dose measured by ISS area dosimeters during each payload's time on orbit, as recorded in NASA OSDR study metadata.",
+ "summary": {
+  "measurements": 32,
+  "flights": [
+   "SpaceX-2",
+   "SpaceX-4",
+   "SpaceX-8",
+   "SpaceX-9",
+   "SpaceX-10",
+   "SpaceX-11",
+   "SpaceX-12",
+   "SpaceX-13",
+   "SpaceX-14",
+   "SpaceX-18",
+   "SpaceX-21"
+  ],
+  "years": [
+   2013,
+   2020
+  ],
+  "studies": 32,
+  "rate_mGy_per_day": {
+   "min": 0.204,
+   "median": 0.294,
+   "max": 0.355
+  }
+ },
+ "missions": [
+  {
+   "flight": "SpaceX-4",
+   "projects": [
+    "RR-1"
+   ],
+   "start": "09/21/2014",
+   "end": "10/25/2014",
+   "location": "ISS-US Laboratory",
+   "days": 38.0,
+   "dose_mGy": 7.752,
+   "rate_mGy_per_day": 0.204,
+   "studies": [
+    "OSD-98",
+    "OSD-99",
+    "OSD-102",
+    "OSD-104",
+    "OSD-168"
+   ]
+  },
+  {
+   "flight": "SpaceX-4",
+   "projects": [
+    "RR-1"
+   ],
+   "start": "09/21/2014",
+   "end": "10/25/2014",
+   "location": "ISS-US Laboratory",
+   "days": 22.0,
+   "dose_mGy": 4.576,
+   "rate_mGy_per_day": 0.208,
+   "studies": [
+    "OSD-47"
+   ]
+  },
+  {
+   "flight": "SpaceX-4",
+   "projects": [
+    "RR-1"
+   ],
+   "start": "09/21/2014",
+   "end": "10/25/2014",
+   "location": "ISS-US Laboratory",
+   "days": 23.0,
+   "dose_mGy": 4.784,
+   "rate_mGy_per_day": 0.208,
+   "studies": [
+    "OSD-47"
+   ]
+  },
+  {
+   "flight": "SpaceX-9",
+   "projects": [
+    "MHU-1"
+   ],
+   "start": "07/18/2016",
+   "end": "09/26/2016",
+   "location": "ISS-Japanese Experiment Module",
+   "days": 39.0,
+   "dose_mGy": 8.97,
+   "rate_mGy_per_day": 0.23,
+   "studies": [
+    "OSD-289",
+    "OSD-532"
+   ]
+  },
+  {
+   "flight": "SpaceX-12",
+   "projects": [
+    "BRIC-22"
+   ],
+   "start": "08/14/2017",
+   "end": "09/17/2017",
+   "location": "ISS-US Laboratory",
+   "days": 13.0,
+   "dose_mGy": 3.007,
+   "rate_mGy_per_day": 0.231,
+   "studies": [
+    "OSD-321"
+   ]
+  },
+  {
+   "flight": "SpaceX-8",
+   "projects": [
+    "RR-3"
+   ],
+   "start": "4/8/2016",
+   "end": "5/11/2016",
+   "location": "ISS-US Laboratory",
+   "days": 39.0,
+   "dose_mGy": 8.97,
+   "rate_mGy_per_day": 0.231,
+   "studies": [
+    "OSD-137",
+    "OSD-161",
+    "OSD-163",
+    "OSD-168"
+   ]
+  },
+  {
+   "flight": "SpaceX-8",
+   "projects": [
+    "RR-3"
+   ],
+   "start": "4/8/2016",
+   "end": "5/11/2016",
+   "location": "ISS-US Laboratory",
+   "days": 40.0,
+   "dose_mGy": 9.2,
+   "rate_mGy_per_day": 0.231,
+   "studies": [
+    "OSD-137",
+    "OSD-161",
+    "OSD-163",
+    "OSD-168"
+   ]
+  },
+  {
+   "flight": "SpaceX-8",
+   "projects": [
+    "RR-3"
+   ],
+   "start": "4/8/2016",
+   "end": "5/11/2016",
+   "location": "ISS-US Laboratory",
+   "days": 41.0,
+   "dose_mGy": 9.471,
+   "rate_mGy_per_day": 0.231,
+   "studies": [
+    "OSD-137",
+    "OSD-161",
+    "OSD-163",
+    "OSD-194"
+   ]
+  },
+  {
+   "flight": "SpaceX-8",
+   "projects": [
+    "RR-3"
+   ],
+   "start": "04/08/2016",
+   "end": "05/11/2016",
+   "location": "ISS-US Laboratory",
+   "days": 42.0,
+   "dose_mGy": 9.702,
+   "rate_mGy_per_day": 0.231,
+   "studies": [
+    "OSD-161",
+    "OSD-194"
+   ]
+  },
+  {
+   "flight": "SpaceX-12",
+   "projects": [
+    "RR-9"
+   ],
+   "start": "08/14/2017",
+   "end": "09/17/2017",
+   "location": "ISS-US Laboratory",
+   "days": 35.0,
+   "dose_mGy": 8.295,
+   "rate_mGy_per_day": 0.237,
+   "studies": [
+    "OSD-255"
+   ]
+  },
+  {
+   "flight": "SpaceX-9  SpaceX-12",
+   "projects": [
+    "MHU-1, MHU-2"
+   ],
+   "start": "07/18/2016  08/14/2017",
+   "end": "09/26/2016  09/17/2017",
+   "location": "ISS-Japanese Experiment Module",
+   "days": 34.0,
+   "dose_mGy": 8.84,
+   "rate_mGy_per_day": 0.26,
+   "studies": [
+    "OSD-289"
+   ]
+  },
+  {
+   "flight": "SpaceX-13",
+   "projects": [
+    "RR-6"
+   ],
+   "start": "12/15/17",
+   "end": "1/13/18",
+   "location": "ISS-US Laboratory",
+   "days": 30.0,
+   "dose_mGy": 8.49,
+   "rate_mGy_per_day": 0.283,
+   "studies": [
+    "OSD-246"
+   ]
+  },
+  {
+   "flight": "SpaceX-14",
+   "projects": [
+    "MHU-3"
+   ],
+   "start": "4/2/18",
+   "end": "5/5/18",
+   "location": "space station",
+   "days": 31.0,
+   "dose_mGy": 8.99,
+   "rate_mGy_per_day": 0.29,
+   "studies": [
+    "OSD-457"
+   ]
+  },
+  {
+   "flight": "SpaceX-13",
+   "projects": [
+    "PGP"
+   ],
+   "start": "12/15/2017",
+   "end": "01/13/2018",
+   "location": "ISS-Columbus",
+   "days": 6.0,
+   "dose_mGy": 1.7067,
+   "rate_mGy_per_day": 0.292253,
+   "studies": [
+    "OSD-480"
+   ]
+  },
+  {
+   "flight": "SpaceX-13",
+   "projects": [
+    "PGP"
+   ],
+   "start": "12/15/2017",
+   "end": "01/13/2018",
+   "location": "ISS-Columbus",
+   "days": 6.0,
+   "dose_mGy": 1.77558,
+   "rate_mGy_per_day": 0.292253,
+   "studies": [
+    "OSD-480"
+   ]
+  },
+  {
+   "flight": "SpaceX-2",
+   "projects": [
+    "Seedling Growth-1"
+   ],
+   "start": "03/01/2013",
+   "end": "03/26/2013",
+   "location": "ISS-Columbus",
+   "days": 6.0,
+   "dose_mGy": 1.763,
+   "rate_mGy_per_day": 0.294,
+   "studies": [
+    "OSD-251",
+    "OSD-346"
+   ]
+  },
+  {
+   "flight": "SpaceX-2",
+   "projects": [
+    "Seedling Growth-1"
+   ],
+   "start": "03/01/2013",
+   "end": "03/26/2013",
+   "location": "ISS-Columbus",
+   "days": 6.0,
+   "dose_mGy": 1.764,
+   "rate_mGy_per_day": 0.294,
+   "studies": [
+    "OSD-251",
+    "OSD-346"
+   ]
+  },
+  {
+   "flight": "SpaceX-8",
+   "projects": [
+    "VEG_03"
+   ],
+   "start": "08-Apr-2016",
+   "end": "11-May-2016",
+   "location": "ISS-Columbus",
+   "days": 64.0,
+   "dose_mGy": 18.829,
+   "rate_mGy_per_day": 0.294,
+   "studies": [
+    "OSD-269"
+   ]
+  },
+  {
+   "flight": "SpaceX-10",
+   "projects": [
+    "APEX-04"
+   ],
+   "start": "02/19/2017",
+   "end": "03/19/2017",
+   "location": "ISS-Columbus",
+   "days": 11.0,
+   "dose_mGy": 3.304,
+   "rate_mGy_per_day": 0.3,
+   "studies": [
+    "OSD-427"
+   ]
+  },
+  {
+   "flight": "SpaceX-18",
+   "projects": [
+    "RR-17"
+   ],
+   "start": "07/25/2019",
+   "end": "08/27/2019",
+   "location": "ISS-US Laboratory",
+   "days": 33.0,
+   "dose_mGy": 10.428,
+   "rate_mGy_per_day": 0.316,
+   "studies": [
+    "OSD-402",
+    "OSD-403",
+    "OSD-404",
+    "OSD-405",
+    "OSD-580"
+   ]
+  },
+  {
+   "flight": "SpaceX-18",
+   "projects": [
+    "RR-17"
+   ],
+   "start": "07/25/2019",
+   "end": "08/27/2019",
+   "location": "ISS-US Laboratory",
+   "days": 53.0,
+   "dose_mGy": 17.013,
+   "rate_mGy_per_day": 0.321,
+   "studies": [
+    "OSD-580"
+   ]
+  },
+  {
+   "flight": "SpaceX-18",
+   "projects": [
+    "RR-17"
+   ],
+   "start": "07/25/2019",
+   "end": "08/27/2019",
+   "location": "ISS-US Laboratory",
+   "days": 54.0,
+   "dose_mGy": 17.334,
+   "rate_mGy_per_day": 0.321,
+   "studies": [
+    "OSD-580"
+   ]
+  },
+  {
+   "flight": "SpaceX-18",
+   "projects": [
+    "RR-17"
+   ],
+   "start": "07/25/2019",
+   "end": "08/27/2019",
+   "location": "ISS-US Laboratory",
+   "days": 55.0,
+   "dose_mGy": 17.655,
+   "rate_mGy_per_day": 0.321,
+   "studies": [
+    "OSD-580"
+   ]
+  },
+  {
+   "flight": "SpaceX-18",
+   "projects": [
+    "RR-17"
+   ],
+   "start": "07/25/2019",
+   "end": "08/27/2019",
+   "location": "ISS-US Laboratory",
+   "days": 56.0,
+   "dose_mGy": 18.032,
+   "rate_mGy_per_day": 0.322,
+   "studies": [
+    "OSD-580"
+   ]
+  },
+  {
+   "flight": "SpaceX-11",
+   "projects": [
+    "FFL-02"
+   ],
+   "start": "06/03/2017",
+   "end": "07/03/2017",
+   "location": "ISS",
+   "days": 30.0,
+   "dose_mGy": 10.31,
+   "rate_mGy_per_day": 0.333,
+   "studies": [
+    "OSD-347"
+   ]
+  },
+  {
+   "flight": "SpaceX-2  SpaceX-4",
+   "projects": [
+    "ARC00XX133"
+   ],
+   "start": "03/01/2013  09/21/2014",
+   "end": "03/26/2013  10/25/2014",
+   "location": "ISS-Columbus",
+   "days": 6.0,
+   "dose_mGy": 2.012,
+   "rate_mGy_per_day": 0.335,
+   "studies": [
+    "OSD-251"
+   ]
+  },
+  {
+   "flight": "SpaceX-2",
+   "projects": [
+    "Seedling Growth-1"
+   ],
+   "start": "03/01/2013",
+   "end": "03/26/2013",
+   "location": "ISS-Columbus",
+   "days": 6.0,
+   "dose_mGy": 2.056,
+   "rate_mGy_per_day": 0.343,
+   "studies": [
+    "OSD-251",
+    "OSD-346"
+   ]
+  },
+  {
+   "flight": "SpaceX-2",
+   "projects": [
+    "Seedling Growth-1"
+   ],
+   "start": "03/01/2013",
+   "end": "03/26/2013",
+   "location": "ISS-Columbus",
+   "days": 6.0,
+   "dose_mGy": 2.066,
+   "rate_mGy_per_day": 0.344,
+   "studies": [
+    "OSD-251",
+    "OSD-346"
+   ]
+  },
+  {
+   "flight": "SpaceX-2",
+   "projects": [
+    "Seedling Growth-1"
+   ],
+   "start": "03/01/2013",
+   "end": "03/26/2013",
+   "location": "ISS-Columbus",
+   "days": 6.0,
+   "dose_mGy": 2.081,
+   "rate_mGy_per_day": 0.347,
+   "studies": [
+    "OSD-251",
+    "OSD-346"
+   ]
+  },
+  {
+   "flight": "SpaceX-14",
+   "projects": [
+    "NNX14AT23G"
+   ],
+   "start": "02-Apr-2018",
+   "end": "05-May-2018",
+   "location": "ISS-Columbus",
+   "days": 4.0,
+   "dose_mGy": 1.397,
+   "rate_mGy_per_day": 0.349,
+   "studies": [
+    "OSD-375"
+   ]
+  },
+  {
+   "flight": "SpaceX-2",
+   "projects": [
+    "Seedling Growth-1"
+   ],
+   "start": "03/01/2013",
+   "end": "03/26/2013",
+   "location": "ISS-Columbus",
+   "days": 6.0,
+   "dose_mGy": 2.012,
+   "rate_mGy_per_day": 0.355,
+   "studies": [
+    "OSD-346"
+   ]
+  },
+  {
+   "flight": "SpaceX-21",
+   "projects": [
+    "RR-23"
+   ],
+   "start": "12/05/2020",
+   "end": "01/13/2021",
+   "location": "ISS-US Laboratory",
+   "days": 37.0,
+   "dose_mGy": 13.135,
+   "rate_mGy_per_day": 0.355,
+   "studies": [
+    "OSD-513",
+    "OSD-515",
+    "OSD-525",
+    "OSD-576"
+   ]
+  }
+ ],
+ "flagged": [
+  {
+   "flight": "SpaceX-8",
+   "projects": [
+    "RR-3"
+   ],
+   "start": "04/08/2016",
+   "end": "05/11/2016",
+   "location": "ISS-US Laboratory",
+   "days": 0.231,
+   "dose_mGy": 8.97,
+   "rate_mGy_per_day": 0.231,
+   "studies": [
+    "OSD-162"
+   ],
+   "reason": "dose / rate = 38.8 days but duration says 0.231; left out of the summary"
+  },
+  {
+   "flight": "SpaceX-8",
+   "projects": [
+    "RR-3"
+   ],
+   "start": "04/08/2016",
+   "end": "05/11/2016",
+   "location": "ISS-US Laboratory",
+   "days": 0.231,
+   "dose_mGy": 9.2,
+   "rate_mGy_per_day": 0.231,
+   "studies": [
+    "OSD-162"
+   ],
+   "reason": "dose / rate = 39.8 days but duration says 0.231; left out of the summary"
+  },
+  {
+   "flight": "SpaceX-8",
+   "projects": [
+    "RR-3"
+   ],
+   "start": "04/08/2016",
+   "end": "05/11/2016",
+   "location": "ISS-US Laboratory",
+   "days": 0.231,
+   "dose_mGy": 9.471,
+   "rate_mGy_per_day": 0.231,
+   "studies": [
+    "OSD-162"
+   ],
+   "reason": "dose / rate = 41.0 days but duration says 0.231; left out of the summary"
+  },
+  {
+   "flight": "SpaceX-21",
+   "projects": [
+    "RR-23"
+   ],
+   "start": "12/5/20",
+   "end": "1/13/21",
+   "location": "ISS-US Laboratory",
+   "days": 38.0,
+   "dose_mGy": 14.2,
+   "rate_mGy_per_day": 0.355,
+   "studies": [
+    "OSD-464",
+    "OSD-506",
+    "OSD-512"
+   ],
+   "reason": "dose / rate = 40.0 days but duration says 38; left out of the summary"
+  },
+  {
+   "flight": "SpaceX-13",
+   "projects": [
+    "PGP"
+   ],
+   "start": "12/15/2017",
+   "end": "01/13/2018",
+   "location": "ISS-Columbus",
+   "days": 5.0,
+   "dose_mGy": 1.75352,
+   "rate_mGy_per_day": 0.292253,
+   "studies": [
+    "OSD-480"
+   ],
+   "reason": "dose / rate = 6.0 days but duration says 5; left out of the summary"
+  },
+  {
+   "flight": "SpaceX-13",
+   "projects": [
+    "PGP"
+   ],
+   "start": "12/15/2017",
+   "end": "01/13/2018",
+   "location": "ISS-Columbus",
+   "days": 5.0,
+   "dose_mGy": 1.76521,
+   "rate_mGy_per_day": 0.292253,
+   "studies": [
+    "OSD-480"
+   ],
+   "reason": "dose / rate = 6.0 days but duration says 5; left out of the summary"
+  }
+ ],
+ "skipped": [
+  {
+   "accession": "OSD-15",
+   "reason": "dose, dose rate or duration missing"
+  },
+  {
+   "accession": "OSD-249",
+   "reason": "absorbed radiation dose rate unit is None, expected 'milligray per day'; absorbed radiation dose unit is 'gray', expected 'milligray'; absorbed radiation dose unit is None, expected 'milligray'; exposure duration unit is None, expected 'day'"
+  },
+  {
+   "accession": "OSD-270",
+   "reason": "dosimetry protocol listed but no values recorded"
+  },
+  {
+   "accession": "OSD-314",
+   "reason": "dose, dose rate or duration missing"
+  },
+  {
+   "accession": "OSD-326",
+   "reason": "absorbed radiation dose rate unit is None, expected 'milligray per day'; absorbed radiation dose unit is None, expected 'milligray'; dose, dose rate or duration missing; exposure duration unit is None, expected 'day'"
+  },
+  {
+   "accession": "OSD-352",
+   "reason": "dosimetry protocol listed but no values recorded"
+  },
+  {
+   "accession": "OSD-462",
+   "reason": "dosimetry protocol listed but no values recorded"
+  },
+  {
+   "accession": "OSD-463",
+   "reason": "dosimetry protocol listed but no values recorded"
+  },
+  {
+   "accession": "OSD-511",
+   "reason": "dosimetry protocol listed but no values recorded"
+  },
+  {
+   "accession": "OSD-536",
+   "reason": "dosimetry protocol listed but no values recorded"
+  },
+  {
+   "accession": "OSD-561",
+   "reason": "dosimetry protocol listed but no values recorded"
+  },
+  {
+   "accession": "OSD-562",
+   "reason": "dosimetry protocol listed but no values recorded"
+  },
+  {
+   "accession": "OSD-563",
+   "reason": "dosimetry protocol listed but no values recorded"
+  },
+  {
+   "accession": "OSD-564",
+   "reason": "dosimetry protocol listed but no values recorded"
+  }
+ ],
+ "sources": {
+  "search": "https://osdr.nasa.gov/osdr/data/search?type=cgene&size=500&ffield=Flight+Program&fvalue=International+Space+Station+%28ISS%29",
+  "search_sha256": "d994cddf4b644242c11bd2f1a63463efd26e33744ce6f0a9f12bfb324bfa2585",
+  "studies": [
+   {
+    "accession": "OSD-15",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/15",
+    "sha256": "56476b6216e34dd86a8a7279b0f2cbc345a2daba50a8e1df7b7782591ed7e09b",
+    "bytes": 79359
+   },
+   {
+    "accession": "OSD-47",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/47",
+    "sha256": "6e60d3eb284c1f5d67278fd5d86a59d670e482ab61a25580f9a926e1a8d99679",
+    "bytes": 262248
+   },
+   {
+    "accession": "OSD-98",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/98",
+    "sha256": "2dfba03ad431d1b810e12f7cae27d2e9313cb2e289a34d3cbb24ca0574a33aeb",
+    "bytes": 223109
+   },
+   {
+    "accession": "OSD-99",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/99",
+    "sha256": "8d7928843da2d937bfbd7ec92c3050e4f3f7c6c3a84e7a7ab41832ccb718a617",
+    "bytes": 190455
+   },
+   {
+    "accession": "OSD-102",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/102",
+    "sha256": "9684bb4447a6ec01e5b286e72491308f2128a156c9acbb5da6284c184ac4e0c0",
+    "bytes": 280856
+   },
+   {
+    "accession": "OSD-104",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/104",
+    "sha256": "3c3f371ff4484cca884154522f8056115a5abf288d7321c52ccdc4f01488eff5",
+    "bytes": 181229
+   },
+   {
+    "accession": "OSD-137",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/137",
+    "sha256": "1e04074e9a35a1c54b4b9a9a7f776f06d596a20b67c8ed920ff9657905df7baf",
+    "bytes": 378973
+   },
+   {
+    "accession": "OSD-161",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/161",
+    "sha256": "c6cdc0df933dd973b7ebc55ee25b7eaf571b5a89ad26fe34d4017951730150c0",
+    "bytes": 360692
+   },
+   {
+    "accession": "OSD-162",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/162",
+    "sha256": "cd7df66e96d44f67d3d4f71d59ee2e79f6dfa3ff953ff70da3e81ac3bff2f3a7",
+    "bytes": 293570
+   },
+   {
+    "accession": "OSD-163",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/163",
+    "sha256": "34c2b773df4559a20b6579786c51687911e4e233ce61e6808a98108867ad4976",
+    "bytes": 350780
+   },
+   {
+    "accession": "OSD-168",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/168",
+    "sha256": "7362a9dba5cd32a7b820854ad8077b528d93545afac65bb53daeb923f97a47ba",
+    "bytes": 577118
+   },
+   {
+    "accession": "OSD-194",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/194",
+    "sha256": "950bbe62ebbf1af5543b7b581ce5918f48b6e4907287ef3671cc9c22fd86584f",
+    "bytes": 175206
+   },
+   {
+    "accession": "OSD-246",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/246",
+    "sha256": "351605463dbaa5f8bb257e1b07fdafbb051fe19f350c5068c033c4acaa0f1e17",
+    "bytes": 597659
+   },
+   {
+    "accession": "OSD-249",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/249",
+    "sha256": "b17f96578dfa215bf81dc41f21543d909d2f946edbd36174225fdbb9bc8852c5",
+    "bytes": 2266528
+   },
+   {
+    "accession": "OSD-251",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/251",
+    "sha256": "58fe6f503915bf6c1790435f275640cfad8bc6de5dc805ac3cb2707f784be068",
+    "bytes": 281548
+   },
+   {
+    "accession": "OSD-255",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/255",
+    "sha256": "05bc4a40bfdd3dfc1cc31b1a7b0f5ac9a527163f577cd44280688734f8fa7c83",
+    "bytes": 189057
+   },
+   {
+    "accession": "OSD-269",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/269",
+    "sha256": "51471828f2e6352c7c3d7af4bc34994a15b8cb91af3cc37fe666fe43d72a5d29",
+    "bytes": 127076
+   },
+   {
+    "accession": "OSD-270",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/270",
+    "sha256": "d7d6767ab58823c80fc7b2b72119102582dc9b6fb6e596d79d3b3b23a93db261",
+    "bytes": 351878
+   },
+   {
+    "accession": "OSD-289",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/289",
+    "sha256": "ee2f8e189bd5accc6a6509c2fca04556d5b1eda0ac4efa8b88251a6a085f3abe",
+    "bytes": 215580
+   },
+   {
+    "accession": "OSD-314",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/314",
+    "sha256": "56d616d095e51a065d924463ddf33d5def1475dfb44d1bf4e0730fe0371f5826",
+    "bytes": 220481
+   },
+   {
+    "accession": "OSD-321",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/321",
+    "sha256": "c2c54d5db7889da03ca7487d19b3fcba07b52edccabd664529f1146183fa9b9c",
+    "bytes": 408083
+   },
+   {
+    "accession": "OSD-326",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/326",
+    "sha256": "9c016cc0e6b22ff30648b96e667d8f18b1e3a1dfdae7ef52a60d939d91e5219d",
+    "bytes": 103469
+   },
+   {
+    "accession": "OSD-346",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/346",
+    "sha256": "dc7b2efff8aee05751ad68507431b015f081aef7025fd409c79c2407e21f032b",
+    "bytes": 528171
+   },
+   {
+    "accession": "OSD-347",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/347",
+    "sha256": "6299f5d5bf26bee56c842bdcd1067a59a91df7e61271d2cddede622a53ad48d9",
+    "bytes": 149499
+   },
+   {
+    "accession": "OSD-352",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/352",
+    "sha256": "1a02f93c2d5a260cbc582eb5a6967cf4671d46a542c48d2e23b917c2796350bb",
+    "bytes": 290110
+   },
+   {
+    "accession": "OSD-375",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/375",
+    "sha256": "75f8a786fbe024f0a0b558a8bda5c31acf3c741d20f350adb6d79b0bced636a9",
+    "bytes": 1107337
+   },
+   {
+    "accession": "OSD-402",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/402",
+    "sha256": "e416b653d9e6afffde8e7bf860656153965a36a743b9fc4a648d9aec377e381a",
+    "bytes": 156004
+   },
+   {
+    "accession": "OSD-403",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/403",
+    "sha256": "ef0391a7fd3edf525a8439f57665b4d41f518fd491337d0623b688364b68c29d",
+    "bytes": 156768
+   },
+   {
+    "accession": "OSD-404",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/404",
+    "sha256": "8891cbd0ed88a475ae145ffb81af91ded231aa8175bd45abb33d2878b3913928",
+    "bytes": 156443
+   },
+   {
+    "accession": "OSD-405",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/405",
+    "sha256": "d4fb1f33463fb66af46f06023e11ea4c85d7b4d0496c2a7bcf34d890fa8dd6ec",
+    "bytes": 154979
+   },
+   {
+    "accession": "OSD-427",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/427",
+    "sha256": "6ff2d21b019d4c049f257d0f8f3f47a0daa30ce2a50786ff18ecb68ab72342a8",
+    "bytes": 1527795
+   },
+   {
+    "accession": "OSD-457",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/457",
+    "sha256": "3117dd071453d51ec2b3535eab2b0795cd398440188c8a2decb5f2cdd61b295f",
+    "bytes": 1621297
+   },
+   {
+    "accession": "OSD-462",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/462",
+    "sha256": "816dec36974d5edc2115570295786573a0e78f5579abd216412af4cfd9a93bcb",
+    "bytes": 1579809
+   },
+   {
+    "accession": "OSD-463",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/463",
+    "sha256": "4e26b84fed8e5f2112ece532bbcc7ddb4d53578131bbd441098016b01c5f19dc",
+    "bytes": 381234
+   },
+   {
+    "accession": "OSD-464",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/464",
+    "sha256": "6c553ab7d911e8250dd94522f71c198dc51da625580b75ff3c3eae9f3c76b6e2",
+    "bytes": 352143
+   },
+   {
+    "accession": "OSD-480",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/480",
+    "sha256": "1b18fe72bb538ace32898ff4fe8ced7f2a1c842f94248ea4247f6133775fefe2",
+    "bytes": 2130161
+   },
+   {
+    "accession": "OSD-506",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/506",
+    "sha256": "c134456f44a09c8660ef3981d7de9b16e7839223d434452aecbf5c474798883c",
+    "bytes": 351512
+   },
+   {
+    "accession": "OSD-511",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/511",
+    "sha256": "a2bba26941df982ba86719a37e698aa1b4d11fdd31cb993ea71a6413e1409997",
+    "bytes": 520567
+   },
+   {
+    "accession": "OSD-512",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/512",
+    "sha256": "8a35ff0d111ccc5303960f01e76c82c069efa031b9f62b71a0824a186098240f",
+    "bytes": 372443
+   },
+   {
+    "accession": "OSD-513",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/513",
+    "sha256": "4f0f323e2272142b7f8ba59e7ed444567075a85bbe9e61a46b5997261af80eb7",
+    "bytes": 368875
+   },
+   {
+    "accession": "OSD-515",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/515",
+    "sha256": "26d98b7ca35c070604d124a417fbf493d46c8378416370f17606193253589b23",
+    "bytes": 367897
+   },
+   {
+    "accession": "OSD-525",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/525",
+    "sha256": "206e62ef41c0efebf4fd0bf5b1b8a31c877d81dbaabd224e6075aabfd8042183",
+    "bytes": 362197
+   },
+   {
+    "accession": "OSD-532",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/532",
+    "sha256": "ae7a3469fd132007d532e2b9445d80f1bd9ee1794914750ec5925af2aa8c22d6",
+    "bytes": 130389
+   },
+   {
+    "accession": "OSD-536",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/536",
+    "sha256": "736d25370c89cbef542a323ed4a7c187b251dbe9b4c7eed1db495d535580ab7f",
+    "bytes": 230134
+   },
+   {
+    "accession": "OSD-561",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/561",
+    "sha256": "0296dc0840bc2ff8324210941b644728958e7be0cc36fa03807c5029874f6e60",
+    "bytes": 456094
+   },
+   {
+    "accession": "OSD-562",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/562",
+    "sha256": "504b455b16fe579f24342783146e59d4d1bfb6172add4c54e3f44950ce59a6a9",
+    "bytes": 466121
+   },
+   {
+    "accession": "OSD-563",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/563",
+    "sha256": "4f702783508b772f836df67dff43b507e44b9433faae109aa8d449e9ebd0f992",
+    "bytes": 194602
+   },
+   {
+    "accession": "OSD-564",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/564",
+    "sha256": "214e619fa6b7197afc2211a0f826facdefe351755db9239011681c90751823fd",
+    "bytes": 193413
+   },
+   {
+    "accession": "OSD-576",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/576",
+    "sha256": "cb955d578515d4a7165470b9991646f8b9788ac0132c4bba1401d5f7929aa6e8",
+    "bytes": 339746
+   },
+   {
+    "accession": "OSD-580",
+    "url": "https://osdr.nasa.gov/osdr/data/osd/meta/580",
+    "sha256": "7afd16bbe68dd0feb2aac67b41acf55ccc6bd19651dbb12a16240d5b8b8e64d5",
+    "bytes": 978729
+   }
+  ],
+  "reference": "https://www.nasa.gov/reference/osdr-environmental-data/"
+ },
+ "boundary": "Area dosimeter readings for the ISS module that held each payload, not a personal crew dose. Absorbed dose in milligray, not effective dose in millisievert, so no career-limit or cancer-risk figure is derived. Shielding of the payload habitat is not taken into account."
+}
