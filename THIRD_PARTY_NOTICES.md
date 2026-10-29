@@ -101,7 +101,7 @@ NASA public research pages and technical reports cited by AstroBone are listed i
 
 ### Validation datasets (offline only, not bundled)
 
-- MCD-rPPG (Egorov et al., arXiv 2508.17924, 2025), https://huggingface.co/datasets/kyegorov/mcd_rppg, CC BY 4.0: webcam face video with a finger PPG at rest and after exercise. Only derived heart-rate numbers and one normalized pulse trace are published in the validation report.
+- MCD-rPPG (Egorov et al., arXiv 2508.17924, 2025), https://huggingface.co/datasets/kyegorov/mcd_rppg, CC BY 4.0: webcam face video with a finger PPG at rest and after exercise. Only derived heart-rate numbers and one normalized pulse trace are published in the validation report. `data/validation/mcd-pulse-*.csv` hold the derived per-method, per-gate and per-person rest/after-squats heart rates behind the Evidence view (no video).
 - UBFC-rPPG (Bobbia et al., Pattern Recognition Letters 2019): used only if listed in `docs/real-video-validation.md`; derived numbers only.
 - open-rppg (https://github.com/KegangWangCCNU/open-rppg) published weights for FacePhys, ME-rPPG chunk, PhysNet and EfficientPhys, run offline for the comparison only.
 
