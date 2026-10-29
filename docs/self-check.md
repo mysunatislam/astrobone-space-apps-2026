@@ -39,10 +39,10 @@ Video never leaves the device; only summary angles are kept.
   | --- | --- | --- | --- |
   | Blood pressure | above 180 / 120 mmHg | 140 / 90 or higher; below 90 / 60 | AHA categories and low blood pressure |
   | Blood sugar | below 54 or above 240 mg/dL | 200 mg/dL or higher | ADA (clinically significant low; check ketones above 240; random-glucose threshold) |
-  | Body temperature | 39.4 °C or higher; below 35 °C | 37.8 °C or higher | Mayo Clinic fever and hypothermia |
+  | Body temperature | 39.4 °C or higher; below 35 °C | 37.8 °C or higher by mouth; 37.2 °C or higher in the armpit; 38 °C or higher by ear or forehead | Mayo Clinic fever, fever first aid and hypothermia |
   | Oxygen saturation | 92 % or less | 93–94 % | NHS England pulse oximetry guidance |
 
-  The ADA's 70 mg/dL alert level is for people treated for diabetes. Replayed on the real Inspiration4 crew glucose (OSD-575, 28 draws), it fired on 4 of 12 healthy pre-flight draws, so it is not used; with 54 mg/dL the limit fires only on the three R+45 draws that the crew replay already treats as a handling suspect, and the personal baseline flags the same three: one REVIEW and two RE-CHECK, single draws outside the usual range that were back to usual by R+82 (`scripts/replay-i4-glucose-limits.mjs`). Every limit action asks for a repeat first (5 minutes' rest for blood pressure, a fresh finger prick in 15 minutes for blood sugar) and points to the mission's own procedure, never a dose. A flight surgeon can set their own limits.
+  The ADA's 70 mg/dL alert level is for people treated for diabetes. Replayed on the real Inspiration4 crew glucose (OSD-575, 28 draws), it fired on 4 of 12 healthy pre-flight draws, so it is not used; with 54 mg/dL the limit fires only on the three R+45 draws that the crew replay already treats as a handling suspect, and the personal baseline flags the same three: one REVIEW and two RE-CHECK, single draws outside the usual range that were back to usual by R+82 (`scripts/replay-i4-glucose-limits.mjs`). Every limit action asks for a repeat first (5 minutes' rest for blood pressure, a fresh finger prick in 15 minutes for blood sugar) and points to the mission's own procedure, never a dose. A flight surgeon can set their own limits. The fever line follows the thermometer site (added 2026-10-29): an armpit reading runs lower, so before this an armpit fever of 37.2–37.7 °C was missed, and ear and forehead readings were held to the stricter oral line.
 - **Red flags override everything** and make the check **URGENT**.
 
 ## Act

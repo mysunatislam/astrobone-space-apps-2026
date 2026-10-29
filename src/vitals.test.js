@@ -24,8 +24,24 @@ test("safety limits follow the published bounds at their edges", () => {
   assert.deepEqual([54, 53, 70, 199, 200, 241].map(v => level("glucose", v)), [null, "urgent", null, null, "attention", "urgent"]);
   // Mayo Clinic: fever 37.8 °C, call at 39.4 °C, hypothermia below 35 °C.
   assert.deepEqual([37.7, 37.8, 39.4, 34.9].map(v => level("bodyTemp", v)), [null, "attention", "urgent", "urgent"]);
+  // Mayo Clinic first aid: the fever line depends on the site. Armpit reads lower (37.2 °C); ear and
+  // temporal artery use 38 °C. Oral stays 37.8 °C, and a reading with no site is treated as oral.
+  const at = (site, v) => safetyLimit("bodyTemp", v, undefined, `temp-${site}-v1`)?.level ?? null;
+  assert.deepEqual([37.1, 37.2, 39.4].map(v => at("armpit", v)), [null, "attention", "urgent"]);
+  for (const site of ["ear", "forehead"]) assert.deepEqual([37.9, 38, 39.4, 34.9].map(v => at(site, v)), [null, "attention", "urgent", "urgent"]);
+  assert.deepEqual([37.7, 37.8].map(v => at("oral", v)), [null, "attention"]);
+  assert.equal(safetyLimit("bodyTemp", 37.4, undefined, "temp-armpit-v1").text, "at or above 37.2 °C (armpit)");
+  assert.equal(safetyLimit("bodyTemp", 39.5, undefined, "temp-armpit-v1").text, "at or above 39.4 °C");
   assert.equal(describeBound([">=", 140], "mmHg"), "at or above 140 mmHg");
   assert.equal(safetyLimit("restingHr", 200), null, "indicators without a fixed limit rely on the personal baseline");
+});
+
+test("an armpit fever is not missed and an ear reading is judged by the ear's own line", () => {
+  const evaluate = (site, v) => evaluateSelfCheck(applyVitals(newCheck("you"), { temp: { value: v, unit: "°C", site } }), []).domains.flatMap(d => d.indicators).find(r => r.key === "bodyTemp").status;
+  assert.equal(evaluate("armpit", 37.5), "attention");
+  assert.equal(evaluate("oral", 37.5), "baseline");
+  assert.equal(evaluate("ear", 37.9), "baseline");
+  assert.equal(evaluate("ear", 38.1), "attention");
 });
 
 test("a fixed limit applies from the first reading, before any baseline exists", () => {

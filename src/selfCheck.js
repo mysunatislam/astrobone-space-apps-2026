@@ -81,31 +81,38 @@ export const INDICATORS = Object.freeze({
 //    alert level is for people treated for diabetes: replayed on real Inspiration4 crew glucose it fired
 //    on 4 of 12 healthy pre-flight draws, so it is not used (scripts/replay-i4-glucose-limits.mjs).
 //  - Temperature: fever 37.8 °C (100 °F) oral or higher, call a provider at 39.4 °C (103 °F),
-//    hypothermia below 35 °C (Mayo Clinic).
+//    hypothermia below 35 °C (Mayo Clinic). The fever line depends on the thermometer site (Mayo Clinic
+//    first aid): armpit reads lower, so 37.2 °C (99 °F) there is already a fever, and ear and temporal
+//    artery (forehead) use 38 °C (100.4 °F). Mayo's first-aid page gives 38 °C for oral too; the
+//    stricter 37.8 °C is kept.
 //  - Oxygen saturation: 93-94 % contact a clinician, 92 % or less urgent (NHS England pulse oximetry).
 export const SAFETY_LIMITS = Object.freeze({
   systolicBp: { urgent: [[">", 180]], attention: [[">=", 140], ["<", 90]], recheck: "Sit quietly for 5 minutes and measure again." },
   diastolicBp: { urgent: [[">", 120]], attention: [[">=", 90], ["<", 60]], recheck: "Sit quietly for 5 minutes and measure again." },
   glucose: { urgent: [["<", 54, "Follow your mission's low blood sugar procedure now."], [">", 240]], attention: [[">=", 200]], recheck: "Recheck in 15 minutes with a fresh finger prick." },
-  bodyTemp: { urgent: [[">=", 39.4], ["<", 35]], attention: [[">=", 37.8]], recheck: "Measure again in 30 minutes at the same site." },
+  bodyTemp: { urgent: [[">=", 39.4], ["<", 35]], attention: [[">=", 37.8]], recheck: "Measure again in 30 minutes at the same site.",
+    sites: { armpit: { attention: [[">=", 37.2]] }, ear: { attention: [[">=", 38]] }, forehead: { attention: [[">=", 38]] } } },
   spo2: { urgent: [["<=", 92]], attention: [["<=", 94]], recheck: "Warm your hands, sit still and measure again on another finger." },
 });
 export const SAFETY_LIMIT_SOURCES = Object.freeze([
   "AHA blood pressure categories and low blood pressure (heart.org)", "ADA hypoglycemia and hyperglycemia guidance (diabetes.org)",
-  "Mayo Clinic fever and hypothermia", "NHS England COVID Oximetry @home guidance (C1671)",
+  "Mayo Clinic fever, fever first aid (by thermometer site) and hypothermia", "NHS England COVID Oximetry @home guidance (C1671)",
 ]);
 
 const OPS = { ">": (a, b) => a > b, ">=": (a, b) => a >= b, "<": (a, b) => a < b, "<=": (a, b) => a <= b };
 const OP_WORDS = { ">": "above", ">=": "at or above", "<": "below", "<=": "at or below" };
 export const describeBound = ([op, value], unit = "") => `${OP_WORDS[op]} ${value}${unit ? ` ${unit}` : ""}`;
 
-// The most serious fixed limit a value crosses, or null.
-export function safetyLimit(key, value, limits = SAFETY_LIMITS) {
-  const rule = limits[key];
-  if (!rule || !Number.isFinite(value)) return null;
+// The most serious fixed limit a value crosses, or null. A protocol naming a measurement site
+// ("temp-armpit-v1") picks that site's bounds where the rule has them.
+const siteOf = protocol => /^temp-(\w+)-v1$/.exec(protocol ?? "")?.[1];
+export function safetyLimit(key, value, limits = SAFETY_LIMITS, protocol = null) {
+  const base = limits[key];
+  if (!base || !Number.isFinite(value)) return null;
+  const site = siteOf(protocol), siteRule = base.sites?.[site], rule = { ...base, ...siteRule };
   for (const level of ["urgent", "attention"]) {
     const bound = (rule[level] ?? []).find(([op, limit]) => OPS[op](value, limit));
-    if (bound) return { level, bound: bound.slice(0, 2), text: describeBound(bound, INDICATORS[key]?.unit), recheck: rule.recheck, first: bound[2] ?? null };
+    if (bound) return { level, bound: bound.slice(0, 2), text: `${describeBound(bound, INDICATORS[key]?.unit)}${siteRule?.[level] ? ` (${site})` : ""}`, recheck: rule.recheck, first: bound[2] ?? null };
   }
   return null;
 }
@@ -242,7 +249,7 @@ function usableValues(history, key, protocol) {
 export function evaluateIndicator(key, value, history, { protocol, usable = true, floor, drift: driftParams, def = INDICATORS[key], limits = def === INDICATORS[key] ? SAFETY_LIMITS : {}, multirule = def === INDICATORS[key] } = {}) {
   if (value === null || value === undefined || Number.isNaN(value)) return { key, status: "notChecked", def };
   // A fixed safety limit is reported even on a result that must be repeated, so the repeat is not skipped.
-  const limit = safetyLimit(key, value, limits);
+  const limit = safetyLimit(key, value, limits, protocol);
   if (!usable) return { key, value, status: "repeat", limit, def };
   const ref = personalReference(history, key, protocol);
   if (!ref.ready) return { key, value, status: limit ? limit.level : "baseline", limit, ref, def };
