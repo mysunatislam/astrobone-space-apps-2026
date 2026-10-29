@@ -212,6 +212,7 @@ body.twin-body { overflow: hidden; }
 .tw-ev ul { margin: 8px 0 0; padding-left: 16px; font-size: 12.5px; line-height: 1.55; color: var(--tw-dim); }
 .tw-ev a { color: var(--tw-cyan); }
 .tw-ev small { display: block; color: var(--tw-faint); }
+.tw-ev ul + h3 { margin-top: 14px; }
 
 /* Legend */
 .tw-legend { position: fixed; z-index: 5; left: 14px; bottom: 150px; width: 300px; padding: 11px 13px; border-radius: 12px; animation: tw-rise .5s ease both; }

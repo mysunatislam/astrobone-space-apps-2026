@@ -1,0 +1,16 @@
+method,what_it_is,mae_bpm,rmse_bpm,r,within_5_bpm_pct,windows_answered_pct,windows
+AstroBone hybrid,"ME-rPPG leading, POS at a quarter weight, spectral fusion; exactly as shipped",2.14,6.88,0.919,89.9,96.3,308
+"AstroBone, held out",AstroBone hybrid with the POS weight chosen on the other people only,2.26,7.08,0.914,89.3,96.3,308
+"ME-rPPG, app","Deep model, 2025: the app's face-mesh crop and gates",2.44,7.88,0.892,89.3,96.3,308
+"ME-rPPG, detector crop",Same browser ONNX model with the official face-detector crop,2.86,8.79,0.862,86.9,100,320
+First hybrid design,"ME-rPPG + POS + CHROM, equal weights; replaced",3.14,10.5,0.825,88.6,95.9,307
+FacePhys,"Deep model, 2025",4.81,12.74,0.755,82.3,98.8,316
+ME-rPPG chunk,"Deep model, offline chunk version",5.5,14.85,0.669,83.8,100,320
+AstroBone live,"POS colour wave with the app's gates; Live Capture, no deep model",6.88,17.29,0.556,78.6,90.6,290
+POS,"Wang 2017, colour projection",7.1,17.38,0.541,77.2,94.4,302
+OMIT,Casado 2023,10.18,21.49,0.355,70.6,95.6,306
+GREEN,"Verkruysse 2008, green channel",10.19,21.53,0.393,72.3,90.3,289
+LGI,Pilz 2018,10.21,21.59,0.349,71,94.7,303
+PhysNet,"Deep model, 2018 (PURE weights)",10.3,20.92,0.469,71.9,100,320
+EfficientPhys,"Deep model, 2023 (PURE weights)",15.95,22.94,0.117,32.5,100,320
+CHROM,"de Haan 2013, chrominance",18.16,28.22,0.152,47.4,95.6,306

@@ -12,6 +12,7 @@ import { BODY_PARTS, bodyPartFor, bodyPartStatus } from "./bodyParts.js";
 import { guidanceFor } from "./countermeasures.js";
 import { HRP_HAZARDS } from "./hazards.js";
 import { INDICATORS, SAFETY_LIMITS, SAFETY_LIMIT_SOURCES, describeBound } from "./selfCheck.js";
+import { testedOnRealData } from "./realDataValidation.js";
 
 const SYSTEMS = [["body", "Body"], ["skeleton", "Skeleton"], ["muscle", "Muscle"], ["cardiovascular", "Cardiovascular"], ["renal", "Renal"], ["radiation", "Radiation"], ["multisystem", "Multisystem"]];
 const SYSTEM_FOCUS = { body: "body", skeleton: "body", muscle: "body", cardiovascular: "thorax", renal: "kidneys", radiation: "body", multisystem: "body", functional: "legs", impact: "leftLeg" };
@@ -675,15 +676,23 @@ export function createTwinApp(root) {
       section("Self-check instruments", [
         "Reaction test: PVT-B, 3 minutes, 1–4 s intervals including 1 s of feedback, 355 ms lapse threshold (Basner, Mollicone & Dinges, Acta Astronautica 2011). Stimulus onset is timed to the frame that draws it.",
         "Fatigue: Samn–Perelli 7-point checklist (USAF School of Aerospace Medicine, 1982). Mood and stress: single 0–10 self-ratings.",
-        "Movement: the same MediaPipe pose model, filter and knee-extension definition as the Movement capture workspace; quality ≥ 0.70 and ≥ 12 samples before any comparison.",
+        "Movement: MediaPipe pose with the hybrid knee model (learned trees on the pose model's 2D and 3D angles, src/kneeHybrid.js); quality ≥ 0.70 and ≥ 12 samples before any comparison, and each camera position keeps its own baseline.",
         "Review trigger: outside 2× the person's own spread or a minimum change, after 3 usable checks of the same protocol. Engineering default, not a clinical threshold.",
       ]),
+      realData(),
       hazardMap(),
       section("Vital-sign safety limits", [...Object.entries(SAFETY_LIMITS).map(([key, rule]) => `${INDICATORS[key].label}: urgent ${rule.urgent.map(b => describeBound(b, INDICATORS[key].unit)).join(" or ")}; tell the crew medical officer today ${rule.attention.map(b => describeBound(b, INDICATORS[key].unit)).join(" or ")}.`),
         `Sources: ${SAFETY_LIMIT_SOURCES.join("; ")}. Fixed limits apply from the first reading; the personal baseline still runs alongside.`]),
       section("Anatomy", ["Z-Anatomy / BodyParts3D atlas, CC BY-SA 4.0 (public/models/anatomy/SOURCE-LICENSE.txt). Reference geometry, not Elena's anatomy.", "Cardiovascular groups are vessels only: kidney and lung tissue are not in the atlas."]),
       section("Not used here", ["No LLM or retrieval model runs in this view; citations are a fixed local index.", "No live sensors: the live camera twin is in the Movement capture workspace.", "No clinical validation. Human medical review is required for any decision."]),
       el("a", { class: "tw-secondary tw-link", href: `${import.meta.env.BASE_URL}#mission-demo` }, "Open Mission Intelligence review ↗"));
+  }
+  // What was measured against real people, and what was not: numbers from src/realDataValidation.js.
+  function realData() {
+    const { tested, notYet } = testedOnRealData();
+    return el("section", { class: "tw-ev" }, el("h3", {}, "Tested on real data"), el("ul", {}, tested.map(t => el("li", {}, t))),
+      el("h3", {}, "Not tested yet"), el("ul", {}, notYet.map(t => el("li", {}, t))),
+      el("p", { class: "tw-note" }, "Method and every table: ", el("a", { href: "https://github.com/mysunatislam/astrobone-space-apps-2026/blob/main/docs/real-video-validation.md", target: "_blank", rel: "noopener noreferrer" }, "real-video validation report"), "."));
   }
   // NASA HRP's five hazards and what the self-check watches for each.
   function hazardMap() {
