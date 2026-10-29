@@ -155,8 +155,9 @@ test("store keeps records in memory unless consent to persist is given", () => {
 });
 
 test("a slow decline that the rolling baseline absorbs is caught as drift from the locked baseline", () => {
-  const history = [170, 171, 169, 170, 170].map(v => ({ values: { kneeExtension: v } }));
-  assert.equal(lockedReference(history, "kneeExtension").count, 5);
+  const history = Array(4).fill([170, 171, 169, 170, 170]).flat().map(v => ({ values: { kneeExtension: v } }));
+  assert.equal(lockedReference(history, "kneeExtension").count, 20, "the first 20 usable checks");
+  assert.equal(lockedReference(history.slice(0, 7), "kneeExtension").count, 7, "all of them while there are fewer");
   let row;
   for (let value = 169; value >= 162; value--) {
     row = evaluateIndicator("kneeExtension", value, history);

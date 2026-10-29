@@ -13,6 +13,7 @@ test("a healthy astronaut is told to log a change on far fewer daily checks than
   assert.ok(single.reviewOrWorsePct > 40, `single-value rule ${single.reviewOrWorsePct} %`);
   assert.ok(multirule.reviewOrWorsePct < 20 && multirule.reviewOrWorsePct < single.reviewOrWorsePct / 2.5, `multirule ${multirule.reviewOrWorsePct} %`);
   assert.ok(multirule.astronautsWithDriftAlarmPct <= single.astronautsWithDriftAlarmPct);
+  assert.ok(multirule.astronautsWithDriftAlarmPct < 5, `drift alarm in ${multirule.astronautsWithDriftAlarmPct} % of stable astronauts`);
   assert.ok(Math.abs(multirule.reviewOrWorsePct - SIMULATED_RELIABILITY.reviewPct) < 2, `${multirule.reviewOrWorsePct} vs ${SIMULATED_RELIABILITY.reviewPct}`);
   assert.ok(Math.abs(multirule.recheckOrWorsePct - SIMULATED_RELIABILITY.recheckPct) < 3, `${multirule.recheckOrWorsePct} vs ${SIMULATED_RELIABILITY.recheckPct}`);
   assert.ok(Math.abs(single.reviewOrWorsePct - SIMULATED_RELIABILITY.singleRuleReviewPct) < 3);
@@ -28,7 +29,7 @@ test("a real change is still flagged, and the app's detection numbers match the 
   assert.ok(SIMULATED_RELIABILITY.detected.find(d => d.key === "pvtLapses").withinThree >= 85);
   // With the camera noise measured on real video, a 10° knee drop takes longer to show but is still caught.
   const knee = SIMULATED_RELIABILITY.detected.find(d => d.key === "kneeExtension");
-  assert.ok(knee.withinThree >= 60 && knee.withinTwoWeeks >= 90, JSON.stringify(knee));
+  assert.ok(knee.withinThree >= 60 && knee.withinTwoWeeks >= 95, JSON.stringify(knee));
 });
 
 test("the knee spreads in the simulation are the measured ones, and they are larger than the old guess", () => {

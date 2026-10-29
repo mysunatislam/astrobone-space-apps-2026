@@ -164,10 +164,15 @@ export function personalReference(history, key, protocol) {
 // its first usable checks, and runs a one-sided CUSUM (Page, Biometrika 1954) of standardized
 // worsening against it. k = 1 SD and h = 6 SD were chosen with `scripts/simulate-detection.mjs`:
 // textbook k = 0.5, h = 4 raised a confirmed alarm in about 1 in 5 stable astronauts over 180 days. Sigma is floored at half the review floor so a
-// suspiciously tight baseline does not turn noise into alarms.
-export const DRIFT = Object.freeze({ k: 1, h: 6, reset: false });
+// suspiciously tight baseline does not turn noise into alarms. The locked baseline is the first `baseline`
+// usable checks (fewer while there are fewer), as laboratory quality control sets its limits from 20 or
+// more results: locked from 5, its mean was off by enough that 15.9 % of stable simulated astronauts got
+// a drift alarm within 60 days with the published day-to-day spreads, against 1.3 % from 20
+// (scripts/simulate-false-alarms.mjs), and a 2°/month knee decline was caught more often, not less
+// (93 % of 1,000 runs within 180 days, median 88 days, scripts/simulate-detection.mjs).
+export const DRIFT = Object.freeze({ k: 1, h: 6, reset: false, baseline: 20 });
 
-export function lockedReference(history, key, protocol, count = BASELINE_WINDOW) {
+export function lockedReference(history, key, protocol, count = DRIFT.baseline) {
   const values = usableValues(history, key, protocol).slice(0, count);
   if (values.length < MIN_BASELINE) return { ready: false, count: values.length, needed: MIN_BASELINE };
   return { ready: true, count: values.length, mean: mean(values), sd: sd(values) };
@@ -205,7 +210,7 @@ export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRI
 // a change for review only when it is far beyond the range (more than `big` times it, about 3 SD) or the
 // previous usable check was also beyond its own range on the same side. With the original rule (one value
 // beyond the 5-check range), a healthy astronaut who checked all 14 indicators daily was told something
-// changed on half of checks (scripts/simulate-false-alarms.mjs, measured and published spreads).
+// changed on 44 % of checks (scripts/simulate-false-alarms.mjs, measured and published spreads).
 export const MULTIRULE = Object.freeze({ big: 1.5 });
 
 // How much the camera's knee reading moves between repeats when the knee did not change, measured on
@@ -229,15 +234,15 @@ export const KNEE_REPEAT_NOISE = Object.freeze({
 // knee spreads are KNEE_REPEAT_NOISE, measured on real video; heart rate, blood pressure and sleep use
 // published day-to-day spreads; oxygen, temperature, the reaction test and the ratings are assumptions
 // until measured on volunteers. With the spreads guessed before (--assumed-knee --previous-spreads) the
-// same rules gave REVIEW 6.9 % and caught 2 h less sleep within 14 checks in 92 %: the guesses made the
+// same rules gave REVIEW 4.9 % and caught 2 h less sleep within 14 checks in 98 %: the guesses made the
 // checks look steadier than people are. The app shows these numbers; src/falseAlarms.test.js keeps them
 // in step with the code.
 export const SIMULATED_RELIABILITY = Object.freeze({
-  astronauts: 1000, days: 60, reviewPct: 15, singleRuleReviewPct: 50.5, recheckPct: 43.7,
+  astronauts: 1000, days: 60, reviewPct: 11.5, singleRuleReviewPct: 44.4, recheckPct: 41.4,
   detected: Object.freeze([
-    ["kneeExtension", "knee extension 10° lower", 65, 91.8], ["pvtLapses", "6 more attention lapses", 96, 100],
-    ["systolicBp", "systolic 20 mmHg higher", 81.8, 100], ["glucose", "fasting blood sugar 20 mg/dL higher", 76.3, 99.8],
-    ["sleepHours", "2 h less sleep", 24.8, 57.3],
+    ["kneeExtension", "knee extension 10° lower", 64.5, 99.5], ["pvtLapses", "6 more attention lapses", 95.8, 100],
+    ["systolicBp", "systolic 20 mmHg higher", 81, 100], ["glucose", "fasting blood sugar 20 mg/dL higher", 75.5, 100],
+    ["sleepHours", "2 h less sleep", 23.5, 59],
   ].map(([key, label, withinThree, withinTwoWeeks]) => Object.freeze({ key, label, withinThree, withinTwoWeeks }))),
 });
 
