@@ -28,8 +28,13 @@ export const singleValueRule = (check, history) => evaluateSelfCheck(check, hist
 // - temperature: SD of seven morning home oral readings over two weeks, 0.31 °C (Diamond et al., PLoS ONE
 //   2021;16:e0245257, 96 adults; a later correction notice, e0259428, could not be read here).
 // Oxygen saturation is an assumption that fits the 1.2 % change needed to show a real change in 10 healthy
-// adults at rest (Wagener and Hendricker, Chest 1987;92:1047-9). The reaction test and the ratings are
-// assumptions: the PVT-B validation (Basner et al., Acta Astronaut 2011;69:949-59) gives no within-person spread.
+// adults at rest (Wagener and Hendricker, Chest 1987;92:1047-9). The reaction test's usual levels are the
+// PVT-B means of 45 adults from a "high performing astronaut surrogate population" who took it 16 times
+// (Basner et al., Sleep 2018;41:zsx187, Table 2: response speed 4.52/s, 0.98 lapses), with no systematic change
+// in either over the 16 tests. Its within-person spread is still an assumption: that paper's SDs (0.41/s, 1.61
+// lapses) are across all its tests and people together, and lapses are taken as Poisson. The ratings are
+// assumptions too: the pooled daily-life studies checked (Scott et al., Assessment 2020; Kraft et al., Emotion
+// 2026) give shares of variance or within-day spreads, not a day-to-day spread in scale points.
 // PREVIOUS_SPREADS are the guesses these replaced (--previous-spreads). `round` mimics how each value is entered.
 export const ASSUMED_KNEE_SD = Object.freeze({ kneeExtension: 3, kneeRom: 4 });
 export const PREVIOUS_SPREADS = Object.freeze({ restingHr: 4, systolicBp: 6, diastolicBp: 4.5, sleepHours: 0.9, bodyTemp: 0.25 });
