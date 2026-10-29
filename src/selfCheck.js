@@ -2,6 +2,7 @@
 // baseline, and choose a bounded next action. Review triggers are engineering
 // defaults for prompting a re-check or human review, not clinical thresholds.
 
+import { PBKDF2_ITERATIONS, SEALED_SCHEMA, newSeal, openSealed, passcodeProblem, sealJson } from "./sealedStore.js";
 export const SELF_CHECK_SCHEMA = "astrobone-self-check-v1";
 
 // PVT-B parameters: 3-minute psychomotor vigilance test, 1-4 s from a response to the next stimulus
@@ -424,16 +425,54 @@ export function restoreBackup(saved, packet) {
   return { checks: [...saved, ...added].sort((a, b) => Date.parse(a.at) - Date.parse(b.at)), added: added.length, skipped: incoming.length - added.length };
 }
 
-// Local storage only with explicit consent; otherwise records live in memory for this tab.
-export function createSelfCheckStore(storage = globalThis.localStorage, key = "astrobone-self-check-v1") {
-  const read = () => { try { return JSON.parse(storage?.getItem(key) || "{}"); } catch { return {}; } };
-  let memory = {};
+// Local storage only with explicit consent; otherwise records live in memory for this tab. With a
+// passcode the saved record is sealed (src/sealedStore.js): while locked nothing is read or written,
+// so a check can never be judged against an empty history or overwrite the sealed copy in plain text.
+// Sealed writes are queued in order; flush() resolves once the last one has reached storage.
+export function createSelfCheckStore(storage = globalThis.localStorage, key = "astrobone-self-check-v1", { iterations = PBKDF2_ITERATIONS, subtle = globalThis.crypto?.subtle } = {}) {
+  const raw = () => { try { return storage?.getItem(key) ?? null; } catch { return null; } };
+  const parsed = () => { try { const all = JSON.parse(raw() || "{}"); return all && typeof all === "object" && !Array.isArray(all) ? all : {}; } catch { return {}; } };
+  let memory = {}, seal = null, writes = Promise.resolve(), failed = false;
+  const queue = task => { writes = writes.then(task).then(() => { failed = false; }, () => { failed = true; }); return writes; };
+  // Anything carrying the sealed schema counts as sealed, damaged or not: fail closed, never overwrite it.
+  const locked = () => !seal && parsed().schema === SEALED_SCHEMA;
+  const read = () => { if (seal) return seal.all; const all = parsed(); return all.schema === SEALED_SCHEMA ? null : all; };
+  const write = all => {
+    if (seal) { const current = seal; current.all = all; queue(async () => storage.setItem(key, JSON.stringify(await sealJson(all, current, subtle)))); return true; }
+    if (locked()) return false;
+    try { storage.setItem(key, JSON.stringify(all)); return true; } catch { return false; }
+  };
   return {
-    load(profileId, persist) { const all = persist ? read() : memory; return all[profileId] ?? []; },
+    load(profileId, persist) { const all = persist ? read() : memory; return all?.[profileId] ?? []; },
     save(profileId, checks, persist) {
-      if (persist) { try { const all = read(); all[profileId] = checks; storage.setItem(key, JSON.stringify(all)); return true; } catch { return false; } }
-      memory[profileId] = checks; return true;
+      if (!persist) { memory[profileId] = checks; return true; }
+      const all = read(); if (!all) return false;
+      return write({ ...all, [profileId]: checks });
     },
-    clear(profileId) { memory[profileId] = []; try { const all = read(); delete all[profileId]; storage?.setItem(key, JSON.stringify(all)); } catch { /* storage unavailable */ } },
+    clear(profileId) { memory[profileId] = []; const all = read(); if (all) { delete all[profileId]; write(all); } },
+    canSeal: Boolean(subtle && globalThis.crypto?.getRandomValues),
+    locked,
+    sealed: () => Boolean(seal) || locked(),
+    get writeFailed() { return failed; },
+    flush: () => writes,
+    async setPasscode(passcode) {
+      const problem = passcodeProblem(passcode); if (problem) throw new Error(problem);
+      const all = read(); if (!all) throw new Error("Unlock the saved checks first.");
+      seal = { ...(await newSeal(passcode, { iterations, subtle })), all };
+      write(all); await writes; if (failed) { seal = null; throw new Error("This browser would not save the encrypted checks."); }
+    },
+    async unlock(passcode) {
+      if (seal) return;
+      const opened = await openSealed(raw(), passcode, subtle);
+      seal = { ...opened.seal, all: opened.value && typeof opened.value === "object" ? opened.value : {} };
+    },
+    lock() { seal = null; },
+    async removePasscode() {
+      if (!seal) throw new Error("Unlock the saved checks first.");
+      const all = seal.all; seal = null;
+      await queue(async () => storage.setItem(key, JSON.stringify(all)));
+    },
+    // A forgotten passcode cannot be recovered: the only way forward is to delete the sealed record.
+    async forget() { seal = null; await queue(async () => storage.removeItem(key)); },
   };
 }

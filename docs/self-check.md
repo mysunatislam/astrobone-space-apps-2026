@@ -87,6 +87,13 @@ Colour is never the only cue. Every status has its own word and marker shape (�
 
 Checks stay in memory unless the astronaut ticks **Save my checks on this device**, which uses browser local storage on that device only. Nothing is sent to a server. Elena's demo records are never stored.
 
+**Passcode (added 2026-10-29).** With saving on, **Add a passcode** encrypts the saved checks on the device, so another person using the same laptop or browser cannot read them (`src/sealedStore.js`, tests in `src/sealedStore.test.js`):
+
+- The browser's Web Crypto turns the passcode (at least 8 characters) into a 256-bit AES-GCM key with PBKDF2-SHA256 and a random 16-byte salt, 600,000 iterations (the OWASP 2023 figure). Every save uses a fresh 12-byte IV. The passcode itself is never stored; the key stays in memory, non-extractable, until **Lock now** or the page closes.
+- While locked, the page neither reads nor writes saved checks. The result step asks for the passcode instead of judging today against an empty history, and nothing can overwrite the sealed copy in plain text.
+- A wrong passcode, or an edited file, fails AES-GCM's check and is refused. A forgotten passcode cannot be recovered: the only way on is **Forgot it? Delete saved checks**.
+- Not covered: the consent setting, the accuracy-check pairs, and files the astronaut downloads (backup, reviewer export, surgeon report) stay unencrypted. Someone who copies the browser's storage can still try passcodes offline, slowed by the 600,000 iterations, so a longer passcode is stronger. This protects against casual reading on a shared device, not against a determined attacker.
+
 ## Demo Profile
 
 **Elena · synthetic demo** reuses the knee and heart-rate checkpoint values from `elenaMissionScenario.js` and adds authored sleep, fatigue, mood, stress, reaction-test and vital-sign values for Days 1–120 and Day 147. The vital signs follow the direction of published findings, not their size for any one person: blood pressure a little lower in flight (Norsk et al. 2015), fasting blood sugar creeping up (Hughson et al. 2016), resting temperature rising (Stahn et al. 2017); all stay inside the safety limits and her usual range on Day 147. In the demo, the first movement capture fails its quality gate and is withheld; the repeat is usable. The Day 147 evaluation flags bone & muscle and behavioral health for review, asks her to re-check resting heart rate and sleep (each just outside her usual range, once), and keeps immune stable. None of these values come from a real person.

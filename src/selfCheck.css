@@ -26,6 +26,12 @@
 .sc-file { position: relative; cursor: pointer; }
 .sc-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .sc-file:focus-within { outline: 2px solid #7fe3ff; outline-offset: 2px; }
+.sc-lock { align-items: end; font-size: 12px; color: var(--tw-dim); }
+.sc-lock small { flex-basis: 100%; font-size: 11px; color: var(--tw-dim); }
+.sc-lock b { flex-basis: 100%; color: var(--st-changed); font-size: 12px; }
+.sc-locked { padding: 10px 12px; border: 1px dashed var(--st-changed); border-radius: 10px; }
+.sc-pass { display: grid; gap: 4px; min-width: 0; flex: 1 1 160px; max-width: 240px; }
+.sc-pass input { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 14px var(--tw-sans); }
 .sc-primary, .sc-secondary { padding: 10px 14px; border-radius: 9px; font: 700 10.5px/1 var(--tw-mono) !important; letter-spacing: .1em; text-transform: uppercase; color: #fff; }
 .sc-primary { border: 1px solid rgba(255, 196, 107, .6); background: linear-gradient(180deg, rgba(255, 170, 70, .3), rgba(255, 120, 40, .14)); }
 .sc-secondary { border: 1px solid var(--tw-line-strong); background: rgba(127, 227, 255, .08); }

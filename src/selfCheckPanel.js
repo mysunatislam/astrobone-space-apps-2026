@@ -15,6 +15,7 @@ import { surgeonReport, byteSize } from "./surgeonReport.js";
 import { STATUS_MARKS, indicatorHistory, historyChartSvg, legendFor, chartableKeys, pointLabel } from "./historyChart.js";
 import { HOLD, REFERENCE_TYPES, summarizeHold, agreement, calibratedFloors, pairsToCsv, createAngleCheckStore } from "./angleCheck.js";
 import { ELENA } from "./elenaMissionScenario.js";
+import { PASSCODE_MIN, passcodeProblem } from "./sealedStore.js";
 import { loadNasaEvidence, nasaWatchPlan } from "./nasaWatch.js";
 import { loadCrewBlood, replayCrew, crewReplayCard } from "./crewReplay.js";
 
@@ -48,7 +49,7 @@ const VIEW_CUE = { front: "facing camera", side: "side-on", oblique: "turned par
 
 export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {}, onTimedTest = () => {} } = {}) {
   const store = createSelfCheckStore();
-  const state = { profile: "elena", environment: DEFAULT_ENVIRONMENT.elena, persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [], chartKey: null, report: false };
+  const state = { profile: "elena", environment: DEFAULT_ENVIRONMENT.elena, persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [], chartKey: null, report: false, lockForm: false, lockNote: null, lockBusy: false };
   const element = el("div", { class: "sc" });
   const video = el("video", { class: "sc-video", playsinline: true, muted: true, "aria-label": "Camera preview" });
   const overlay = el("canvas", { class: "sc-overlay", "aria-hidden": "true" });
@@ -105,6 +106,8 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   }
 
   const history = () => (state.profile === "elena" ? [...ELENA_HISTORY, ...(store.load("DEMO-ELENA", false))] : store.load("you", state.persist));
+  // Saved checks sealed with a passcode and not yet unlocked: nothing is evaluated or saved until they are.
+  const locked = () => state.profile === "you" && state.persist && store.locked();
   function reset() {
     stopCamera(); stopPvt(true);
     state.step = 0; state.capture = null; state.pvt = null; state.evaluation = null; state.captures = 0; state.saved = false; state.failed = {}; state.earned = []; state.report = false;
@@ -124,6 +127,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   function go(step) { state.step = Math.max(0, Math.min(STEPS.length - 1, step)); if (STEPS[state.step][0] !== "movement") stopCamera(); if (STEPS[state.step][0] !== "body") stopPulse(); if (STEPS[state.step][0] === "result") evaluate(); render(); onStep(STEPS[state.step][0]); }
 
   function evaluate() {
+    if (locked()) { state.evaluation = null; return; }
     state.evaluation = evaluateSelfCheck(state.check, history(), { floors: state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor), environment: environment() });
     onEvaluate(state.evaluation, state.profile);
   }
@@ -313,6 +317,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   // ---------- Save & follow-up ----------
   function saveCheck() {
     if (state.saved || !state.evaluation) return;
+    if (locked()) { state.lockNote = "Unlock your saved checks to save this one."; render(); return; }
     const profileId = state.profile === "elena" ? "DEMO-ELENA" : "you";
     const checks = state.profile === "elena" ? store.load(profileId, false) : history(), before = routine().status;
     checks.push({ ...state.check, at: new Date().toISOString(), complete: isComplete(state.evaluation), evaluation: { overall: state.evaluation.overall, domains: state.evaluation.domains.map(d => ({ key: d.key, status: d.status })) } });
@@ -336,6 +341,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   function backupAll() { download(JSON.stringify(backupPacket(history()), null, 2), "application/json", `AstroBone-backup-${new Date().toISOString().slice(0, 10)}.json`); }
   async function restoreFrom(e) {
     const file = e.target.files?.[0]; if (!file) return;
+    if (locked()) { state.backupNote = "Unlock your saved checks first."; render(); return; }
     try {
       const result = restoreBackup(history(), JSON.parse(await file.text()));
       store.save("you", result.checks, state.persist);
@@ -504,7 +510,8 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   }
 
   function resultBody() {
-    const ev = state.evaluation; if (!ev) return [];
+    const ev = state.evaluation;
+    if (!ev) return locked() ? [el("p", { class: "sc-lead", role: "status" }, "Your saved checks are locked. Unlock them above so today's results are compared with your own usual range.")] : [];
     const [label, detail] = STATUS[ev.overall];
     const measured = d => d.indicators.filter(r => r.status !== "notChecked");
     const charted = chartableKeys(history(), state.check);
@@ -619,6 +626,47 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       el("small", {}, el("span", {}, low), el("span", {}, high)));
   }
 
+  // ---------- Passcode ----------
+  async function lockTask(task, done) {
+    state.lockBusy = true; state.lockNote = null; render();
+    try { await task(); state.lockNote = done; state.lockForm = false; } catch (err) { state.lockNote = err.message; }
+    state.lockBusy = false;
+    if (STEPS[state.step][0] === "result" && !state.saved) evaluate();
+    render();
+  }
+  const passField = (name, label, autocomplete) => el("label", { class: "sc-pass" }, label,
+    el("input", { type: "password", name, autocomplete, required: true, minlength: PASSCODE_MIN, disabled: state.lockBusy || undefined }));
+  function lockRow() {
+    if (state.profile !== "you" || !state.persist || !store.canSeal) return null;
+    const note = state.lockNote || store.writeFailed ? el("small", { role: "status" }, state.lockNote || "The last encrypted save did not reach this device's storage.") : null;
+    if (store.locked()) {
+      return el("form", { class: "sc-row sc-lock sc-locked", onsubmit: e => { e.preventDefault(); const passcode = e.target.elements.passcode.value; lockTask(() => store.unlock(passcode), "Unlocked."); } },
+        el("b", {}, "Saved checks are locked"), passField("passcode", "Passcode", "current-password"),
+        el("button", { type: "submit", class: "sc-primary", disabled: state.lockBusy || undefined }, state.lockBusy ? "Unlocking…" : "Unlock"),
+        el("button", { type: "button", class: "sc-link", onclick: () => { if (confirm("Delete every saved check on this device? Without the passcode they cannot be opened, so this cannot be undone.")) lockTask(() => store.forget(), "Saved checks deleted."); } }, "Forgot it? Delete saved checks"),
+        note);
+    }
+    if (store.sealed()) {
+      return el("div", { class: "sc-row sc-lock" }, el("span", {}, "Saved checks are encrypted with your passcode."),
+        el("button", { type: "button", class: "sc-secondary", onclick: () => { store.lock(); state.lockNote = "Locked. Enter the passcode to open your checks again."; if (!state.saved) state.evaluation = null; render(); } }, "Lock now"),
+        el("button", { type: "button", class: "sc-link", disabled: state.lockBusy || undefined, onclick: () => { if (confirm("Remove the passcode? Saved checks will be stored without encryption on this device.")) lockTask(() => store.removePasscode(), "Passcode removed. Saved checks are no longer encrypted."); } }, "Remove passcode"),
+        note);
+    }
+    if (!state.lockForm) {
+      return el("div", { class: "sc-row sc-lock" }, el("button", { type: "button", class: "sc-secondary", onclick: () => { state.lockForm = true; state.lockNote = null; render(); } }, "Add a passcode"),
+        el("small", {}, "Encrypts saved checks on this device. Without one, anyone who uses this browser can read them."), note);
+    }
+    return el("form", { class: "sc-row sc-lock", onsubmit: e => {
+      e.preventDefault(); const { passcode, repeat } = e.target.elements, problem = passcodeProblem(passcode.value, repeat.value);
+      if (problem) { state.lockNote = problem; render(); return; }
+      lockTask(() => store.setPasscode(passcode.value), "Saved checks are now encrypted. You will need the passcode each time this page opens.");
+    } },
+      passField("passcode", `New passcode (at least ${PASSCODE_MIN} characters)`, "new-password"), passField("repeat", "Repeat it", "new-password"),
+      el("button", { type: "submit", class: "sc-primary", disabled: state.lockBusy || undefined }, state.lockBusy ? "Encrypting…" : "Encrypt saved checks"),
+      el("button", { type: "button", class: "sc-link", onclick: () => { state.lockForm = false; state.lockNote = null; render(); } }, "Cancel"),
+      el("small", {}, "If you forget it, the saved checks cannot be recovered. Back them up first; the backup file itself is not encrypted, so keep it private."), note);
+  }
+
   function render() {
     const steps = el("ol", { class: "sc-steps" }, STEPS.map(([key, label], i) => el("li", {}, el("button", { type: "button", "aria-current": i === state.step ? "step" : undefined, onclick: () => go(i) }, `${i + 1} ${label}`))));
     const profile = el("div", { class: "sc-profile", role: "group", "aria-label": "Whose check" },
@@ -632,7 +680,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       // Ask the browser not to clear saved checks when space runs low (it may still say no).
       if (state.persist) navigator.storage?.persist?.().catch(() => {});
       angleStore.save(check.pairs, state.persist); render();
-    } }), `Save my checks on this device (${history().length} saved)`) : null;
+    } }), `Save my checks on this device (${locked() ? "locked" : `${history().length} saved`})`) : null;
     const backup = state.profile === "you" ? el("div", { class: "sc-row sc-backup" },
       el("button", { type: "button", class: "sc-secondary", disabled: history().length ? undefined : true, onclick: backupAll }, "Back up all checks"),
       el("label", { class: "sc-secondary sc-file" }, "Restore from backup", el("input", { type: "file", accept: "application/json,.json", onchange: restoreFrom })),
@@ -640,7 +688,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const nav = STEPS[state.step][0] === "result" ? null : el("div", { class: "sc-nav" },
       state.step > 0 ? el("button", { type: "button", class: "sc-secondary", onclick: () => go(state.step - 1) }, "Back") : el("span"),
       el("button", { type: "button", class: "sc-primary", "data-next": true, onclick: () => go(state.step + 1) }, state.step === STEPS.length - 2 ? "Evaluate" : "Next"));
-    element.replaceChildren(...[profile, where, consent, backup, steps, el("div", { class: "sc-body" }, stepBody()), nav].filter(Boolean));
+    element.replaceChildren(...[profile, where, consent, lockRow(), backup, steps, el("div", { class: "sc-body" }, stepBody()), nav].filter(Boolean));
     // Re-inserting a media element pauses it; resume the live preview.
     if (camera?.running && video.paused) video.play().catch(() => {});
     if (!pvt.running && !pvtStage.dataset.count) pvtStage.dataset.count = "Ready";
