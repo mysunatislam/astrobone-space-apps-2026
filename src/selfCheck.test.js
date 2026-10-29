@@ -110,6 +110,17 @@ test("once there are 10 checks the usual range takes its spread from up to 30 of
   assert.equal(evaluateIndicator("restingHr", 74, short).tolerance, 8, "under 10 checks: the 5-check SD, here below the floor");
 });
 
+test("sleep from a tracker is its own baseline; sleep saved without a source counts as the person's own estimate", () => {
+  const legacy = [7, 7.5, 7, 7.5].map(v => ({ values: { sleepHours: v } }));
+  assert.equal(evaluateIndicator("sleepHours", 5, legacy, { protocol: "sleep-tracker-v1" }).status, "baseline", "a first tracker night is not judged against estimates");
+  assert.notEqual(evaluateIndicator("sleepHours", 5, legacy, { protocol: "sleep-estimate-v1" }).status, "baseline", "an estimate is compared with earlier estimates");
+  const check = { ...newCheck("you"), values: { sleepHours: 5 } };
+  const row = evaluateSelfCheck(check, legacy).domains.flatMap(d => d.indicators).find(r => r.key === "sleepHours");
+  assert.equal(row.ref.count, 4, "a check with no source is an estimate too");
+  const tracked = { ...newCheck("you"), values: { sleepHours: 5 }, protocols: { sleepHours: "sleep-tracker-v1" } };
+  assert.equal(evaluateSelfCheck(tracked, legacy).domains.flatMap(d => d.indicators).find(r => r.key === "sleepHours").status, "baseline");
+});
+
 test("a re-check is one bounded action and nothing is logged for review", () => {
   const history = [160, 161, 159, 160].map(v => ({ values: { kneeExtension: v } }));
   const result = evaluateSelfCheck({ ...newCheck("you"), values: { kneeExtension: 154 } }, history);

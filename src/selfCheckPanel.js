@@ -1,6 +1,6 @@
 import {
   PVT_B, PVT_PROTOCOL, PVT_INPUTS, PVT_DEVICE_WORDS, pvtDeviceClass, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
-  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, BP_SITES, GLUCOSE_SOURCES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
+  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, BP_SITES, GLUCOSE_SOURCES, SLEEP_SOURCES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
 import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
@@ -481,7 +481,11 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     }
     if (key === "mind") {
       const v = c.values;
+      const sleepSource = c.protocols.sleepHours ?? SLEEP_SOURCES[0][0];
       return [number("Sleep in the last 24 h", "h", v.sleepHours, 0, 16, 0.5, value => { v.sleepHours = value; }),
+        el("span", { class: "sc-row", role: "radiogroup", "aria-label": "Sleep hours from" }, SLEEP_SOURCES.map(([protocol, label]) => el("label", { class: "sc-radio" },
+          el("input", { type: "radio", name: "sc-sleep-source", checked: sleepSource === protocol || undefined, onchange: () => { c.protocols.sleepHours = protocol; } }), label))),
+        el("small", { class: "sc-note" }, "Your own estimate and a tracker are kept apart: people's own estimates average close to an hour more than a wrist tracker measures."),
         el("fieldset", { class: "sc-fieldset" }, el("legend", {}, "How do you feel right now? (Samn-Perelli)"),
           SAMN_PERELLI.map((label, i) => el("label", { class: "sc-radio" }, el("input", { type: "radio", name: "sc-fatigue", value: i + 1, checked: v.fatigue === i + 1 || undefined, onchange: () => { v.fatigue = i + 1; } }), `${i + 1} · ${label}`))),
         slider("Mood", v.mood, value => { v.mood = value; }, "0 very low", "10 very good"),
