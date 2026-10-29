@@ -11,7 +11,7 @@ const DAYS_PER_MONTH = 30.4375;
 // Display scale for the skeletal tint: 0 % to the model's value at mission end (Day 240 ~ 9.9 %).
 export const BONE_TINT_SCALE = Object.freeze({ min: 0, max: 0.10 });
 // Visual multiplier only: radiation tracks drawn per mGy of cumulative synthetic dose.
-export const TRACKS_PER_MGY = 2;
+export const TRACKS_PER_MGY = 1;
 export const MAX_TRACKS = 120;
 // Parameter-table confidence for the capacity-loss rate (docs/parameter-evidence-table.md, B-05).
 export const BONE_MODEL_EVIDENCE = Object.freeze({ id: "B-05", level: "Low", solidity: 0.55 });

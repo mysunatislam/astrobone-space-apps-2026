@@ -12,7 +12,7 @@ test("Elena checkpoints have explicit synthetic provenance on every authored val
 });
 test("Day 147 computes actual subtraction and eight implemented gates", () => {
   const r = deriveMission(initialMissionState(), external);
-  assert.equal(r.change.delta, -14); assert.equal(r.cardio.delta, 12); assert.equal(r.dose, 22.05); assert.equal(r.gates.length, 8); assert.equal(r.passed, 8);
+  assert.equal(r.change.delta, -14); assert.equal(r.cardio.delta, 12); assert.equal(r.dose, 66.87); assert.equal(r.gates.length, 8); assert.equal(r.passed, 8);
   assert.equal(r.references.length, 3); assert.equal(r.day, 147); assert.match(r.engine, /no LLM/);
 });
 test("baseline has no invented follow-up and no future observation", () => {
@@ -32,12 +32,12 @@ test("sensor and evidence failures abstain, independent of loaded assets", () =>
 });
 test("event is time-scoped, deterministic and never overwrites dosimeter history", () => {
   const state = initialMissionState(); state.event = { day: 147 }; const r = deriveMission(state, external);
-  assert.equal(r.dose, 22.05); assert.equal(r.doseWithEvent, 32.05); assert.equal(r.radiation, "REASSESSMENT REQUIRED");
-  const early = deriveMission({ ...state, day: 120 }, external); assert.equal(early.event, null); assert.equal(early.doseWithEvent, 18);
+  assert.equal(r.dose, 66.87); assert.equal(r.doseWithEvent, 76.87); assert.equal(r.radiation, "REASSESSMENT REQUIRED");
+  const early = deriveMission({ ...state, day: 120 }, external); assert.equal(early.event, null); assert.equal(early.doseWithEvent, 54.5);
 });
 test("what-if exposure remains separate; leaving lab restores authored readings", () => {
   const state = initialMissionState(); state.lab = true; state.options.exposure = 50;
-  assert.equal(deriveMission(state, external).dose, 50); state.lab = false; assert.equal(deriveMission(state, external).dose, 22.05);
+  assert.equal(deriveMission(state, external).dose, 50); state.lab = false; assert.equal(deriveMission(state, external).dose, 66.87);
 });
 test("offline toggle changes remote status, not comparisons or source data", () => {
   const a = deriveMission(initialMissionState(), external), b = deriveMission({ ...initialMissionState(), offline: true }, external);

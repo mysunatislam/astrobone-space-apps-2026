@@ -15,7 +15,7 @@ try {
     await page.locator("#case-name").getByText("Commander Alex Morgan").waitFor();
     await page.waitForFunction(()=>document.querySelector("#case-day")?.textContent==="Day 180");
     assert.match(await page.locator("#case-change").innerText(),/165 to 151 deg/);
-    assert.match(await page.locator("#case-dose").innerText(),/27 mGy.*synthetic/);
+    assert.match(await page.locator("#case-dose").innerText(),/81.98 mGy.*synthetic/);
     assert.match(await page.locator("#case-heart-value").innerText(),/76 bpm.*synthetic/);
     for (const channel of ["cardiovascular", "radiation", "xray"]) {
       await page.locator(`#channel-${channel}`).click();

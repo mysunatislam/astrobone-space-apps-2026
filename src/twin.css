@@ -195,8 +195,9 @@ body.twin-body { overflow: hidden; }
 .tw-subtabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
 .tw-subtabs button { border: 1px solid var(--tw-line); background: rgba(4, 10, 22, .4); padding: 7px 10px; border-radius: 8px; font: 600 10px var(--tw-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tw-dim); }
 .tw-subtabs button[aria-pressed="true"] { color: #fff; border-color: var(--tw-line-strong); background: rgba(127, 227, 255, .1); }
-.tw-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-.tw-mini .tw-card { padding: 9px; }
+.tw-mini { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.tw-mini .tw-card { padding: 9px; min-width: 0; }
+.tw-mini .tw-card header { flex-wrap: wrap; row-gap: 4px; }
 .tw-mini .tw-card strong { font-size: 20px; }
 .tw-pathway { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 22px; position: relative; }
 .tw-pathway li { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 11px 12px; border-radius: 10px; border: 1px solid rgba(178, 124, 255, .35); background: rgba(178, 124, 255, .07); }

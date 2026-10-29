@@ -595,7 +595,7 @@ export function createTwinApp(root) {
     if (state.physio === "cardio") body = [chartCanvas, el("div", { class: "tw-mini" }, card({ label: "Current HR", value: String(s.heart.bpm), unit: "bpm", kind: "SYNTHETIC", quality: s.heart.quality }), card({ label: "Baseline", value: String(s.heart.baselineBpm), unit: "bpm", kind: "SYNTHETIC" }), card({ label: "ΔHR", value: signed(s.heart.delta), unit: "bpm", kind: "DERIVED" })),
       el("p", { class: "tw-note" }, `The 3D heart beats at ${fmt(s.heart.hz, 2)} Hz = ${s.heart.bpm} bpm / 60. Input quality ${s.heart.quality.toFixed(2)} is a synthetic rPPG-style indicator. No ECG and no cardiovascular prediction model, so no model-vs-observed comparison exists.`)];
     else if (state.physio === "renal") body = [renalPathway(), el("p", { class: "tw-note" }, "Pathway from spaceflight physiology literature for context. Only the first step has an AstroBone value (the capacity modifier); the rest have no data for Elena and are not computed.")];
-    else if (state.physio === "radiation") body = [chartCanvas, el("div", { class: "tw-mini" }, card({ label: "Cumulative", value: fmt(s.radiation.doseMgy, 2), unit: "mGy", kind: "SYNTHETIC" }), card({ label: "Record rate", value: "0.15", unit: "mGy/day", kind: "DERIVED" }), card({ label: "Burden", value: "Not modeled", kind: "NONE" })),
+    else if (state.physio === "radiation") body = [chartCanvas, el("div", { class: "tw-mini" }, card({ label: "Cumulative", value: fmt(s.radiation.doseMgy, 2), unit: "mGy", kind: "SYNTHETIC" }), card({ label: "Record rate", value: fmt(ELENA.doseRate.value, 3), unit: "mGy/day", kind: "SYNTHETIC", detail: "Mars-cruise rate measured by MSL/RAD (Guo et al. 2015)" }), card({ label: "Burden", value: "Not modeled", kind: "NONE" })),
       el("p", { class: "tw-note" }, `Tracks around Elena: ${s.radiation.tracks} (= ${TRACKS_PER_MGY} × dose). Dose history is illustrative and is not effective dose, organ dose or a transport calculation.`)];
     else body = [chartCanvas, predictedText()];
     fill(drawer, drawerHead("PHYSIOLOGY", PHYSIO_TABS.find(([k]) => k === state.physio)[1], state.physio === "renal" ? "NONE" : state.physio === "predicted" ? "DERIVED" : "SYNTHETIC"), tabs, ...body);
@@ -633,7 +633,7 @@ export function createTwinApp(root) {
       const pts = obs.map(r => ({ day: r.day.value, value: r.heartRate.value })); line(pts, y, "rgba(255,90,130,.8)"); dots(pts, y, "#ff5a86");
       chartCanvas.setAttribute("aria-label", `Heart rate by day: ${pts.map(p => `Day ${p.day} ${p.value} bpm`).join(", ")}`);
     } else if (state.physio === "radiation") {
-      const y = axis(0, 50); grid(0, 50, 10, y, "");
+      const y = axis(0, 120); grid(0, 120, 20, y, "");
       ctx.strokeStyle = "rgba(200,184,255,.9)"; ctx.beginPath(); obs.forEach((r, i) => { const px = x(r.day.value), py = y(r.absorbedDose.value); if (i) { ctx.lineTo(px, y(obs[i - 1].absorbedDose.value)); ctx.lineTo(px, py); } else ctx.moveTo(px, py); }); ctx.lineTo(nowX, y(obs.at(-1).absorbedDose.value)); ctx.stroke();
       if (current.radiation.eventIncluded) { ctx.fillStyle = "#ffc46b"; ctx.fillRect(x(IMPACT_SCENARIO.day.value) - 1, y(current.radiation.doseMgy), 3, y(current.radiation.recordedDoseMgy) - y(current.radiation.doseMgy)); }
       chartCanvas.setAttribute("aria-label", `Cumulative synthetic dose: ${obs.map(r => `Day ${r.day.value} ${r.absorbedDose.value} mGy`).join(", ")}`);
@@ -765,7 +765,7 @@ export function createTwinApp(root) {
       state.compare = false; scene.setCompare(false); scene.resetImpact(); state.impactDone = false; state.mc = null;
       await step(() => { setExperience("mission"); setDay(1, { travel: true }); }, "DAY 1 · BASELINE SCAN · synthetic personal baseline locked", 3400);
       await step(async () => { setExperience("twin", { system: "skeleton" }); await animateDay(30); }, `DAY 30 · MODEL-ESTIMATED SKELETAL CHANGE −${fmt(twinState(30).bone.lossFraction * 100)} % · weight-bearing bones`, 3600);
-      await step(async () => { setExperience("mission"); await animateDay(60); }, "DAY 60 · MULTISYSTEM · knee extension −2°, heart rate +2 bpm, 9 mGy (synthetic records)", 4000);
+      await step(async () => { setExperience("mission"); await animateDay(60); }, `DAY 60 · MULTISYSTEM · knee extension −2°, heart rate +2 bpm, ${ELENA.observations.find(r => r.day.value === 60).absorbedDose.value} mGy (synthetic records)`, 4000);
       await step(async () => { setExperience("twin", { system: "cardiovascular" }); await animateDay(90); }, "DAY 90 · HEART RATE 69 bpm (+5) · the heart beats at the recorded rate", 4200);
       await step(async () => { setExperience("functional"); await animateDay(120); }, "DAY 120 · FUNCTIONAL ASSESSMENT · knee extension 157° (−8° vs Day 1)", 4200);
       const pvo = predictedVsObserved(CURRENT_DAY);
