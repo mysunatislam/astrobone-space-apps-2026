@@ -1,12 +1,13 @@
 // Monte Carlo check of the self-check review rules on synthetic daily knee-extension series.
 // Compares the rolling-baseline rule alone ("day") with the rule plus CUSUM drift against the locked
 // baseline ("day + drift"): false alarms on a stable astronaut, and days to detect a gradual decline
-// or a step drop. Measurement noise is Gaussian; this tests the rules, not the camera.
-// Usage: node scripts/simulate-detection.mjs [--runs=1000] [--noise=2] [--floor=5] [--k=1 --h=6] [--reset]
-import { evaluateIndicator, INDICATORS } from "../src/selfCheck.js";
+// or a step drop. Measurement noise is Gaussian, by default the camera's repeat noise measured on real
+// video (KNEE_REPEAT_NOISE, 4.4°); this tests the rules, not the camera.
+// Usage: node scripts/simulate-detection.mjs [--runs=1000] [--noise=4.4] [--floor=5] [--k=1 --h=6] [--reset]
+import { evaluateIndicator, INDICATORS, KNEE_REPEAT_NOISE } from "../src/selfCheck.js";
 
 const arg = (name, fallback) => { const hit = process.argv.find(a => a.startsWith(`--${name}=`)); return hit ? Number(hit.split("=")[1]) : fallback; };
-const runs = arg("runs", 1000), noise = arg("noise", 2), floor = arg("floor", INDICATORS.kneeExtension.floor);
+const runs = arg("runs", 1000), noise = arg("noise", KNEE_REPEAT_NOISE.kneeExtension.sd), floor = arg("floor", INDICATORS.kneeExtension.floor);
 const driftParams = process.argv.some(a => a.startsWith("--k=")) ? { k: arg("k"), h: arg("h"), reset: process.argv.includes("--reset") } : undefined;
 const DAYS = 180, START = 170, PROTOCOL = "sim";
 
@@ -63,5 +64,7 @@ const rows = [
   scenario("Gradual decline 2°/month from day 30", d => START - Math.max(0, d - ONSET) * 2 / 30, ONSET),
   scenario("Gradual decline 4°/month from day 30", d => START - Math.max(0, d - ONSET) * 4 / 30, ONSET),
   scenario("Step drop of 8° on day 30", d => START - (d >= ONSET ? 8 : 0), ONSET),
+  // Starts while the locked baseline is still being collected, so part of it is absorbed into the start level.
+  scenario("Gradual decline 4°/month from day 5", d => START - Math.max(0, d - 5) * 4 / 30, 5),
 ];
 console.log(JSON.stringify({ runs, noiseSdDegrees: noise, days: DAYS, floorDegrees: floor, rules: { day: "rolling baseline only", any: "rolling baseline + CUSUM drift" }, rows }, null, 2));

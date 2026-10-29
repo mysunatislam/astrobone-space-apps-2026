@@ -541,7 +541,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         el("button", { type: "button", class: "sc-secondary", "aria-expanded": String(state.report), onclick: () => { state.report = !state.report; render(); if (state.report) element.querySelector(".sc-report")?.scrollIntoView({ block: "nearest", behavior: "smooth" }); } }, "Report for flight surgeon"),
         el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
       state.report ? reportSection() : null,
-      el("p", { class: "sc-note" }, "Review triggers: one value outside your usual range (your last 5 checks' average ± 2× your own spread, taken from up to 30 checks once you have 10, or a minimum change, whichever is larger; from 3 usable checks) asks for a re-check; two in a row, or one far outside, is logged for review, and so is a steady drift from your first checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
+      el("p", { class: "sc-note" }, "Review triggers: one value outside your usual range (your last 5 checks' average ± 2× your own spread, taken from up to 30 checks once you have 10, or a minimum change, whichever is larger; from 3 usable checks) asks for a re-check; two in a row, or one far outside, is logged for review, and so is a steady drift from your first 20 checks (CUSUM). Engineering defaults, not clinical thresholds. AstroBone does not diagnose or prescribe."),
       reliabilityNote(),
       state.profile === "elena" ? el("p", { class: "sc-note" }, ELENA_SELF_CHECK_BOUNDARY) : null];
   }
