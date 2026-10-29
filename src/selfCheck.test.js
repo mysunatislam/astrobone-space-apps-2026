@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   summarizePvt, PVT_PROTOCOL, personalReference, evaluateIndicator, lockedReference, driftCheck, evaluateSelfCheck, recommendActions, newCheck, createSelfCheckStore, PVT_B, INDICATORS,
-  backupPacket, restoreBackup, SPREAD, pvtDeviceClass,
+  backupPacket, restoreBackup, SPREAD, pvtDeviceClass, sleepDebt, SLEEP_DEBT,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, elenaDay147, ELENA_POOR_CAPTURE } from "./elenaSelfCheck.js";
 
@@ -222,6 +222,33 @@ test("ordinary day-to-day noise around a steady value does not raise drift", () 
     history.push({ values: { kneeExtension: 170 + n } });
   }
   assert.equal(driftCheck("kneeExtension", 170, history).drift, false);
+});
+
+test("a fortnight of short nights that no single night shows is logged as sleep debt", () => {
+  // 30 nights alternating 6 and 8 h (usual 7, about 1.8 h from night to night), then 2 h less each night.
+  const usual = Array.from({ length: 30 }, (_, i) => (i % 2 ? 8 : 6)), short = Array.from({ length: SLEEP_DEBT.nights }, (_, i) => (i % 2 ? 6 : 4));
+  const history = [...usual, ...short.slice(0, -1)].map(v => ({ values: { sleepHours: v } }));
+  const row = evaluateIndicator("sleepHours", short.at(-1), history);
+  assert.equal(row.status, "changed");
+  assert.equal(row.reason, "debt", "each night is inside the rolling range; only the total shows it");
+  assert.equal(row.debt.debt, 28);
+  assert.ok(row.debt.limit > 20 && row.debt.limit < 28, JSON.stringify(row.debt));
+  assert.match(evaluateSelfCheck({ id: "x", values: { sleepHours: short.at(-1) } }, history).actions.find(a => a.id === "review-behavioral").text, /last 14 nights add up to 28 h less sleep than your usual/);
+  // Half that loss (1 h a night) stays within ordinary night-to-night change over 14 nights.
+  assert.equal(sleepDebt(usual, 6).flagged, false);
+  assert.equal(sleepDebt([...usual, ...short.map(v => v + 1).slice(0, -1)], 6).flagged, false);
+});
+
+test("sleep debt waits for enough nights, never flags more sleep, and keeps estimates and trackers apart", () => {
+  assert.equal(sleepDebt(Array(SLEEP_DEBT.nights + SPREAD.min - 2).fill(7), 4).ready, false);
+  assert.equal(sleepDebt(Array(SLEEP_DEBT.nights + SPREAD.min - 1).fill(7), 7).ready, true);
+  const usual = Array.from({ length: 30 }, (_, i) => (i % 2 ? 8 : 6));
+  assert.ok(sleepDebt([...usual, ...Array(13).fill(9)], 9).debt < 0);
+  assert.equal(sleepDebt([...usual, ...Array(13).fill(9)], 9).flagged, false);
+  // Tracker nights are not added to a run of own estimates.
+  const history = [...usual.map(v => ({ values: { sleepHours: v } })), ...Array(13).fill(0).map(() => ({ values: { sleepHours: 5 }, protocols: { sleepHours: "sleep-tracker-v1" } }))];
+  assert.notEqual(evaluateIndicator("sleepHours", 5, history, { protocol: "sleep-estimate-v1" }).debt.flagged, true);
+  assert.equal(evaluateIndicator("sleepHours", 5, history, { protocol: "sleep-tracker-v1" }).debt.ready, false);
 });
 
 test("drift needs a locked baseline and never flags an improvement", () => {
