@@ -63,7 +63,8 @@ button:hover {
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
-summary:focus-visible {
+summary:focus-visible,
+[tabindex="0"]:focus-visible {
   outline: 3px solid rgba(20, 124, 114, 0.24);
   outline-offset: 2px;
 }

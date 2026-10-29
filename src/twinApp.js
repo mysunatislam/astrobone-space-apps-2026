@@ -67,7 +67,7 @@ export function createTwinApp(root) {
     el("span", { class: "tw-eyebrow" }, "SYSTEMS"),
     SYSTEMS.map(([key, label]) => el("button", { type: "button", "data-system": key, onclick: () => { stopDemo(); state.compare = false; setExperience("twin", { system: key }); } }, el("i", { "aria-hidden": "true" }), label)),
     el("button", { type: "button", class: "tw-compare", "aria-pressed": "false", onclick: () => { stopDemo(); toggleCompare(); } }, "Day 1 vs now"));
-  const panels = el("section", { class: "tw-panels", "aria-label": "Selected system values", "aria-live": "polite" });
+  const panels = el("section", { class: "tw-panels", "aria-label": "Selected system values", "aria-live": "polite", tabindex: "0" });
   const nodes = el("section", { class: "tw-nodes", "aria-label": "Multisystem status" });
   const drawer = el("section", { class: "tw-drawer", "aria-live": "polite" });
   const legend = el("div", { class: "tw-legend" });
