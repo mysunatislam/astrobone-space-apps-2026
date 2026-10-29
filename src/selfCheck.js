@@ -204,18 +204,36 @@ export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRI
 // one value beyond the usual range is a warning, "recheck", measured again at the next check. It counts as
 // a change for review only when it is far beyond the range (more than `big` times it, about 3 SD) or the
 // previous usable check was also beyond its own range on the same side. With the single-value rule, a
-// healthy astronaut who checked all 14 indicators daily was told something changed on 31 % of checks
-// (scripts/simulate-false-alarms.mjs).
+// healthy astronaut who checked all 14 indicators daily was told something changed on 36 % of checks
+// (scripts/simulate-false-alarms.mjs, measured knee noise).
 export const MULTIRULE = Object.freeze({ big: 1.5 });
+
+// How much the camera's knee reading moves between repeats when the knee did not change, measured on
+// saved real video against motion capture (REHAB24-6, 9 people; src/kneeRepeatability.js,
+// scripts/validation/knee-repeatability.mjs). Side-on squats, the closest match to the side-on seated test:
+// range of motion from 97 consecutive-repetition pairs; extension scaled from it by the side-on ratio of
+// extension to range-of-motion error. One person's 21 squats measured directly moved less (extension 2.3°,
+// range 4.5°), so these are the cautious figures. mdc95 is the smallest change between two single checks
+// that this noise alone exceeds only 1 time in 20. Squats are not the seated test, and these are repeats in
+// one session, not on different days.
+export const KNEE_REPEAT_NOISE = Object.freeze({
+  kneeExtension: Object.freeze({ sd: 4.4, mdc95: 12.3 }),
+  kneeRom: Object.freeze({ sd: 5.8, mdc95: 16 }),
+  oneVideo: Object.freeze({ kneeExtension: 2.3, kneeRom: 4.5, squats: 21 }),
+  facingMinusSideOn: 10.9,
+  source: "REHAB24-6, side-on squats against motion capture, 9 people",
+});
 
 // What scripts/simulate-false-alarms.mjs measured for these rules: 1,000 simulated healthy astronauts
 // doing all 14 checks daily for 60 days, then a real step change on day 31 (400 astronauts each). The
-// day-to-day spreads behind it are assumptions until measured on volunteers. The app shows these
+// knee spreads are KNEE_REPEAT_NOISE, measured on real video; the other day-to-day spreads are assumptions
+// until measured on volunteers. With the knee spreads assumed before (3° and 4°) the figures were REVIEW
+// 7.2 % and a 10° knee drop flagged within three checks in 91 % (--assumed-knee). The app shows these
 // numbers; src/falseAlarms.test.js keeps them in step with the code.
 export const SIMULATED_RELIABILITY = Object.freeze({
-  astronauts: 1000, days: 60, reviewPct: 7.2, singleRuleReviewPct: 31.2, recheckPct: 31.5,
+  astronauts: 1000, days: 60, reviewPct: 10.5, singleRuleReviewPct: 36.1, recheckPct: 35.6,
   detected: Object.freeze([
-    ["kneeExtension", "knee extension 10° lower", 91, 100], ["pvtLapses", "6 more attention lapses", 94.5, 100],
+    ["kneeExtension", "knee extension 10° lower", 68.8, 94.3], ["pvtLapses", "6 more attention lapses", 94.5, 100],
     ["systolicBp", "systolic 20 mmHg higher", 82.5, 100], ["glucose", "fasting blood sugar 20 mg/dL higher", 74.3, 99.5],
     ["sleepHours", "2 h less sleep", 56.8, 93],
   ].map(([key, label, withinThree, withinTwoWeeks]) => Object.freeze({ key, label, withinThree, withinTwoWeeks }))),

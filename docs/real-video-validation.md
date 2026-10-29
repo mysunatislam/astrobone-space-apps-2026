@@ -7,6 +7,7 @@ Generated 2026-10-27 by `scripts/validation/`. Every number below was measured o
 - **Knee: the app's 3D knee angle missed squat depth.** Facing the camera, MediaPipe's 3D world-landmark angle made the knee's range of motion 29.9° too small on average in squats and 26.9° in lunges. Larger MediaPipe models did not fix it.
 - **8 pretrained pose models compared.** SynthPose-B placed the knee best (70.4 % within 10 % of the thigh, MediaPipe lite 53.8 %), but only MediaPipe gives a 3D angle, and side-on every model read squat range of motion with 4.9–8.7° error. A better keypoint model alone does not fix the facing-camera error; the hybrid does.
 - **The hybrid knee model fixes most of it.** MediaPipe plus 100 learned trees: knee range-of-motion error 21.7° → 13.2° per rep, ICC(2,1) 0.549 → 0.769, better for 9 of 9 people left out of training. Shipped in `src/kneeHybrid.js`.
+- **Knee repeat noise, measured.** With nothing about the knee changing, the camera's side-on squat reading moved ±5.8° (range of motion) between consecutive repetitions, so two single checks must differ by 16° before noise is an unlikely cause (extension ±4.4°, 12.3°). These now drive the false-alarm simulation and are shown beside each knee result (section 5).
 - **Pulse: the old method almost never answered on real webcam video.** POS with a 60 % peak-share gate refused 95 % of 30-second windows.
 - **The pulse hybrid reads within 2.1 bpm on average.** ME-rPPG (deep model) leading, POS at a quarter weight: 90 % of windows within 5 bpm of the finger sensor on 40 people at rest and after squats, 96 % of windows answered (the rest refused for head movement or lighting); with the shipped quality gate (0.3), 0.6 bpm on 77 % of windows.
 - **The hybrid beats its parts, validated on people it was not tuned on.** Deep model alone 2.4 bpm, our first equal-weight design (with CHROM) 3.1 bpm, shipped hybrid 2.1 bpm; with the POS weight chosen leave-one-person-out, 2.3 bpm.
@@ -157,7 +158,30 @@ AstroBone compares a resting heart rate only with the same person's earlier read
 
 **Context.** Holter recordings of seven ISS crew members found night-time heart rate unchanged in flight (about 55 bpm) with lower daytime rates (Fraser, Hughson et al., IAC-11.A1.2.9, 2011). After flight, heart rate on standing or tilt rises (93 vs 74 bpm in six astronauts, Cox et al., J Physiol 2002; stand-test tachycardia in 11 ISS astronauts, Lee et al., Front Physiol 2020). A sustained change from a crew member's own resting baseline is therefore the signal worth watching; the app flags it for review past 8 bpm and never diagnoses.
 
-## 5. Limits
+## 5. Repeat noise: what one knee check can tell
+
+AstroBone compares each knee check with the same person's earlier checks, never with a population norm. Whether a change is real therefore depends less on the absolute error above than on how much the error itself moves when nothing about the knee changed. No volunteer has been measured on different days yet, so this section takes the closest answer the saved data hold: consecutive repetitions of the same knee, on the same camera, in the same video. The saved per-repetition table has no person column, so the few pairs that straddle two videos (and two people) are counted too; they can only make the noise look larger. `scripts/validation/knee-repeatability.mjs` computes this section from the files in `data/validation/` (derived from REHAB24-6), with no download.
+
+| Movement, camera position | Reps | Bias | 95 % limits of agreement | Repeat noise (SD) | Detectable change (MDC95) |
+|---|---|---|---|---|---|
+| Squat, side-on | 98 | -3° | -18.4° to 12.4° | 5.8° | 16° |
+| Squat, facing | 196 | -15.8° | -39.5° to 8° | 7.8° | 21.6° |
+| Squat, part-turned | 186 | -10.5° | -34.1° to 13.2° | 6.1° | 16.9° |
+| Lunge, side-on | 91 | 3.2° | -19.5° to 26° | 7.7° | 21.3° |
+| Lunge, facing | 176 | -11.4° | -43.1° to 20.2° | 10.4° | 28.7° |
+| Lunge, part-turned | 181 | -6.6° | -36.1° to 23° | 8.8° | 24.4° |
+
+Range of motion per repetition, shipped hybrid, camera minus motion capture. **Repeat noise** is the mean difference between consecutive repetitions' errors divided by 1.128 (the moving-range estimate), so a person's steady offset cancels the way it cancels against their own baseline. In every position it is smaller than the spread of the error across people: part of the error is a steady offset of each person and set-up. **MDC95** = 1.96 × √2 × repeat noise, the smallest difference between two single readings that noise alone exceeds only 1 time in 20. Side-on, the hybrid repeats no worse than the old 3D angle (squats 5.8° against 7°).
+
+**One person, 21 squats, frame by frame.** The one video kept frame by frame (person 6) splits into 21 squats. Side-on, the extension error moved 2.3° and the range-of-motion error 4.5° from squat to squat (facing: 2.3° and 4.6°), less than the pooled figures, so the pooled ones are the cautious choice. The steps are uneven: the median extension step was 1.8°, but the error sat at a different level in the first few squats than in the rest (side-on extension shifted 7.8° after squat 3, facing 14.9° after squat 5). That looks like a change in how or where the person squatted rather than random camera noise (the saved file does not record which). The camera repeats closely when the movement is repeated closely, which is why the self-check asks for the same position every day.
+
+**The same knee, facing and side-on at once.** In 98 squats the facing camera read the same knee's range of motion 10.9° lower than the side-on camera on average (SD 13.5°; lunges 16.1° lower, SD 18.2°). A change of camera position is a change of reading, so the app keeps a separate baseline for each position and refuses part-turned captures.
+
+**What the app now uses.** Side-on squats are the closest match to the side-on seated test: range of motion ±5.8° (MDC95 16°, 97 pairs). The per-repetition table holds range of motion only, so extension is scaled by the side-on ratio of extension error to range-of-motion error on the same repetitions (0.76): ±4.4° (MDC95 12.3°). These are `KNEE_REPEAT_NOISE` in `src/selfCheck.js`, and they replace the 3° and 4° that `scripts/simulate-false-alarms.mjs` used to assume. With them a healthy astronaut doing all 14 checks daily is told REVIEW on 10.5 % of days (7.2 % with the old guess), and a real 10° drop in knee extension is flagged within three checks in 68.8 % of runs (91 %) and within 14 checks in 94.3 % (100 %). The knee is now the noisiest daily check, and the app says so: the result shows the measured noise beside each knee capture, and **How often is this wrong?** shows the new figures.
+
+**What this does not prove.** These are repeats within one session, of squats and lunges, by nine healthy adults in one lab. Day-to-day repeatability of the seated test (new camera placement, clothing and light), and anything in microgravity, still needs the same volunteers checked on different days against a goniometer. The in-app angle check records exactly those pairs and raises the knee review trigger to the measured detectable change once there are 20 pairs from 3 people.
+
+## 6. Limits
 
 - The knee hybrid was trained on squats and lunges; the self-check uses a seated knee extension. Side-on, both are motion in one plane, but the seated test needs its own goniometer check (the in-app angle check records exactly that).
 - Nine people in one lab for the knee; healthy adults on Earth for the pulse. None are astronauts.
@@ -165,6 +189,6 @@ AstroBone compares a resting heart rate only with the same person's earlier read
 - The live browser path was run end to end with Chromium's fake camera playing a real face video (`scripts/qa-camera-pulse.mjs`). On the headless test machine, with software graphics, the worker analysed only 7 frames a second, below the 15 the estimator needs, so the app refused with that reason instead of reporting a rate. A reading on a real phone or laptop camera, next to a finger pulse oximeter, is still needed.
 - REHAB24-6 is CC BY-NC 4.0, so the fitted trees are for non-commercial use.
 
-## 6. Rerun
+## 7. Rerun
 
-See `scripts/validation/README.md`. In short: download the datasets, run `rppg_worker.py` and `pose_driver.sh`, then `eval_rppg.py`, `export_signals.py`, `score-wave-pulse.mjs`, `eval_pose.py`, `hybrid_pose.py`, `export_knee_hybrid.py`, `report_data.py` and this file's generator `write_validation_doc.py`.
+See `scripts/validation/README.md`. In short: download the datasets, run `rppg_worker.py` and `pose_driver.sh`, then `eval_rppg.py`, `export_signals.py`, `score-wave-pulse.mjs`, `eval_pose.py`, `hybrid_pose.py`, `export_knee_hybrid.py`, `report_data.py` and this file's generator `write_validation_doc.py`. Section 5 needs no download: `node scripts/validation/knee-repeatability.mjs` prints it from `data/validation/`.

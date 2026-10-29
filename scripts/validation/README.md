@@ -39,6 +39,15 @@ python hybrid_pose.py mp-lite mp-full # rule, ridge blend, boosted trees, shippe
 python export_knee_hybrid.py <repo>   # refits on all 9 people, writes src/kneeHybridModel.js and its test fixture
 ```
 
+Knee repeat noise needs no download: it reads the derived tables committed in `data/validation/` (the per-repetition table, the
+per-method summary and one squat video frame by frame, all written by the steps above) through `src/kneeRepeatability.js`:
+
+```sh
+node knee-repeatability.mjs           # section 5 of docs/real-video-validation.md; --json for the raw numbers
+```
+
+`src/kneeRepeatability.test.js` checks that `KNEE_REPEAT_NOISE` in `src/selfCheck.js` and the doc's section 5 match its output.
+
 Report and doc:
 
 ```sh

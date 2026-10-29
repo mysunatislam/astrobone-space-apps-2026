@@ -3,8 +3,9 @@
 // spread) and runs the app's own evaluateSelfCheck on them. A real step change is then added to one
 // indicator to see whether the rules still catch it.
 // --single runs the original single-value rule instead, for comparison.
-// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--json]
-import { evaluateSelfCheck, INDICATORS } from "../src/selfCheck.js";
+// --assumed-knee uses the knee spreads assumed before they were measured on real video.
+// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--assumed-knee] [--json]
+import { evaluateSelfCheck, INDICATORS, KNEE_REPEAT_NOISE } from "../src/selfCheck.js";
 
 const arg = (name, fallback) => { const hit = process.argv.find(a => a.startsWith(`--${name}=`)); return hit ? Number(hit.split("=")[1]) : fallback; };
 const RUNS = arg("runs", 1000), DAYS = arg("days", 60), SPREAD = arg("spread", 1);
@@ -12,11 +13,13 @@ export const singleValueRule = (check, history) => evaluateSelfCheck(check, hist
 
 // Usual level and day-to-day spread (1 SD) of a healthy astronaut. These are assumptions, stated so they
 // can be argued with: glucose uses the EFLM within-person CV of 4.9 % plus about 4 % for a home meter;
-// blood pressure is the mean of two seated home readings; the knee spread is the camera's repeat noise,
-// which the volunteer study has not measured yet. `round` mimics how each value is entered.
+// blood pressure is the mean of two seated home readings; the knee spreads are the camera's repeat noise
+// measured on real video (KNEE_REPEAT_NOISE; ASSUMED_KNEE_SD is what was assumed before that).
+// `round` mimics how each value is entered.
+export const ASSUMED_KNEE_SD = Object.freeze({ kneeExtension: 3, kneeRom: 4 });
 export const STABLE_PERSON = Object.freeze({
-  kneeExtension: { mean: 165, sd: 3, round: 1 },
-  kneeRom: { mean: 65, sd: 4, round: 1 },
+  kneeExtension: { mean: 165, sd: KNEE_REPEAT_NOISE.kneeExtension.sd, round: 1 },
+  kneeRom: { mean: 65, sd: KNEE_REPEAT_NOISE.kneeRom.sd, round: 1 },
   restingHr: { mean: 62, sd: 4, round: 1 },
   systolicBp: { mean: 116, sd: 6, round: 1 },
   diastolicBp: { mean: 75, sd: 4.5, round: 1 },
@@ -47,11 +50,11 @@ function sample(spec, random, spread, shift = 0) {
 }
 
 // One astronaut's daily checks. `change` = { key, day, shift } adds a real step change from that day.
-export function simulateAstronaut(seed, { days = DAYS, spread = SPREAD, change = null, evaluate = evaluateSelfCheck } = {}) {
+export function simulateAstronaut(seed, { days = DAYS, spread = SPREAD, change = null, evaluate = evaluateSelfCheck, person = STABLE_PERSON } = {}) {
   const random = rng(seed), history = [], out = [];
   for (let day = 1; day <= days; day++) {
     const values = {};
-    for (const [key, spec] of Object.entries(STABLE_PERSON)) values[key] = sample(spec, random, spread, change && key === change.key && day >= change.day ? change.shift : 0);
+    for (const [key, spec] of Object.entries(person)) values[key] = sample(spec, random, spread, change && key === change.key && day >= change.day ? change.shift : 0);
     const keys = Object.keys(values);
     const check = { id: `sim-${seed}-${day}`, missionDay: day, at: `day ${day}`, values, protocols: Object.fromEntries(keys.map(k => [k, "sim"])), quality: Object.fromEntries(keys.map(k => [k, true])), redFlags: {}, symptoms: {} };
     const ev = evaluate(check, history);
@@ -65,12 +68,12 @@ const rows = ev => ev.domains.flatMap(d => d.indicators);
 const REVIEW_OR_WORSE = new Set(["changed", "attention", "urgent"]);
 const RECHECK_OR_WORSE = new Set(["recheck", ...REVIEW_OR_WORSE]);
 
-export function falseAlarmSummary({ runs = RUNS, days = DAYS, spread = SPREAD, evaluate } = {}) {
+export function falseAlarmSummary({ runs = RUNS, days = DAYS, spread = SPREAD, evaluate, person } = {}) {
   let checks = 0, review = 0, recheck = 0, changedRows = 0, limitChecks = 0, driftRuns = 0;
   const byKey = Object.fromEntries(Object.keys(INDICATORS).map(k => [k, 0]));
   for (let i = 0; i < runs; i++) {
     let drifted = false;
-    for (const { day, ev } of simulateAstronaut(1000 + i, { days, spread, evaluate })) {
+    for (const { day, ev } of simulateAstronaut(1000 + i, { days, spread, evaluate, person })) {
       if (day <= 5) continue; // baselines are still being built
       checks++;
       if (REVIEW_OR_WORSE.has(ev.overall)) review++;
@@ -94,10 +97,10 @@ export function falseAlarmSummary({ runs = RUNS, days = DAYS, spread = SPREAD, e
 
 // Share of astronauts whose changed indicator is flagged on the first check after a real step change,
 // within the first three checks, and within two weeks of daily checks.
-export function detectionSummary(change, { runs = RUNS, days = DAYS, spread = SPREAD, evaluate } = {}) {
+export function detectionSummary(change, { runs = RUNS, days = DAYS, spread = SPREAD, evaluate, person } = {}) {
   let first = 0, within3 = 0, within14 = 0;
   for (let i = 0; i < runs; i++) {
-    const flagged = simulateAstronaut(5000 + i, { days, spread, change, evaluate })
+    const flagged = simulateAstronaut(5000 + i, { days, spread, change, evaluate, person })
       .filter(({ day }) => day >= change.day && day < change.day + 14)
       .map(({ ev }) => rows(ev).find(r => r.key === change.key)?.status)
       .map(s => REVIEW_OR_WORSE.has(s));
@@ -119,11 +122,12 @@ export const STEP_CHANGES = Object.freeze([
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const evaluate = process.argv.includes("--single") ? singleValueRule : evaluateSelfCheck;
-  const result = { rule: evaluate === singleValueRule ? "single value" : "multirule", stable: falseAlarmSummary({ evaluate }), detection: STEP_CHANGES.map(c => detectionSummary(c, { runs: Math.min(RUNS, 400), evaluate })) };
+  const person = process.argv.includes("--assumed-knee") ? { ...STABLE_PERSON, ...Object.fromEntries(Object.entries(ASSUMED_KNEE_SD).map(([k, sd]) => [k, { ...STABLE_PERSON[k], sd }])) } : STABLE_PERSON;
+  const result = { rule: evaluate === singleValueRule ? "single value" : "multirule", stable: falseAlarmSummary({ evaluate, person }), detection: STEP_CHANGES.map(c => detectionSummary(c, { runs: Math.min(RUNS, 400), evaluate, person })) };
   if (process.argv.includes("--json")) console.log(JSON.stringify(result, null, 2));
   else {
     const s = result.stable;
-    console.log(`Rule: ${result.rule}. Stable astronauts: ${s.runs} x ${s.days} days, spread x${s.spread}, ${s.checksJudged} checks judged after the first 5`);
+    console.log(`Rule: ${result.rule}${person === STABLE_PERSON ? "" : ", assumed knee spreads"}. Stable astronauts: ${s.runs} x ${s.days} days, spread x${s.spread}, ${s.checksJudged} checks judged after the first 5`);
     console.log(`  REVIEW or worse: ${s.reviewOrWorsePct}% of checks (RE-CHECK or worse ${s.recheckOrWorsePct}%); ${s.changedRowsPerCheck} changed rows per check; fixed limit crossed on ${s.fixedLimitPct}%; drift alarm in ${s.astronautsWithDriftAlarmPct}% of astronauts`);
     console.log(`  Changed rows by indicator (% of checks): ${Object.entries(s.changedPctByIndicator).map(([k, v]) => `${k} ${v}`).join(", ")}`);
     for (const d of result.detection) console.log(`  Real change, ${d.label}: flagged on the first check ${d.firstCheckPct}%, within 3 checks ${d.withinThreeChecksPct}%, within 14 ${d.withinTwoWeeksPct}%`);

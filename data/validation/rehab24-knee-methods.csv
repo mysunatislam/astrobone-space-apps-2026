@@ -1,0 +1,43 @@
+method,exercise_view,rom_mae_deg,rom_bias_deg,rom_icc21,extension_mae_deg,rep_knee_pairs
+"Pretrained, 3D angle (app before)",Ex5|front,27.3,-26.9,0.263,8.07,176
+"Pretrained, 2D angle",Ex5|front,44.01,-39.66,0.13,21.39,176
+"Fixed rule: 2D side-on, else 3D",Ex5|front,27.3,-26.9,0.263,8.07,176
+Linear blend (ridge),Ex5|front,22.27,-19.31,0.347,12.42,176
+Learned trees,Ex5|front,13.64,-9.24,0.616,9.5,176
+Learned trees + fallback (shipped),Ex5|front,15.47,-11.42,0.521,9.11,176
+"Pretrained, 3D angle (app before)",Ex5|half,13.3,-8.3,0.681,8.12,181
+"Pretrained, 2D angle",Ex5|half,12.2,-7.04,0.753,14.07,181
+"Fixed rule: 2D side-on, else 3D",Ex5|half,13.66,-6.82,0.667,8.68,181
+Linear blend (ridge),Ex5|half,12.4,-5.28,0.718,10.05,181
+Learned trees,Ex5|half,13.24,-6.46,0.737,9.16,181
+Learned trees + fallback (shipped),Ex5|half,13.07,-6.59,0.742,8.92,181
+"Pretrained, 3D angle (app before)",Ex5|side,9.81,0.37,0.82,6.8,91
+"Pretrained, 2D angle",Ex5|side,7.85,4.22,0.896,7.11,91
+"Fixed rule: 2D side-on, else 3D",Ex5|side,7.79,4.17,0.896,7.05,91
+Linear blend (ridge),Ex5|side,8.75,3.61,0.851,6.72,91
+Learned trees,Ex5|side,8.45,2.88,0.863,6.63,91
+Learned trees + fallback (shipped),Ex5|side,8.73,3.24,0.861,6.67,91
+"Pretrained, 3D angle (app before)",Ex6|front,29.91,-29.91,0.378,10.88,196
+"Pretrained, 2D angle",Ex6|front,49.76,-49.75,0.178,9.87,196
+"Fixed rule: 2D side-on, else 3D",Ex6|front,29.91,-29.91,0.378,10.88,196
+Linear blend (ridge),Ex6|front,21.77,-21.63,0.506,18.37,196
+Learned trees,Ex6|front,16.12,-14.83,0.579,9.78,196
+Learned trees + fallback (shipped),Ex6|front,16.77,-15.75,0.564,9.8,196
+"Pretrained, 3D angle (app before)",Ex6|half,23.18,-23.01,0.443,7.26,186
+"Pretrained, 2D angle",Ex6|half,24.53,-23.4,0.325,8.67,186
+"Fixed rule: 2D side-on, else 3D",Ex6|half,22.06,-21.67,0.458,8.29,186
+Linear blend (ridge),Ex6|half,16.72,-15.68,0.57,10.21,186
+Learned trees,Ex6|half,11.11,-8.39,0.732,6.16,186
+Learned trees + fallback (shipped),Ex6|half,13.07,-10.46,0.628,6.36,186
+"Pretrained, 3D angle (app before)",Ex6|side,18.82,-18.82,0.556,5.84,98
+"Pretrained, 2D angle",Ex6|side,6.07,-3.72,0.906,6.32,98
+"Fixed rule: 2D side-on, else 3D",Ex6|side,6.07,-3.72,0.906,6.32,98
+Linear blend (ridge),Ex6|side,7.83,-6.7,0.863,6.91,98
+Learned trees,Ex6|side,7.11,-4.81,0.864,4.3,98
+Learned trees + fallback (shipped),Ex6|side,6.52,-3.02,0.895,4.97,98
+"Pretrained, 3D angle (app before)",all|all,21.68,-19.6,0.549,8.15,928
+"Pretrained, 2D angle",all|all,27.56,-24.07,0.393,11.99,928
+"Fixed rule: 2D side-on, else 3D",all|all,19.98,-17.07,0.584,8.54,928
+Linear blend (ridge),all|all,16.28,-12.76,0.671,11.63,928
+Learned trees,all|all,12.38,-8.05,0.795,7.99,928
+Learned trees + fallback (shipped),all|all,13.19,-8.88,0.769,7.99,928
