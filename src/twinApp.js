@@ -137,7 +137,7 @@ export function createTwinApp(root) {
 
   // Clicking the body opens a card for that part: what it does, how spaceflight affects it, and its
   // status from the latest self-check, with a shortcut to measure it or open its analysis.
-  const PART_STATUS = { urgent: "URGENT", attention: "CONTACT TODAY", changed: "REVIEW", repeat: "REPEAT", baseline: "BASELINE", stable: "STABLE", notChecked: "NOT CHECKED" };
+  const PART_STATUS = { urgent: "URGENT", attention: "CONTACT TODAY", changed: "REVIEW", recheck: "RE-CHECK", repeat: "REPEAT", baseline: "BASELINE", stable: "STABLE", notChecked: "NOT CHECKED" };
   function showPart(name, at) {
     const key = bodyPartFor(name);
     if (!key) { navigateFromBody(name); return; }
@@ -316,7 +316,7 @@ export function createTwinApp(root) {
   }
   // Before Day 147 the nodes show Elena's authored self-check records; from Day 147 the evaluated self-check.
   function selfCheckNode(key) {
-    const label = { changed: "REVIEW", stable: "STABLE", repeat: "REPEAT", baseline: "BASELINE", urgent: "URGENT", notChecked: "NOT CHECKED" };
+    const label = PART_STATUS;
     if (current.day < CURRENT_DAY) {
       const record = ELENA_HISTORY.filter(r => r.missionDay <= current.day).at(-1), v = record.values;
       return key === "behavioral"
@@ -325,7 +325,7 @@ export function createTwinApp(root) {
     }
     const evaluation = selfCheck.latestEvaluation("elena"), domain = evaluation?.domains.find(d => d.key === key);
     if (!domain) return { status: "Not checked", change: "Open Self-Check", conf: 0, confLabel: "NO DATA", kind: "NONE" };
-    const changed = domain.indicators?.filter(r => r.status === "changed").map(r => r.def.label.toLowerCase()) ?? [];
+    const changed = domain.indicators?.filter(r => ["urgent", "attention", "changed", "recheck"].includes(r.status)).map(r => r.def.label.toLowerCase()) ?? [];
     return { status: label[domain.status], change: key === "immune" ? (domain.symptoms?.length ? domain.symptoms.join(", ") : "no new symptoms") : changed.length ? changed.join(", ") : "within usual range",
       conf: .8, confLabel: key === "immune" ? "SELF-REPORT" : "TEST + SELF-REPORT", kind: "SYNTHETIC" };
   }

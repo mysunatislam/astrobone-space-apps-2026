@@ -1,0 +1,129 @@
+// How often does a healthy, unchanging astronaut get told something changed? Simulates daily self-checks
+// of every indicator for stable astronauts (each with their own usual level and Gaussian day-to-day
+// spread) and runs the app's own evaluateSelfCheck on them. A real step change is then added to one
+// indicator to see whether the rules still catch it.
+// --single runs the original single-value rule instead, for comparison.
+// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--json]
+import { evaluateSelfCheck, INDICATORS } from "../src/selfCheck.js";
+
+const arg = (name, fallback) => { const hit = process.argv.find(a => a.startsWith(`--${name}=`)); return hit ? Number(hit.split("=")[1]) : fallback; };
+const RUNS = arg("runs", 1000), DAYS = arg("days", 60), SPREAD = arg("spread", 1);
+export const singleValueRule = (check, history) => evaluateSelfCheck(check, history, { multirule: false });
+
+// Usual level and day-to-day spread (1 SD) of a healthy astronaut. These are assumptions, stated so they
+// can be argued with: glucose uses the EFLM within-person CV of 4.9 % plus about 4 % for a home meter;
+// blood pressure is the mean of two seated home readings; the knee spread is the camera's repeat noise,
+// which the volunteer study has not measured yet. `round` mimics how each value is entered.
+export const STABLE_PERSON = Object.freeze({
+  kneeExtension: { mean: 165, sd: 3, round: 1 },
+  kneeRom: { mean: 65, sd: 4, round: 1 },
+  restingHr: { mean: 62, sd: 4, round: 1 },
+  systolicBp: { mean: 116, sd: 6, round: 1 },
+  diastolicBp: { mean: 75, sd: 4.5, round: 1 },
+  spo2: { mean: 98, sd: 0.8, round: 1, max: 100 },
+  glucose: { mean: 90, sd: 5.7, round: 1 },
+  bodyTemp: { mean: 36.7, sd: 0.25, round: 0.1 },
+  pvtSpeed: { mean: 3.6, sd: 0.15, round: 0.01 },
+  pvtLapses: { poisson: 2 },
+  sleepHours: { mean: 6.8, sd: 0.9, round: 0.5, min: 0 },
+  fatigue: { mean: 3, sd: 0.8, round: 1, min: 1, max: 7 },
+  mood: { mean: 7, sd: 1, round: 1, min: 0, max: 10 },
+  stress: { mean: 4, sd: 1.2, round: 1, min: 0, max: 10 },
+});
+
+export function rng(seed) {
+  return () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+const gaussian = random => { let u = 0; while (!u) u = random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * random()); };
+const poisson = (random, lambda) => { let k = 0, p = 1; const l = Math.exp(-lambda); do { k++; p *= random(); } while (p > l); return k - 1; };
+
+function sample(spec, random, spread, shift = 0) {
+  if (spec.poisson) return poisson(random, spec.poisson + shift);
+  let v = spec.mean + shift + spec.sd * spread * gaussian(random);
+  v = Math.round(v / spec.round) * spec.round;
+  if (spec.min !== undefined) v = Math.max(spec.min, v);
+  if (spec.max !== undefined) v = Math.min(spec.max, v);
+  return Number(v.toFixed(2));
+}
+
+// One astronaut's daily checks. `change` = { key, day, shift } adds a real step change from that day.
+export function simulateAstronaut(seed, { days = DAYS, spread = SPREAD, change = null, evaluate = evaluateSelfCheck } = {}) {
+  const random = rng(seed), history = [], out = [];
+  for (let day = 1; day <= days; day++) {
+    const values = {};
+    for (const [key, spec] of Object.entries(STABLE_PERSON)) values[key] = sample(spec, random, spread, change && key === change.key && day >= change.day ? change.shift : 0);
+    const keys = Object.keys(values);
+    const check = { id: `sim-${seed}-${day}`, missionDay: day, at: `day ${day}`, values, protocols: Object.fromEntries(keys.map(k => [k, "sim"])), quality: Object.fromEntries(keys.map(k => [k, true])), redFlags: {}, symptoms: {} };
+    const ev = evaluate(check, history);
+    out.push({ day, ev });
+    history.push(check);
+  }
+  return out;
+}
+
+const rows = ev => ev.domains.flatMap(d => d.indicators);
+const REVIEW_OR_WORSE = new Set(["changed", "attention", "urgent"]);
+const RECHECK_OR_WORSE = new Set(["recheck", ...REVIEW_OR_WORSE]);
+
+export function falseAlarmSummary({ runs = RUNS, days = DAYS, spread = SPREAD, evaluate } = {}) {
+  let checks = 0, review = 0, recheck = 0, changedRows = 0, limitChecks = 0, driftRuns = 0;
+  const byKey = Object.fromEntries(Object.keys(INDICATORS).map(k => [k, 0]));
+  for (let i = 0; i < runs; i++) {
+    let drifted = false;
+    for (const { day, ev } of simulateAstronaut(1000 + i, { days, spread, evaluate })) {
+      if (day <= 5) continue; // baselines are still being built
+      checks++;
+      if (REVIEW_OR_WORSE.has(ev.overall)) review++;
+      if (RECHECK_OR_WORSE.has(ev.overall)) recheck++;
+      if (rows(ev).some(r => r.limit)) limitChecks++;
+      for (const r of rows(ev)) if (r.status === "changed") { changedRows++; byKey[r.key]++; if (r.reason === "drift") drifted = true; }
+    }
+    if (drifted) driftRuns++;
+  }
+  const pct = x => Number((100 * x).toFixed(1));
+  return {
+    runs, days, spread, checksJudged: checks,
+    reviewOrWorsePct: pct(review / checks),
+    recheckOrWorsePct: pct(recheck / checks),
+    changedRowsPerCheck: Number((changedRows / checks).toFixed(2)),
+    fixedLimitPct: pct(limitChecks / checks),
+    astronautsWithDriftAlarmPct: pct(driftRuns / runs),
+    changedPctByIndicator: Object.fromEntries(Object.entries(byKey).map(([k, n]) => [k, pct(n / checks)])),
+  };
+}
+
+// Share of astronauts whose changed indicator is flagged on the first check after a real step change,
+// and within the first three checks.
+export function detectionSummary(change, { runs = RUNS, days = DAYS, spread = SPREAD, evaluate } = {}) {
+  let first = 0, within3 = 0;
+  for (let i = 0; i < runs; i++) {
+    const flagged = simulateAstronaut(5000 + i, { days, spread, change, evaluate })
+      .filter(({ day }) => day >= change.day && day < change.day + 3)
+      .map(({ ev }) => rows(ev).find(r => r.key === change.key)?.status)
+      .map(s => REVIEW_OR_WORSE.has(s));
+    if (flagged[0]) first++;
+    if (flagged.some(Boolean)) within3++;
+  }
+  return { ...change, firstCheckPct: Number((100 * first / runs).toFixed(1)), withinThreeChecksPct: Number((100 * within3 / runs).toFixed(1)) };
+}
+
+export const STEP_CHANGES = Object.freeze([
+  { key: "kneeExtension", day: 31, shift: -10, label: "knee extension 10° lower" },
+  { key: "systolicBp", day: 31, shift: 20, label: "systolic 20 mmHg higher" },
+  { key: "glucose", day: 31, shift: 20, label: "fasting blood sugar 20 mg/dL higher" },
+  { key: "sleepHours", day: 31, shift: -2, label: "2 hours less sleep" },
+  { key: "pvtLapses", day: 31, shift: 6, label: "6 more attention lapses" },
+]);
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const evaluate = process.argv.includes("--single") ? singleValueRule : evaluateSelfCheck;
+  const result = { rule: evaluate === singleValueRule ? "single value" : "multirule", stable: falseAlarmSummary({ evaluate }), detection: STEP_CHANGES.map(c => detectionSummary(c, { runs: Math.min(RUNS, 400), evaluate })) };
+  if (process.argv.includes("--json")) console.log(JSON.stringify(result, null, 2));
+  else {
+    const s = result.stable;
+    console.log(`Rule: ${result.rule}. Stable astronauts: ${s.runs} x ${s.days} days, spread x${s.spread}, ${s.checksJudged} checks judged after the first 5`);
+    console.log(`  REVIEW or worse: ${s.reviewOrWorsePct}% of checks (RE-CHECK or worse ${s.recheckOrWorsePct}%); ${s.changedRowsPerCheck} changed rows per check; fixed limit crossed on ${s.fixedLimitPct}%; drift alarm in ${s.astronautsWithDriftAlarmPct}% of astronauts`);
+    console.log(`  Changed rows by indicator (% of checks): ${Object.entries(s.changedPctByIndicator).map(([k, v]) => `${k} ${v}`).join(", ")}`);
+    for (const d of result.detection) console.log(`  Real change, ${d.label}: flagged on the first check ${d.firstCheckPct}%, within 3 checks ${d.withinThreeChecksPct}%`);
+  }
+}

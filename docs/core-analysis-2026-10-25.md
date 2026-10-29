@@ -43,7 +43,7 @@ Range of motion now uses the 5th–95th percentile spread, which tracking jitter
 
 Two findings matter for the pitch:
 
-1. The rolling rule alone almost never confirms a gradual decline, and it confirms a real 8° step drop only about a quarter of the time, because the dropped value enters the baseline before the 24 h re-check. The drift rule fixes both.
+1. The rolling rule alone almost never confirms a gradual decline, and it confirms a real 8° step drop only about a quarter of the time, because the dropped value enters the baseline before the 24 h re-check. The drift rule fixes both. (2026-10-29: the daily multirule now judges a second value outside against the range from before the first, so the rolling rule alone confirms the 8° step drop in 62.5 % of runs; see [self-check](self-check.md#evaluate).)
 2. With 3° noise and the default 5° floor, confirmed false alarms rise to 10.7% (day rule) and 15.5% (with drift). Raising the floor to the measured MDC95 brings them back under 1%. That is why the accuracy study and the calibrated floor belong together.
 
 **Limits.** The noise is Gaussian and independent from day to day. Real captures will have day effects (lighting, posture, clothing) that make noise larger and correlated, so these are best-case rates for the rule itself, not for the camera. The decline rates are synthetic; the real rate of change in knee extension during flight is not known.

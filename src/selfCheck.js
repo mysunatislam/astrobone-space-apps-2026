@@ -167,12 +167,14 @@ export function lockedReference(history, key, protocol, count = BASELINE_WINDOW)
 
 // `def` lets a caller run the same rule on a measure outside INDICATORS (the Inspiration4 blood
 // replay in crewReplay.js); `baselineCount` locks the baseline to a known pre-mission set.
-export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRIFT.h, reset = DRIFT.reset, floor, def = INDICATORS[key], baselineCount } = {}) {
+export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRIFT.h, reset = DRIFT.reset, floor, def = INDICATORS[key], baselineCount, movingRange = def === INDICATORS[key] } = {}) {
   const locked = lockedReference(history, key, protocol, baselineCount);
   if (!locked.ready) return { ready: false };
-  const later = usableValues(history, key, protocol).slice(locked.count);
-  // The locked mean is itself estimated from a few checks; widen sigma for that uncertainty.
-  const sigma = Math.max(locked.sd, (floor ?? def.floor) / 2) * Math.sqrt(1 + 1 / locked.count);
+  const all = usableValues(history, key, protocol), later = all.slice(locked.count);
+  // Sigma: for daily checks, the larger of the locked checks' SD and the moving-range spread of every
+  // usable check, so five lucky-tight first checks cannot set it. The locked mean is itself estimated
+  // from a few checks; widen sigma for that uncertainty.
+  const sigma = Math.max(locked.sd, movingRange ? movingRangeSd([...all, value]) : 0, (floor ?? def.floor) / 2) * Math.sqrt(1 + 1 / locked.count);
   const directions = def.direction === "both" ? ["up", "down"] : [def.direction];
   let cusum = 0, drift = false;
   for (const direction of directions) {
@@ -190,34 +192,69 @@ export function driftCheck(key, value, history, protocol, { k = DRIFT.k, h = DRI
   return { ready: true, cusum: round(cusum, 2), drift, lockedMean: locked.mean, sinceBaseline: value - locked.mean, checks: later.length + 1 };
 }
 
+// Daily-check multirule, after laboratory quality control (Westgard et al., Clin Chem 1981;27:493-501):
+// one value beyond the usual range is a warning, "recheck", measured again at the next check. It counts as
+// a change for review only when it is far beyond the range (more than `big` times it, about 3 SD) or the
+// previous usable check was also beyond its own range on the same side. With the single-value rule, a
+// healthy astronaut who checked all 14 indicators daily was told something changed on 31 % of checks
+// (scripts/simulate-false-alarms.mjs).
+export const MULTIRULE = Object.freeze({ big: 1.5 });
+
+// Day-to-day spread from consecutive differences: mean |x[i] - x[i-1]| / 1.128, the individuals-chart
+// estimate (Montgomery, Introduction to Statistical Quality Control). A slow drift barely moves it.
+function movingRangeSd(values) {
+  const ranges = values.slice(1).map((x, i) => Math.abs(x - values[i]));
+  return ranges.length ? mean(ranges) / 1.128 : 0;
+}
+
+// The day rule on its own: is `value` beyond the usual range of the last few usable values (mean ±
+// 2 SD, at least the floor), and on which side (-1 worse low, 1 worse high, 0 inside)?
+function dayJudgement(values, value, def, floor) {
+  const window = values.slice(-BASELINE_WINDOW);
+  if (window.length < MIN_BASELINE) return null;
+  const m = mean(window), tolerance = Math.max(2 * sd(window), floor ?? def.floor), delta = value - m;
+  const side = def.direction !== "up" && delta < -tolerance ? -1 : def.direction !== "down" && delta > tolerance ? 1 : 0;
+  return { mean: m, tolerance, delta, side };
+}
+
 function usableValues(history, key, protocol) {
   return history.filter(check => check.values?.[key] !== undefined && check.values[key] !== null && (!protocol || check.protocols?.[key] === protocol) && check.quality?.[key] !== false)
     .map(check => check.values[key]);
 }
 
-// A caller's own `def` (the crew replay's lab measures) gets no fixed limits unless it passes some.
-export function evaluateIndicator(key, value, history, { protocol, usable = true, floor, drift: driftParams, def = INDICATORS[key], limits = def === INDICATORS[key] ? SAFETY_LIMITS : {} } = {}) {
+// A caller's own `def` (the crew replay's lab measures, a few draws months apart) keeps the original
+// single-value rule and drift sigma, and gets no fixed limits unless it passes some: a lab result beyond
+// its reference change value is already a two-point comparison.
+export function evaluateIndicator(key, value, history, { protocol, usable = true, floor, drift: driftParams, def = INDICATORS[key], limits = def === INDICATORS[key] ? SAFETY_LIMITS : {}, multirule = def === INDICATORS[key] } = {}) {
   if (value === null || value === undefined || Number.isNaN(value)) return { key, status: "notChecked", def };
   // A fixed safety limit is reported even on a result that must be repeated, so the repeat is not skipped.
   const limit = safetyLimit(key, value, limits);
   if (!usable) return { key, value, status: "repeat", limit, def };
   const ref = personalReference(history, key, protocol);
   if (!ref.ready) return { key, value, status: limit ? limit.level : "baseline", limit, ref, def };
-  const tolerance = Math.max(2 * ref.sd, floor ?? def.floor), delta = value - ref.mean;
-  const worse = def.direction === "down" ? delta < -tolerance : def.direction === "up" ? delta > tolerance : Math.abs(delta) > tolerance;
-  const drift = driftCheck(key, value, history, protocol, { floor, def, ...driftParams });
-  const reason = limit ? "limit" : worse ? "day" : drift.drift ? "drift" : null;
-  return { key, value, status: limit ? limit.level : reason ? "changed" : "stable", reason, limit, ref, delta, tolerance, drift, series: usableValues(history, key, protocol), def };
+  const series = usableValues(history, key, protocol), today = dayJudgement(series, value, def, floor);
+  const { tolerance, delta } = today;
+  // Two in a row: the previous check and this one both beyond the range that held before the previous
+  // check, on the same side, so a real change is not hidden by the rolling range moving towards it.
+  const previous = multirule && series.length ? dayJudgement(series.slice(0, -1), series.at(-1), def, floor) : null;
+  const twice = Boolean(previous?.side) && dayJudgement(series.slice(0, -1), value, def, floor)?.side === previous.side;
+  const confirmed = (today.side !== 0 && (!multirule || Math.abs(delta) > MULTIRULE.big * tolerance)) || twice;
+  const drift = driftCheck(key, value, history, protocol, { floor, def, movingRange: multirule, ...driftParams });
+  const reason = limit ? "limit" : confirmed ? "day" : drift.drift ? "drift" : today.side ? "once" : null;
+  const status = limit ? limit.level : reason === "once" ? "recheck" : reason ? "changed" : "stable";
+  return { key, value, status, reason, limit, ref, delta, tolerance, drift, series, def };
 }
 
-// "attention" = a fixed safety limit crossed: tell the crew medical officer today.
-export const STATUS_RANK = Object.freeze({ urgent: 6, attention: 5, changed: 4, repeat: 3, baseline: 2, stable: 1, notChecked: 0 });
+// "attention" = a fixed safety limit crossed: tell the crew medical officer today. "recheck" = beyond the
+// usual range once: measure again at the next check before anything is logged.
+export const STATUS_RANK = Object.freeze({ urgent: 7, attention: 6, changed: 5, recheck: 4, repeat: 3, baseline: 2, stable: 1, notChecked: 0 });
 const worst = statuses => statuses.reduce((best, status) => (STATUS_RANK[status] > STATUS_RANK[best] ? status : best), "notChecked");
 
-export function evaluateSelfCheck(check, history = [], { floors = {}, limits = SAFETY_LIMITS, environment = null } = {}) {
+// `multirule: false` gives the original single-value rule, for comparison (scripts/simulate-false-alarms.mjs).
+export function evaluateSelfCheck(check, history = [], { floors = {}, limits = SAFETY_LIMITS, environment = null, multirule = true } = {}) {
   const prior = history.filter(h => h.id !== check.id);
   const values = check.values || {}, protocols = check.protocols || {}, quality = check.quality || {};
-  const indicators = Object.keys(INDICATORS).map(key => evaluateIndicator(key, values[key], prior, { protocol: protocols[key], usable: quality[key] !== false, floor: floors[key], limits }));
+  const indicators = Object.keys(INDICATORS).map(key => evaluateIndicator(key, values[key], prior, { protocol: protocols[key], usable: quality[key] !== false, floor: floors[key], limits, multirule }));
   const redFlags = RED_FLAGS.filter(([key]) => check.redFlags?.[key]).map(([, label]) => label);
   const symptoms = IMMUNE_SYMPTOMS.filter(([key]) => check.symptoms?.[key]).map(([, label]) => label);
   const domains = DOMAINS.map(([key, label, hazard]) => {
@@ -280,6 +317,9 @@ export function recommendActions(domains, redFlags, check = {}, environment = nu
       drift.length ? `${join(drift)} ${drift.length > 1 ? "have" : "has"} drifted steadily from your starting baseline` : null].filter(Boolean);
     actions.push({ id: `review-${domain.key}`, priority: "review", text: `${domain.label}: ${parts.join("; ")}. Re-check in 24 h at the same time and ${review}.`, due: 24 });
   }
+  // One value just outside the usual range is a warning, not a change: measure it again first.
+  const rechecks = rows.filter(r => r.status === "recheck").map(r => r.def.label.toLowerCase());
+  if (rechecks.length) actions.push({ id: "recheck", priority: "recheck", text: `Check ${join(rechecks)} again at your next self-check. ${rechecks.length > 1 ? "Each is" : "It is"} just outside your usual range today. One value like this is not logged as a change; two in a row, or one far outside, is.`, due: 24 });
   if (rows.some(r => r.status === "baseline")) actions.push({ id: "baseline", priority: "info", text: `Keep checking daily. Comparisons start after ${MIN_BASELINE} usable checks of each test.`, due: 24 });
   if (!actions.length) actions.push({ id: "routine", priority: "info", text: "No change outside your usual range. Next self-check in 24 h.", due: 24 });
   if (check.notes) actions.push({ id: "note", priority: "info", text: "Your note is attached to this record for the reviewer.", due: null });
@@ -295,12 +335,30 @@ export const TEMP_SITES = Object.freeze([["oral", "Mouth"], ["ear", "Ear"], ["fo
 const VITAL_KEYS = ["systolicBp", "diastolicBp", "spo2", "glucose", "bodyTemp"];
 const finite = v => (typeof v === "number" && Number.isFinite(v) ? v : null);
 
+// What a typed vital sign may be, by unit. A value outside it gets a message instead of being dropped
+// silently, with a hint when it fits the other unit (5.5 typed as mg/dL is a mmol/L reading; 98.6 °C is
+// °F), and a blood pressure reading whose top number is not the larger is not used: swapped, 80/120
+// would read as low blood pressure.
+export const VITAL_RANGES = Object.freeze({ systolic: [50, 260, "mmHg"], diastolic: [30, 160, "mmHg"], spo2: [50, 100, "%"], "mg/dL": [20, 600, "mg/dL"], "mmol/L": [1, 33, "mmol/L"], "°C": [30, 45, "°C"], "°F": [86, 113, "°F"] });
+const OTHER_UNIT = { "mg/dL": "mmol/L", "mmol/L": "mg/dL", "°C": "°F", "°F": "°C" };
+
+export function vitalEntryProblem(kind, value, { unit, diastolic } = {}) {
+  if (!Number.isFinite(value)) return null;
+  const [min, max, label] = VITAL_RANGES[unit ?? kind], other = OTHER_UNIT[unit];
+  if (value < min || value > max) {
+    const [a, b] = VITAL_RANGES[other] ?? [];
+    return other && value >= a && value <= b ? `${value} ${label} is outside ${min}–${max}. It looks like a ${other} reading: change the unit.` : `${value} is outside ${min}–${max} ${label}. Check the number.`;
+  }
+  if (kind === "systolic" && Number.isFinite(diastolic) && value <= diastolic) return `${value}/${diastolic}: the top number (systolic) is the larger one. Check the order; this reading is not used.`;
+  return null;
+}
+
 export function applyVitals(check, vitals = {}) {
   const set = (key, value, protocol, quality = true) => {
     if (value === null) { delete check.values[key]; delete check.protocols[key]; delete check.quality[key]; return; }
     check.values[key] = value; check.protocols[key] = protocol; check.quality[key] = quality;
   };
-  const readings = (vitals.bp?.readings ?? []).filter(([s, d] = []) => finite(s) !== null && finite(d) !== null);
+  const readings = (vitals.bp?.readings ?? []).filter(([s, d] = []) => finite(s) !== null && finite(d) !== null && s > d);
   const avg = i => (readings.length ? Math.round(readings.reduce((sum, r) => sum + r[i], 0) / readings.length) : null);
   set("systolicBp", avg(0), "bp-seated-5min-v1", vitals.bp?.rested === true);
   set("diastolicBp", avg(1), "bp-seated-5min-v1", vitals.bp?.rested === true);
@@ -325,6 +383,32 @@ export function vitalsFromValues(values = {}, protocols = {}) {
 
 export function newCheck(profileId, at = new Date().toISOString()) {
   return { schema: SELF_CHECK_SCHEMA, id: `${profileId}-${at}`, profileId, at, values: {}, protocols: {}, quality: {}, sources: {}, redFlags: null, symptoms: null, notes: "" };
+}
+
+// A backup of every saved check, so a baseline survives a cleared browser or a new device. Restoring
+// merges by id (a check already here is kept) and reads only the fields the evaluation uses, as numbers,
+// strings and booleans, so a damaged or foreign file cannot inject anything else.
+export const BACKUP_SCHEMA = "astrobone-self-check-backup-v1";
+export function backupPacket(checks, exportedAt = new Date().toISOString()) {
+  return { schema: BACKUP_SCHEMA, profile: "This device", exportedAt, checks, boundary: "Self-monitoring record. Not a diagnosis." };
+}
+const pick = (obj, ok) => Object.fromEntries(Object.entries(obj && typeof obj === "object" ? obj : {}).filter(([key, value]) => key in INDICATORS && ok(value)));
+function readCheck(raw) {
+  if (!raw || typeof raw.id !== "string" || !Number.isFinite(Date.parse(raw.at))) return null;
+  const values = pick(raw.values, Number.isFinite);
+  if (!Object.keys(values).length) return null;
+  const flags = list => (raw[list] && typeof raw[list] === "object" ? Object.fromEntries(Object.entries(raw[list]).filter(([, v]) => typeof v === "boolean")) : null);
+  return { schema: SELF_CHECK_SCHEMA, id: raw.id, profileId: "you", at: raw.at, ...(Number.isFinite(raw.missionDay) ? { missionDay: raw.missionDay } : {}), values,
+    protocols: pick(raw.protocols, v => typeof v === "string"), quality: pick(raw.quality, v => typeof v === "boolean"), sources: pick(raw.sources, v => typeof v === "string"),
+    redFlags: flags("redFlags"), symptoms: flags("symptoms"), notes: typeof raw.notes === "string" ? raw.notes.slice(0, 2000) : "" };
+}
+// Accepts a backup or a single exported check ("Export for reviewer").
+export function restoreBackup(saved, packet) {
+  const incoming = packet?.schema === BACKUP_SCHEMA && Array.isArray(packet.checks) ? packet.checks : packet?.schema === "astrobone-self-check-export-v1" && packet.check ? [packet.check] : null;
+  if (!incoming) throw new Error("This file is not an AstroBone self-check backup.");
+  const ids = new Set(saved.map(c => c.id)), added = [];
+  for (const check of incoming.map(readCheck)) if (check && !ids.has(check.id)) { ids.add(check.id); added.push(check); }
+  return { checks: [...saved, ...added].sort((a, b) => Date.parse(a.at) - Date.parse(b.at)), added: added.length, skipped: incoming.length - added.length };
 }
 
 // Local storage only with explicit consent; otherwise records live in memory for this tab.

@@ -372,11 +372,13 @@ body.twin-body { overflow: hidden; }
 .tw-partcard-row small { font: 9px var(--tw-mono); letter-spacing: .08em; color: var(--tw-faint); }
 .tw-st-stable em, .tw-partcard-row.tw-st-stable small { color: var(--st-stable); }
 .tw-st-changed em, .tw-partcard-row.tw-st-changed small, .tw-partcard-row.tw-st-changed b { color: var(--st-changed); }
+.tw-st-recheck em, .tw-partcard-row.tw-st-recheck small, .tw-partcard-row.tw-st-recheck b { color: var(--st-changed); }
 .tw-st-attention em, .tw-partcard-row.tw-st-attention small, .tw-partcard-row.tw-st-attention b { color: var(--st-attention); }
 .tw-st-urgent em, .tw-partcard-row.tw-st-urgent small, .tw-partcard-row.tw-st-urgent b { color: var(--st-urgent); }
 .tw-st-baseline em, .tw-st-repeat em, .tw-partcard-row.tw-st-baseline small, .tw-partcard-row.tw-st-repeat small { color: var(--st-wait); }
 .tw-st-notChecked em { color: var(--tw-dim); }
 .tw-partcard-status.tw-st-changed { border-color: rgba(255, 159, 67, .45); }
+.tw-partcard-status.tw-st-recheck { border-color: rgba(255, 159, 67, .35); border-style: dashed; }
 .tw-partcard-status.tw-st-attention { border-color: rgba(255, 111, 181, .5); }
 .tw-partcard-status.tw-st-urgent { border-color: rgba(255, 90, 79, .5); }
 .tw-partcard-helps { padding-left: 8px; border-left: 2px solid var(--tw-green); }

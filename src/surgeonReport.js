@@ -18,6 +18,7 @@ export function rowReason(row) {
   if (row.status === "baseline") return `building baseline ${row.ref?.count ?? 0}/${row.ref?.needed ?? 3}`;
   const usual = row.ref?.ready ? `usual ${num(row.ref.mean, d)} ± ${num(row.tolerance, Math.max(d, 1))}` : "";
   if (row.reason === "drift") return `steady drift from starting level ${num(row.drift.lockedMean, d)}${usual ? `; ${usual}` : ""}`;
+  if (row.status === "recheck") return `outside once, measure again next check; ${usual}`;
   return usual;
 }
 
@@ -31,7 +32,7 @@ export function surgeonReport(evaluation, check, { environment = null, profile =
   const symptoms = ev.domains.find(d => d.key === "immune")?.symptoms ?? [];
   if (symptoms.length) lines.push(`New symptoms: ${symptoms.join(", ")}`);
 
-  const order = ["urgent", "attention", "changed", "repeat", "baseline"];
+  const order = ["urgent", "attention", "changed", "recheck", "repeat", "baseline"];
   const flagged = rows.filter(r => order.includes(r.status)).sort((a, b) => order.indexOf(a.status) - order.indexOf(b.status));
   if (flagged.length) {
     lines.push("", "NEEDS A LOOK");
