@@ -75,13 +75,13 @@ try {
     assert.ok(Math.abs(Number(await page.locator('[data-resp="rate"]').textContent()) - 15) < .6);
     await page.locator('[data-resp="save"]').click();
     assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem("astrobone.respiratory.accepted.v1")).length), 1);
-    assert.match(await page.locator('[data-resp="baseline"]').textContent(), /Save 2 more usable depth/);
+    assert.match(await page.locator('[data-resp="baseline"]').textContent(), /Save 2 more usable RGB-D/);
     await page.locator('[data-resp="depth"]').setInputFiles(depthInput);
     await page.waitForFunction(() => document.querySelector('[data-resp="save"]').textContent === "Recording already saved");
     assert.equal(await page.locator('[data-resp="save"]').isDisabled(), true);
     assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem("astrobone.respiratory.accepted.v1")).length), 1);
     await profile.fill("qa-separate-profile"); await profile.blur();
-    assert.match(await page.locator('[data-resp="baseline"]').textContent(), /Save 3 more usable depth/);
+    assert.match(await page.locator('[data-resp="baseline"]').textContent(), /Save 3 more usable RGB-D/);
     assert.equal(await page.locator('.resp-history-row').count(), 0);
     assert.match(await page.locator('[data-resp="history"]').textContent(), /No saved readings/);
     assert.equal(await page.locator('[data-resp="rate"]').textContent(), "—");
