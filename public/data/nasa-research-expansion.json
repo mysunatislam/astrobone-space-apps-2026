@@ -1,0 +1,220 @@
+{
+  "schema": "astrobone-nasa-research-expansion-v1",
+  "built": "2026-11-01",
+  "scope": "External NASA research; not personal crew measurements or respiratory validation data",
+  "studies": [
+    {
+      "accession": "OSD-489",
+      "title": "RR-1 lumbar vertebra microCT",
+      "population": "Female Mus musculus; RR-1; lumbar vertebra L4; 37 days in space",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-489",
+      "records": 37,
+      "method": "Mean, median, minimum and maximum of finite source values by explicit source group. No imputation, significance tests or clinical extrapolation. n is available sample rows.",
+      "boundary": "Same RR-1 mission as OSD-804; not an independent replication. Descriptive animal group summaries only. No clinical, human bone-strength, or respiratory thresholds.",
+      "source": {
+        "file": "LSDS-15_microCT_alwoodTRANSFORMED.csv",
+        "sha256": "5550c593ab27b1ab6371c43d1c8552ff3830fd9a246ecea5b0d654e61cccd9b0",
+        "bytes": 6061,
+        "url": "https://osdr.nasa.gov/geode-py/ws/studies/OSD-489/download?source=datamanager&file=LSDS-15_microCT_alwoodTRANSFORMED.csv",
+        "manifestUrl": "https://visualization.osdr.nasa.gov/biodata/api/v2/dataset/OSD-489/file/LSDS-15_microCT_alwoodTRANSFORMED.csv/",
+        "restricted": false,
+        "visible": true,
+        "accessVerifiedOn": "2026-11-01"
+      },
+      "metrics": [
+        {
+          "field": "percent_bone_volume_bvtv_percent",
+          "label": "Bone volume / tissue volume",
+          "unit": "%",
+          "groups": [
+            {
+              "label": "Baseline",
+              "n": 10,
+              "missing": 0,
+              "mean": 13.312437,
+              "median": 13.03456,
+              "min": 10.25078,
+              "max": 17.05863
+            },
+            {
+              "label": "Vivarium",
+              "n": 10,
+              "missing": 0,
+              "mean": 13.49502,
+              "median": 13.19271,
+              "min": 9.39336,
+              "max": 17.60322
+            },
+            {
+              "label": "Flight",
+              "n": 8,
+              "missing": 0,
+              "mean": 10.7193925,
+              "median": 10.20365,
+              "min": 7.50679,
+              "max": 14.51896
+            },
+            {
+              "label": "Ground Control",
+              "n": 9,
+              "missing": 0,
+              "mean": 13.50889556,
+              "median": 14.2,
+              "min": 7.66736,
+              "max": 19.24629
+            }
+          ]
+        },
+        {
+          "field": "trabecular_thickness_mm",
+          "label": "Trabecular thickness",
+          "unit": "mm",
+          "groups": [
+            {
+              "label": "Baseline",
+              "n": 10,
+              "missing": 0,
+              "mean": 0.069127,
+              "median": 0.06756,
+              "min": 0.06042,
+              "max": 0.07971
+            },
+            {
+              "label": "Vivarium",
+              "n": 10,
+              "missing": 0,
+              "mean": 0.06888,
+              "median": 0.06896,
+              "min": 0.06105,
+              "max": 0.07552
+            },
+            {
+              "label": "Flight",
+              "n": 8,
+              "missing": 0,
+              "mean": 0.0631,
+              "median": 0.062555,
+              "min": 0.05393,
+              "max": 0.07038
+            },
+            {
+              "label": "Ground Control",
+              "n": 9,
+              "missing": 0,
+              "mean": 0.07115667,
+              "median": 0.07065,
+              "min": 0.06101,
+              "max": 0.08223
+            }
+          ]
+        },
+        {
+          "field": "trabecular_separation_mm",
+          "label": "Trabecular spacing",
+          "unit": "mm",
+          "groups": [
+            {
+              "label": "Baseline",
+              "n": 10,
+              "missing": 0,
+              "mean": 0.290152,
+              "median": 0.28828,
+              "min": 0.26381,
+              "max": 0.31751
+            },
+            {
+              "label": "Vivarium",
+              "n": 10,
+              "missing": 0,
+              "mean": 0.292598,
+              "median": 0.287465,
+              "min": 0.24949,
+              "max": 0.34177
+            },
+            {
+              "label": "Flight",
+              "n": 8,
+              "missing": 0,
+              "mean": 0.30375875,
+              "median": 0.298085,
+              "min": 0.28345,
+              "max": 0.33196
+            },
+            {
+              "label": "Ground Control",
+              "n": 9,
+              "missing": 0,
+              "mean": 0.29330889,
+              "median": 0.28272,
+              "min": 0.25846,
+              "max": 0.35428
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "accession": "OSD-654",
+      "title": "Spaceflight tibia microCT table profile",
+      "population": "Mus musculus; tibia; RR-9 and hindlimb-unloading investigation",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-654",
+      "records": 25,
+      "method": "Finite-value coverage, minimum and maximum only; source group codes are not mapped or pooled into a treatment comparison. No imputation.",
+      "boundary": "Coverage and ranges of the supplied table only. Treatment groups are not inferred from sample-name codes. No pooled treatment comparison or countermeasure efficacy claim. Missing values are not zero.",
+      "source": {
+        "file": "LSDS-66_microCT_uCT_TRANSFORMED.csv",
+        "sha256": "43254281c99ff290eefafb80043aef912233646e1df807981fdc82845f82e0fd",
+        "bytes": 1930,
+        "url": "https://osdr.nasa.gov/geode-py/ws/studies/OSD-654/download?source=datamanager&file=LSDS-66_microCT_uCT_TRANSFORMED.csv",
+        "manifestUrl": "https://visualization.osdr.nasa.gov/biodata/api/v2/dataset/OSD-654/file/LSDS-66_microCT_uCT_TRANSFORMED.csv/",
+        "restricted": false,
+        "visible": true,
+        "accessVerifiedOn": "2026-11-01"
+      },
+      "metrics": [
+        {
+          "field": "cortical_thickness_millimeter",
+          "label": "Cortical thickness",
+          "unit": "mm",
+          "groups": [
+            {
+              "label": "All table records · mixed study groups",
+              "n": 24,
+              "missing": 1,
+              "min": 0.18,
+              "max": 0.251
+            }
+          ]
+        },
+        {
+          "field": "trabecular_separation_millimeter",
+          "label": "Trabecular spacing",
+          "unit": "mm",
+          "groups": [
+            {
+              "label": "All table records · mixed study groups",
+              "n": 24,
+              "missing": 1,
+              "min": 0.171,
+              "max": 0.22851
+            }
+          ]
+        },
+        {
+          "field": "trabecular_number_1_per_millimeter",
+          "label": "Trabecular number",
+          "unit": "1/mm",
+          "groups": [
+            {
+              "label": "All table records · mixed study groups",
+              "n": 24,
+              "missing": 1,
+              "min": 2.27603,
+              "max": 3.584
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

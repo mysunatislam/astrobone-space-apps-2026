@@ -1,0 +1,138 @@
+/* AstroBone's mission shell keeps the existing interactive anatomical twin and its provenance. */
+:root { --ab-surface:#08121f; --ab-border:rgba(129,184,224,.2); --ab-muted:#98acc3; }
+.ab-brand-logo { display:block; width:76px; height:62px; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 0 12px #038dce20); }
+.tw-top { top:16px; left:24px; right:24px; min-height:76px; height:auto; padding:6px 16px 6px 10px; border-radius:16px; background:linear-gradient(120deg,rgba(12,27,46,.96),rgba(5,13,25,.93)); border-color:var(--ab-border); box-shadow:0 14px 48px #0005; }
+.lab-body #app { padding-top:112px; }
+.tw-brand { gap:8px; }
+.tw-brand b { font-size:14px; letter-spacing:.19em; }
+.tw-brand small { font-size:8px; line-height:1.4; letter-spacing:.09em; }
+.tw-nav button,.tw-nav a { font-family:var(--tw-sans); font-size:11px; letter-spacing:0; text-transform:none; padding:10px 9px; }
+.tw-live { text-transform:none; font-family:var(--tw-sans); letter-spacing:0; font-size:11px; padding:11px 13px; color:#d9faff; border-color:#357789; background:#082631; }
+.tw-start { text-transform:none; font-family:var(--tw-sans) !important; letter-spacing:0; font-size:11px !important; background:#13334d; border-color:#366784; padding:11px 13px; }
+.tw-card,.tw-node,.tw-drawer,.tw-legend,.tw-timeline,.tw-systems { border-color:var(--ab-border); box-shadow:0 12px 38px #0003; }
+.tw-card,.tw-node { background:linear-gradient(135deg,rgba(13,29,48,.94),rgba(6,15,29,.9)); }
+.tw-node { padding:12px 14px; border-radius:12px; animation:none; }
+.tw-node strong { font-family:var(--tw-sans); font-weight:400; letter-spacing:-.025em; }
+.tw-node-head { font-family:var(--tw-sans); letter-spacing:.02em; }
+.tw-node small { line-height:1.5; }
+.tw-systems { background:rgba(7,18,32,.91); }
+.tw-timeline { left:24px; right:24px; bottom:18px; background:rgba(7,17,31,.94); border-radius:14px; padding:15px 18px; }
+.ab-mission-overview { position:fixed; z-index:5; top:120px; left:28px; width:324px; color:#f0f6ff; }
+.ab-overview-top { display:grid; gap:12px; }
+.ab-kicker { font:600 9px/1.4 var(--tw-mono); letter-spacing:.14em; color:#86d9f4; }
+.ab-prototype { width:fit-content; padding:5px 7px; border:1px solid #345066; border-radius:4px; font:500 8px/1.3 var(--tw-mono); color:#acbdce; letter-spacing:.06em; }
+.ab-mission-overview h1 { font:500 clamp(34px,3.1vw,48px)/1.04 var(--tw-sans); letter-spacing:-.055em; margin:18px 0 14px; }
+.ab-mission-overview h1 span { color:#7ad8f4; }
+.ab-overview-description { max-width:290px; color:#a2b7ce; font:400 13px/1.7 var(--tw-sans); margin:0 0 18px; }
+.ab-scope-note { display:flex; gap:10px; padding:13px 0; border-top:1px solid var(--ab-border); color:#91a6be; font:11px/1.65 var(--tw-sans); }
+.ab-scope-note>span:first-child { color:#ddb779; font-size:21px; line-height:1.4; }
+.ab-scope-note b { color:#d7c39f; font-weight:500; }
+.ab-breathing-cta { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:15px 17px; border-radius:10px; background:linear-gradient(110deg,#9be6f7,#69caec); color:#041c2c; font:650 14px/1.3 var(--tw-sans); text-decoration:none; box-shadow:0 8px 30px #3dc8f41a; border:1px solid #9eeaff; }
+.ab-breathing-cta small { display:block; font:650 8px/1.3 var(--tw-mono); margin-bottom:6px; letter-spacing:.12em; color:#17495e; }
+.ab-breathing-cta>span:last-child { font-size:23px; font-weight:400; }
+.ab-breathing-cta:hover { background:#b7f1ff; }
+.ab-overview-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:9px; }
+.ab-overview-actions button { display:flex; align-items:center; justify-content:space-between; text-align:left; gap:6px; color:#d5e5f6; padding:12px 10px; border:1px solid var(--ab-border); border-radius:8px; background:#0b1a2be6; font-size:11px; }
+.ab-overview-actions button:hover { border-color:#68c9e8; background:#102c43; }
+.ab-device-note { display:flex; gap:7px; align-items:center; margin-top:15px; color:#93aaa9; font:10px/1.5 var(--tw-sans); }
+.ab-device-dot { width:5px; height:5px; border-radius:50%; background:#83d7bb; }
+#twin-root:not([data-experience="mission"])>.ab-mission-overview { display:none; }
+#twin-root[data-demo="true"]>.ab-mission-overview { opacity:0; pointer-events:none; }
+.tw-booting .ab-mission-overview,.tw-booting .ab-respiratory-shortcut { opacity:0; pointer-events:none; }
+.ab-mission-overview { transition:opacity .7s; }
+.ab-intro-logo { display:block; width:min(280px,60vw); height:auto; margin:0 auto 22px; }
+.tw-intro-title:has(.ab-intro-logo)>b { display:none; }
+.tw-intro-title:has(.ab-intro-logo)>span { letter-spacing:.18em; font-size:10px; }
+.ab-respiratory-shortcut { position:fixed; z-index:6; right:24px; bottom:168px; width:255px; display:flex; gap:10px; align-items:center; padding:12px 14px; border:1px solid #32627d; border-radius:11px; color:#d7eff9; text-decoration:none; background:rgba(8,30,47,.96); font:500 12px/1.4 var(--tw-sans); }
+.ab-respiratory-shortcut small { display:block; color:#8bb3c5; font-size:10px; font-weight:400; margin-top:3px; }
+.ab-respiratory-shortcut>span:last-child { margin-left:auto; color:#7fe3ff; font-size:19px; }
+.ab-respiratory-glyph { font-size:28px; line-height:1; color:#82dff5; }
+.ab-respiratory-shortcut:hover { border-color:#8ae8ff; background:#123c55; }
+#twin-root:not([data-experience="twin"])>.ab-respiratory-shortcut { display:none; }
+.ab-evidence-dialog { width:min(1020px,calc(100vw - 32px)); max-height:88vh; border:1px solid #365b76; border-radius:18px; padding:26px; color:#e5effc; background:#091523; box-shadow:0 28px 120px #0009; }
+.ab-evidence-dialog::backdrop { background:#010711cc; backdrop-filter:blur(7px); }
+.ab-evidence-heading { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; position:static; }
+.ab-evidence-heading h2 { font:500 32px/1.2 var(--tw-sans); letter-spacing:-.045em; margin:9px 0 7px; }
+.ab-evidence-heading p { font-size:12px; color:#9fb3cb; margin:0; line-height:1.6; }
+.ab-dialog-close { width:34px; min-height:34px; padding:0; flex-shrink:0; font-size:23px!important; color:#a9c7df!important; border:1px solid #35516b; border-radius:8px; background:#112236; }
+.ab-evidence-boundary { margin-top:22px; background:#1b2836; border-left:3px solid #dbb970; padding:12px 14px; font:11px/1.65 var(--tw-sans); color:#d4c9b1; }
+.ab-evidence-controls { display:grid; grid-template-columns:1.6fr 1fr; gap:14px; margin:22px 0 12px; }
+.ab-evidence-controls label { display:block; font-size:10px; color:#a9bfd5; }
+.ab-evidence-controls input,.ab-evidence-controls select { display:block; width:100%; min-height:41px; border:1px solid #304d66; border-radius:7px; padding:10px; margin-top:7px; color:#d9e8f8; background:#0c1e31; font:12px var(--tw-sans); }
+.ab-evidence-count { color:#8aa7c1; font-size:10px; }
+.ab-evidence-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:15px; }
+.ab-source-card { border:1px solid #29455c; background:#0d1e30; border-radius:11px; padding:17px; }
+.ab-source-meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; color:#8ccde4; font:9px/1.4 var(--tw-mono); }
+.ab-source-meta>span:last-child { color:#c1c2ad; }
+.ab-source-card h3 { font:500 15px/1.45 var(--tw-sans); margin:13px 0 8px; }
+.ab-source-card a { color:#deedfc; text-decoration:none; }
+.ab-source-card a:hover { color:#7fe3ff; text-decoration:underline; }
+.ab-source-card p { color:#a6bad0; font-size:11px; line-height:1.7; margin:8px 0; }
+.ab-source-card .ab-source-population { color:#80b9cc; font-size:10px; }
+.ab-source-card details { border-top:1px solid #29455c; padding-top:10px; margin-top:13px; }
+.ab-source-card summary { cursor:pointer; color:#c6d9ec; font-size:10px; }
+.ab-evidence-footer { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; margin-top:22px; padding-top:18px; border-top:1px solid #29455c; font-size:10px; color:#8eaac3; }
+.ab-evidence-footer a { color:#85d5ef; text-decoration:none; }
+@media(min-width:961px) {
+  #twin-root[data-experience="mission"] .tw-systems { display:none; }
+  #twin-root[data-experience="mission"] .tw-nodes { left:auto; top:120px; right:28px; bottom:174px; width:255px; display:grid; align-content:start; gap:8px; overflow:auto; scrollbar-width:thin; pointer-events:auto; padding-right:3px; }
+  #twin-root[data-experience="mission"] .tw-node-col { position:static; transform:none; width:auto; gap:8px; }
+  #twin-root[data-experience="mission"] .tw-legend { left:28px; bottom:174px; width:324px; padding:13px 15px; }
+}
+@media(max-width:1250px) and (min-width:961px) {
+  .tw-top { gap:8px; }
+  .tw-brand>span { display:none; }
+  .tw-nav button,.tw-nav a { font-size:10px; padding:10px 7px; }
+  .ab-mission-overview { width:285px; }
+  #twin-root[data-experience="mission"] .tw-legend { width:285px; }
+  #twin-root[data-experience="mission"] .tw-nodes { width:220px; }
+}
+@media(max-height:900px) and (min-width:961px) {
+  .ab-mission-overview { top:112px; }
+  .ab-overview-top { gap:8px; }
+  .ab-mission-overview h1 { font-size:34px; margin:12px 0; }
+  .ab-overview-description { font-size:12px; margin-bottom:8px; }
+  .ab-scope-note { padding:8px 0; }
+  .ab-breathing-cta { padding:11px 13px; }
+  .ab-overview-actions button { padding:9px; }
+  .ab-device-note { margin-top:10px; }
+  #twin-root[data-experience="mission"] .tw-legend { display:none; }
+}
+@media(max-width:960px) {
+  .lab-body #app { padding-top:8px; }
+  .tw-top { top:0; left:auto; right:auto; padding:7px 10px; min-height:64px; border-radius:12px; gap:7px; }
+  .tw-brand>span { display:block; }
+  .ab-brand-logo { width:59px; height:48px; }
+  .tw-brand b { font-size:12px; }
+  .tw-brand small { font-size:7px; }
+  .tw-top>.tw-live { grid-column:1/-1; grid-row:3; justify-self:stretch; justify-content:center; padding:9px; }
+  .tw-nav button,.tw-nav a { padding:8px 10px; }
+  .ab-mission-overview { position:static; width:auto; order:2; margin:18px 0 8px; padding:0 4px; }
+  .ab-overview-top { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+  .ab-mission-overview h1 { font-size:40px; margin:17px 0 12px; }
+  .ab-mission-overview h1 br { display:none; }
+  .ab-overview-description { max-width:520px; font-size:13px; margin-bottom:12px; }
+  .ab-scope-note { margin-top:10px; }
+  .ab-breathing-cta { padding:14px 17px; }
+  #tw-canvas { position:relative; top:auto; height:48vh; min-height:310px; order:3; }
+  .tw-systems { order:4; }
+  .tw-timeline { order:5; left:auto; right:auto; bottom:auto; padding:13px; }
+  .tw-nodes { order:6; grid-template-columns:1fr 1fr; gap:10px; }
+  .tw-node-col { gap:10px; }
+  .tw-node { padding:11px; }
+  .tw-drawer { order:7; }
+  .tw-legend { order:8; }
+  .ab-respiratory-shortcut { position:static; width:auto; order:9; margin-top:12px; }
+  .ab-device-note { margin-bottom:3px; }
+  .ab-evidence-dialog { padding:19px; }
+}
+@media(max-width:540px) {
+  .ab-mission-overview h1 { font-size:34px; }
+  .tw-top .tw-start { max-width:130px; font-size:10px!important; padding:9px; }
+  .tw-brand>span { display:none; }
+  .tw-nodes { grid-template-columns:1fr; }
+  .ab-evidence-grid,.ab-evidence-controls { grid-template-columns:1fr; }
+  .ab-evidence-heading h2 { font-size:28px; }
+  .ab-source-card { padding:14px; }
+}
+@media(prefers-reduced-motion:reduce) { .ab-mission-overview { transition:none; } }

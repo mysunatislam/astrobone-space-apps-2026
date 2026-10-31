@@ -1,0 +1,41 @@
+.ab-nasa-expansion { margin-top:24px; padding-top:23px; border-top:1px solid #29455c; font-family:var(--tw-sans, sans-serif); color:#e5effc; }
+.ab-expansion-heading { display:flex; gap:16px; justify-content:space-between; align-items:center; }
+.ab-expansion-kicker { display:block; color:#81cce2; font:500 9px/1.5 var(--tw-mono, monospace); letter-spacing:.08em; }
+.ab-expansion-heading h3 { font-size:21px; line-height:1.35; font-weight:500; letter-spacing:-.025em; margin:8px 0 0; }
+.ab-expansion-count { white-space:nowrap; padding:7px 9px; border:1px solid #31556c; border-radius:6px; color:#b8d9e7; font:10px/1.4 var(--tw-mono, monospace); }
+.ab-expansion-intro,.ab-expansion-footnote { color:#9bb2c8; font-size:11px; line-height:1.7; margin:11px 0 18px; }
+.ab-expansion-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.ab-expansion-study { min-width:0; border:1px solid #315068; border-radius:12px; padding:18px; background:linear-gradient(145deg,#102439,#0b1a2b); }
+.ab-expansion-study h4 { font-weight:500; font-size:16px; line-height:1.4; margin:7px 0; }
+.ab-expansion-population { color:#88aeca; font-size:10px; line-height:1.6; margin:7px 0 18px; }
+.ab-expansion-chart-title { font-size:10px; line-height:1.6; color:#b6cbdd; margin:16px 0 12px; }
+.ab-expansion-bars { display:grid; gap:12px; margin:18px 0 20px; }
+.ab-expansion-bar { display:grid; grid-template-columns:88px minmax(25px,1fr) 51px; gap:9px; align-items:center; font-size:10px; color:#9fb7ce; }
+.ab-expansion-bar b { text-align:right; font-size:10px; color:#b6cfe4; font-weight:500; font-variant-numeric:tabular-nums; }
+.ab-expansion-track { height:8px; background:#20374c; border-radius:2px; overflow:hidden; }
+.ab-expansion-track i { display:block; height:100%; background:#6894ad; border-radius:2px; }
+.ab-expansion-bar.is-flight .ab-expansion-track i { background:#7cdcf1; }
+.ab-expansion-bar.is-flight>span,.ab-expansion-bar.is-flight>b { color:#9ae8f7; }
+.ab-expansion-table-wrap { overflow-x:auto; margin-top:13px; }
+.ab-expansion-table-wrap table { width:100%; border-collapse:collapse; font-size:10px; line-height:1.6; }
+.ab-expansion-table-wrap caption { text-align:left; color:#82a7be; font-size:9px; margin-bottom:8px; }
+.ab-expansion-table-wrap th,.ab-expansion-table-wrap td { padding:8px 6px; text-align:left; border-bottom:1px solid #29465e; color:#c1d2e2; font-weight:400; vertical-align:top; font-variant-numeric:tabular-nums; }
+.ab-expansion-table-wrap thead th { color:#82a6c2; font-size:9px; }
+.ab-expansion-table-wrap th:first-child { padding-left:0; }
+.ab-expansion-coverage { display:grid; grid-template-columns:auto 1fr; gap:4px 13px; align-items:center; margin:14px 0 22px; }
+.ab-expansion-coverage strong { grid-row:span 2; color:#9ae8f7; font-size:34px; font-weight:500; line-height:1; letter-spacing:-.06em; font-variant-numeric:tabular-nums; }
+.ab-expansion-coverage span { color:#c5d9e8; font-size:10px; line-height:1.5; }
+.ab-expansion-coverage small { color:#bcae8d; font-size:10px; line-height:1.5; }
+.ab-expansion-boundary { color:#cfbea0; font-size:10px; line-height:1.7; margin:16px 0; padding:10px 11px; border-left:2px solid #a2885c; background:#a68d5910; }
+.ab-expansion-provenance { border-top:1px solid #29465e; padding-top:13px; color:#9fb7ca; font-size:10px; line-height:1.6; }
+.ab-expansion-provenance summary { color:#b7d4e6; cursor:pointer; }
+.ab-expansion-provenance p { font-size:9px; overflow-wrap:anywhere; margin:9px 0; }
+.ab-expansion-links { display:flex; flex-wrap:wrap; gap:9px 15px; margin:12px 0; }
+.ab-expansion-links a { color:#8cd8ee; text-decoration:underline; text-underline-offset:3px; }
+.ab-expansion-hash-label { display:block; color:#7ea0ba; font-size:9px; margin-top:13px; }
+.ab-expansion-provenance code { display:block; color:#b6cadb; overflow-wrap:anywhere; white-space:normal; font-size:9px; }
+.ab-expansion-footnote { font-size:10px; margin:14px 0 0; }
+.ab-expansion-status { padding:19px; border:1px solid #315068; border-radius:10px; margin-top:22px; background:#0c2033; color:#9dbbd2; font:11px/1.7 var(--tw-sans, sans-serif); }
+.ab-expansion-status button { margin-top:7px; padding:9px 12px; background:#153c52; border:1px solid #49829c; border-radius:6px; color:#cbeaf4; cursor:pointer; font-size:11px; }
+.ab-expansion-status.is-error { color:#d4c19d; border-color:#766444; }
+@media(max-width:720px) { .ab-expansion-grid { grid-template-columns:1fr; } .ab-expansion-heading { align-items:flex-start; } .ab-expansion-count { font-size:9px; } .ab-expansion-heading h3 { font-size:18px; } .ab-expansion-study { padding:15px; } }
