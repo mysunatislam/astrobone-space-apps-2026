@@ -4,7 +4,7 @@
 
 **Live app:** https://mysunatislam.github.io/astrobone-space-apps-2026/
 
-NASA Space Apps Challenge 2026 · [Create Health Monitoring Software for Astronauts on Space Missions](https://www.spaceappschallenge.org/2026/challenges/create-health-monitoring-software-for-astronauts-on-space-missions/) · Team AstroBone, Barisal, Bangladesh
+NASA Space Apps Challenge 2026 · [Create Health Monitoring Software for Astronauts on Space Missions](https://www.spaceappschallenge.org/2026/challenges/health-monitoring-software/) · Team AstroBone, Barisal, Bangladesh
 
 | Team member | Role |
 | --- | --- |
@@ -60,7 +60,7 @@ The supplied AstroBone logo now appears in the app header and introduction. Miss
 
 Two additional real NASA tables, **OSD-489 and OSD-654**, add **62 source rows** with reproducible summaries, SHA-256 provenance and missing-value accounting. These are animal bone-research context, not respiratory validation data. The catalog has 13 entries and distinguishes computed datasets from metadata and publications.
 
-Respiratory estimates remain **unvalidated against a reference belt**. A paired-reference import tool reports error and usable coverage without claiming clinical validation. See [module and validation protocol](docs/respiratory-module.md), [NASA evidence](docs/RESPIRATORY_NASA_EVIDENCE.md), and [three-minute demonstration](docs/space-apps-demo-2026.md).
+Respiratory estimates remain **unvalidated against a reference belt**. A paired-reference import tool reports error and usable coverage without claiming clinical validation. See [challenge alignment](docs/challenge-alignment.md), [module and validation protocol](docs/respiratory-module.md), [NASA evidence](docs/RESPIRATORY_NASA_EVIDENCE.md), and [three-minute demonstration](docs/space-apps-demo-2026.md).
 
 Rebuild the new NASA snapshot with `node scripts/build_nasa_research_expansion.mjs`. Check the new interface with `node scripts/qa-respiratory-upgrade.mjs http://127.0.0.1:5173/` (Chrome and a running dev server required).
 

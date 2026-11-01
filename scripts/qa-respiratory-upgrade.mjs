@@ -29,6 +29,15 @@ try {
     const logo = page.locator(".ab-brand-logo");
     assert.equal(await logo.evaluate(img => img.complete && img.naturalWidth > 0), true);
     await capturePage(page, { path: `${out}/mission-${viewport.width}.png`, fullPage: viewport.width < 500 });
+    stage("Open primary daily check and distinguish personal from synthetic profiles");
+    await page.getByRole("link", { name: /Open daily self-check/ }).click();
+    await page.locator('#twin-root[data-experience="selfcheck"]').waitFor();
+    assert.match(await page.locator(".tw-drawer h2").textContent(), /Gather.*evaluate.*act/);
+    assert.equal(await page.getByRole("button", { name: "Elena · synthetic demo", exact: true }).isVisible(), true);
+    await page.getByRole("button", { name: "You · this device", exact: true }).click();
+    assert.equal(await page.getByRole("button", { name: "You · this device", exact: true }).getAttribute("aria-pressed"), "true");
+    assert.equal(await page.getByRole("combobox", { name: "Mission environment" }).locator("option").count(), 6);
+    await page.locator('.tw-nav [data-experience="mission"]').click();
     stage("Browse NASA data and filter sources");
     await page.locator('[data-ab-action="evidence"]').click();
     await page.locator(".ab-expansion-study").first().waitFor({ state: "visible", timeout: 15000 });
@@ -92,7 +101,7 @@ try {
     await page.waitForFunction(() => document.querySelector("[data-reference-report]").textContent.includes("50% coverage"));
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, "Horizontal overflow");
     assert.deepEqual(errors, [], "No browser exceptions");
-    results.push({ viewport, passed: true, screenshotsEnabled, checks: ["branding", "NASA data", "search", "capture route", "synthetic isolation", "JSON export", "depth rejection", "depth duplicate prevention", "crew history isolation", "reference coverage", "responsive overflow", "browser exceptions"] });
+    results.push({ viewport, passed: true, screenshotsEnabled, checks: ["branding", "daily health workflow", "personal and synthetic profiles", "mission environments", "NASA data", "search", "capture route", "synthetic isolation", "JSON export", "depth rejection", "depth duplicate prevention", "crew history isolation", "reference coverage", "responsive overflow", "browser exceptions"] });
     stage("All functional checks passed");
     await context.close();
   }

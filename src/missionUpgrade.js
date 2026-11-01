@@ -31,13 +31,13 @@ export function mountMissionUpgrade(root, app) {
   overview.setAttribute("aria-label", "AstroBone mission overview");
   overview.innerHTML = `<div class="ab-overview-top"><span class="ab-kicker">HUMAN HEALTH / DEEP SPACE</span><span class="ab-prototype">RESEARCH PROTOTYPE</span></div>
     <h1>Human health, <br><span>in focus.</span></h1>
-    <p class="ab-overview-description">A clearer view of movement, physiology, and the science behind a longer mission.</p>
-    <div class="ab-scope-note"><span aria-hidden="true">◇</span><span>The twin shows a <b>synthetic mission</b>.<br>Start a capture to collect your own observations.</span></div>
-    <a class="ab-breathing-cta" href="${import.meta.env.BASE_URL}lab.html#respiratory-monitor"><span><small>NEW / EXPERIMENTAL</small>Start a breathing check</span><span aria-hidden="true">↗</span></a>
-    <div class="ab-overview-actions"><button type="button" data-ab-action="twin">Explore the twin <span aria-hidden="true">→</span></button><button type="button" data-ab-action="evidence">NASA evidence <span aria-hidden="true">↗</span></button></div>
+    <p class="ab-overview-description">Record vital signs, sleep and mood. Compare usable readings with your own baseline, then review your next action.</p>
+    <div class="ab-scope-note"><span aria-hidden="true">◇</span><span>This is <b>Elena’s synthetic mission</b>.<br>Choose “You · this device” in Self-Check for your own readings.</span></div>
+    <a class="ab-selfcheck-cta" href="#selfcheck" data-ab-action="selfcheck"><span><small>GATHER · EVALUATE · ACT</small>Open daily self-check</span><span aria-hidden="true">→</span></a>
+    <div class="ab-overview-actions"><a class="ab-breathing-cta" href="${import.meta.env.BASE_URL}lab.html#respiratory-monitor"><span><small>EXPERIMENTAL</small>Breathing check</span><span aria-hidden="true">↗</span></a><button type="button" data-ab-action="evidence">NASA evidence <span aria-hidden="true">↗</span></button></div>
     <div class="ab-device-note"><span class="ab-device-dot" aria-hidden="true"></span><span>Camera processing on your device</span></div>`;
   root.append(overview);
-  overview.querySelector('[data-ab-action="twin"]').onclick = () => app.setExperience("twin");
+  overview.querySelector('[data-ab-action="selfcheck"]').onclick = event => { event.preventDefault(); app.setExperience("selfcheck"); };
 
   const evidenceDialog = node("dialog", undefined, "ab-evidence-dialog");
   evidenceDialog.setAttribute("aria-labelledby", "ab-evidence-title");
