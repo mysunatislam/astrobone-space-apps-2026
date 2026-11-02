@@ -501,8 +501,11 @@ export function applyVitals(check, vitals = {}) {
   };
   const readings = (vitals.bp?.readings ?? []).filter(([s, d] = []) => finite(s) !== null && finite(d) !== null && s > d);
   const avg = i => (readings.length ? Math.round(readings.reduce((sum, r) => sum + r[i], 0) / readings.length) : null);
-  set("systolicBp", avg(0), bpProtocol(vitals.bp?.site), vitals.bp?.rested === true);
-  set("diastolicBp", avg(1), bpProtocol(vitals.bp?.site), vitals.bp?.rested === true);
+  // A cuff that reported movement, a loose cuff, an irregular pulse or a wrong arm position
+  // (Bluetooth status bits, src/bleVitals.js) makes the reading one to repeat, like an unrested one.
+  const bpUsable = vitals.bp?.rested === true && !vitals.bp?.deviceWarnings?.length;
+  set("systolicBp", avg(0), bpProtocol(vitals.bp?.site), bpUsable);
+  set("diastolicBp", avg(1), bpProtocol(vitals.bp?.site), bpUsable);
   set("spo2", finite(vitals.spo2?.value), "spo2-rest-v1");
   const g = finite(vitals.glucose?.value);
   set("glucose", g === null ? null : Math.round(vitals.glucose.unit === "mmol/L" ? g * GLUCOSE_MG_PER_MMOL : g), glucoseProtocol(vitals.glucose));

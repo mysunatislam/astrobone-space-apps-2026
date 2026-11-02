@@ -18,6 +18,7 @@ import { ELENA } from "./elenaMissionScenario.js";
 import { PASSCODE_MIN, passcodeProblem } from "./sealedStore.js";
 import { loadNasaEvidence, nasaWatchPlan } from "./nasaWatch.js";
 import { loadCrewBlood, replayCrew, crewReplayCard } from "./crewReplay.js";
+import { readBluetoothVital, bluetoothAvailable } from "./bleVitals.js";
 import { SURGEON_LIMITS_KEY, editableBounds, surgeonLimitsProblem, applySurgeonLimits, surgeonLimitsSummary, newSurgeonLimits, parseSurgeonLimits } from "./surgeonLimits.js";
 
 const STEPS = [["safety", "Safety"], ["movement", "Movement"], ["reaction", "Reaction"], ["mind", "Sleep & mood"], ["body", "Body"], ["result", "Result & action"]];
@@ -68,6 +69,8 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   // records, so they are kept on this device whether or not checks are saved. Elena's demo always uses
   // public guidance so its numbers stay fixed.
   const surgeon = { set: null, draft: null, note: null };
+  // Bluetooth readings in progress or done, by vital (src/bleVitals.js): what the form says under the button.
+  const ble = { busy: null, notes: {} };
   try { const saved = localStorage.getItem(SURGEON_LIMITS_KEY); if (saved) { const { set, problem } = parseSurgeonLimits(saved); if (!problem) surgeon.set = set; } } catch { /* storage unavailable */ }
   const limits = () => (state.profile === "elena" ? SAFETY_LIMITS : applySurgeonLimits(surgeon.set));
   // NASA life-science data sets what this check asks for and when (src/nasaWatch.js).
@@ -397,16 +400,30 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         node.className = `sc-limit${hits.length ? ` sc-${hit ? hit.limit.level : "ok"}` : ""}`;
         node.textContent = !hits.length ? "" : !hit ? "Within the safety limits"
           : `${INDICATORS[hit.k].short ?? INDICATORS[hit.k].label} ${hit.limit.text}: ${hit.limit.level === "urgent" ? "urgent safety limit" : "tell your crew medical officer today"}`;
-        if (keys.some(k => k === "systolicBp") && hits.length && c.quality.systolicBp === false) node.textContent += " · sit for 5 minutes first, or it will be repeated";
+        if (keys.some(k => k === "systolicBp") && hits.length && c.quality.systolicBp === false) node.textContent += vt.bp?.deviceWarnings?.length ? " · the cuff flagged this reading, so it will be repeated" : " · sit for 5 minutes first, or it will be repeated";
       };
       chips.push(update); update(); return node;
     };
     const about = key => el("small", { class: "sc-about" }, INDICATORS[key].about);
+    // "Read from Bluetooth": fills the boxes from a standard cuff, finger clip or thermometer; the person
+    // still sees and can correct the numbers before the check is evaluated.
+    const bleButton = (kind, label, fillIn) => !bluetoothAvailable() || state.profile === "elena" ? null : el("span", { class: "sc-ble" },
+      el("button", { class: "sc-secondary", type: "button", disabled: ble.busy ? true : undefined, onclick: async () => {
+        ble.busy = kind; ble.notes[kind] = { text: "Choose the device in the browser's list…" }; render();
+        try {
+          const r = await readBluetoothVital(kind, { onStatus: text => { ble.notes[kind] = { text }; render(); } });
+          fillIn(r); (vt.bluetooth ??= {})[kind] = r.device;
+          vt.source = `Bluetooth: ${Object.values(vt.bluetooth).join(", ")}; other values typed`;
+          ble.notes[kind] = { text: `Filled in from ${r.device}${r.warnings.length ? `. The device reported that ${r.warnings.join(" and ")}: measure again.` : ". Check the numbers before you go on."}`, bad: r.warnings.length > 0 };
+        } catch (error) { ble.notes[kind] = { text: error.message, bad: true }; }
+        ble.busy = null; sync(); render();
+      } }, ble.busy === kind ? "Reading…" : `Read from Bluetooth ${label}`),
+      ble.notes[kind] ? el("small", { class: `sc-note${ble.notes[kind].bad ? " sc-bad" : ""}`, role: "status" }, ble.notes[kind].text) : null);
     const bp = vt.bp ??= { readings: [], rested: false, site: "arm" };
     const bpInputs = [];
     const reading = (i, label) => {
-      const pair = bpInputs[i] = [num(bp.readings[i]?.[0], 50, 260, 1, `${label} systolic`, n => { (bp.readings[i] ??= [null, null])[0] = n; }),
-        num(bp.readings[i]?.[1], 30, 160, 1, `${label} diastolic`, n => { (bp.readings[i] ??= [null, null])[1] = n; })];
+      const pair = bpInputs[i] = [num(bp.readings[i]?.[0], 50, 260, 1, `${label} systolic`, n => { (bp.readings[i] ??= [null, null])[0] = n; delete bp.deviceWarnings; }),
+        num(bp.readings[i]?.[1], 30, 160, 1, `${label} diastolic`, n => { (bp.readings[i] ??= [null, null])[1] = n; delete bp.deviceWarnings; })];
       return el("span", { class: "sc-bp" }, pair[0], el("i", {}, "/"), pair[1], el("i", {}, "mmHg"));
     };
     const bpProblem = () => bpInputs.map(([s, d]) => vitalEntryProblem("systolic", typed(s), { diastolic: typed(d) }) ?? vitalEntryProblem("diastolic", typed(d))).find(Boolean);
@@ -417,10 +434,11 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const tempInput = num(temp.value, ...tRange(), "Body temperature", n => { temp.value = n; });
     return el("fieldset", { class: "sc-fieldset sc-vitals" }, el("legend", {}, "Vital signs · type what you measured today, leave blank to skip"),
       el("div", { class: "sc-vital" }, el("b", {}, "Blood pressure"), reading(0, "Reading 1"), el("small", {}, "Second reading a minute later (optional, averaged)"), reading(1, "Reading 2"),
+        bleButton("bp", "cuff", r => { bp.readings[0] = [r.systolic, r.diastolic]; bp.deviceWarnings = r.warnings; }),
         el("span", { class: "sc-row", role: "radiogroup", "aria-label": "Cuff position" }, BP_SITES.map(([site, label]) => el("label", { class: "sc-radio" },
           el("input", { type: "radio", name: "sc-bp-site", checked: (bp.site ?? "arm") === site || undefined, onchange: () => { bp.site = site; sync(); } }), label))),
         checkbox("sc-bp-rested", "Seated with my back supported, rested for 5 minutes", bp.rested, value => { bp.rested = value; sync(); }), problem(bpProblem), chip(["systolicBp", "diastolicBp"]), about("systolicBp"), about("diastolicBp")),
-      el("div", { class: "sc-vital" }, el("b", {}, "Oxygen saturation"), el("span", { class: "sc-bp" }, spo2Input, el("i", {}, "%")), problem(() => vitalEntryProblem("spo2", typed(spo2Input))), chip(["spo2"]), about("spo2")),
+      el("div", { class: "sc-vital" }, el("b", {}, "Oxygen saturation"), el("span", { class: "sc-bp" }, spo2Input, el("i", {}, "%")), bleButton("spo2", "finger clip", r => { spo2.value = r.spo2; }), problem(() => vitalEntryProblem("spo2", typed(spo2Input))), chip(["spo2"]), about("spo2")),
       el("div", { class: "sc-vital" }, el("b", {}, "Blood sugar"),
         el("span", { class: "sc-bp" }, glucoseInput,
           el("select", { "aria-label": "Blood sugar unit", onchange: e => { const was = glucose.unit; glucose.unit = e.target.value; if (Number.isFinite(glucose.value) && was !== glucose.unit) glucose.value = Number((was === "mg/dL" ? glucose.value / GLUCOSE_MG_PER_MMOL : glucose.value * GLUCOSE_MG_PER_MMOL).toFixed(glucose.unit === "mg/dL" ? 0 : 1)); sync(); render(); } },
@@ -435,6 +453,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
           el("select", { "aria-label": "Temperature unit", onchange: e => { const was = temp.unit; temp.unit = e.target.value; if (Number.isFinite(temp.value) && was !== temp.unit) temp.value = Number((was === "°C" ? temp.value * 9 / 5 + 32 : (temp.value - 32) * 5 / 9).toFixed(1)); sync(); render(); } },
             ["°C", "°F"].map(u => el("option", { selected: temp.unit === u || undefined }, u))),
           el("select", { "aria-label": "Thermometer site", onchange: e => { temp.site = e.target.value; sync(); } }, TEMP_SITES.map(([k, label]) => el("option", { value: k, selected: temp.site === k || undefined }, label)))),
+        bleButton("temp", "thermometer", r => { temp.unit = "°C"; temp.value = r.celsius; if (r.site) temp.site = r.site; }),
         problem(() => vitalEntryProblem("bodyTemp", typed(tempInput), { unit: temp.unit })), chip(["bodyTemp"]), about("bodyTemp")),
       el("small", { class: "sc-note" }, `Safety limits apply from the first reading and follow public guidance (${SAFETY_LIMIT_SOURCES.join("; ")}). Your flight surgeon can set their own below. Each value is also compared with your own usual range once you have 3 checks.`),
       surgeonLimitsBlock());
