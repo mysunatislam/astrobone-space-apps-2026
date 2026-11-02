@@ -131,3 +131,5 @@
 @media (max-width: 1200px) { .db-crew-row { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); } .db-crew-meta { justify-items: start; } }
 @media (max-width: 960px) { .db-hero-crew { grid-template-columns: minmax(0, 1fr); } .db-crew-row { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .tw-dash { animation: none; } }
+/* During the guided tour the caption sits at the bottom of the dashboard, off its headline. */
+#twin-root[data-experience="health"] .tw-caption { top: auto; bottom: 24px; }

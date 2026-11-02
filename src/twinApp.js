@@ -801,6 +801,14 @@ export function createTwinApp(root) {
       await step(() => selfCheck.go(5), "EVALUATE · bone & muscle, cardiovascular and behavioral health are outside her usual range · vital signs inside the safety limits", 5400);
       await step(null, "WHO TO TELL · on the way to Mars, Earth is 3–22 min away, so the crew medical officer acts first", 4200);
       await step(() => selfCheck.saveCheck(), "ACT · re-check in 24 h and log for medical review at the next communication window", 4400);
+      await step(() => setExperience("health"), "MY HEALTH · her whole check on one screen · knee extension, reaction speed and attention lapses outside her own range", 4800);
+      await step(() => dashboard.showCrew(), "CREW VIEW · four crew, most serious first · Daniel's blood pressure 144/92 is over the safety limit: tell the medical officer today", 5200);
+      await step(() => { dashboard.showSelf(); setExperience("selfcheck"); selfCheck.setEnvironment("station"); drawer.querySelector(".sc-ladder")?.scrollIntoView({ block: "center" }); },
+        "SAME RESULT ON THE SPACE STATION · the flight surgeon can join in real time and Earth is a day away", 4200);
+      await step(() => { selfCheck.setEnvironment("marsTransit"); drawer.querySelector(".sc-ladder")?.scrollIntoView({ block: "center" }); },
+        "ON THE WAY TO MARS · every message to Earth takes 3–22 min, so the crew medical officer acts first", 4200);
+      await step(() => setExperience("twin", { system: "skeleton" }), null, 1400);
+      await step(() => showPart("tibiaL", scene.project("tibiaL") ?? undefined), "TAP THE BODY · the shin bone: what it does, how spaceflight affects it, and Elena's status today", 4600);
       await step(async () => { setExperience("impact"); }, "UNEXPECTED EVENT · reconstructed from authored inputs", 1600);
       await step(() => runImpact(), null, 900);
       await step(() => runMonteCarloView(), null, 0);

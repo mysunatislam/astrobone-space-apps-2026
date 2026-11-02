@@ -187,5 +187,5 @@ export function createDashboardPanel({ selfCheck, dose = () => null, onMeasure =
   }
   function fillRoot(...children) { element.replaceChildren(...children.filter(Boolean)); }
 
-  return { element, render, showCrew() { view = "crew"; chartKey = null; report = false; render(); } };
+  return { element, render, showCrew() { view = "crew"; chartKey = null; report = false; render(); }, showSelf() { view = "self"; chartKey = null; report = false; } };
 }
