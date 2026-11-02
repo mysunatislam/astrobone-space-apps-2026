@@ -88,7 +88,7 @@ body.twin-body { overflow: hidden; }
 /* Narrower desktops: the astronaut's name gives way so every section stays visible. */
 @media (max-width: 1960px) { .tw-ident { display: none; } }
 @media (max-width: 1700px) { .tw-daybox { display: none; } }
-@media (max-width: 1500px) {
+@media (max-width: 1599px) {
   .tw-start { padding: 10px 12px; letter-spacing: .06em; }
   .tw-nav button, .tw-nav a { padding: 9px 7px; letter-spacing: .04em; }
   .tw-top { gap: 10px; }
