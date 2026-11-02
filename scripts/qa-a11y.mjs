@@ -34,6 +34,7 @@ try {
     await scan(page, `${viewport.width}px self-check, passcode form`);
     for (const step of ["2 Movement", "3 Reaction", "4 Sleep", "5 Body", "6 Result"]) {
       await page.getByRole("button", { name: new RegExp(step) }).click(); await page.waitForTimeout(500);
+      await page.evaluate(() => document.querySelectorAll(".sc-sl").forEach(d => { d.open = true; })); // flight surgeon's limits form
       await scan(page, `${viewport.width}px self-check ${step}`);
     }
     await page.close();

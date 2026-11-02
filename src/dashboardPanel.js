@@ -43,11 +43,11 @@ export function createDashboardPanel({ selfCheck, dose = () => null, onMeasure =
         model: dashboardModel({ records: member.history, current: member.today, environment, routine: status }) };
     }
     const profile = selfCheck.state.profile;
-    const environment = selfCheck.environment(), floors = selfCheck.floors(), routine = selfCheck.routine();
+    const environment = selfCheck.environment(), floors = selfCheck.floors(), routine = selfCheck.routine(), limits = selfCheck.limits?.();
     const records = selfCheck.history();
     let current = selfCheck.current, evaluation = current ? selfCheck.state.evaluation : null;
     if (!current && profile === "elena" && !records.some(r => r.missionDay === 147)) current = elenaDay147();
-    return { profile, environment, routine, floors, model: dashboardModel({ records, current, evaluation, environment, routine: routine.status, floors }), records, current };
+    return { profile, environment, routine, floors, limits, model: dashboardModel({ records, current, evaluation, environment, routine: routine.status, floors, limits }), records, current };
   }
 
   function tile(t, selected) {
@@ -61,11 +61,11 @@ export function createDashboardPanel({ selfCheck, dose = () => null, onMeasure =
       t.sinceFirst ? el("em", {}, ` · ${signed(t.sinceFirst.delta, t.def.digits ?? 0)}${t.unit} since ${t.sinceFirst.day ? `Day ${t.sinceFirst.day}` : "first check"}`) : null));
   }
 
-  function chart(model, records, current, floors) {
+  function chart(model, records, current, floors, limits) {
     const key = model.tiles.some(t => t.key === chartKey && t.points >= 2) ? chartKey : model.chartKey;
     if (!key) return el("section", { class: "db-chart db-card" }, el("header", {}, el("b", {}, "Over time")), el("p", { class: "db-note" }, "Charts appear after two checks of the same measurement."));
     const all = [...records.filter(r => !current || r.id !== current.id)];
-    const hist = indicatorHistory(key, all, current ?? null, { floors });
+    const hist = indicatorHistory(key, all, current ?? null, { floors, limits });
     const box = el("div", { class: "db-chart-box", html: historyChartSvg(hist, { width: 560, height: 236 }) });
     return el("section", { class: "db-chart db-card", "aria-label": "Over time" },
       el("header", {}, el("b", {}, `Over time · ${hist.def.label}`), el("small", {}, "Tap any tile to chart it. Each point is judged as it was on its own day.")),
@@ -128,7 +128,7 @@ export function createDashboardPanel({ selfCheck, dose = () => null, onMeasure =
 
   function render() {
     if (view === "crew") { renderCrew(); return; }
-    const { profile, member, environment, routine, model, records, current, floors } = data();
+    const { profile, member, environment, routine, model, records, current, floors, limits } = data();
     const where = whereText(environment);
     const who = el("div", { class: "db-who" }, el("span", { class: "tw-eyebrow" }, member ? "CREW MEMBER · TODAY" : "MY HEALTH · TODAY"),
       el("h2", {}, member ? `${member.role} ${member.name}` : profile === "elena" ? "Commander Elena Torres" : "You"),
@@ -181,7 +181,7 @@ export function createDashboardPanel({ selfCheck, dose = () => null, onMeasure =
       el("strong", {}, doseInfo.text, el("small", {}, " mGy")), el("small", {}, doseInfo.detail)) : null;
 
     fillRoot(hero, domains, grid,
-      el("div", { class: "db-bottom" }, chart(model, records, current, floors), el("div", { class: "db-side" }, actions, radiation)),
+      el("div", { class: "db-bottom" }, chart(model, records, current, floors, limits), el("div", { class: "db-side" }, actions, radiation)),
       adherence(profile, routine, member),
       el("small", { class: "db-boundary" }, member ? CREW_BOUNDARY : profile === "elena" ? ELENA_SELF_CHECK_BOUNDARY : "Your checks stay on this device. A self-monitoring record, not a diagnosis."));
   }

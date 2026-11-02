@@ -1,4 +1,4 @@
-import { INDICATORS, DOMAINS, STATUS_RANK, evaluateSelfCheck } from "./selfCheck.js";
+import { INDICATORS, DOMAINS, STATUS_RANK, SAFETY_LIMITS, evaluateSelfCheck } from "./selfCheck.js";
 import { STATUS_MARKS, indicatorHistory } from "./historyChart.js";
 import { escalationPlan } from "./missionEnvironment.js";
 
@@ -16,16 +16,16 @@ export const unitText = def => (!def.unit ? "" : def.unit === "°" ? "°" : ` ${
 
 // records: saved checks, oldest first. current: today's check if it is not among them (or null).
 // evaluation: the self-check's evaluation of today's check (or null: evaluate the newest record).
-export function dashboardModel({ records = [], current = null, evaluation = null, environment = null, routine = null, floors = {} } = {}) {
+export function dashboardModel({ records = [], current = null, evaluation = null, environment = null, routine = null, floors = {}, limits = SAFETY_LIMITS } = {}) {
   const all = [...records.filter(r => !current || r.id !== current.id), ...(current ? [current] : [])];
   if (!all.length) return { empty: true, routine };
   const today = current ?? all.at(-1);
-  const ev = evaluation ?? evaluateSelfCheck(today, all.slice(0, -1), { floors, environment });
+  const ev = evaluation ?? evaluateSelfCheck(today, all.slice(0, -1), { floors, environment, limits });
   const rows = ev.domains.flatMap(d => d.indicators);
 
   const tiles = Object.keys(INDICATORS).map(key => {
     const def = INDICATORS[key], row = rows.find(r => r.key === key) ?? { status: "notChecked" };
-    const hist = indicatorHistory(key, all.slice(0, -1), today, { floors });
+    const hist = indicatorHistory(key, all.slice(0, -1), today, { floors, limits });
     const points = hist?.points ?? [];
     const first = points[0] ?? null, last = points.at(-1) ?? null;
     const usual = row.ref?.ready && Number.isFinite(row.tolerance) ? { mean: row.ref.mean, tolerance: row.tolerance } : null;

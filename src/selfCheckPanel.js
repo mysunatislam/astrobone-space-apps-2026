@@ -1,6 +1,6 @@
 import {
   PVT_B, PVT_PROTOCOL, PVT_INPUTS, PVT_DEVICE_WORDS, pvtDeviceClass, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
-  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, BP_SITES, GLUCOSE_SOURCES, SLEEP_SOURCES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
+  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, BP_SITES, GLUCOSE_SOURCES, SLEEP_SOURCES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, SAFETY_LIMITS, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
 import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
@@ -18,6 +18,7 @@ import { ELENA } from "./elenaMissionScenario.js";
 import { PASSCODE_MIN, passcodeProblem } from "./sealedStore.js";
 import { loadNasaEvidence, nasaWatchPlan } from "./nasaWatch.js";
 import { loadCrewBlood, replayCrew, crewReplayCard } from "./crewReplay.js";
+import { SURGEON_LIMITS_KEY, editableBounds, surgeonLimitsProblem, applySurgeonLimits, surgeonLimitsSummary, newSurgeonLimits, parseSurgeonLimits } from "./surgeonLimits.js";
 
 const STEPS = [["safety", "Safety"], ["movement", "Movement"], ["reaction", "Reaction"], ["mind", "Sleep & mood"], ["body", "Body"], ["result", "Result & action"]];
 const STATUS = {
@@ -63,6 +64,12 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   const check = { open: false, participant: "P1", side: "left", referenceType: REFERENCE_TYPES[0], reference: null, hold: null, holding: false, pairs: [] };
   try { state.persist = localStorage.getItem("astrobone-self-check-consent") === "1"; } catch { /* storage unavailable */ }
   check.pairs = angleStore.load(state.persist);
+  // Safety limits set by the crew's flight surgeon (src/surgeonLimits.js). They are settings, not health
+  // records, so they are kept on this device whether or not checks are saved. Elena's demo always uses
+  // public guidance so its numbers stay fixed.
+  const surgeon = { set: null, draft: null, note: null };
+  try { const saved = localStorage.getItem(SURGEON_LIMITS_KEY); if (saved) { const { set, problem } = parseSurgeonLimits(saved); if (!problem) surgeon.set = set; } } catch { /* storage unavailable */ }
+  const limits = () => (state.profile === "elena" ? SAFETY_LIMITS : applySurgeonLimits(surgeon.set));
   // NASA life-science data sets what this check asks for and when (src/nasaWatch.js).
   let evidence = null, evidenceError = null;
   loadNasaEvidence(import.meta.env.BASE_URL).then(data => { evidence = data; render(); }).catch(error => { evidenceError = error.message; render(); });
@@ -128,7 +135,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
 
   function evaluate() {
     if (locked()) { state.evaluation = null; return; }
-    state.evaluation = evaluateSelfCheck(state.check, history(), { floors: state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor), environment: environment() });
+    state.evaluation = evaluateSelfCheck(state.check, history(), { floors: state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor), environment: environment(), limits: limits() });
     onEvaluate(state.evaluation, state.profile);
   }
 
@@ -332,7 +339,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     state.saved = true; state.earned = newBadges(before, routine().status); render();
   }
   function exportPacket() {
-    return { schema: "astrobone-self-check-export-v1", profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device", environment: environment(), check: state.check, evaluation: state.evaluation, followUps: state.followUps,
+    return { schema: "astrobone-self-check-export-v1", profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device", environment: environment(), check: state.check, evaluation: state.evaluation, followUps: state.followUps, surgeonLimits: state.profile === "elena" ? null : surgeon.set,
       boundary: "Self-monitoring record. Review triggers are engineering defaults, not clinical thresholds. Not a diagnosis.", exportedAt: new Date().toISOString() };
   }
   function download(text, type, name) {
@@ -354,7 +361,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
 
   // The same result as a short plain-text message for the flight surgeon, readable without AstroBone.
   function reportSection() {
-    const text = surgeonReport(state.evaluation, state.check, { environment: environment(), profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device",
+    const text = surgeonReport(state.evaluation, state.check, { environment: environment(), profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device", surgeonLimits: state.profile === "elena" ? null : surgeon.set,
       followUps: state.saved ? state.followUps : null });
     const kb = n => `${(n / 1024).toFixed(1)} kB`, size = byteSize(text), full = byteSize(JSON.stringify(exportPacket(), null, 2));
     const copied = el("small", { role: "status" });
@@ -385,7 +392,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const chip = keys => {
       const node = el("small", { class: "sc-limit", role: "status" });
       const update = () => {
-        const hits = keys.filter(k => Number.isFinite(c.values[k])).map(k => ({ k, limit: safetyLimit(k, c.values[k], undefined, c.protocols[k]) }));
+        const hits = keys.filter(k => Number.isFinite(c.values[k])).map(k => ({ k, limit: safetyLimit(k, c.values[k], limits(), c.protocols[k]) }));
         const hit = hits.find(h => h.limit?.level === "urgent") ?? hits.find(h => h.limit);
         node.className = `sc-limit${hits.length ? ` sc-${hit ? hit.limit.level : "ok"}` : ""}`;
         node.textContent = !hits.length ? "" : !hit ? "Within the safety limits"
@@ -429,7 +436,49 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
             ["°C", "°F"].map(u => el("option", { selected: temp.unit === u || undefined }, u))),
           el("select", { "aria-label": "Thermometer site", onchange: e => { temp.site = e.target.value; sync(); } }, TEMP_SITES.map(([k, label]) => el("option", { value: k, selected: temp.site === k || undefined }, label)))),
         problem(() => vitalEntryProblem("bodyTemp", typed(tempInput), { unit: temp.unit })), chip(["bodyTemp"]), about("bodyTemp")),
-      el("small", { class: "sc-note" }, `Safety limits apply from the first reading and follow public guidance (${SAFETY_LIMIT_SOURCES.join("; ")}). Your flight surgeon can set their own. Each value is also compared with your own usual range once you have 3 checks.`));
+      el("small", { class: "sc-note" }, `Safety limits apply from the first reading and follow public guidance (${SAFETY_LIMIT_SOURCES.join("; ")}). Your flight surgeon can set their own below. Each value is also compared with your own usual range once you have 3 checks.`),
+      surgeonLimitsBlock());
+  }
+
+  // ---------- Flight surgeon's limits ----------
+  // The flight surgeon moves any public line for this person, signs it with their name and the date, and
+  // can send the same settings as a file. A set that would switch a limit off is refused (surgeonLimits.js).
+  function surgeonLimitsBlock() {
+    const demo = state.profile === "elena", active = surgeon.set, lines = surgeonLimitsSummary(active);
+    const draft = surgeon.draft ??= newSurgeonLimits({ setBy: active?.setBy ?? "", reason: active?.reason ?? "", values: { ...(active?.values ?? {}) } });
+    const save = set => {
+      const problem = surgeonLimitsProblem(set);
+      if (problem) { surgeon.note = { bad: true, text: problem }; render(); return; }
+      surgeon.set = set; surgeon.draft = null; surgeon.note = { bad: false, text: `Saved: ${surgeonLimitsSummary(set).length} limit${surgeonLimitsSummary(set).length === 1 ? "" : "s"} set by ${set.setBy}.` };
+      try { localStorage.setItem(SURGEON_LIMITS_KEY, JSON.stringify(set)); } catch { surgeon.note.text += " This browser could not keep them after the page closes."; }
+      if (state.evaluation) evaluate(); render();
+    };
+    const clear = () => { surgeon.set = null; surgeon.draft = null; surgeon.note = { bad: false, text: "Back to public guidance." }; try { localStorage.removeItem(SURGEON_LIMITS_KEY); } catch { /* storage unavailable */ } if (state.evaluation) evaluate(); render(); };
+    const load = async e => {
+      const file = e.target.files?.[0]; if (!file) return;
+      const { set, problem } = parseSurgeonLimits(await file.text());
+      if (problem) { surgeon.note = { bad: true, text: problem }; render(); return; }
+      save(set);
+    };
+    const rows = editableBounds().map(b => el("label", { class: "sc-sl-row" }, el("span", {}, b.label),
+      el("span", { class: "sc-bp" }, el("input", { type: "number", step: b.unit === "°C" ? 0.1 : 1, inputmode: "decimal", placeholder: String(b.value), value: Number.isFinite(draft.values[b.id]) ? draft.values[b.id] : "",
+        "aria-label": `${b.label}, public guidance ${b.value}${b.unit ? ` ${b.unit}` : ""}`,
+        oninput: e => { const n = e.target.value === "" ? null : Number(e.target.value); if (n === null || n === b.value) delete draft.values[b.id]; else draft.values[b.id] = n; } }), el("i", {}, b.unit ?? ""))));
+    return el("details", { class: "sc-sl", open: surgeon.note ? true : undefined },
+      el("summary", {}, active && !demo ? `Flight surgeon's limits · set by ${active.setBy}, ${active.date}` : "Flight surgeon's limits · public guidance in use"),
+      demo ? el("p", { class: "sc-note" }, "Elena's demo always uses public guidance so its numbers stay fixed. Limits saved here apply to You · this device.") : null,
+      active ? el("div", { class: "sc-sl-active" }, el("b", {}, `In use for You · this device: set by ${active.setBy} on ${active.date}${active.reason ? ` (${active.reason})` : ""}`),
+        el("ul", {}, lines.map(t => el("li", {}, t)))) : null,
+      el("p", { class: "sc-note" }, "Leave a box empty to keep the public value shown in it. An urgent line must stay beyond the tell-today line, and every value must be physiologically plausible, so a typo cannot switch a limit off. Lines for a particular thermometer site or cuff keep their public values."),
+      el("label", { class: "sc-sl-row" }, el("span", {}, "Set by (flight surgeon's name)"), el("input", { type: "text", value: draft.setBy, autocomplete: "off", oninput: e => { draft.setBy = e.target.value; } })),
+      el("label", { class: "sc-sl-row" }, el("span", {}, "Reason (optional)"), el("input", { type: "text", value: draft.reason, autocomplete: "off", oninput: e => { draft.reason = e.target.value; } })),
+      el("div", { class: "sc-sl-grid" }, rows),
+      surgeon.note ? el("p", { class: `sc-note${surgeon.note.bad ? " sc-bad" : ""}`, role: surgeon.note.bad ? "alert" : "status" }, surgeon.note.text) : null,
+      el("div", { class: "sc-sl-actions" },
+        el("button", { class: "sc-primary", type: "button", onclick: () => save({ ...draft, date: new Date().toISOString().slice(0, 10), values: { ...draft.values } }) }, "Save these limits"),
+        active ? el("button", { class: "sc-secondary", type: "button", onclick: () => download(JSON.stringify(active, null, 2), "application/json", `AstroBone-surgeon-limits-${active.date}.json`) }, "Download limits file") : null,
+        el("label", { class: "sc-secondary sc-file" }, "Load limits file", el("input", { type: "file", accept: "application/json,.json", onchange: load })),
+        active ? el("button", { class: "sc-secondary", type: "button", onclick: clear }, "Use public guidance") : null));
   }
 
   // ---------- Rendering ----------
@@ -590,7 +639,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const pick = charted.includes(state.chartKey) ? state.chartKey
       : (rows.filter(r => charted.includes(r.key)).sort((a, b) => STATUS_RANK[b.status] - STATUS_RANK[a.status])[0]?.key ?? charted[0]);
     const floors = state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor);
-    const hist = indicatorHistory(pick, history(), state.saved ? null : state.check, { floors });
+    const hist = indicatorHistory(pick, history(), state.saved ? null : state.check, { floors, limits: limits() });
     const box = el("div", { class: "sc-hchart-box" }); box.innerHTML = historyChartSvg(hist);
     const d = hist.def;
     return el("section", { class: "sc-over", "aria-label": "Over time" },
@@ -727,6 +776,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     locked: () => locked(),
     environment: () => environment(),
     floors: () => (state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor)),
+    limits: () => limits(),
     get current() { return state.evaluation && !state.saved ? state.check : null; },
     latestEvaluation(profile = state.profile) {
       if (state.evaluation && state.profile === profile) return state.evaluation;

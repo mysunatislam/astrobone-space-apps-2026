@@ -117,7 +117,9 @@ export function safetyLimit(key, value, limits = SAFETY_LIMITS, protocol = null)
   const site = siteOf(protocol), siteRule = base.sites?.[site], rule = { ...base, ...siteRule };
   for (const level of ["urgent", "attention"]) {
     const bound = (rule[level] ?? []).find(([op, limit]) => OPS[op](value, limit));
-    if (bound) return { level, bound: bound.slice(0, 2), text: `${describeBound(bound, INDICATORS[key]?.unit)}${siteRule?.[level] ? ` (${site})` : ""}`, recheck: rule.recheck, first: bound[2] ?? null };
+    // A line moved by the crew's flight surgeon (src/surgeonLimits.js) carries "surgeon" and says so.
+    const surgeon = bound?.[3] === "surgeon";
+    if (bound) return { level, bound: bound.slice(0, 2), text: `${describeBound(bound, INDICATORS[key]?.unit)}${siteRule?.[level] ? ` (${site})` : ""}${surgeon ? " (flight surgeon's limit)" : ""}`, recheck: rule.recheck, first: bound[2] ?? null, surgeon };
   }
   return null;
 }
