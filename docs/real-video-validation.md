@@ -134,6 +134,28 @@ The app's previous method (POS with a 60 % spectral peak-share gate) answered 5 
 
 **Live Capture.** The continuous Live Capture view reads the POS colour wave alone (no deep model, so the 3D scene keeps its frame rate) through the same estimator with a 12-second first window and a 0.3 gate (`colourPulseFromSamples` in `src/cameraPulse.js`). On these windows it answered 33 % at 1.2 bpm; the rest it reports as unclear and asks the person to hold still. The 45-second self-check is the reading meant for the daily baseline.
 
+### 3b. AstroBone's camera pulse vs NeuroBridge Asha's VitalSense (2026-11-02)
+
+NeuroBridge Asha (mysunatislam/neurobridge-asha-unified-app, same author) has its own camera pulse, VitalSense: the mean colour of three forehead and cheek rectangles, POS (Wang 2017), detrend, band-pass and an FFT peak over 12 s, with a signal-to-noise gate and a jump filter. On one person it read 68-71 bpm against a wristwatch's 70 bpm. To pick one for AstroBone, both ran on the same frames of the same 40 MCD-rPPG people (front webcam, first 60 s, at rest and after 15 squats; 80 recordings, 320 readings at 30, 40, 50 and 60 s):
+
+- NeuroBridge: `app/vitalsense.js` copied unchanged (commit a145b2c) into `scripts/validation/neurobridge/`, fed frame by frame exactly as its `perception.js` samples the three rectangles; its reading at each instant is scored against the finger PPG over the 12 s it analyses.
+- AstroBone: `fusedPulseFromSamples` from `src/cameraPulse.js` as shipped, on the 30 s before the same instants, and on 12 s for a like-for-like check.
+
+| Method | Mean error (bpm) | Within 5 bpm | Answered |
+|---|---|---|---|
+| NeuroBridge VitalSense, as shipped | 6.38 | 76.0 % | 84.7 % |
+| AstroBone hybrid, 30 s, as shipped | 2.22 | 89.6 % | 96.3 % |
+| AstroBone hybrid, 30 s, quality gate 0.3 | 0.62 | 97.6 % | 76.9 % |
+| Same 263 readings both answered: NeuroBridge / AstroBone 12 s | 6.17 / 2.15 | 77.6 % / 93.5 % | |
+| At rest: NeuroBridge / AstroBone | 5.04 / 2.19 | 78.3 % / 89.7 % | |
+| After squats: NeuroBridge / AstroBone | 7.87 / 2.25 | 73.4 % / 89.5 % | |
+
+AstroBone's hybrid stays. The deep ME-rPPG wave is what makes the difference: NeuroBridge's colour-only POS lands close to the colour-only rows in the table above (POS 7.1 bpm). Its jump filter refused 41 readings ("signal changed abruptly"), mostly after squats, when the true rate was falling fast. The AstroBone row reproduces this section's main result (2.22 vs 2.14 bpm, the same 308 windows answered) through a separate re-implementation of the frame pipeline, which is a check on both. The wristwatch reading fits this: at rest in good light NeuroBridge is often right, but over 40 people it is about three times further off.
+
+**Breathing from head movement.** VitalSense also estimates breathing from the up-and-down of the face landmarks. Against each recording's respiratory rate in MCD-rPPG (recorded once per session; the dataset card does not say how), it answered 55 % of recordings with a 5.45 breaths/min average error, and AstroBone's 60-second version (`breathingFromHead` in `src/faceCues.js`) did worse (7.72 on 34 %). Guessing the dataset mean every time is off by 1.40. Neither is shown as a number in the app: the crewmate check asks the crew to count breaths for 30 s instead. (The truth here is weak, 15-24 breaths/min with no stated method, but a method that loses to a fixed guess is not ready.)
+
+Rerun: `python scripts/validation/nb_pulse_worker.py <out> 60` (downloads each video and finger PPG from Hugging Face, deletes them after use), `python scripts/validation/nb_pulse_export.py <out> <export.json>`, `node scripts/validation/nb-pulse-compare.mjs <export.json> <result.json>`. Table: `data/validation/neurobridge-pulse-compare.csv`.
+
 ## 4. Change from the person's own baseline
 
 AstroBone compares a resting heart rate only with the same person's earlier readings by the same method. The closest test in this data is the rise from rest to right after 15 squats in the same person (first 30 s window of each recording).

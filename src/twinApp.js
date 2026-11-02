@@ -7,6 +7,7 @@ import { IMPACT_SCENARIO, evaluateImpact, runMonteCarlo, eventDistributions, env
 import { RISK_THRESHOLDS } from "./riskModel.js";
 import { createSelfCheckPanel } from "./selfCheckPanel.js";
 import { createDashboardPanel } from "./dashboardPanel.js";
+import { createCrewmatePanel } from "./crewmatePanel.js";
 import { ELENA_HISTORY } from "./elenaSelfCheck.js";
 import { EXPERIENCES, CAPTURE, experienceFromHash } from "./siteNav.js";
 import { BODY_PARTS, bodyPartFor, bodyPartStatus } from "./bodyParts.js";
@@ -135,6 +136,21 @@ export function createTwinApp(root) {
   const dashHost = el("section", { class: "tw-dash", hidden: true, "aria-live": "polite" }, dashboard.element);
   root.insertBefore(dashHost, tooltip);
 
+  // Crewmate check: a crewmate suddenly has pain. The twin turns to the systems the answers point at.
+  state.crewSystem = "multisystem"; state.crewFocus = "body";
+  const CREW_ALERTS = { cardiovascular: "cardiovascular", skeleton: "musculoskeletal", muscle: "musculoskeletal", renal: "renal" };
+  const crewmate = createCrewmatePanel({
+    onAssess: a => {
+      if (state.experience !== "crewmate") return;
+      const shown = a?.systems.find(s => s !== "nervous") ?? "multisystem";
+      state.crewSystem = shown; state.crewFocus = a?.focus ?? "body";
+      scene.setAlerts(Object.fromEntries((a?.systems ?? []).filter(s => CREW_ALERTS[s]).map(s => [CREW_ALERTS[s], true])));
+      scene.setSystem(shown, { focusTarget: state.crewFocus });
+    },
+    onSystem: (system, focus) => { state.crewSystem = system; scene.setSystem(system, { focusTarget: system === "renal" ? "kidneys" : focus }); },
+    onCameraActive: active => scene.setPaused(active),
+  });
+
   // Body as navigation: the structure clicked selects the analysis.
   function navigateFromBody(name) {
     if (name === "tibiaL") setExperience("impact");
@@ -186,12 +202,14 @@ export function createTwinApp(root) {
     if (state.experience === "functional") return "functional";
     if (state.experience === "impact") return "impact";
     if (state.experience === "selfcheck") return SELF_STEP_VIEW[state.selfStep][0];
+    if (state.experience === "crewmate") return state.crewSystem;
     if (state.experience === "physiology") return PHYSIO_TABS.find(([key]) => key === state.physio)[2];
     return state.system;
   }
   function sceneFocus(system) {
     if (state.experience === "physiology") return PHYSIO_TABS.find(([key]) => key === state.physio)[3];
     if (state.experience === "selfcheck") return SELF_STEP_VIEW[state.selfStep][1];
+    if (state.experience === "crewmate") return state.crewFocus;
     return SYSTEM_FOCUS[system] ?? "body";
   }
 
@@ -216,6 +234,8 @@ export function createTwinApp(root) {
     if (experience !== "twin" && state.compare) { state.compare = false; scene.setCompare(false); }
     if (previous === "impact" && experience !== "impact") scene.resetImpact();
     if (previous === "selfcheck" && experience !== "selfcheck") { selfCheck.stop(); scene.setAlerts({}); }
+    if (previous === "crewmate" && experience !== "crewmate") { crewmate.stop(); scene.setAlerts({}); }
+    if (experience === "crewmate" && previous !== "crewmate") scene.setAlerts(Object.fromEntries((crewmate.assessment?.systems ?? []).filter(s => CREW_ALERTS[s]).map(s => [CREW_ALERTS[s], true])));
     const target = sceneSystem();
     scene.setSystem(target, { focusTarget: focus ? sceneFocus(target) : undefined });
     if (experience === "impact" && state.impactDone && !state.impactRunning) { scene.showStress(true); scene.focus("leftLeg"); }
@@ -410,12 +430,16 @@ export function createTwinApp(root) {
   // ---------- Drawer experiences ----------
   function renderDrawer() {
     const exp = state.experience;
-    drawer.hidden = !["selfcheck", "functional", "impact", "physiology", "evidence"].includes(exp);
+    drawer.hidden = !["selfcheck", "crewmate", "functional", "impact", "physiology", "evidence"].includes(exp);
     if (drawer.hidden) { fill(drawer); drawer.dataset.view = ""; return; }
     // The self-check keeps live camera and test state, so its element is never rebuilt.
     if (exp === "selfcheck") {
       if (drawer.dataset.view !== "selfcheck" || !drawer.contains(selfCheck.element)) fill(drawer, drawerHead("DAILY SELF-CHECK", "Gather · evaluate · act"), selfCheck.element);
       drawer.dataset.view = "selfcheck"; return;
+    }
+    if (exp === "crewmate") {
+      if (drawer.dataset.view !== "crewmate" || !drawer.contains(crewmate.element)) fill(drawer, drawerHead("CREWMATE CHECK", "Sudden pain: how fast to get help"), crewmate.element);
+      drawer.dataset.view = "crewmate"; return;
     }
     drawer.dataset.view = exp;
     if (exp === "impact") renderImpact();
