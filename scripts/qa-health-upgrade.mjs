@@ -4,8 +4,8 @@ import { resolve } from 'node:path';
 import { chromium } from 'playwright';
 const base=process.argv[2] || 'http://127.0.0.1:5173/';
 const out=resolve('.artifacts/health-upgrade'); await mkdir(out,{recursive:true});
-const axe=await readFile(resolve('../qa-tools/node_modules/axe-core/axe.min.js'),'utf8');
-const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const axe=await readFile(resolve(process.env.AXE_CORE || '../qa-tools/node_modules/axe-core/axe.min.js'),'utf8');
+const browser=await chromium.launch({...(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {channel:'chrome'}),headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const report=[];
 // Fixtures exist only in isolated Playwright contexts, never in the user's browser.
 const fixture=[0,1,2].map(i=>({schema:'astrobone-self-check-v1',id:'QA-baseline-'+i,profileId:'you',at:new Date(Date.UTC(2026,9,27+i,8)).toISOString(),values:{restingHr:64+i,sleepHours:7.5,mood:7},protocols:{restingHr:'resting-self-reported-v1'},quality:{restingHr:true,sleepHours:true,mood:true},sources:{restingHr:'QA disposable instrument',sleepHours:'Self-report',mood:'Self-report'},redFlags:{},symptoms:{},complete:true}));
