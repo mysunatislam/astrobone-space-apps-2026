@@ -60,3 +60,27 @@ test("adherence strip marks Elena's four missed days and today", () => {
   assert.equal(strip.cells.at(-1).state, "today");
   assert.deepEqual(strip.cells.filter(c => c.state === "missed").map(c => c.day), [33, 34, 88, 131]);
 });
+
+test("crew view sorts the four synthetic crew most serious first, each judged against their own checks", async () => {
+  const { CREW } = await import("./crewDemo.js");
+  const { crewRoster, crewSummaryText } = await import("./healthDashboard.js");
+  const roster = crewRoster(CREW, env);
+  assert.deepEqual(roster.rows.map(r => [r.id, r.status]), [["daniel", "attention"], ["elena", "changed"], ["sofia", "recheck"], ["priya", "stable"]]);
+  assert.deepEqual(roster.counts, { attention: 1, changed: 1, recheck: 1, stable: 1 });
+  const daniel = roster.rows[0];
+  assert.equal(daniel.lead.key, "systolicBp");
+  assert.match(daniel.lead.limit, /at or above 140 mmHg/);
+  // Elena in the crew view is exactly her own dashboard.
+  const elena = roster.rows.find(r => r.id === "elena");
+  assert.equal(elena.model.overall, dashboardModel({ records: ELENA_HISTORY, current: elenaDay147(), environment: env }).overall);
+  assert.equal(elena.adherence.done, ELENA_CHECK_DAYS.length + 1);
+  const text = crewSummaryText(roster, env);
+  assert.ok(new TextEncoder().encode(text).length < 2048, "fits a slow link");
+  assert.match(text.split("\n")[3], /^CONTACT TODAY Daniel Okoye/);
+});
+
+test("values keep their decimals: 37.0 °C stays 37.0", () => {
+  const model = dashboardModel({ records: ELENA_HISTORY, current: elenaDay147(), environment: env });
+  assert.equal(model.tiles.find(t => t.key === "pvtSpeed").text, "3.00");
+  assert.equal(model.tiles.find(t => t.key === "bodyTemp").text, "37.3");
+});

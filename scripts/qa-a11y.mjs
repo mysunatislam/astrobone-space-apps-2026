@@ -24,6 +24,9 @@ try {
     const page = await browser.newPage({ viewport });
     await page.goto(base, { waitUntil: "load", timeout: 90000 }); await page.waitForTimeout(5000);
     for (const view of views) { await page.evaluate(v => { location.hash = v; }, view); await page.waitForTimeout(1500); await scan(page, `${viewport.width}px #${view}`); }
+    await page.evaluate(() => { location.hash = "health"; }); await page.waitForTimeout(800);
+    await page.locator(".db-profile button", { hasText: "Crew" }).click(); await page.waitForTimeout(500); await scan(page, `${viewport.width}px #health crew`);
+    await page.locator('[data-crew="daniel"]').click(); await page.waitForTimeout(500); await scan(page, `${viewport.width}px #health crew member`);
     await page.evaluate(() => { location.hash = "selfcheck"; }); await page.waitForTimeout(800);
     await page.getByRole("button", { name: "You · this device" }).click();
     await page.locator(".sc-consent input").check();

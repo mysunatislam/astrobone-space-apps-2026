@@ -11,7 +11,7 @@ import { escalationPlan } from "./missionEnvironment.js";
 
 const FLAGGED = new Set(["urgent", "attention", "changed", "recheck"]);
 const round = (value, digits = 0) => Number(Number(value).toFixed(digits));
-export const formatValue = (value, def) => (Number.isFinite(value) ? `${round(value, def.digits ?? 0)}` : "--");
+export const formatValue = (value, def) => (Number.isFinite(value) ? Number(value).toFixed(def.digits ?? 0) : "--");
 export const unitText = def => (!def.unit ? "" : def.unit === "°" ? "°" : ` ${def.unit}`);
 
 // records: saved checks, oldest first. current: today's check if it is not among them (or null).
@@ -71,4 +71,34 @@ export function adherenceStrip(doneDays, today, { from = Math.max(1, today - 59)
   const done = new Set(doneDays), cells = [];
   for (let day = from; day <= to; day++) cells.push({ day, state: day === today ? (done.has(day) ? "today-done" : "today") : done.has(day) ? "done" : "missed" });
   return { from, to, cells, done: cells.filter(c => c.state.endsWith("done")).length, missed: cells.filter(c => c.state === "missed").length };
+}
+
+// The crew view for the crew medical officer and the flight surgeon: every crew member's own dashboard
+// model, most serious first, so the person who needs attention is on top. Same engine, same rules, each
+// person against their own earlier checks.
+export function crewRoster(crew, environment = null) {
+  const rows = crew.map(member => {
+    const model = dashboardModel({ records: member.history, current: member.today, environment });
+    const lead = model.flagged[0] ?? null;
+    const day = model.missionDay;
+    const done = member.checkDays.filter(d => d <= day).length + (member.checkDays.includes(day) ? 0 : 1);
+    return { id: member.id, name: member.name, role: member.role, status: model.overall, mark: model.mark, model, lead,
+      flagged: model.flagged.map(t => `${t.def.label} ${t.text}${t.unit}`), day, adherence: { done, of: day } };
+  });
+  rows.sort((a, b) => STATUS_RANK[b.status] - STATUS_RANK[a.status] || a.name.localeCompare(b.name));
+  const counts = Object.fromEntries(Object.keys(STATUS_MARKS).map(s => [s, rows.filter(r => r.status === s).length]).filter(([, n]) => n));
+  return { rows, counts };
+}
+
+// One plain-text line per crew member, small enough for a slow deep-space link.
+export function crewSummaryText(roster, environment = null) {
+  const day = roster.rows[0]?.day;
+  const lines = [`ASTROBONE CREW SUMMARY${Number.isFinite(day) ? ` · Mission day ${day}` : ""}${environment ? ` · ${environment.place} · message to Earth ${environment.delayText} one way` : ""}`,
+    "Most serious first. Each person is compared with their own earlier checks. Not a diagnosis.", ""];
+  for (const r of roster.rows) {
+    lines.push(`${r.mark.word.padEnd(13)} ${r.name} (${r.role})${r.flagged.length ? `: ${r.flagged.join("; ")}` : ": no change outside usual range"}`);
+    const first = r.model.actions.find(a => a.priority !== "info");
+    if (first) lines.push(`              Next: ${first.text}`);
+  }
+  return lines.join("\n");
 }
