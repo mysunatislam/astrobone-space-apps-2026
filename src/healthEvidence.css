@@ -1,0 +1,20 @@
+.health-evidence { margin-top: 14px; border: 1px solid #344b60; border-radius: 12px; background: #0b1b2a; color: #dbeaf3; font-size: 14px; line-height: 1.6; }
+.health-evidence > summary { padding: 12px 14px; color: #9be4f5; cursor: pointer; font-weight: 650; }
+.health-evidence-body { padding: 0 14px 16px; }
+.health-evidence h4 { font-size: 16px; margin: 10px 0 6px; color: #f1f8fd; }
+.health-evidence p { margin: 8px 0; }
+.health-evidence a { color: #9be4f5; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.health-evidence small { display: block; color: #bdcddd; font-size: 12px; margin-top: 4px; }
+.health-evidence ul { padding-left: 18px; }
+.health-evidence li + li { margin-top: 14px; }
+.health-evidence li p { font-size: 12px; color: #bdcddd; }
+.health-evidence-boundary { border-left: 3px solid #d5b46f; padding: 6px 10px; background: #172331; }
+.health-evidence-hazards { font-size: 13px; }
+.health-human-context { border-top: 1px solid #344b60; margin-top: 16px; padding-top: 8px; }
+.health-research-table { overflow-x: auto; }
+.health-evidence table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 13px; }
+.health-evidence caption { text-align: left; padding: 8px 0; color: #dbeaf3; }
+.health-evidence th, .health-evidence td { text-align: left; border-bottom: 1px solid #344b60; padding: 8px; }
+.health-evidence code { display: block; overflow-wrap: anywhere; font-size: 11px; margin-top: 6px; }
+.health-evidence button { min-height: 44px; background: #143449; color: #ddf5ff; border: 1px solid #5c8ba8; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+.health-evidence :focus-visible { outline: 3px solid #91e5f9; outline-offset: 3px; }

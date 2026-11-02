@@ -1,0 +1,12 @@
+.daily-respiratory { margin:18px 0; padding:18px; border:1px solid #70bdd44d; border-radius:12px; background:#102332; color:#e2f2fb; }
+.daily-respiratory h3 { margin:0 0 9px; font-size:16px; }
+.daily-respiratory p { font-size:13px; line-height:1.65; margin:8px 0 13px; }
+.daily-respiratory .daily-respiratory-note { color:#b1c8da; font-size:12px; }
+.daily-respiratory label { display:flex; flex-direction:column; gap:7px; font-size:12px; margin:12px 0; }
+.daily-respiratory select { max-width:100%; width:100%; padding:10px; color:#e2f2fb; background:#091822; border:1px solid #6e98ac; border-radius:7px; }
+.daily-respiratory button { margin:4px 7px 4px 0; }
+.daily-respiratory-link { color:#8de9ff; font-size:13px; display:inline-block; margin:8px 0; text-underline-offset:3px; }
+.daily-respiratory-attached { display:flex; flex-direction:column; gap:7px; padding:12px; background:#173845; border-radius:7px; font-size:13px; }
+.daily-respiratory-attached span { color:#c4d8e5; font-size:12px; }
+.daily-respiratory-attached button { align-self:start; }
+.daily-respiratory :focus-visible { outline:2px solid #a5e8ff; outline-offset:3px; }

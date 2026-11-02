@@ -1,6 +1,6 @@
 import {
   PVT_B, PVT_PROTOCOL, PVT_INPUTS, PVT_DEVICE_WORDS, pvtDeviceClass, SAMN_PERELLI, RED_FLAGS, IMMUNE_SYMPTOMS, INDICATORS, newCheck, summarizePvt, evaluateSelfCheck, createSelfCheckStore,
-  safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, BP_SITES, GLUCOSE_SOURCES, SLEEP_SOURCES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
+  savedCheckEvaluation, safetyLimit, applyVitals, vitalsFromValues, vitalEntryProblem, backupPacket, restoreBackup, SIMULATED_RELIABILITY, KNEE_REPEAT_NOISE, TEMP_SITES, BP_SITES, GLUCOSE_SOURCES, SLEEP_SOURCES, GLUCOSE_MG_PER_MMOL, SAFETY_LIMIT_SOURCES, STATUS_RANK,
 } from "./selfCheck.js";
 import { ELENA_HISTORY, ELENA_POOR_CAPTURE, ELENA_USABLE_CAPTURE, ELENA_PVT, ELENA_SELF_CHECK_BOUNDARY, ELENA_CHECK_DAYS, elenaDay147 } from "./elenaSelfCheck.js";
 import { ENVIRONMENTS, DEFAULT_ENVIRONMENT, environmentFor, escalationPlan } from "./missionEnvironment.js";
@@ -18,6 +18,11 @@ import { ELENA } from "./elenaMissionScenario.js";
 import { PASSCODE_MIN, passcodeProblem } from "./sealedStore.js";
 import { loadNasaEvidence, nasaWatchPlan } from "./nasaWatch.js";
 import { loadCrewBlood, replayCrew, crewReplayCard } from "./crewReplay.js";
+import { getHealthRecordStore, getHealthConsent, setHealthConsent, getActiveProfile, setActiveProfile, notifyHealthRecordsChanged, healthBackup, restoreHealthBackup } from './healthRecordStore.js';
+import { selectedFollowUps, followUpsFor, updateFollowUpStatus, FOLLOW_UP_STATUSES, FOLLOW_UP_LABELS, followUpBucket } from './followUps.js';
+import { createDailyRespiratorySection } from './dailyRespiratory.js';
+import { createHealthEvidenceDetails } from './healthEvidence.js';
+import { SEALED_SCHEMA } from './sealedStore.js';
 
 const STEPS = [["safety", "Safety"], ["movement", "Movement"], ["reaction", "Reaction"], ["mind", "Sleep & mood"], ["body", "Body"], ["result", "Result & action"]];
 const STATUS = {
@@ -48,8 +53,8 @@ const kneeMethod = cap => cap.angleMethod === "hybrid" ? ` · hybrid knee model 
 const VIEW_CUE = { front: "facing camera", side: "side-on", oblique: "turned partway: face the camera or turn fully side-on" };
 
 export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {}, onTimedTest = () => {} } = {}) {
-  const store = createSelfCheckStore();
-  const state = { profile: "elena", environment: DEFAULT_ENVIRONMENT.elena, persist: false, step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [], chartKey: null, report: false, lockForm: false, lockNote: null, lockBusy: false };
+  const store = getHealthRecordStore();
+  const state = { profile: getActiveProfile(), environment: DEFAULT_ENVIRONMENT[getActiveProfile()], persist: getHealthConsent(), step: 0, check: null, capture: null, pvt: null, evaluation: null, captures: 0, followUps: [], saved: false, failed: {}, earned: [], chartKey: null, report: false, lockForm: false, lockNote: null, lockBusy: false };
   const element = el("div", { class: "sc" });
   const video = el("video", { class: "sc-video", playsinline: true, muted: true, "aria-label": "Camera preview" });
   const overlay = el("canvas", { class: "sc-overlay", "aria-hidden": "true" });
@@ -61,7 +66,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   const pulse = { engine: null, measuring: false, result: null, progress: null };
   const angleStore = createAngleCheckStore();
   const check = { open: false, participant: "P1", side: "left", referenceType: REFERENCE_TYPES[0], reference: null, hold: null, holding: false, pairs: [] };
-  try { state.persist = localStorage.getItem("astrobone-self-check-consent") === "1"; } catch { /* storage unavailable */ }
+
   check.pairs = angleStore.load(state.persist);
   // NASA life-science data sets what this check asks for and when (src/nasaWatch.js).
   let evidence = null, evidenceError = null;
@@ -110,7 +115,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   const locked = () => state.profile === "you" && state.persist && store.locked();
   function reset() {
     stopCamera(); stopPvt(true);
-    state.step = 0; state.capture = null; state.pvt = null; state.evaluation = null; state.captures = 0; state.saved = false; state.failed = {}; state.earned = []; state.report = false;
+    state.step = 0; state.capture = null; state.pvt = null; state.evaluation = null; state.captures = 0; state.saved = false; state.failed = {}; state.earned = []; state.report = false; state.followUps = []; state.saveNote = null;
     if (state.profile === "elena") {
       state.check = elenaDay147(); state.check.id = `DEMO-ELENA-day-147-${Date.now()}`;
       // Movement and reaction results arrive through the demo capture buttons.
@@ -122,13 +127,17 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     } else { state.check = newCheck("you"); state.check.vitals = {}; }
     render(); onStep(STEPS[0][0]);
   }
-  function switchProfile(profile) { if (state.profile === profile) return; state.profile = profile; state.environment = DEFAULT_ENVIRONMENT[profile]; reset(); }
+  function switchProfile(profile) {
+    if (!['you', 'elena'].includes(profile) || state.profile === profile) return;
+    state.profile = profile; state.environment = DEFAULT_ENVIRONMENT[profile]; reset(); setActiveProfile(profile); notifyHealthRecordsChanged();
+  }
   const environment = () => environmentFor(state.environment);
   function go(step) { state.step = Math.max(0, Math.min(STEPS.length - 1, step)); if (STEPS[state.step][0] !== "movement") stopCamera(); if (STEPS[state.step][0] !== "body") stopPulse(); if (STEPS[state.step][0] === "result") evaluate(); render(); onStep(STEPS[state.step][0]); }
 
   function evaluate() {
     if (locked()) { state.evaluation = null; return; }
-    state.evaluation = evaluateSelfCheck(state.check, history(), { floors: state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor), environment: environment() });
+    const prior = state.saved ? history().filter(item => Date.parse(item.at) < Date.parse(state.check.at)) : history();
+    state.evaluation = evaluateSelfCheck(state.check, prior, { floors: state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor), environment: environment() });
     onEvaluate(state.evaluation, state.profile);
   }
 
@@ -317,19 +326,58 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   }
 
   // ---------- Save & follow-up ----------
-  function saveCheck() {
-    if (state.saved || !state.evaluation) return;
-    if (locked()) { state.lockNote = "Unlock your saved checks to save this one."; render(); return; }
-    const profileId = state.profile === "elena" ? "DEMO-ELENA" : "you";
-    const checks = state.profile === "elena" ? store.load(profileId, false) : history(), before = routine().status;
-    checks.push({ ...state.check, at: new Date().toISOString(), complete: isComplete(state.evaluation), evaluation: { overall: state.evaluation.overall, domains: state.evaluation.domains.map(d => ({ key: d.key, status: d.status })) } });
-    store.save(profileId, checks, state.profile === "elena" ? false : state.persist);
-    const now = Date.now();
-    state.followUps = [...element.querySelectorAll("[data-action]:checked")].map(input => {
-      const action = state.evaluation.actions.find(a => a.id === input.dataset.action);
-      return { ...action, recordedAt: new Date(now).toISOString(), dueAt: action.due === null ? null : new Date(now + action.due * 3600e3).toISOString(), status: "open" };
-    });
-    state.saved = true; state.earned = newBadges(before, routine().status); render();
+  async function saveCheck() {
+    if (state.saved || state.saveBusy || !state.evaluation) return;
+    if (locked()) { state.saveNote = 'Unlock your saved checks before saving.'; render(); return; }
+    const profile = state.profile, profileId = profile === 'elena' ? 'DEMO-ELENA' : 'you', persist = profile === 'you' && state.persist;
+    const checks = store.load(profileId, persist), before = routine().status, at = new Date().toISOString();
+    const actions = [...element.querySelectorAll('[data-action]:checked')].map(input => state.evaluation.actions.find(action => action.id === input.dataset.action)).filter(Boolean);
+    const record = structuredClone({ ...state.check, at, environment: state.environment, complete: isComplete(state.evaluation), followUps: selectedFollowUps(actions, state.check.id, at) });
+    if (checks.some(check => check.id === record.id)) { state.saveNote = 'This check is already saved. Start a new check to record another observation.'; render(); return; }
+    state.saveBusy = true; state.saveNote = null; render();
+    try {
+      if (!store.save(profileId, [...checks, record], persist)) throw new Error('This check could not be saved. Your existing records have been kept.');
+      await store.flush(); if (persist && store.writeFailed) throw new Error('The check did not reach device storage. Unlock again if another tab changed the record.');
+      if (state.profile === profile && state.check.id === record.id) {
+        state.check = record; state.followUps = record.followUps; state.saved = true; state.earned = newBadges(before, routine().status);
+      }
+      notifyHealthRecordsChanged();
+    } catch (error) { state.saveNote = error.message; }
+    finally { state.saveBusy = false; render(); }
+  }
+  async function updateFollowUp(checkId, actionId, status) {
+    if (locked()) throw new Error('Unlock your saved health record first.');
+    const key = state.profile === 'elena' ? 'DEMO-ELENA' : 'you', persist = state.profile === 'you' && state.persist;
+    const result = updateFollowUpStatus(store.load(key, persist), checkId, actionId, status);
+    if (!result.changed) return;
+    if (!store.save(key, result.checks, persist)) throw new Error('The follow-up could not be saved.');
+    await store.flush(); if (persist && store.writeFailed) throw new Error('The follow-up did not reach device storage.');
+    if (state.check.id === checkId) { state.followUps = result.checks.find(check => check.id === checkId).followUps; state.check.followUps = state.followUps; }
+    notifyHealthRecordsChanged(); render();
+  }
+  function openSavedCheck(checkId) {
+    if (locked()) { state.lockNote = 'Unlock your saved health record first.'; render(); return; }
+    const saved = savedCheckEvaluation(history(), checkId, { environment: environment() });
+    if (!saved.check) return;
+    stopCamera(); stopPulse(); stopPvt(true);
+    state.check = structuredClone(saved.check); state.evaluation = saved.evaluation; state.saved = true; state.followUps = saved.check.followUps ?? [];
+    state.step = STEPS.length - 1; state.report = false; render(); onStep('result');
+  }
+  function followUpCard() {
+    if (locked()) return null;
+    const items = followUpsFor(history()); if (!items.length) return null;
+    const list = el('section', { class: 'sc-followups', 'aria-label': 'Saved follow-up actions' }, el('h3', {}, 'Your follow-ups'),
+      el('p', { class: 'sc-note' }, 'Actions stay linked to the check that created them. Marking a task completed does not change the health reading.'));
+    for (const task of items) list.append(el('article', { class: 'sc-followup', 'data-task-status': task.status },
+      el('div', { class: 'sc-followup-head' }, el('strong', {}, followUpBucket(task)), el('time', { datetime: task.dueAt || task.recordedAt }, task.status === 'completed' && task.completedAt ? 'Completed ' + new Date(task.completedAt).toLocaleString() : task.dueAt ? 'Due ' + new Date(task.dueAt).toLocaleString() : 'No scheduled due time')),
+      el('p', {}, task.text),
+      el('div', { class: 'sc-row' }, el('label', {}, 'Action status ', el('select', { 'data-followup-status': task.id, 'aria-label': 'Status for ' + task.text, onchange: async event => {
+        event.target.disabled = true;
+        try { await updateFollowUp(task.sourceCheckId, task.id, event.target.value); }
+        catch (error) { state.saveNote = error.message; render(); }
+      } }, FOLLOW_UP_STATUSES.map(value => el('option', { value, selected: value === task.status || undefined }, FOLLOW_UP_LABELS[value])))),
+      el('button', { type: 'button', class: 'sc-link', 'data-followup-source': task.sourceCheckId, onclick: () => openSavedCheck(task.sourceCheckId) }, 'Open source check · ' + new Date(task.sourceAt).toLocaleDateString()))));
+    return list;
   }
   function exportPacket() {
     return { schema: "astrobone-self-check-export-v1", profile: state.profile === "elena" ? "DEMO-ELENA (synthetic)" : "This device", environment: environment(), check: state.check, evaluation: state.evaluation, followUps: state.followUps,
@@ -340,16 +388,27 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const a = el("a", { href: url, download: name }); a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   function exportJson() { download(JSON.stringify(exportPacket(), null, 2), "application/json", `AstroBone-self-check-${state.profile}-${Date.now()}.json`); }
-  function backupAll() { download(JSON.stringify(backupPacket(history()), null, 2), "application/json", `AstroBone-backup-${new Date().toISOString().slice(0, 10)}.json`); }
+  async function backupAll() {
+    try { const packet = await healthBackup(store, state.persist); download(JSON.stringify(packet, null, 2), 'application/json', 'AstroBone-' + (packet.schema === SEALED_SCHEMA ? 'encrypted-' : '') + 'health-backup-' + new Date().toISOString().slice(0, 10) + '.json'); }
+    catch (error) { state.backupNote = error.message; render(); }
+  }
+  async function applyBackup(packet, passcode) {
+    state.backupBusy = true; render();
+    try {
+      const result = await restoreHealthBackup(packet, { store, persist: state.persist, passcode });
+      state.backupPending = null; state.backupNote = 'Restored ' + result.added + ' checks and ' + result.respiratoryAdded + ' respiratory readings.' + (state.persist ? '' : ' Kept for this tab; enable saving to keep new records on this device.');
+    } catch (error) { state.backupNote = error.message; }
+    state.backupBusy = false; render();
+  }
   async function restoreFrom(e) {
     const file = e.target.files?.[0]; if (!file) return;
-    if (locked()) { state.backupNote = "Unlock your saved checks first."; render(); return; }
+    if (locked()) { state.backupNote = 'Unlock the saved health record first.'; render(); return; }
     try {
-      const result = restoreBackup(history(), JSON.parse(await file.text()));
-      store.save("you", result.checks, state.persist);
-      state.backupNote = `Restored ${result.added} check${result.added === 1 ? "" : "s"}${result.skipped ? ` (${result.skipped} already here or unreadable)` : ""}.${state.persist ? "" : " Tick saving on this device to keep them."}`;
-    } catch (err) { state.backupNote = err instanceof SyntaxError ? "That file is not readable JSON." : err.message; }
-    render();
+      if (file.size > 10000000) throw new Error('Choose a health backup smaller than 10 MB.');
+      const packet = JSON.parse(await file.text());
+      if (packet?.schema === SEALED_SCHEMA) { state.backupPending = packet; state.backupNote = 'Enter this backup’s passcode to merge it with your current records.'; render(); }
+      else await applyBackup(packet);
+    } catch (error) { state.backupNote = error instanceof SyntaxError ? 'That file is not readable JSON.' : error.message; render(); }
   }
 
   // The same result as a short plain-text message for the flight surgeon, readable without AstroBone.
@@ -436,7 +495,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   function stepBody() {
     const [key] = STEPS[state.step], c = state.check, demo = state.profile === "elena";
     if (key === "safety") {
-      return [routineCard(), planCard(), el("p", { class: "sc-lead" }, "Right now, do you have any of these?"),
+      return [followUpCard(), routineCard(), planCard(), el("p", { class: "sc-lead" }, "Right now, do you have any of these?"),
         el("div", { class: "sc-checks" }, RED_FLAGS.map(([k, label]) => checkbox(`rf-${k}`, label, Boolean(c.redFlags?.[k]), value => { c.redFlags = { ...(c.redFlags || {}), [k]: value }; render(); }))),
         Object.values(c.redFlags || {}).some(Boolean) ? el("p", { class: "sc-urgent", role: "alert" }, "Contact your crew medical officer now. Finish the check only if it is safe to do so.") : null,
         el("button", { type: "button", class: "sc-secondary", onclick: () => { c.redFlags = {}; go(1); } }, "None of these · continue")];
@@ -513,6 +572,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         el("label", { class: "sc-text" }, "Heart-rate source",
           el("select", { onchange: e => { c.sources.restingHr = e.target.value; } }, ["Wearable or chest strap", "Pulse oximeter", "Manual pulse count", "Camera (rPPG hybrid)", "Synthetic demo"].map(s => el("option", { selected: (c.sources.restingHr ?? (demo ? "Synthetic demo" : "Wearable or chest strap")) === s || undefined }, s)))),
         vitalsBlock(),
+        createDailyRespiratorySection({ getContext: () => ({ profile: state.profile, persist: state.persist, locked: locked(), check: state.check }), onAttach: summary => { if (locked()) return; if (summary) state.check.respiratory = summary; else delete state.check.respiratory; state.saved = false; render(); } }),
         number("Personal dosimeter, cumulative (context only)", "mGy", c.dosimeter, 0, 10000, 0.01, value => { c.dosimeter = value; }),
         why("heart", "showed no consistent heart effect from radiation, so dose never raises an alarm. It is logged beside heart rate for the medical reviewer.")
           ?? el("p", { class: "sc-note" }, "Radiation dose is recorded as mission context. It is never turned into a health status.")];
@@ -521,7 +581,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   }
 
   function resultBody() {
-    const ev = state.evaluation;
+    const ev = locked() ? null : state.evaluation;
     if (!ev) return locked() ? [el("p", { class: "sc-lead", role: "status" }, "Your saved checks are locked. Unlock them above so today's results are compared with your own usual range.")] : [];
     const [label, detail] = STATUS[ev.overall];
     const measured = d => d.indicators.filter(r => r.status !== "notChecked");
@@ -540,14 +600,17 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
               : r.reason === "drift" ? `gradual drift · start ${fmt(r.drift.lockedMean, r.def.digits ?? 0)}`
               : r.reason === "debt" ? `sleep debt ${fmt(r.debt.debt, 1)} h over ${r.debt.nights} nights · usual ${fmt(r.debt.usual, 1)} h a night` : `usual ${fmt(r.ref.mean, r.def.digits ?? 0)} ± ${fmt(r.tolerance, r.def.digits ?? 1)}`),
             trend(r)))) : d.key !== "immune" ? el("p", {}, "Not checked.") : null,
-        helps(d)))),
+        helps(d), createHealthEvidenceDetails(d.key)))),
       overTime(ev, charted),
+      state.check.respiratory ? el("p", { class: "sc-result" }, `Experimental respiratory motion: ${fmt(state.check.respiratory.rate)} breaths/min · ${state.check.respiratory.source} · ${Math.round(state.check.respiratory.quality * 100)}% signal quality. Reference-belt validation pending.`) : null,
       el("section", { class: "sc-actions" }, el("h3", {}, "Your next step"),
         ev.actions.map(a => el("label", { class: `sc-action sc-${a.priority}` }, el("input", { type: "checkbox", "data-action": a.id, checked: (a.priority !== "info" || a.id === "routine") || undefined, disabled: state.saved || undefined }), el("span", {}, a.text)))),
       state.saved ? el("div", { class: "sc-result" }, el("strong", {}, `Saved · ${routine().status.streak}-day streak`), el("p", {}, state.followUps.length ? state.followUps.map(f => `${f.text.split(".")[0]}${f.dueAt ? ` · due ${new Date(f.dueAt).toLocaleString()}` : ""}`).join(" | ") : "No follow-up selected."),
         state.earned.length ? el("div", { class: "sc-badges", role: "status" }, state.earned.map(b => el("span", { class: "sc-badge sc-earned sc-new", title: b.detail }, `★ New badge: ${b.label}`))) : null,
         el("small", {}, state.profile === "elena" ? "Demo record kept in memory for this tab." : state.persist ? "Saved on this device." : "Kept in memory for this tab (saving on this device is off)."))
-        : el("button", { type: "button", class: "sc-primary", onclick: saveCheck }, "Save check & selected actions"),
+        : el("button", { type: "button", class: "sc-primary", disabled: state.saveBusy || undefined, onclick: saveCheck }, state.saveBusy ? "Saving…" : "Save check & selected actions"),
+      state.saveNote ? el("p", { class: "sc-note", role: "status" }, state.saveNote) : null,
+      followUpCard(),
       el("div", { class: "sc-row" },
         el("button", { type: "button", class: "sc-secondary", "aria-expanded": String(state.report), onclick: () => { state.report = !state.report; render(); if (state.report) element.querySelector(".sc-report")?.scrollIntoView({ block: "nearest", behavior: "smooth" }); } }, "Report for flight surgeon"),
         el("button", { type: "button", class: "sc-secondary", onclick: exportJson }, "Export for reviewer (JSON)"), el("button", { type: "button", class: "sc-secondary", onclick: reset }, "New check")),
@@ -648,7 +711,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   async function lockTask(task, done) {
     state.lockBusy = true; state.lockNote = null; render();
     try { await task(); state.lockNote = done; state.lockForm = false; } catch (err) { state.lockNote = err.message; }
-    state.lockBusy = false;
+    state.lockBusy = false; notifyHealthRecordsChanged();
     if (STEPS[state.step][0] === "result" && !state.saved) evaluate();
     render();
   }
@@ -666,13 +729,13 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     }
     if (store.sealed()) {
       return el("div", { class: "sc-row sc-lock" }, el("span", {}, "Saved checks are encrypted with your passcode."),
-        el("button", { type: "button", class: "sc-secondary", onclick: () => { store.lock(); state.lockNote = "Locked. Enter the passcode to open your checks again."; if (!state.saved) state.evaluation = null; render(); } }, "Lock now"),
+        el("button", { type: "button", class: "sc-secondary", onclick: () => { store.lock(); state.lockNote = "Locked. Enter the passcode to open your checks again."; state.evaluation = null; notifyHealthRecordsChanged(); render(); } }, "Lock now"),
         el("button", { type: "button", class: "sc-link", disabled: state.lockBusy || undefined, onclick: () => { if (confirm("Remove the passcode? Saved checks will be stored without encryption on this device.")) lockTask(() => store.removePasscode(), "Passcode removed. Saved checks are no longer encrypted."); } }, "Remove passcode"),
         note);
     }
     if (!state.lockForm) {
       return el("div", { class: "sc-row sc-lock" }, el("button", { type: "button", class: "sc-secondary", onclick: () => { state.lockForm = true; state.lockNote = null; render(); } }, "Add a passcode"),
-        el("small", {}, "Encrypts saved checks on this device. Without one, anyone who uses this browser can read them."), note);
+        el("small", {}, "Encrypts checks, follow-ups and respiratory readings together. Without a passcode, anyone using this browser can read saved records."), note);
     }
     return el("form", { class: "sc-row sc-lock", onsubmit: e => {
       e.preventDefault(); const { passcode, repeat } = e.target.elements, problem = passcodeProblem(passcode.value, repeat.value);
@@ -682,7 +745,7 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
       passField("passcode", `New passcode (at least ${PASSCODE_MIN} characters)`, "new-password"), passField("repeat", "Repeat it", "new-password"),
       el("button", { type: "submit", class: "sc-primary", disabled: state.lockBusy || undefined }, state.lockBusy ? "Encrypting…" : "Encrypt saved checks"),
       el("button", { type: "button", class: "sc-link", onclick: () => { state.lockForm = false; state.lockNote = null; render(); } }, "Cancel"),
-      el("small", {}, "If you forget it, the saved checks cannot be recovered. Back them up first; the backup file itself is not encrypted, so keep it private."), note);
+      el("small", {}, "The same passcode protects saved checks, follow-ups and respiratory readings. Backups made while encrypted stay encrypted and need this passcode."), note);
   }
 
   function render() {
@@ -694,15 +757,21 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     const where = el("label", { class: "sc-env" }, el("span", {}, "Where"), el("select", { "aria-label": "Mission environment", onchange: e => { state.environment = e.target.value; if (state.evaluation) evaluate(); render(); } },
       ENVIRONMENTS.map(env => el("option", { value: env.key, selected: env.key === state.environment || undefined }, `${env.label} · ${env.place}`))));
     const consent = state.profile === "you" ? el("label", { class: "sc-consent" }, el("input", { type: "checkbox", checked: state.persist || undefined, onchange: e => {
-      state.persist = e.target.checked; try { localStorage.setItem("astrobone-self-check-consent", state.persist ? "1" : "0"); } catch { /* storage unavailable */ }
+      state.persist = e.target.checked; setHealthConsent(state.persist);
       // Ask the browser not to clear saved checks when space runs low (it may still say no).
       if (state.persist) navigator.storage?.persist?.().catch(() => {});
       angleStore.save(check.pairs, state.persist); render();
     } }), `Save my checks on this device (${locked() ? "locked" : `${history().length} saved`})`) : null;
     const backup = state.profile === "you" ? el("div", { class: "sc-row sc-backup" },
-      el("button", { type: "button", class: "sc-secondary", disabled: history().length ? undefined : true, onclick: backupAll }, "Back up all checks"),
+      el("button", { type: "button", class: "sc-secondary", disabled: (history().length || store.load("respiratory:you", state.persist).length || (state.persist && store.sealed())) ? undefined : true, onclick: backupAll }, state.persist && store.sealed() ? "Back up encrypted health record" : "Back up all health records"),
       el("label", { class: "sc-secondary sc-file" }, "Restore from backup", el("input", { type: "file", accept: "application/json,.json", onchange: restoreFrom })),
-      state.backupNote ? el("small", { role: "status" }, state.backupNote) : null) : null;
+      el('button', { type: 'button', class: 'sc-link', onclick: async () => { if (confirm('Delete saved self-checks, follow-ups and respiratory readings from this device? This cannot be undone.')) { try { await store.forget(); notifyHealthRecordsChanged(); reset(); } catch (error) { state.backupNote = error.message; render(); } } } }, 'Delete all health records'),
+      el('small', { class: 'sc-note' }, state.persist && store.sealed() ? 'Backup files stay encrypted. Reviewer exports are readable files.' : 'Backup and reviewer files are not encrypted. Keep them private.'),
+      state.backupPending ? el('form', { class: 'sc-row', onsubmit: event => { event.preventDefault(); void applyBackup(state.backupPending, event.target.elements.backupPasscode.value); } },
+        el('label', {}, 'Backup passcode', el('input', { type: 'password', name: 'backupPasscode', required: true, autocomplete: 'current-password' })),
+        el('button', { type: 'submit', class: 'sc-secondary', disabled: state.backupBusy || undefined }, state.backupBusy ? 'Restoring…' : 'Unlock and restore backup'),
+        el('button', { type: 'button', class: 'sc-link', onclick: () => { state.backupPending = null; render(); } }, 'Cancel restore')) : null,
+      state.backupNote ? el('small', { role: 'status' }, state.backupNote) : null) : null;
     const nav = STEPS[state.step][0] === "result" ? null : el("div", { class: "sc-nav" },
       state.step > 0 ? el("button", { type: "button", class: "sc-secondary", onclick: () => go(state.step - 1) }, "Back") : el("span"),
       el("button", { type: "button", class: "sc-primary", "data-next": true, onclick: () => go(state.step + 1) }, state.step === STEPS.length - 2 ? "Evaluate" : "Next"));
@@ -712,17 +781,27 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     if (!pvt.running && !pvtStage.dataset.count) pvtStage.dataset.count = "Ready";
   }
 
+  function snapshot(profile = state.profile) {
+    const persist = profile === 'you' && state.persist, isLocked = persist && store.locked();
+    const checks = isLocked ? [] : profile === 'elena' ? [...ELENA_HISTORY, ...store.load('DEMO-ELENA', false)] : store.load('you', persist);
+    const latest = savedCheckEvaluation(checks, null, { environment: environmentFor(checks.at(-1)?.environment ?? DEFAULT_ENVIRONMENT[profile]) });
+    return { profile, locked: Boolean(isLocked), persist, latestCheck: latest.check, evaluation: latest.evaluation, history: checks, followUps: followUpsFor(checks) };
+  }
+  globalThis.addEventListener?.('astrobone-profile-change', event => { if (event.detail?.profile !== state.profile) switchProfile(event.detail.profile); });
+  globalThis.addEventListener?.('astrobone-records-change', () => { state.persist = getHealthConsent(); if (locked()) { state.evaluation = null; state.check = newCheck('you'); state.check.vitals = {}; state.saved = false; state.followUps = []; state.step = 0; } render(); });
   reset();
   return {
-    element, reset, go, demoCapture, applyDemoPvt: () => applyPvt(ELENA_PVT, "SYNTHETIC DEMO"), saveCheck,
+    element, reset, go, demoCapture, applyDemoPvt: () => applyPvt(ELENA_PVT, 'SYNTHETIC DEMO'), saveCheck, snapshot, updateFollowUp, openSavedCheck,
+    openFollowUps() { go(0); element.querySelector('.sc-followups')?.scrollIntoView({ block: 'start' }); },
     setProfile: switchProfile,
     setEnvironment(key) { if (environmentFor(key)) { state.environment = key; if (state.evaluation) evaluate(); render(); } },
     openStep(key) { go(Math.max(0, STEPS.findIndex(([k]) => k === key))); },
     stop() { stopCamera(); stopPulse(); stopPvt(true); },
     get state() { return state; },
     latestEvaluation(profile = state.profile) {
+      if (profile === 'you' && state.persist && store.locked()) return null;
       if (state.evaluation && state.profile === profile) return state.evaluation;
-      return profile === "elena" ? evaluateSelfCheck(elenaDay147(), ELENA_HISTORY, { environment: environmentFor(DEFAULT_ENVIRONMENT.elena) }) : null;
+      return profile === 'elena' ? evaluateSelfCheck(elenaDay147(), ELENA_HISTORY, { environment: environmentFor(DEFAULT_ENVIRONMENT.elena) }) : snapshot(profile).evaluation;
     },
   };
 }

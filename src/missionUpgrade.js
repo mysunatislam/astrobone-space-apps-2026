@@ -1,6 +1,8 @@
 import "./missionUpgrade.css";
 import { NASA_RESPIRATORY_EVIDENCE, SPACE_APPS_2026 } from "./data/nasaRespiratoryEvidence.js";
 import { initNasaExpansionPanel } from "./nasaExpansionPanel.js";
+import { HEALTH_CONTEXT_SOURCES } from "./healthEvidenceData.js";
+import { personalDashboardModel } from "./personalDashboardModel.js";
 
 const logoUrl = `${import.meta.env.BASE_URL}brand/astrobone-logo.png`;
 const node = (tag, text, className = "") => {
@@ -53,11 +55,11 @@ export function mountMissionUpgrade(root, app) {
   close.onclick = () => evidenceDialog.close();
   let evidencePausedTwin = false;
   evidenceDialog.addEventListener("close", () => {
-    if (evidencePausedTwin) app.scene.setPaused(false);
+    if (evidencePausedTwin) app.updateScenePause?.();
     evidencePausedTwin = false;
   });
   evidenceDialog.addEventListener("click", event => { if (event.target === evidenceDialog) { const rect = evidenceDialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) evidenceDialog.close(); } });
-  const sources = Array.isArray(NASA_RESPIRATORY_EVIDENCE) ? NASA_RESPIRATORY_EVIDENCE : [];
+  const sources = [...(Array.isArray(NASA_RESPIRATORY_EVIDENCE) ? NASA_RESPIRATORY_EVIDENCE : []), ...HEALTH_CONTEXT_SOURCES];
   const selector = evidenceDialog.querySelector("#ab-evidence-domain"), search = evidenceDialog.querySelector("#ab-evidence-search");
   [...new Set(sources.map(source => source.domain).filter(Boolean))].forEach(domain => { const option = node("option", domain); option.value = domain; selector.append(option); });
   function renderSources() {
@@ -95,5 +97,40 @@ export function mountMissionUpgrade(root, app) {
   respiratoryLink.href = `${import.meta.env.BASE_URL}lab.html#respiratory-monitor`;
   respiratoryLink.innerHTML = '<span class="ab-respiratory-glyph" aria-hidden="true">⌁</span><span>Respiratory motion<small>Experimental / camera capture</small></span><span aria-hidden="true">↗</span>';
   root.append(respiratoryLink);
-  return { openEvidence };
+  const healthDashboard = node("section", undefined, "ab-health-dashboard");
+  healthDashboard.setAttribute("aria-label", "My health dashboard"); root.append(healthDashboard);
+  const goCheck = (result = false) => { app.setExperience("selfcheck"); if (result) { if (app.selfCheck.openFollowUps) app.selfCheck.openFollowUps(); else app.selfCheck.openStep("result"); } };
+  function renderPersonalDashboard() {
+    const personal = app.state.profile === "you";
+    healthDashboard.hidden = !personal || app.state.experience !== "mission";
+    overview.querySelector("h1").innerHTML = personal ? 'Your health, <br><span>your next step.</span>' : 'Human health, <br><span>in focus.</span>';
+    overview.querySelector(".ab-scope-note").innerHTML = personal ? '<span aria-hidden="true">◇</span><span><b>My health · this device</b><br>Your own saved observations. Unmeasured values stay empty.</span>' : '<span aria-hidden="true">◇</span><span><b>Elena’s synthetic mission</b><br>Fictional observations for exploring the workflow.</span>';
+    overview.querySelector(".ab-device-note span:last-child").textContent = app.state.lightweight ? "Lightweight view · 3D rendering paused" : "Reference anatomy · camera processing on your device";
+    if (!personal) return;
+    const model = personalDashboardModel(app.selfCheck.snapshot?.("you"));
+    const heading = node("header"); heading.append(node("span", "TODAY / MY HEALTH", "ab-kicker"), node("h2", "A clear view of your day."), node("p", model.summary));
+    healthDashboard.replaceChildren(heading);
+    if (model.locked) {
+      const lock = node("div", undefined, "ab-health-empty"); lock.append(node("h3", "Your health record is locked"), node("p", "Unlock in Self-Check to view saved observations and follow-ups. No empty baseline is substituted."));
+      const unlock = node("button", "Unlock my record", "ab-health-action"); unlock.type = "button"; unlock.onclick = () => goCheck(); lock.append(unlock); healthDashboard.append(lock); return;
+    }
+    const strip = node("div", undefined, "ab-health-summary");
+    for (const [label, value] of [["Saved checks", model.checkCount], ["Follow-ups open", model.openCount], ["Record", model.persist ? "Saved on device" : "This session"]]) { const item = node("div"); item.append(node("small", label), node("strong", value)); strip.append(item); }
+    healthDashboard.append(strip);
+    const cards = node("div", undefined, "ab-health-grid");
+    for (const item of model.indicators) {
+      const card = node("article", undefined, "ab-health-card"); card.dataset.indicator = item.key; card.dataset.status = item.status;
+      card.append(node("span", item.label, "ab-health-label"), node("strong", item.value), node("span", item.statusLabel, "ab-health-status"), node("small", item.detail)); cards.append(card);
+    }
+    healthDashboard.append(cards);
+    const tasks = node("section", undefined, "ab-health-next"); tasks.append(node("h3", "What to do next"));
+    if (!model.tasks.length) tasks.append(node("p", model.checkCount ? "Review your last check or start the next one. New follow-ups appear here when you choose and save them." : "Start a daily check. Use instrument readings or self-reports; camera tests are optional. Comparable usable readings build your personal baseline."));
+    for (const task of model.tasks.slice(0, 3)) { const button = node("button", undefined, "ab-health-task"); button.type = "button"; button.append(node("strong", task.label), node("span", task.text), node("small", task.due)); button.onclick = () => goCheck(true); tasks.append(button); }
+    const next = node("button", model.tasks.length ? "Manage follow-ups →" : "Open daily self-check →", "ab-health-action"); next.type = "button"; next.onclick = () => goCheck(Boolean(model.tasks.length)); tasks.append(next); healthDashboard.append(tasks);
+  }
+  root.addEventListener("astrobone-dashboard-render", renderPersonalDashboard);
+  window.addEventListener("astrobone-records-change", renderPersonalDashboard);
+  window.addEventListener("astrobone-open-evidence", openEvidence);
+  renderPersonalDashboard();
+  return { openEvidence, renderPersonalDashboard };
 }

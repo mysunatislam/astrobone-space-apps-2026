@@ -2,7 +2,9 @@
 // baseline, and choose a bounded next action. Review triggers are engineering
 // defaults for prompting a re-check or human review, not clinical thresholds.
 
-import { PBKDF2_ITERATIONS, SEALED_SCHEMA, newSeal, openSealed, passcodeProblem, sealJson } from "./sealedStore.js";
+import { PBKDF2_ITERATIONS, SEALED_SCHEMA, newSeal, openSealed, passcodeProblem, sealJson, readEnvelope } from "./sealedStore.js";
+import { normalizeFollowUps } from "./followUps.js";
+import { respiratoryAttachment } from "./respiratoryHistory.js";
 export const SELF_CHECK_SCHEMA = "astrobone-self-check-v1";
 
 // PVT-B parameters: 3-minute psychomotor vigilance test, 1-4 s from a response to the next stimulus
@@ -531,18 +533,23 @@ export const BACKUP_SCHEMA = "astrobone-self-check-backup-v1";
 export function backupPacket(checks, exportedAt = new Date().toISOString()) {
   return { schema: BACKUP_SCHEMA, profile: "This device", exportedAt, checks, boundary: "Self-monitoring record. Not a diagnosis." };
 }
-const pick = (obj, ok) => Object.fromEntries(Object.entries(obj && typeof obj === "object" ? obj : {}).filter(([key, value]) => key in INDICATORS && ok(value)));
+const pick = (obj, ok) => Object.fromEntries(Object.entries(obj && typeof obj === "object" ? obj : {}).filter(([key, value]) => Object.hasOwn(INDICATORS, key) && ok(value)));
 function readCheck(raw) {
-  if (!raw || typeof raw.id !== "string" || !Number.isFinite(Date.parse(raw.at))) return null;
+  if (raw?.synthetic === true || /demo|elena|synthetic/i.test(String(raw?.profileId || "")) || /^(DEMO|elena)[-:]/i.test(String(raw?.id || "")) || Object.values(raw?.sources || {}).some(value => /synthetic|demo/i.test(String(value)))) return null;
+  if (!raw || typeof raw.id !== "string" || !raw.id.trim() || raw.id.length > 160 || typeof raw.at !== "string" || !Number.isFinite(Date.parse(raw.at))) return null;
   const values = pick(raw.values, Number.isFinite);
-  if (!Object.keys(values).length) return null;
+  const respiratory = respiratoryAttachment(raw.respiratory);
+  if (!Object.keys(values).length && !raw.redFlags && !raw.symptoms && !respiratory) return null;
   const flags = list => (raw[list] && typeof raw[list] === "object" ? Object.fromEntries(Object.entries(raw[list]).filter(([, v]) => typeof v === "boolean")) : null);
   return { schema: SELF_CHECK_SCHEMA, id: raw.id, profileId: "you", at: raw.at, ...(Number.isFinite(raw.missionDay) ? { missionDay: raw.missionDay } : {}), values,
-    protocols: pick(raw.protocols, v => typeof v === "string"), quality: pick(raw.quality, v => typeof v === "boolean"), sources: pick(raw.sources, v => typeof v === "string"),
-    redFlags: flags("redFlags"), symptoms: flags("symptoms"), notes: typeof raw.notes === "string" ? raw.notes.slice(0, 2000) : "" };
+    protocols: pick(raw.protocols, v => typeof v === "string"), quality: pick(raw.quality, v => typeof v === "boolean"), sources: Object.fromEntries(Object.entries(raw.sources && typeof raw.sources === "object" ? raw.sources : {}).filter(([key, value]) => (Object.hasOwn(INDICATORS, key) || ["movement", "reaction", "vitals", "mind", "body", "sleep"].includes(key)) && typeof value === "string").map(([key, value]) => [key, value.slice(0, 200)])),
+    redFlags: flags("redFlags"), symptoms: flags("symptoms"), notes: typeof raw.notes === "string" ? raw.notes.slice(0, 2000) : "",
+    complete: raw.complete === true, environment: typeof raw.environment === "string" ? raw.environment : null,
+    followUps: normalizeFollowUps(raw.followUps, raw.id, raw.at), ...(Number.isFinite(raw.dosimeter) && raw.dosimeter >= 0 ? { dosimeter: raw.dosimeter } : {}), ...(respiratory ? { respiratory } : {}) };
 }
 // Accepts a backup or a single exported check ("Export for reviewer").
 export function restoreBackup(saved, packet) {
+  if (packet?.synthetic === true || /demo|synthetic/i.test(String(packet?.profile || ""))) throw new Error("Synthetic demo records cannot be restored as personal measurements.");
   const incoming = packet?.schema === BACKUP_SCHEMA && Array.isArray(packet.checks) ? packet.checks : packet?.schema === "astrobone-self-check-export-v1" && packet.check ? [packet.check] : null;
   if (!incoming) throw new Error("This file is not an AstroBone self-check backup.");
   const ids = new Set(saved.map(c => c.id)), added = [];
@@ -557,47 +564,87 @@ export function restoreBackup(saved, packet) {
 export function createSelfCheckStore(storage = globalThis.localStorage, key = "astrobone-self-check-v1", { iterations = PBKDF2_ITERATIONS, subtle = globalThis.crypto?.subtle } = {}) {
   const raw = () => { try { return storage?.getItem(key) ?? null; } catch { return null; } };
   const parsed = () => { try { const all = JSON.parse(raw() || "{}"); return all && typeof all === "object" && !Array.isArray(all) ? all : {}; } catch { return {}; } };
-  let memory = {}, seal = null, writes = Promise.resolve(), failed = false;
+  let memory = {}, seal = null, writes = Promise.resolve(), failed = false, observedRaw = raw();
   const queue = task => { writes = writes.then(task).then(() => { failed = false; }, () => { failed = true; }); return writes; };
-  // Anything carrying the sealed schema counts as sealed, damaged or not: fail closed, never overwrite it.
-  const locked = () => !seal && parsed().schema === SEALED_SCHEMA;
-  const read = () => { if (seal) return seal.all; const all = parsed(); return all.schema === SEALED_SCHEMA ? null : all; };
+  const locked = () => { if (seal && raw() !== observedRaw) seal = null; return !seal && parsed().schema === SEALED_SCHEMA; };
+  const read = () => {
+    if (seal && raw() !== observedRaw) seal = null;
+    if (seal) return seal.all;
+    const all = parsed(); observedRaw = raw();
+    return all.schema === SEALED_SCHEMA ? null : all;
+  };
   const write = all => {
-    if (seal) { const current = seal; current.all = all; queue(async () => storage.setItem(key, JSON.stringify(await sealJson(all, current, subtle)))); return true; }
+    if (seal) {
+      const current = seal; current.all = all;
+      queue(async () => {
+        if (seal !== current || raw() !== observedRaw) { seal = null; throw new Error('Saved records changed or were locked. Unlock again.'); }
+        const expected = observedRaw;
+        const value = JSON.stringify(await sealJson(all, current, subtle));
+        if (seal !== current || raw() !== expected) { seal = null; throw new Error('Saved records changed or were locked. Unlock again.'); }
+        try { storage.setItem(key, value); observedRaw = value; }
+        catch (error) { if (seal === current) seal = null; throw error; }
+      });
+      return true;
+    }
     if (locked()) return false;
-    try { storage.setItem(key, JSON.stringify(all)); return true; } catch { return false; }
+    try { const value = JSON.stringify(all); storage.setItem(key, value); observedRaw = value; failed = false; return true; }
+    catch { failed = true; return false; }
   };
   return {
-    load(profileId, persist) { const all = persist ? read() : memory; return all?.[profileId] ?? []; },
+    load(profileId, persist) { const all = persist ? read() : memory; return Array.isArray(all?.[profileId]) ? structuredClone(all[profileId]) : []; },
     save(profileId, checks, persist) {
+      checks = structuredClone(checks);
       if (!persist) { memory[profileId] = checks; return true; }
       const all = read(); if (!all) return false;
       return write({ ...all, [profileId]: checks });
     },
-    clear(profileId) { memory[profileId] = []; const all = read(); if (all) { delete all[profileId]; write(all); } },
-    canSeal: Boolean(subtle && globalThis.crypto?.getRandomValues),
-    locked,
-    sealed: () => Boolean(seal) || locked(),
-    get writeFailed() { return failed; },
-    flush: () => writes,
+    saveMany(records, persist) {
+      records = structuredClone(records);
+      if (!persist) { memory = { ...memory, ...records }; return true; }
+      const all = read(); return all ? write({ ...all, ...records }) : false;
+    },
+    clear(profileId) { memory[profileId] = []; const all = read(); if (all) { const copy = { ...all }; delete copy[profileId]; write(copy); } },
+    canSeal: Boolean(subtle && globalThis.crypto?.getRandomValues), locked,
+    sealed: () => Boolean(seal) || locked(), get writeFailed() { return failed; }, flush: () => writes,
+    async encryptedBackup() {
+      await writes;
+      if (failed) throw new Error('The latest save failed. Try again before making a backup.');
+      const envelope = parsed(); if (!readEnvelope(envelope)) throw new Error('This encrypted record is damaged or unavailable.');
+      return envelope;
+    },
     async setPasscode(passcode) {
+      await writes;
       const problem = passcodeProblem(passcode); if (problem) throw new Error(problem);
-      const all = read(); if (!all) throw new Error("Unlock the saved checks first.");
-      seal = { ...(await newSeal(passcode, { iterations, subtle })), all };
-      write(all); await writes; if (failed) { seal = null; throw new Error("This browser would not save the encrypted checks."); }
+      const all = read(); if (!all) throw new Error('Unlock the saved checks first.');
+      const expected = observedRaw;
+      const next = await newSeal(passcode, { iterations, subtle });
+      if (raw() !== expected) throw new Error('Saved records changed in another tab. Reload before encrypting.');
+      seal = { ...next, all }; write(all); await writes;
+      if (failed) { seal = null; throw new Error('This browser would not save the encrypted checks.'); }
     },
     async unlock(passcode) {
-      if (seal) return;
-      const opened = await openSealed(raw(), passcode, subtle);
-      seal = { ...opened.seal, all: opened.value && typeof opened.value === "object" ? opened.value : {} };
+      if (seal && raw() === observedRaw) return;
+      const value = raw(), opened = await openSealed(value, passcode, subtle);
+      if (raw() !== value) throw new Error('Saved records changed in another tab. Unlock again.');
+      observedRaw = value; seal = { ...opened.seal, all: opened.value && typeof opened.value === 'object' ? opened.value : {} };
     },
     lock() { seal = null; },
     async removePasscode() {
-      if (!seal) throw new Error("Unlock the saved checks first.");
+      await writes;
+      if (!seal || raw() !== observedRaw) { seal = null; throw new Error('Unlock the saved checks first.'); }
       const all = seal.all; seal = null;
-      await queue(async () => storage.setItem(key, JSON.stringify(all)));
+      await queue(async () => { const value = JSON.stringify(all); storage.setItem(key, value); observedRaw = value; });
+      if (failed) throw new Error('The passcode could not be removed.');
     },
-    // A forgotten passcode cannot be recovered: the only way forward is to delete the sealed record.
-    async forget() { seal = null; await queue(async () => storage.removeItem(key)); },
+    async forget() { seal = null; memory = {}; await queue(async () => { storage.removeItem(key); observedRaw = null; }); if (failed) throw new Error('The saved health record could not be deleted.'); },
   };
+}
+
+// Reconstruct a saved result from only the observations that preceded it.
+export function savedCheckEvaluation(checks, checkId = null, options = {}) {
+  const ordered = checks.filter(check => check && typeof check.id === 'string' && Number.isFinite(Date.parse(check.at))).slice().sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+  const check = checkId ? ordered.find(item => item.id === checkId) : ordered.at(-1);
+  if (!check) return { check: null, evaluation: null };
+  const prior = ordered.filter(item => item.id !== check.id && Date.parse(item.at) < Date.parse(check.at));
+  return { check, evaluation: evaluateSelfCheck(check, prior, options) };
 }

@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { personalDashboardModel } from './personalDashboardModel.js';
+const check = { id:'c3', at:'2026-11-01T10:00:00Z', values:{restingHr:73,sleepHours:6.5},quality:{restingHr:false,sleepHours:true},protocols:{sleepHours:'self-v1'} };
+test('empty personal dashboard never supplies demo readings',()=> { const m=personalDashboardModel(); assert.equal(m.checkCount,0); assert.ok(m.indicators.every(r=>r.value==='—')); assert.equal(m.tasks.length,0); });
+test('locked dashboard withholds all values and tasks even if a caller provides cached data',()=> { const m=personalDashboardModel({locked:true,latestCheck:check,history:[check],followUps:[{id:'a',text:'Repeat',status:'open'}]}); assert.ok(m.indicators.every(r=>r.value==='—')); assert.equal(m.tasks.length,0); assert.equal(m.checkCount,0); });
+test('failed quality is withheld and comparable baseline excludes current/future/other protocol',()=> { const history=[{...check,id:'a',at:'2026-10-30T10:00:00Z'},{...check,id:'b',at:'2026-10-31T10:00:00Z',protocols:{sleepHours:'wearable'}},check,{...check,id:'future',at:'2026-11-02T10:00:00Z'}];const m=personalDashboardModel({latestCheck:check,history});assert.equal(m.indicators[0].value,'—'); assert.equal(m.indicators[2].value,'6.5 h');assert.ok(m.indicators[2].detail.includes('1/3 prior')); });
+test('completed actions disappear from outstanding dashboard list',()=> { const m=personalDashboardModel({followUps:[{id:'a',text:'Review',status:'completed'},{id:'b',text:'Repeat',status:'recheck'}]});assert.equal(m.openCount,1);assert.equal(m.tasks[0].label,'Recheck'); });

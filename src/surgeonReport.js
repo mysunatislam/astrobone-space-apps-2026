@@ -47,7 +47,13 @@ export function surgeonReport(evaluation, check, { environment = null, profile =
   const actions = followUps ?? ev.actions.filter(a => a.priority !== "info");
   if (actions.length) {
     lines.push("", followUps ? "ACTIONS THE ASTRONAUT SELECTED" : "WHAT THE ASTRONAUT WAS ADVISED");
-    for (const a of actions) lines.push(`- ${a.text}`);
+    for (const a of actions) lines.push(`- ${a.text}${a.status ? ` [${a.status}${a.dueAt ? `; due ${a.dueAt}` : ""}${a.completedAt ? `; completed ${a.completedAt}` : ""}]` : ""}`);
+  }
+  if (check.respiratory) {
+    const r = check.respiratory;
+    lines.push('', 'EXPERIMENTAL RESPIRATORY MOTION', '- ' + num(r.rate, 1) + ' breaths/min; source ' + r.source + '; captured ' + r.recordedAt,
+      '- Signal quality ' + num(r.quality * 100) + '%; ' + num(r.duration) + ' s; protocol ' + r.protocol,
+      '- Reference-belt validation pending. Signal quality is not measurement accuracy. No clinical status inferred.');
   }
   const failed = Object.entries(check.quality ?? {}).filter(([, ok]) => ok === false).map(([key]) => rows.find(r => r.key === key)?.def.label ?? key);
   const context = [

@@ -1,6 +1,6 @@
 // AstroBone offline pack. After one online visit, the twin (home), Live Capture and their models,
 // NASA summaries and pose runtime are served from this device's cache.
-const CACHE = "astrobone-offline-v11";
+const CACHE = "astrobone-offline-v12";
 const CORE = [
   "./", "lab.html",
   "brand/astrobone-logo.png",
