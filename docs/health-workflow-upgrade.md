@@ -2,6 +2,16 @@
 
 The daily workflow is Gather → Evaluate → Act. Personal observations, Elena's authored demonstration and external NASA research retain distinct identities throughout the app.
 
+## One health record
+
+Self-checks, their follow-ups and breathing readings live in one record on this device (`astrobone-self-check-v1`: `you` and `respiratory:you`), under one consent switch and one optional passcode. The header's **My health / Demo mission** switch picks whose record every view shows; Elena's demo checks are kept separately and are refused when restoring a personal backup. Breathing readings saved on the Live Capture page go to the same record, and the page can unlock it. Readings from the old per-crew-code list move only after the person picks their own code, and the old plaintext rows are removed only after the move has reached storage.
+
+A follow-up chosen with a check is saved inside that check, with due, re-check, awaiting-review and completed states and completion times. Reopening a saved check re-evaluates it against strictly earlier checks only, with the flight surgeon's limits if set.
+
+## Guided demo
+
+The guided demo is the full mission simulation in nine chapters (baseline, prediction, gather, reaction/sleep/body, evaluate and act, My Health and crew, where the crew is, body and impact, evidence). Play runs it; Pause holds; Back, Next and the chapter numbers jump straight to a chapter; Exit returns to where the person was, including an unfinished check of their own. A synthetic capture that is still running when the profile or check changes is dropped, so it can never land on a personal check.
+
 ## NASA explanations beside results
 
 Each result domain includes a **Why are we monitoring this?** disclosure. It identifies the relevant NASA hazards, the purpose of the check, the source population and the limits of that evidence. This release adds three verified human-research references: NASA's sleep risk overview, Ames fatigue and HERA analog research, and NASA's food and nutrition research synthesis. They are labeled research context; no new participant dataset is claimed for these references.

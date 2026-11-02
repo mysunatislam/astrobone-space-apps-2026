@@ -184,7 +184,8 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
     $("samples").textContent = String(samples.filter(s => s.valid !== false).length);
     const duplicate = hasSavedRespiratoryCapture(history, { captureId, subjectId, source, protocol: result.protocol });
     $("save").disabled = active || demo || !canReport || saved || duplicate || busy || isLocked();
-    if (duplicate) $("save").textContent = "Recording already saved";
+    if (saved) $("save").textContent = persist() ? "Saved to my health record" : "Kept for this tab";
+    else if (duplicate) $("save").textContent = "Recording already saved";
     $("export").disabled = active || samples.length === 0;
     if (result.waveform?.length) drawWave(result.waveform);
     else if (samples.length > 1) drawWave(samples.slice(-300).map(s => s.chest));

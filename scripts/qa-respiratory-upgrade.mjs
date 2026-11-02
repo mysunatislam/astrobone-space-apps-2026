@@ -97,7 +97,7 @@ try {
     await page.waitForFunction(() => !document.querySelector('[data-resp="save"]').disabled);
     assert.ok(Math.abs(Number(await page.locator('[data-resp="rate"]').textContent()) - 15) < .6);
     await page.locator('[data-resp="save"]').click();
-    await page.waitForFunction(() => document.querySelector('[data-resp="save"]').textContent === "Saved to my health record");
+    await page.waitForFunction(() => document.querySelector('[data-resp="save"]').textContent === "Saved to my health record", null, { timeout: 15000 }).catch(async error => { console.log("status:", await page.locator('[data-resp="status"]').textContent(), "| save:", await page.locator('[data-resp="save"]').textContent()); throw error; });
     const saved = (await stored())["respiratory:you"];
     assert.equal(saved.length, 2); assert.equal(saved[1].source, "depth"); assert.equal(saved[1].experimental, true); assert.equal(saved[1].synthetic, false);
     assert.match(await page.locator('[data-resp="baseline"]').textContent(), /Save 2 more usable RGB-D/);
