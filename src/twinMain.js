@@ -1,5 +1,6 @@
 import "./twin.css";
 import "./selfCheck.css";
+import "./dashboard.css";
 import { createTwinApp } from "./twinApp.js";
 import { registerOffline } from "./offline.js";
 

@@ -720,6 +720,14 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     openStep(key) { go(Math.max(0, STEPS.findIndex(([k]) => k === key))); },
     stop() { stopCamera(); stopPulse(); stopPvt(true); },
     get state() { return state; },
+    // For the My Health dashboard: saved checks, the routine, today's unsaved check and the floors the
+    // result screen uses, so the dashboard shows exactly the self-check's own judgement.
+    history: () => (locked() ? [] : history()),
+    routine: () => routine(),
+    locked: () => locked(),
+    environment: () => environment(),
+    floors: () => (state.profile === "elena" ? {} : calibratedFloors(check.pairs, INDICATORS.kneeExtension.floor)),
+    get current() { return state.evaluation && !state.saved ? state.check : null; },
     latestEvaluation(profile = state.profile) {
       if (state.evaluation && state.profile === profile) return state.evaluation;
       return profile === "elena" ? evaluateSelfCheck(elenaDay147(), ELENA_HISTORY, { environment: environmentFor(DEFAULT_ENVIRONMENT.elena) }) : null;

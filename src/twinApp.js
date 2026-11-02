@@ -6,6 +6,7 @@ import {
 import { IMPACT_SCENARIO, evaluateImpact, runMonteCarlo, eventDistributions, envelopeDistributions, bendingStressField } from "./twinImpact.js";
 import { RISK_THRESHOLDS } from "./riskModel.js";
 import { createSelfCheckPanel } from "./selfCheckPanel.js";
+import { createDashboardPanel } from "./dashboardPanel.js";
 import { ELENA_HISTORY } from "./elenaSelfCheck.js";
 import { EXPERIENCES, CAPTURE, experienceFromHash } from "./siteNav.js";
 import { BODY_PARTS, bodyPartFor, bodyPartStatus } from "./bodyParts.js";
@@ -58,8 +59,8 @@ export function createTwinApp(root) {
   const dayValue = el("strong", { id: "tw-day" }, String(state.day));
   const startButton = el("button", { type: "button", class: "tw-start", onclick: () => (state.demo ? stopDemo() : runDemo()) }, "Start mission simulation");
   const header = el("header", { class: "tw-top" },
-    el("a", { class: "tw-brand", href: "#", "aria-label": "AstroBone digital twin home", onclick: e => { e.preventDefault(); stopDemo(); setExperience("mission"); } },
-      el("span", { class: "tw-mark", "aria-hidden": "true" }), el("span", {}, el("b", {}, "ASTROBONE"), el("small", {}, "DIGITAL PHYSIOLOGICAL TWIN"))),
+    el("a", { class: "tw-brand", href: "#", "aria-label": "AstroBone Digital Physiological Twin, home", onclick: e => { e.preventDefault(); stopDemo(); setExperience("mission"); } },
+      el("span", { class: "tw-mark", "aria-hidden": "true" }), el("span", {}, el("b", {}, "ASTROBONE"), " ", el("small", {}, "DIGITAL PHYSIOLOGICAL TWIN"))),
     nav, liveLink,
     el("div", { class: "tw-ident" }, el("b", {}, "ELENA TORRES"), el("small", {}, `SYNTHETIC ASTRONAUT · ${ELENA.identity.mission.value}`)),
     el("div", { class: "tw-daybox", "aria-live": "polite" }, el("small", {}, "MISSION DAY"), el("span", {}, dayValue, el("i", {}, `/ ${MISSION_LENGTH}`))),
@@ -124,6 +125,15 @@ export function createTwinApp(root) {
     onTimedTest: active => scene.setPaused(active),
   });
 
+  // My Health: the astronaut's own dashboard, drawn from the self-check's records and judgement.
+  const dashboard = createDashboardPanel({
+    selfCheck,
+    dose: () => { const s = twinState(CURRENT_DAY); return { text: fmt(s.radiation.doseMgy, 2), detail: `By Day ${CURRENT_DAY} at ${ELENA.doseRate?.value ?? 0.458} mGy a day, the rate Curiosity's RAD measured on the way to Mars. Above the ISS range in NASA OSDR (0.20-0.35 mGy a day).${s.radiation.eventIncluded ? " Includes a tabletop event." : ""}` }; },
+    onMeasure: () => { stopDemo(); selfCheck.reset(); setExperience("selfcheck"); revealOnPhone(); },
+  });
+  const dashHost = el("section", { class: "tw-dash", hidden: true, "aria-live": "polite" }, dashboard.element);
+  root.insertBefore(dashHost, tooltip);
+
   // Body as navigation: the structure clicked selects the analysis.
   function navigateFromBody(name) {
     if (name === "tibiaL") setExperience("impact");
@@ -171,7 +181,7 @@ export function createTwinApp(root) {
 
   function sceneSystem() {
     if (state.compare) return "skeleton";
-    if (state.experience === "mission" || state.experience === "evidence") return "multisystem";
+    if (state.experience === "mission" || state.experience === "evidence" || state.experience === "health") return "multisystem";
     if (state.experience === "functional") return "functional";
     if (state.experience === "impact") return "impact";
     if (state.experience === "selfcheck") return SELF_STEP_VIEW[state.selfStep][0];
@@ -378,6 +388,8 @@ export function createTwinApp(root) {
     if (state.experience === "twin") panels.replaceChildren(...(state.compare ? compareCards() : systemCards()));
     else panels.replaceChildren();
     if (state.experience === "mission") renderNodes(); else nodes.replaceChildren();
+    dashHost.hidden = state.experience !== "health";
+    if (!dashHost.hidden) dashboard.render();
     renderDrawer(); renderLegend(); drawSpark();
   }
 
