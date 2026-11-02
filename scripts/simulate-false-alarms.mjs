@@ -8,7 +8,10 @@
 // --change=key:shift adds a step change on day 31 to the detection list (e.g. --change=sleepHours:-1).
 // --seed=N runs a different set of simulated astronauts (0 is the set the app's numbers come from), to see
 // how much the figures move by chance.
-// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--assumed-knee] [--previous-spreads] [--change=key:shift] [--seed=N] [--json]
+// --sd=key:value sets one reading's day-to-day spread (for attention lapses, a spread above Poisson's makes the
+// count overdispersed), and --sensitivity reruns the figures with the spreads that are still assumed halved,
+// doubled and at the reaction test's published upper bound, to show how much the figures hang on them.
+// Usage: node scripts/simulate-false-alarms.mjs [--runs=1000] [--days=60] [--spread=1] [--single] [--assumed-knee] [--previous-spreads] [--change=key:shift] [--seed=N] [--sd=key:value] [--sensitivity] [--json]
 import { evaluateSelfCheck, INDICATORS, KNEE_REPEAT_NOISE } from "../src/selfCheck.js";
 
 const arg = (name, fallback) => { const hit = process.argv.find(a => a.startsWith(`--${name}=`)); return hit ? Number(hit.split("=")[1]) : fallback; };
@@ -60,9 +63,27 @@ export function rng(seed) {
 }
 const gaussian = random => { let u = 0; while (!u) u = random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * random()); };
 const poisson = (random, lambda) => { let k = 0, p = 1; const l = Math.exp(-lambda); do { k++; p *= random(); } while (p > l); return k - 1; };
+// Gamma(shape, 1) by Marsaglia and Tsang (ACM TOMS 2000), with the shape < 1 boost.
+function gamma(random, shape) {
+  if (shape < 1) return gamma(random, shape + 1) * random() ** (1 / shape);
+  const d = shape - 1 / 3, c = 1 / Math.sqrt(9 * d);
+  for (;;) {
+    let x, v;
+    do { x = gaussian(random); v = 1 + c * x; } while (v <= 0);
+    v = v ** 3; const u = random();
+    if (Math.log(u) < 0.5 * x * x + d - d * v + d * Math.log(v)) return d * v;
+  }
+}
+// A count with mean `mean` and SD `sd`: Poisson when sd is at most sqrt(mean), otherwise a gamma-Poisson
+// (negative binomial) mixture with that variance.
+const count = (random, mean, sd) => {
+  if (!(sd ** 2 > mean)) return poisson(random, mean);
+  const shape = mean ** 2 / (sd ** 2 - mean);
+  return poisson(random, gamma(random, shape) * mean / shape);
+};
 
 function sample(spec, random, spread, shift = 0) {
-  if (spec.poisson) return poisson(random, spec.poisson + shift);
+  if (spec.poisson) return spec.sd ? count(random, spec.poisson + shift, spec.sd) : poisson(random, spec.poisson + shift);
   let v = spec.mean + shift + spec.sd * spread * gaussian(random);
   v = Math.round(v / spec.round) * spec.round;
   if (spec.min !== undefined) v = Math.max(spec.min, v);
@@ -145,10 +166,60 @@ export const STEP_CHANGES = Object.freeze([
   { key: "pvtLapses", day: 31, shift: 6, label: "6 more attention lapses" },
 ]);
 
+// The readings whose day-to-day spread is still an assumption (docs/self-check.md). For the reaction test there
+// is an upper bound: Basner et al. 2018 (Table 2) give SDs of 0.41/s for speed and 1.61 for lapses across all 16
+// tests of all 45 people. Those SDs hold the differences between people as well as each person's own day-to-day
+// change, so one person's spread should not be larger, apart from chance.
+export const ASSUMED_SPREADS = Object.freeze(["spo2", "pvtSpeed", "pvtLapses", "fatigue", "mood", "stress"]);
+export const PVT_POOLED_SD = Object.freeze({ pvtSpeed: 0.41, pvtLapses: 1.61 });
+export const SENSITIVITY_SCENARIOS = Object.freeze([
+  { name: "as shipped" },
+  { name: "assumed spreads halved (lapses stay Poisson)", factor: 0.5 },
+  { name: "assumed spreads doubled (lapses at their upper bound)", factor: 2 },
+  { name: "reaction test at its published upper bound", sds: PVT_POOLED_SD },
+]);
+// A stable person with the assumed spreads scaled by `factor` and/or set by `sds` ({ key: sd }).
+export function personWithSpreads({ factor = 1, sds = {} } = {}, base = STABLE_PERSON) {
+  const person = { ...base };
+  if (factor !== 1) for (const key of ASSUMED_SPREADS) {
+    const spec = base[key];
+    person[key] = spec.poisson ? (factor > 1 ? { ...spec, sd: PVT_POOLED_SD.pvtLapses } : spec) : { ...spec, sd: Number((spec.sd * factor).toFixed(3)) };
+  }
+  for (const [key, sd] of Object.entries(sds)) person[key] = { ...person[key], sd };
+  return person;
+}
+const spreadOf = spec => spec.sd ?? Number(Math.sqrt(spec.poisson).toFixed(2));
+// How much the shown figures hang on the spreads that are still assumed. Only the attention-lapse change among
+// the shown detection figures uses an assumed spread; each reading has its own random stream, so the others
+// do not move at all.
+export function assumptionSensitivity({ runs = RUNS, detectionRuns = Math.min(RUNS, 400), seed = SEED, scenarios = SENSITIVITY_SCENARIOS } = {}) {
+  const lapses = STEP_CHANGES.find(c => c.key === "pvtLapses");
+  return scenarios.map(scenario => {
+    const person = personWithSpreads(scenario), stable = falseAlarmSummary({ runs, person, seed }), found = detectionSummary(lapses, { runs: detectionRuns, person, seed });
+    return {
+      name: scenario.name, spreads: Object.fromEntries(ASSUMED_SPREADS.map(k => [k, spreadOf(person[k])])),
+      reviewPct: stable.reviewOrWorsePct, recheckPct: stable.recheckOrWorsePct, fixedLimitPct: stable.fixedLimitPct,
+      assumedChangedPct: Object.fromEntries(ASSUMED_SPREADS.map(k => [k, stable.changedPctByIndicator[k]])),
+      lapsesWithinThree: found.withinThreeChecksPct, lapsesWithinTwoWeeks: found.withinTwoWeeksPct,
+    };
+  });
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const evaluate = process.argv.includes("--single") ? singleValueRule : evaluateSelfCheck;
   const withSpreads = spreads => Object.fromEntries(Object.entries(spreads).map(([k, sd]) => [k, { ...STABLE_PERSON[k], sd }]));
-  const person = { ...STABLE_PERSON, ...(process.argv.includes("--assumed-knee") ? withSpreads(ASSUMED_KNEE_SD) : {}), ...(process.argv.includes("--previous-spreads") ? withSpreads(PREVIOUS_SPREADS) : {}) };
+  const setSds = Object.fromEntries(process.argv.filter(a => a.startsWith("--sd=")).map(a => { const [key, sd] = a.slice(5).split(":"); return [key, Number(sd)]; }));
+  const person = personWithSpreads({ sds: setSds }, { ...STABLE_PERSON, ...(process.argv.includes("--assumed-knee") ? withSpreads(ASSUMED_KNEE_SD) : {}), ...(process.argv.includes("--previous-spreads") ? withSpreads(PREVIOUS_SPREADS) : {}) });
+  if (process.argv.includes("--sensitivity")) {
+    const rows = assumptionSensitivity();
+    if (process.argv.includes("--json")) console.log(JSON.stringify(rows, null, 2));
+    else for (const r of rows) {
+      console.log(`${r.name}: ${Object.entries(r.spreads).map(([k, v]) => `${k} ${v}`).join(", ")}`);
+      console.log(`  REVIEW or worse ${r.reviewPct}% of checks, RE-CHECK or worse ${r.recheckPct}%, fixed limit ${r.fixedLimitPct}%; changed rows (% of checks): ${Object.entries(r.assumedChangedPct).map(([k, v]) => `${k} ${v}`).join(", ")}`);
+      console.log(`  6 more attention lapses flagged within 3 checks ${r.lapsesWithinThree}%, within 14 ${r.lapsesWithinTwoWeeks}%`);
+    }
+    process.exit(0);
+  }
   const changed = Object.keys(person).filter(k => person[k] !== STABLE_PERSON[k]);
   const extra = process.argv.filter(a => a.startsWith("--change=")).map(a => { const [key, shift] = a.slice(9).split(":"); return { key, day: 31, shift: Number(shift), label: `${key} ${shift}` }; });
   const result = { rule: evaluate === singleValueRule ? "single value" : "multirule", stable: falseAlarmSummary({ evaluate, person }), detection: [...STEP_CHANGES, ...extra].map(c => detectionSummary(c, { runs: Math.min(RUNS, 400), evaluate, person })) };

@@ -286,11 +286,16 @@ export const KNEE_REPEAT_NOISE = Object.freeze({
 // spreads guessed before (--assumed-knee --previous-spreads) the same rules gave REVIEW 4.4 % and caught
 // 2 h less sleep within 14 checks in 100 %: the guesses made the checks look steadier than people are.
 // `chance`: the same run with --seed=1 and --seed=2 (other simulated astronauts) moved the shown figures
-// by up to 6 points (systolic within 3 checks, 76 to 82 %). The app shows these numbers;
-// src/falseAlarms.test.js keeps them in step with the code.
+// by up to 6 points (systolic within 3 checks, 76 to 82 %). `assumed`: the same run with the spreads that
+// are still assumed (oxygen, reaction speed, lapses, fatigue, mood, stress) halved, doubled (lapses at their
+// upper bound), and with only the reaction test as spread out as Basner et al. 2018 found across all 16 tests
+// of all 45 people (0.41/s, 1.61 lapses; a person's own spread should not be larger). `--sensitivity`;
+// --seed=1 and --seed=2 gave 11.5/11.4, 19.8/19.9 and 15.3/15.2 %. The app shows these numbers; src/falseAlarms.test.js keeps them in
+// step with the code.
 export const SIMULATED_RELIABILITY = Object.freeze({
   astronauts: 1000, days: 60, reviewPct: 11.4, singleRuleReviewPct: 44.8, recheckPct: 42.1,
   chance: Object.freeze({ sets: 3, maxShift: 6 }),
+  assumed: Object.freeze({ halvedPct: 10.9, doubledPct: 19.2, pvtUpperBoundPct: 14.8 }),
   detected: Object.freeze([
     ["kneeExtension", "knee extension 10° lower", 60.3, 98], ["pvtLapses", "6 more attention lapses", 97.5, 100],
     ["systolicBp", "systolic 20 mmHg higher", 82, 99.5], ["glucose", "fasting blood sugar 20 mg/dL higher", 79.5, 100],
