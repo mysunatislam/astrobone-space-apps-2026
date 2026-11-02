@@ -146,4 +146,5 @@ export const PROVENANCE = Object.freeze({
   ATLAS: "Z-Anatomy / BodyParts3D reference geometry. Not Elena's anatomy.",
   NASA: "External NASA research population. Never Elena's data.",
   NONE: "No data source exists for this quantity in AstroBone.",
+  CHECK: "Measured by a check on this device (Self-Check or Crewmate check), not by the twin.",
 });

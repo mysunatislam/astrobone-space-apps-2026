@@ -20,7 +20,7 @@ import { DEMO_CHAPTERS } from "./guidedHealthDemo.js";
 import { kneeDumbbell, pulseBars, alarmBars, evidenceTables } from "./evidenceCharts.js";
 
 const SYSTEMS = [["body", "Body"], ["skeleton", "Skeleton"], ["muscle", "Muscle"], ["nervous", "Nervous system"], ["cardiovascular", "Cardiovascular"], ["renal", "Renal"], ["radiation", "Radiation"], ["multisystem", "Multisystem"]];
-const SYSTEM_FOCUS = { body: "body", skeleton: "body", muscle: "body", nervous: "body", cardiovascular: "thorax", renal: "kidneys", radiation: "body", multisystem: "body", functional: "legs", impact: "leftLeg" };
+const SYSTEM_FOCUS = { body: "body", skeleton: "body", muscle: "body", nervous: "head", cardiovascular: "thorax", renal: "kidneys", radiation: "body", multisystem: "body", functional: "legs", impact: "leftLeg" };
 // Self-check step -> [scene system, camera focus].
 const SELF_STEP_VIEW = { safety: ["multisystem", "body"], movement: ["functional", "legs"], reaction: ["multisystem", "head"], mind: ["multisystem", "head"], body: ["cardiovascular", "thorax"], result: ["multisystem", "body"] };
 const PHYSIO_TABS = [["cardio", "Cardiovascular", "cardiovascular", "thorax"], ["renal", "Renal pathway", "renal", "kidneys"], ["radiation", "Radiation", "radiation", "body"], ["predicted", "Predicted vs observed", "skeleton", "legs"]];
@@ -334,7 +334,15 @@ export function createTwinApp(root) {
       q !== null ? el("div", { class: "tw-quality", title: "Visual solidity follows this indicator" }, el("i", { style: `width:${Math.round(q * 100)}%` }), el("span", {}, qualityLabel ?? `INPUT QUALITY ${q.toFixed(2)}`)) : null);
   }
 
+  // No nervous-system anatomy is loaded: the Nervous view turns to the head and lists what is measured instead.
+  function nervousCards() {
+    return [card({ label: "Nervous-system model", value: "Not loaded", kind: "NONE", detail: "The twin has no brain or nerve anatomy. This view shows the head and the checks that watch the brain and nerves." }),
+        card({ label: "Reaction test", value: "PVT-B", kind: "CHECK", detail: "3-minute vigilance test from the Self-Check (Basner et al. 2011): speed and lapses against your own baseline." }),
+        card({ label: "Sleep, fatigue, mood", value: "Self-report", kind: "CHECK", detail: "Daily ratings in the Self-Check, compared with your own usual." }),
+        card({ label: "Face and speech", value: "Crewmate check", kind: "CHECK", detail: "Mouth asymmetry, eye closure and reading pauses, compared with the crewmate's own earlier checks; BE-FAST signs are asked directly." })];
+  }
   function systemCards() {
+    if (state.system === "nervous") return nervousCards();
     if (state.profile === "you") {
       const snapshot = selfCheck.snapshot?.("you"), evaluation = snapshot?.evaluation;
       return [card({ label: "Reference anatomy", value: "Explore the body", kind: "ATLAS", detail: "The model is a reference atlas. Personal bone density, muscle force and organ function are not measured." }),
@@ -367,6 +375,7 @@ export function createTwinApp(root) {
       radiation: [dose, day, card({ label: "Tracks drawn", value: String(s.radiation.tracks), kind: "DERIVED", detail: `${TRACKS_PER_MGY} per mGy of cumulative dose. Paths are illustrative, not particle transport.` }),
         card({ label: "Biological burden", value: "Not modeled", kind: "NONE", detail: "No organ dose or radiation-effect model. Dose does not imply injury." })],
       multisystem: [day, bone, knee, heart, dose, trend],
+      nervous: nervousCards(),
     };
     return map[state.system] ?? map.multisystem;
   }
