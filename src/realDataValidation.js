@@ -11,6 +11,21 @@ export const REAL_DATA_VALIDATION = Object.freeze({
   pulse: Object.freeze({ dataset: "MCD-rPPG", people: 40, windows: 308, mae: 2.1, gatedMae: 0.6, gatedAnsweredPct: 76.9, gate: 0.3, changeError: 4.2, changePeople: 38 }),
 });
 
+// The per-person and per-method rows the Evidence charts draw (data/validation/rehab24-knee-per-person.csv
+// and mcd-pulse-methods.csv; src/realDataValidation.test.js checks every value against the files).
+// Knee: range-of-motion error in degrees for each person, with that person left out of training.
+export const KNEE_PER_PERSON = Object.freeze([
+  [1, 23.21, 12.74], [2, 28.1, 16.96], [3, 17.51, 12.16], [4, 13.51, 9.37], [5, 24.29, 14.2],
+  [6, 23.18, 16.06], [7, 22.44, 12.93], [8, 20.06, 13.31], [9, 22.72, 10.89],
+].map(([person, before, after]) => Object.freeze({ person, before, after })));
+// Pulse: average error in beats per minute against the finger sensor, 30-second windows. A selection of
+// the 15 methods in the file: the shipped one, the deep models and the classic colour methods.
+export const PULSE_METHODS = Object.freeze([
+  ["AstroBone hybrid", "AstroBone (shipped)", 2.14, true], ["ME-rPPG, app", "ME-rPPG deep model", 2.44], ["FacePhys", "FacePhys deep model", 4.81],
+  ["AstroBone live", "AstroBone, colour only", 6.88, true], ["POS", "POS (Wang 2017)", 7.1], ["GREEN", "Green channel (2008)", 10.19],
+  ["PhysNet", "PhysNet deep model", 10.3], ["CHROM", "CHROM (de Haan 2013)", 18.16],
+].map(([method, label, mae, ours = false]) => Object.freeze({ method, label, mae, ours })));
+
 // From data/validation/rehab24-knee-methods.csv and rehab24-knee-per-person.csv.
 export function kneeSummary(methods, perPerson) {
   const row = (method, view) => methods.find(m => m.method === method && m.exercise_view === view);

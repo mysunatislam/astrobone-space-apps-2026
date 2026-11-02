@@ -14,6 +14,7 @@ import { guidanceFor } from "./countermeasures.js";
 import { HRP_HAZARDS } from "./hazards.js";
 import { INDICATORS, SAFETY_LIMITS, SAFETY_LIMIT_SOURCES, describeBound } from "./selfCheck.js";
 import { testedOnRealData } from "./realDataValidation.js";
+import { kneeDumbbell, pulseBars, alarmBars, evidenceTables } from "./evidenceCharts.js";
 
 const SYSTEMS = [["body", "Body"], ["skeleton", "Skeleton"], ["muscle", "Muscle"], ["cardiovascular", "Cardiovascular"], ["renal", "Renal"], ["radiation", "Radiation"], ["multisystem", "Multisystem"]];
 const SYSTEM_FOCUS = { body: "body", skeleton: "body", muscle: "body", cardiovascular: "thorax", renal: "kidneys", radiation: "body", multisystem: "body", functional: "legs", impact: "leftLeg" };
@@ -673,6 +674,7 @@ export function createTwinApp(root) {
     const sources = research ? ["cardiovascular", "radiation", "bone"].map(key => research[key]).filter(Boolean) : [];
     if (!research) loadResearch();
     fill(drawer, drawerHead("EVIDENCE", "What every visual is built from"),
+      proofCharts(),
       el("ul", { class: "tw-truth" }, Object.entries(PROVENANCE).map(([kind, text]) => el("li", {}, prov(kind), el("span", {}, text)))),
       section("Synthetic astronaut", ["Elena Torres and every reading: src/elenaMissionScenario.js (schema astrobone-elena-synthetic-v1).", ELENA.boundary, `Impact branch: src/twinImpact.js. ${IMPACT_SCENARIO.boundary}`]),
       section("Models in this view", [
@@ -698,6 +700,20 @@ export function createTwinApp(root) {
       section("Anatomy", ["Z-Anatomy / BodyParts3D atlas, CC BY-SA 4.0 (public/models/anatomy/SOURCE-LICENSE.txt). Reference geometry, not Elena's anatomy.", "Cardiovascular groups are vessels only: kidney and lung tissue are not in the atlas."]),
       section("Not used here", ["No LLM or retrieval model runs in this view; citations are a fixed local index.", "No live sensors: the live camera twin is in the Movement capture workspace.", "No clinical validation. Human medical review is required for any decision."]),
       el("a", { class: "tw-secondary tw-link", href: `${import.meta.env.BASE_URL}#mission-demo` }, "Open Mission Intelligence review ↗"));
+  }
+  // Proof at a glance: the real-data and simulation results as charts (src/evidenceCharts.js), each with
+  // its numbers as a table underneath.
+  function proofCharts() {
+    const tables = evidenceTables();
+    const svgNode = markup => { const box = el("div", { class: "ev-chart-box" }); box.innerHTML = markup; return box; };
+    const table = ({ head, rows }) => el("details", {}, el("summary", {}, "Show as a table"),
+      el("table", { class: "ev-table" }, el("thead", {}, el("tr", {}, head.map(h => el("th", { scope: "col" }, h)))),
+        el("tbody", {}, rows.map(r => el("tr", {}, r.map((c, i) => (i ? el("td", {}, c) : el("th", { scope: "row" }, c))))))));
+    const figure = (title, note, markup, data) => el("figure", { class: "ev-fig" }, el("figcaption", {}, el("b", {}, title), el("small", {}, note)), svgNode(markup), table(data));
+    return el("section", { class: "tw-ev ev-proof" }, el("h3", {}, "Proof at a glance"),
+      figure("Knee angle vs motion capture", "REHAB24-6 · 9 real people, each left out of training · range-of-motion error, lower is better", kneeDumbbell(), tables.knee),
+      figure("Camera pulse vs finger sensor", "MCD-rPPG · 40 real people · average error in beats per minute, lower is better", pulseBars(), tables.pulse),
+      figure("False alarms and real changes", "Simulation · 1,000 healthy astronauts, measured knee noise and published day-to-day spreads", alarmBars(), tables.alarms));
   }
   // What was measured against real people, and what was not: numbers from src/realDataValidation.js.
   function realData() {
