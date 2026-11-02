@@ -1,3 +1,4 @@
+import { surgeonLimitsSummary } from "./surgeonLimits.js";
 import { STATUS_MARKS } from "./historyChart.js";
 
 // The self-check as a short plain-text message for the flight surgeon. It reads on any ground terminal
@@ -23,12 +24,15 @@ export function rowReason(row) {
   return usual;
 }
 
-export function surgeonReport(evaluation, check, { environment = null, profile = "", followUps = null } = {}) {
+export function surgeonReport(evaluation, check, { environment = null, profile = "", followUps = null, surgeonLimits = null } = {}) {
   const ev = evaluation, rows = ev.domains.flatMap(d => d.indicators.map(row => ({ ...row, domain: d.label }))).filter(r => r.status !== "notChecked");
   const when = Number.isFinite(check.missionDay) ? `Mission day ${check.missionDay}` : new Date(check.at).toISOString().slice(0, 16).replace("T", " ") + " UTC";
   const lines = [`ASTROBONE SELF-CHECK REPORT · ${profile || check.profileId} · ${when}`];
   if (environment) lines.push(`Where: ${environment.label}, ${environment.place} · message to Earth ${environment.delayText} one way`);
   lines.push(`Overall: ${STATUS_MARKS[ev.overall].word}`);
+  // Limits the flight surgeon moved for this person, so the reader knows which lines were applied.
+  const moved = surgeonLimitsSummary(surgeonLimits);
+  if (moved.length) lines.push(`Safety limits set by ${surgeonLimits.setBy} on ${surgeonLimits.date}: ${moved.join("; ")}`);
   lines.push(`Red flags: ${ev.redFlags.length ? ev.redFlags.join("; ") : "none reported"}`);
   const symptoms = ev.domains.find(d => d.key === "immune")?.symptoms ?? [];
   if (symptoms.length) lines.push(`New symptoms: ${symptoms.join(", ")}`);

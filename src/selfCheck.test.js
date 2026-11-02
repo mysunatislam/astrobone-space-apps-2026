@@ -169,7 +169,7 @@ test("a poor demo capture is withheld and asks for a repeat instead of a compari
 
 test("a backup restores a lost baseline, keeps checks already here and reads only numbers it uses", () => {
   // Elena's values as if typed on this device, one check a month.
-  const mine = ELENA_HISTORY.map((c, i) => ({ ...c, id: `you-${i}`, profileId: "you", sources: {}, missionDay: undefined, at: new Date(Date.UTC(2026, 4 + i, 1)).toISOString() }));
+  const mine = ELENA_HISTORY.map((c, i) => ({ ...c, id: `you-${i}`, profileId: "you", sources: {}, synthetic: undefined, missionDay: undefined, at: new Date(Date.UTC(2026, 4 + i, 1)).toISOString() }));
   const saved = mine.slice(3), packet = JSON.parse(JSON.stringify(backupPacket(mine, "2026-10-29T00:00:00Z")));
   const result = restoreBackup(saved, packet);
   assert.equal(result.added, mine.length - saved.length);
@@ -184,6 +184,12 @@ test("a backup restores a lost baseline, keeps checks already here and reads onl
   assert.deepEqual(odd.checks[0].quality, {});
   assert.throws(() => restoreBackup([], { checks: [] }), /not an AstroBone self-check backup/);
   assert.equal(restoreBackup([], { schema: "astrobone-self-check-export-v1", check: mine[0] }).added, 1, "a single personal exported check is accepted");
+});
+
+test("demo self-check exports are never restored as personal measurements", () => {
+  assert.throws(() => restoreBackup([], { schema: "astrobone-self-check-export-v1", synthetic: true, check: ELENA_HISTORY[0] }), /Synthetic demo records/);
+  assert.equal(restoreBackup([], { schema: "astrobone-self-check-export-v1", check: ELENA_HISTORY[0] }).added, 0, "an Elena check is dropped even without the packet flag");
+  assert.equal(restoreBackup([], backupPacket(ELENA_HISTORY)).added, 0, "a backup of demo checks adds nothing");
 });
 
 test("store keeps records in memory unless consent to persist is given", () => {

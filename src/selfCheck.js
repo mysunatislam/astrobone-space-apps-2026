@@ -119,7 +119,9 @@ export function safetyLimit(key, value, limits = SAFETY_LIMITS, protocol = null)
   const site = siteOf(protocol), siteRule = base.sites?.[site], rule = { ...base, ...siteRule };
   for (const level of ["urgent", "attention"]) {
     const bound = (rule[level] ?? []).find(([op, limit]) => OPS[op](value, limit));
-    if (bound) return { level, bound: bound.slice(0, 2), text: `${describeBound(bound, INDICATORS[key]?.unit)}${siteRule?.[level] ? ` (${site})` : ""}`, recheck: rule.recheck, first: bound[2] ?? null };
+    // A line moved by the crew's flight surgeon (src/surgeonLimits.js) carries "surgeon" and says so.
+    const surgeon = bound?.[3] === "surgeon";
+    if (bound) return { level, bound: bound.slice(0, 2), text: `${describeBound(bound, INDICATORS[key]?.unit)}${siteRule?.[level] ? ` (${site})` : ""}${surgeon ? " (flight surgeon's limit)" : ""}`, recheck: rule.recheck, first: bound[2] ?? null, surgeon };
   }
   return null;
 }
@@ -501,8 +503,11 @@ export function applyVitals(check, vitals = {}) {
   };
   const readings = (vitals.bp?.readings ?? []).filter(([s, d] = []) => finite(s) !== null && finite(d) !== null && s > d);
   const avg = i => (readings.length ? Math.round(readings.reduce((sum, r) => sum + r[i], 0) / readings.length) : null);
-  set("systolicBp", avg(0), bpProtocol(vitals.bp?.site), vitals.bp?.rested === true);
-  set("diastolicBp", avg(1), bpProtocol(vitals.bp?.site), vitals.bp?.rested === true);
+  // A cuff that reported movement, a loose cuff, an irregular pulse or a wrong arm position
+  // (Bluetooth status bits, src/bleVitals.js) makes the reading one to repeat, like an unrested one.
+  const bpUsable = vitals.bp?.rested === true && !vitals.bp?.deviceWarnings?.length;
+  set("systolicBp", avg(0), bpProtocol(vitals.bp?.site), bpUsable);
+  set("diastolicBp", avg(1), bpProtocol(vitals.bp?.site), bpUsable);
   set("spo2", finite(vitals.spo2?.value), "spo2-rest-v1");
   const g = finite(vitals.glucose?.value);
   set("glucose", g === null ? null : Math.round(vitals.glucose.unit === "mmol/L" ? g * GLUCOSE_MG_PER_MMOL : g), glucoseProtocol(vitals.glucose));

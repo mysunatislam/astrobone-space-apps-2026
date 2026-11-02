@@ -291,3 +291,177 @@
 .sc-backup { align-items:center; gap:10px; }
 .sc-backup input[type="password"] { background:#0c1926; color:#e5f4ff; border:1px solid #527386; border-radius:6px; padding:9px; max-width:100%; }
 @media(max-width:560px) { .sc-followups { padding:14px; } .sc-followup .sc-row { align-items:stretch; } .sc-followup .sc-row>* { width:100%; } }
+/* Today's checks: what NASA life-science data asks this check to watch, and when */
+.sc-plan { display: grid; gap: 8px; padding: 12px; border-radius: 12px; border: 1px solid rgba(109, 255, 176, .28); background: linear-gradient(180deg, rgba(109, 255, 176, .06), rgba(4, 10, 22, .4)); }
+.sc-plan header { display: grid; gap: 3px; }
+.sc-plan header b { font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-green); }
+.sc-plan header small { font-size: 11px; color: var(--tw-dim); }
+.sc-rule { display: grid; gap: 4px; padding: 9px 10px; border-radius: 9px; border: 1px solid var(--tw-line); background: rgba(4, 10, 22, .5); }
+.sc-rule-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sc-rule-head strong { font-size: 12.5px; color: #fff; }
+.sc-pill { flex: none; padding: 3px 7px; border-radius: 999px; border: 1px solid currentColor; font: 700 9px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-green); }
+.sc-rule-scheduled .sc-pill, .sc-rule-on-return .sc-pill { color: var(--tw-cyan); }
+.sc-rule-no-alarm .sc-pill, .sc-rule-routine .sc-pill { color: var(--tw-dim); }
+.sc-rule-text { margin: 0; font-size: 12px; line-height: 1.4; color: var(--tw-ink); }
+.sc-rule-when { margin: 0; font-size: 11.5px; color: var(--tw-cyan); }
+.sc-rule-tested summary { cursor: pointer; list-style: none; }
+.sc-rule-tested .sc-pill { color: var(--tw-cyan); }
+.sc-crew { display: grid; gap: 4px; }
+.sc-crew small { font-size: 10.5px; color: var(--tw-dim); }
+.sc-crew-row { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 8px; font: 11px var(--tw-mono); color: var(--tw-ink); }
+.sc-crew-row .sc-spark { width: 110px; height: 22px; }
+.sc-rule-finding { margin: 0; font-size: 11px; line-height: 1.45; color: var(--tw-dim); }
+.sc-src { display: flex; flex-wrap: wrap; gap: 5px; }
+.sc-src span, .sc-why b { font: 700 9px var(--tw-mono); letter-spacing: .08em; color: var(--tw-green); }
+.sc-src span { padding: 2px 6px; border-radius: 5px; background: rgba(109, 255, 176, .08); }
+.sc-why { margin: 0; padding: 7px 10px; border-left: 2px solid var(--tw-green); background: rgba(109, 255, 176, .05); font-size: 11.5px; line-height: 1.45; color: var(--tw-dim); }
+
+/* Where the astronaut is: sets the escalation ladder */
+.sc-env { display: flex; align-items: center; gap: 8px; font: 600 10px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-dim); }
+.sc-env select, .sc-vital select { flex: 1; min-width: 0; padding: 7px 9px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 13px var(--tw-sans); }
+
+/* Fixed safety limit crossed: tell the crew medical officer today */
+.sc-overall.sc-attention { border-color: rgba(255, 111, 181, .7); background: rgba(255, 111, 181, .1); }
+.sc-overall.sc-attention strong, .sc-domain.sc-attention header em, .sc-domain li.sc-attention b { color: var(--st-attention); }
+.tw-drawer .sc-domain.sc-attention { border-color: rgba(255, 111, 181, .55); }
+.tw-drawer .sc-domain.sc-urgent { border-color: rgba(255, 90, 79, .6); }
+.sc-domain.sc-urgent header em, .sc-domain li.sc-urgent b { color: var(--st-urgent); }
+.sc-action.sc-attention { border-color: rgba(255, 111, 181, .55); background: rgba(255, 111, 181, .07); }
+
+/* Vital signs */
+.sc-vitals { gap: 12px; }
+.sc-vital { display: grid; gap: 6px; padding-bottom: 10px; border-bottom: 1px solid var(--tw-line); }
+.sc-vital > b { font-size: 12.5px; color: #fff; }
+.sc-bp { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.sc-bp input { width: 84px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 14px var(--tw-mono); }
+.sc-bp input[aria-invalid] { border-color: var(--st-attention); }
+.sc-bp i { font-style: normal; color: var(--tw-dim); font: 600 11px var(--tw-mono); }
+.sc-bp select { flex: none; width: auto; }
+.sc-vital > small:not(.sc-limit):not(.sc-about):not(.sc-entry-problem) { font-size: 11px; color: var(--tw-faint); }
+.sc-entry-problem { font-size: 11px; font-weight: 600; line-height: 1.4; color: var(--st-attention); }
+.sc-entry-problem:empty { display: none; }
+.sc-limit { font: 600 10.5px var(--tw-mono); letter-spacing: .04em; }
+.sc-limit:empty { display: none; }
+.sc-limit::before { content: "● "; }
+.sc-limit.sc-ok { color: var(--st-stable); }
+.sc-limit.sc-attention { color: var(--st-attention); }
+.sc-limit.sc-urgent { color: var(--st-urgent); }
+.sc-about { font-size: 11px; line-height: 1.45; color: var(--tw-faint); }
+
+/* Who to tell: escalation ladder */
+.sc-ladder { display: grid; gap: 8px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--tw-line-strong); background: rgba(4, 10, 22, .5); }
+.sc-ladder header { display: grid; gap: 2px; }
+.sc-ladder header b { font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-cyan); }
+.sc-ladder header small { font-size: 11px; color: var(--tw-dim); }
+.sc-ladder ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; counter-reset: rung; }
+.sc-ladder li { display: grid; align-content: start; gap: 2px; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--tw-line); color: var(--tw-faint); counter-increment: rung; }
+.sc-ladder li strong { font-size: 11px; line-height: 1.25; }
+.sc-ladder li strong::before { content: counter(rung) " · "; font-family: var(--tw-mono); }
+.sc-ladder li span { font-size: 10px; }
+.sc-ladder li.sc-active { grid-column: 1 / -1; order: -1; color: #fff; border-color: var(--tw-amber); background: rgba(255, 210, 122, .08); }
+.sc-ladder li.sc-active p { margin: 2px 0 0; font-size: 12px; line-height: 1.45; color: var(--tw-ink); }
+
+/* NASA HRP hazards behind each domain, and what helps */
+.sc-hazards { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.sc-hazards span { padding: 2px 6px; border-radius: 5px; background: rgba(127, 227, 255, .07); font: 700 8.5px var(--tw-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tw-cyan); }
+.sc-helps { margin-top: 8px; }
+.sc-helps summary { cursor: pointer; font: 600 10px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-green); }
+.sc-helps ul { list-style: disc; margin: 6px 0 4px; padding-left: 16px; display: grid; gap: 4px; }
+.sc-helps li { display: list-item; font-size: 11.5px; line-height: 1.45; color: var(--tw-ink); }
+.sc-helps small { display: block; font-size: 10px; line-height: 1.4; color: var(--tw-faint); }
+
+/* Mission routine, streak and badges */
+.sc-routine { display: grid; gap: 8px; padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 210, 122, .35); background: linear-gradient(180deg, rgba(255, 210, 122, .07), rgba(4, 10, 22, .4)); }
+.sc-routine header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.sc-routine header b { font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-amber); }
+.sc-routine header small { font-size: 11px; color: var(--tw-dim); }
+.sc-streak { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.sc-streak strong { font: 700 28px/1 var(--tw-mono); color: var(--tw-amber); font-variant-numeric: tabular-nums; }
+.sc-streak span { font-size: 12.5px; color: var(--tw-ink); }
+.sc-streak small { font: 10px var(--tw-mono); color: var(--tw-faint); }
+.sc-routine-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.sc-routine-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; font-size: 11.5px; color: var(--tw-dim); }
+.sc-routine-list b { grid-column: 1; font-size: 11.5px; color: #fff; }
+.sc-routine-list span { grid-column: 1; }
+.sc-routine-list .sc-link { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.sc-badges { display: flex; flex-wrap: wrap; gap: 5px; }
+.sc-badge { padding: 3px 8px; border-radius: 999px; border: 1px solid var(--tw-line); font: 600 9.5px var(--tw-mono); letter-spacing: .05em; color: var(--tw-faint); }
+.sc-badge.sc-earned { border-color: rgba(255, 210, 122, .55); color: var(--tw-amber); background: rgba(255, 210, 122, .07); }
+.sc-badge.sc-new { animation: sc-badge-in .6s ease-out both; }
+@keyframes sc-badge-in { from { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .sc-badge.sc-new { animation: none; } }
+@media (max-width: 420px) { .sc-ladder ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Status word and shape on every result row, so colour is never the only cue */
+.sc-domain li > span { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 7px; }
+.sc-word { font: 700 8.5px var(--tw-mono); font-style: normal; letter-spacing: .1em; color: var(--tw-faint); white-space: nowrap; }
+.sc-word.sc-stable { color: var(--st-stable); } .sc-word.sc-changed, .sc-word.sc-recheck { color: var(--st-changed); } .sc-word.sc-attention { color: var(--st-attention); }
+.sc-word.sc-urgent { color: var(--st-urgent); } .sc-word.sc-baseline, .sc-word.sc-repeat { color: var(--st-wait); }
+.sc-rowlink { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; text-decoration: underline dotted rgba(127, 227, 255, .5); text-underline-offset: 3px; }
+.sc-rowlink:hover { color: var(--tw-cyan); }
+
+/* Over time: full-size chart for one indicator */
+.sc-over { display: grid; gap: 8px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--tw-line-strong); background: rgba(4, 10, 22, .5); }
+.sc-over header { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sc-over header b { font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-cyan); }
+.sc-over header label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--tw-dim); }
+.sc-over select { max-width: 220px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--tw-line-strong); background: rgba(4, 10, 22, .8); color: var(--tw-ink); font: 12px var(--tw-sans); }
+.sc-over > small { font-size: 11px; line-height: 1.4; color: var(--tw-faint); }
+.sc-hchart { display: block; width: 100%; height: auto; overflow: visible; }
+.sc-h-grid { stroke: rgba(110, 190, 255, .1); stroke-width: 1; }
+.sc-h-tick, .sc-h-unit { font: 10px var(--tw-mono); fill: var(--tw-faint); }
+.sc-h-band { fill: rgba(127, 227, 255, .1); }
+.sc-h-start { stroke: var(--tw-faint); stroke-width: 1; stroke-dasharray: 4 4; }
+.sc-h-limit { stroke-width: 1.2; stroke-dasharray: 7 4; }
+.sc-h-limit.sc-h-urgent { stroke: var(--st-urgent); } .sc-h-limit.sc-h-attention { stroke: var(--st-attention); }
+.sc-h-note { font: 600 9.5px var(--tw-mono); fill: var(--tw-dim); }
+.sc-h-note.sc-h-urgent { fill: var(--st-urgent); } .sc-h-note.sc-h-attention { fill: var(--st-attention); }
+.sc-h-line { fill: none; stroke: var(--tw-cyan); stroke-width: 1.6; stroke-linejoin: round; }
+.sc-h-pt { stroke-width: 1.6; }
+.sc-h-stable { fill: var(--st-stable); stroke: var(--st-stable); }
+.sc-h-baseline { fill: var(--tw-bg); stroke: var(--st-wait); }
+.sc-h-repeat { fill: none; stroke: var(--st-wait); stroke-width: 2.2; }
+.sc-h-changed { fill: var(--st-changed); stroke: var(--st-changed); }
+.sc-h-recheck { fill: var(--tw-bg); stroke: var(--st-changed); stroke-width: 2; }
+.sc-h-attention { fill: var(--st-attention); stroke: var(--st-attention); }
+.sc-h-urgent { fill: var(--st-urgent); stroke: var(--st-urgent); }
+.sc-h-today { stroke: #fff; }
+.sc-h-now { font: 700 10px var(--tw-mono); letter-spacing: .06em; }
+/* Hollow markers would leave the "today" label unfilled: give those labels their status colour */
+.sc-h-now.sc-h-baseline, .sc-h-now.sc-h-repeat { fill: var(--st-wait); } .sc-h-now.sc-h-recheck { fill: var(--st-changed); }
+/* A dark halo keeps labels readable where they cross a line or a band */
+.sc-hchart text { paint-order: stroke; stroke: #050c18; stroke-width: 3px; stroke-linejoin: round; }
+.sc-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 12px; font: 600 9.5px var(--tw-mono); letter-spacing: .06em; color: var(--tw-dim); }
+.sc-legend li { display: flex; align-items: center; gap: 5px; }
+.sc-legend i { font-style: normal; font-size: 11px; }
+.sc-legend .sc-stable i { color: var(--st-stable); } .sc-legend .sc-baseline i, .sc-legend .sc-repeat i { color: var(--st-wait); }
+.sc-legend .sc-changed i, .sc-legend .sc-recheck i { color: var(--st-changed); } .sc-legend .sc-attention i { color: var(--st-attention); } .sc-legend .sc-urgent i { color: var(--st-urgent); }
+.sc-legend-band i { width: 14px; height: 9px; background: rgba(127, 227, 255, .18); }
+.sc-legend-start i { width: 14px; border-top: 1px dashed var(--tw-faint); }
+.sc-legend-limit i { width: 14px; border-top: 1.5px dashed var(--st-attention); }
+.sc-htable summary { cursor: pointer; font: 600 10px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--tw-dim); }
+.sc-htable ol { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 2px; font: 11px var(--tw-mono); color: var(--tw-dim); }
+
+/* Report for flight surgeon: the result as plain text for a slow link */
+.sc-report { display: grid; gap: 8px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--tw-line-strong); background: rgba(4, 10, 22, .5); }
+.sc-report header, .tw-drawer .sc-report > header { display: grid; gap: 2px; margin-bottom: 0; }
+.sc-report header b { font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-cyan); }
+.sc-report header small { font-size: 11px; color: var(--tw-faint); }
+.sc-report pre { margin: 0; max-height: 280px; overflow: auto; padding: 10px; border-radius: 8px; border: 1px solid var(--tw-line); background: rgba(0, 0, 0, .35); font: 11px/1.5 var(--tw-mono); color: var(--tw-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.sc-report .sc-row small { align-self: center; font-size: 11px; color: var(--tw-dim); }
+
+/* Flight surgeon's limits (src/surgeonLimits.js) */
+.sc-sl { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--tw-line); border-radius: 10px; background: rgba(14, 30, 54, .35); }
+.sc-sl summary { cursor: pointer; font: 700 10.5px var(--tw-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--tw-ink); }
+.sc-sl[open] > summary { margin-bottom: 8px; }
+.sc-sl > * + * { margin-top: 8px; }
+.sc-sl-active { border-left: 3px solid var(--tw-cyan); padding-left: 10px; font-size: 12px; }
+.sc-sl-active ul { margin: 4px 0 0; padding-left: 16px; color: var(--tw-dim); line-height: 1.45; }
+.sc-sl-grid { display: grid; gap: 6px; }
+.sc-sl-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 12px; color: var(--tw-dim); }
+.sc-sl-row input[type="number"] { width: 76px; }
+.sc-sl-row input[type="text"] { width: min(220px, 50vw); padding: 7px 10px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 13px var(--tw-sans); }
+.sc-sl-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Read a vital from a Bluetooth device (src/bleVitals.js) */
+.sc-ble { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.sc-ble .sc-secondary { padding: 7px 10px; }

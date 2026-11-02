@@ -86,10 +86,17 @@ body.twin-body { overflow: hidden; }
 .tw-start:hover { border-color: var(--tw-cyan); }
 [data-demo="true"] .tw-start { border-color: rgba(255, 159, 67, .6); background: rgba(255, 159, 67, .16); }
 /* Narrower desktops: the astronaut's name gives way so every section stays visible. */
-@media (max-width: 1760px) { .tw-ident { display: none; } }
-@media (max-width: 1500px) {
+@media (max-width: 1960px) { .tw-ident { display: none; } }
+@media (max-width: 1700px) { .tw-daybox { display: none; } }
+@media (max-width: 1599px) {
   .tw-start { padding: 10px 12px; letter-spacing: .06em; }
-  .tw-nav button, .tw-nav a { padding: 9px 8px; letter-spacing: .06em; }
+  .tw-nav button, .tw-nav a { padding: 9px 7px; letter-spacing: .04em; }
+  .tw-top { gap: 10px; }
+}
+@media (max-width: 1400px) and (min-width: 961px) {
+  .tw-brand small { display: none; }
+  .tw-nav button, .tw-nav a { padding: 9px 6px; font-size: 10.5px; letter-spacing: .03em; }
+  .tw-live { padding: 9px 9px; letter-spacing: .04em; }
   .tw-brand b { letter-spacing: .2em; }
   .tw-brand small { letter-spacing: .12em; }
   .tw-daybox { display: none; } /* the timeline shows the mission day */
@@ -393,3 +400,27 @@ body.twin-body { overflow: hidden; }
 .tw-hazards li { margin-bottom: 6px; }
 .tw-hazards li b { display: block; color: #fff; font-size: 12.5px; }
 .tw-hazards li span { display: block; }
+@media (max-width: 1300px) and (min-width: 961px) { .tw-nav button, .tw-nav a { padding: 9px 5px; } .tw-top { gap: 8px; } }
+
+/* Evidence: proof at a glance (src/evidenceCharts.js) */
+.ev-fig { margin: 12px 0 0; }
+.ev-fig figcaption { display: grid; gap: 2px; margin-bottom: 6px; }
+.ev-fig figcaption b { font-size: 13px; color: var(--tw-ink); }
+.ev-fig figcaption small { font-size: 11px; line-height: 1.4; }
+.ev-chart { display: block; width: 100%; height: auto; font-family: var(--tw-sans); }
+.ev-chart .ev-grid { stroke: var(--tw-line); stroke-width: 1; }
+.ev-chart .ev-tick { fill: var(--tw-faint); font-size: 10px; }
+.ev-chart .ev-label { fill: var(--tw-dim); font-size: 11px; }
+.ev-chart .ev-strong { fill: var(--tw-ink); font-weight: 700; }
+.ev-chart .ev-value { fill: var(--tw-ink); font-size: 10.5px; }
+.ev-chart .ev-dim { fill: var(--tw-dim); }
+.ev-chart .ev-sub { fill: var(--tw-ink); font-size: 11px; font-weight: 600; }
+.ev-chart .ev-ours { fill: var(--tw-cyan); }
+.ev-chart .ev-before { fill: #6f819a; }
+.ev-chart .ev-link { stroke: var(--tw-faint); stroke-width: 2; }
+.ev-chart circle { stroke: #071223; stroke-width: 2; }
+.ev-chart .ev-hit { fill: transparent; }
+.ev-chart .ev-row:hover .ev-hit { fill: rgba(127, 227, 255, .07); }
+.ev-table { width: 100%; margin-top: 6px; border-collapse: collapse; font-size: 11.5px; }
+.ev-table th, .ev-table td { padding: 3px 6px; border-bottom: 1px solid var(--tw-line); text-align: left; }
+.ev-table td { font-variant-numeric: tabular-nums; color: var(--tw-ink); }

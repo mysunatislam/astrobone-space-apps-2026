@@ -22,7 +22,7 @@ const link = (href, label, current = false) => {
 };
 const header = document.createElement("header");
 header.className = "tw-top lab-top";
-header.innerHTML = `<a class="tw-brand" href="./" aria-label="AstroBone home"><span class="tw-mark" aria-hidden="true"></span><span><b>ASTROBONE</b><small>DIGITAL PHYSIOLOGICAL TWIN</small></span></a>
+header.innerHTML = `<a class="tw-brand" href="./" aria-label="AstroBone Digital Physiological Twin, home"><span class="tw-mark" aria-hidden="true"></span><span><b>ASTROBONE</b> <small>DIGITAL PHYSIOLOGICAL TWIN</small></span></a>
   <nav class="tw-nav" aria-label="AstroBone sections"></nav>
   <span class="lab-chip"><i aria-hidden="true"></i>On this device · nothing uploaded</span>`;
 const nav = header.querySelector("nav");

@@ -1,0 +1,135 @@
+/* My Health dashboard (src/dashboardPanel.js). Status colours are the shared --st-* tokens; every status
+   also carries its word and marker glyph, so nothing relies on colour alone. */
+.tw-dash { position: fixed; z-index: 7; left: 14px; right: 14px; top: 82px; bottom: 14px; overflow-y: auto; scrollbar-width: thin; border-radius: 16px;
+  background: linear-gradient(180deg, rgba(5, 12, 26, .9), rgba(3, 8, 18, .93)); border: 1px solid var(--tw-line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: tw-rise .35s ease both; }
+.tw-dash[hidden] { display: none; }
+#twin-root[data-experience="health"] .tw-timeline, #twin-root[data-experience="health"] .tw-systems, #twin-root[data-experience="health"] .tw-legend { display: none; }
+
+.db { max-width: 1480px; margin: 0 auto; padding: 18px 20px 22px; display: grid; gap: 14px; color: var(--tw-ink); font-family: var(--tw-sans); }
+.db-card { border: 1px solid var(--tw-line); border-radius: 12px; background: rgba(14, 30, 54, .45); padding: 12px 14px; }
+.db-card > header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.db-card > header b { font: 700 11px var(--tw-mono); letter-spacing: .12em; text-transform: uppercase; }
+.db-card > header small, .db-note { color: var(--tw-dim); font-size: 12px; }
+.db small { font-size: 12px; }
+
+/* Status colours */
+.db-st-urgent { --db-st: var(--st-urgent); }
+.db-st-attention { --db-st: var(--st-attention); }
+.db-st-changed, .db-st-recheck { --db-st: var(--st-changed); }
+.db-st-baseline, .db-st-repeat { --db-st: var(--st-wait); }
+.db-st-stable { --db-st: var(--st-stable); }
+.db-st-notChecked { --db-st: var(--tw-faint); }
+.db-mark { display: inline-flex; align-items: center; gap: 4px; color: var(--db-st); font: 700 10px var(--tw-mono); letter-spacing: .08em; white-space: nowrap; }
+.db-mark i { font-style: normal; }
+
+/* Hero: who, overall status, routine */
+.db-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
+.db-who { display: grid; align-content: start; gap: 6px; }
+.db-who .tw-eyebrow { color: var(--tw-cyan); }
+.db-who h2 { margin: 0; font: 600 26px/1.15 var(--tw-sans); }
+.db-who > small { color: var(--tw-dim); line-height: 1.4; }
+.db-profile { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.db-profile button { padding: 6px 10px; border-radius: 999px; border: 1px solid var(--tw-line-strong); background: transparent; color: var(--tw-dim); font: 600 10px var(--tw-mono); letter-spacing: .06em; cursor: pointer; }
+.db-profile button[aria-pressed="true"] { background: rgba(127, 227, 255, .14); color: var(--tw-ink); }
+.db-overall { border-left: 4px solid var(--db-st, var(--tw-line-strong)); display: grid; align-content: start; gap: 6px; }
+.db-overall.db-st-recheck { border-left-style: dashed; }
+.db-overall-word { display: flex; align-items: center; gap: 10px; color: var(--db-st); font: 800 30px/1 var(--tw-mono); letter-spacing: .06em; }
+.db-overall-word i { font-style: normal; font-size: 26px; }
+.db-overall p { margin: 0; font-size: 15px; line-height: 1.45; }
+.db-overall .db-who-tell { font-size: 13px; color: var(--tw-dim); }
+.db-overall .db-who-tell b { color: var(--tw-ink); }
+.db-overall .tw-primary { width: auto; justify-self: start; }
+.db-routine { display: grid; align-content: start; gap: 8px; }
+.db-streak { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: baseline; }
+.db-streak strong { grid-row: span 2; font: 800 40px/1 var(--tw-mono); color: var(--tw-amber); }
+.db-streak span { font: 700 11px var(--tw-mono); letter-spacing: .1em; text-transform: uppercase; }
+.db-streak small { color: var(--tw-dim); }
+
+/* Body systems */
+.db-domains { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.db-domain { border-top: 3px solid var(--db-st); display: grid; gap: 4px; padding: 10px 12px; }
+.db-domain.db-st-recheck { border-top-style: dashed; }
+.db-domain-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.db-domain-head b { font-size: 14px; }
+.db-domain small { color: var(--tw-dim); line-height: 1.35; }
+
+/* Indicator tiles, grouped by system */
+.db-grid { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-start; }
+.db-group h3 { margin: 0 0 6px; font: 700 10px var(--tw-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--tw-dim); }
+.db-tiles { display: flex; flex-wrap: wrap; gap: 10px; }
+.db-tile { width: 200px; display: grid; gap: 6px; text-align: left; padding: 10px 12px; border-radius: 12px; cursor: pointer; color: var(--tw-ink);
+  border: 1px solid var(--tw-line); border-top: 3px solid var(--db-st); background: rgba(14, 30, 54, .45); transition: border-color .2s, background .2s; }
+.db-tile.db-st-recheck { border-top-style: dashed; }
+.db-tile:hover { background: rgba(26, 52, 88, .55); }
+.db-tile[aria-pressed="true"] { border-color: var(--tw-cyan); box-shadow: 0 0 0 1px var(--tw-cyan) inset; }
+.db-tile:focus-visible { outline: 2px solid var(--tw-cyan); outline-offset: 2px; }
+.db-tile-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; color: var(--tw-dim); }
+.db-tile-head > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.db-tile strong { font: 700 26px/1 var(--tw-sans); }
+.db-tile strong small { font: 500 13px var(--tw-sans); color: var(--tw-dim); }
+.db-tile-spark .sc-spark { max-width: none; width: 100%; height: 30px; }
+.db-tile-spark.db-none { font-size: 11px; color: var(--tw-faint); height: 30px; display: flex; align-items: center; }
+.db-tile-foot { color: var(--tw-dim); line-height: 1.3; }
+.db-tile-foot em { font-style: normal; color: var(--tw-ink); }
+
+/* Chart, next steps, dose, adherence */
+.db-bottom { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+.db-side { display: grid; gap: 12px; }
+.db-chart-box .sc-hchart { max-height: 300px; }
+.db-chart .sc-legend { margin-top: 6px; }
+.db-chart details { margin-top: 8px; font-size: 12px; color: var(--tw-dim); }
+.db-actions ol { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13px; line-height: 1.45; }
+.db-act.db-pr-urgent::marker { color: var(--st-urgent); }
+.db-act.db-pr-review::marker, .db-act.db-pr-recheck::marker { color: var(--st-changed); }
+.db-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.db-buttons .tw-primary, .db-buttons .tw-secondary { width: auto; flex: 1 1 180px; }
+.db-report { margin: 10px 0 0; padding: 10px; max-height: 260px; overflow: auto; border-radius: 8px; background: rgba(0, 0, 0, .35); border: 1px solid var(--tw-line); font: 11px/1.45 var(--tw-mono); white-space: pre-wrap; color: var(--tw-ink); }
+.db-dose strong { font: 700 28px/1 var(--tw-sans); }
+.db-dose strong small { font-size: 13px; color: var(--tw-dim); }
+.db-dose > small { display: block; margin-top: 6px; color: var(--tw-dim); line-height: 1.4; }
+.db-days { display: flex; flex-wrap: wrap; gap: 3px; margin: 4px 0 8px; }
+.db-day { width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--tw-faint); }
+.db-day.db-done, .db-day.db-today-done { background: var(--tw-cyan); border-color: var(--tw-cyan); }
+.db-day.db-today, .db-day.db-today-done { box-shadow: 0 0 0 2px var(--tw-amber); }
+.db-boundary { color: var(--tw-faint); }
+
+@media (max-width: 1200px) {
+  .db-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .db-who { grid-column: 1 / -1; }
+  .db-domains { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .db-bottom { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 960px) {
+  .tw-dash { position: static; order: 2; margin-top: 4px; border-radius: 14px; }
+  #twin-root[data-experience="health"] #tw-canvas { position: static; order: 8; height: 40vh; }
+  .db { padding: 14px 12px 16px; }
+  .db-hero { grid-template-columns: minmax(0, 1fr); }
+  .db-domains { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .db-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .db-tile { width: auto; min-width: 0; overflow: hidden; }
+  .db-tile-head, .db-domain-head { flex-wrap: wrap; justify-content: flex-start; row-gap: 2px; }
+  .db-tile-head > span:first-child { white-space: normal; }
+  .db-group { width: 100%; }
+}
+
+/* Crew view */
+.db-hero-crew { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); }
+.db-crew-counts { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.db-crew-counts > span { display: inline-flex; align-items: center; gap: 8px; }
+.db-crew-counts b { font: 800 26px/1 var(--tw-mono); color: var(--db-st); }
+.db-crew { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.db-crew-row { display: grid; grid-template-columns: minmax(170px, 1fr) minmax(0, 2.4fr) minmax(150px, 1fr) auto; gap: 14px; align-items: center; border-left: 4px solid var(--db-st); }
+.db-crew-row.db-st-recheck { border-left-style: dashed; }
+.db-crew-who { display: grid; gap: 3px; }
+.db-crew-who b { font-size: 17px; }
+.db-crew-who small, .db-crew-what small, .db-crew-meta small, .db-crew-spark small { color: var(--tw-dim); line-height: 1.4; }
+.db-crew-what { display: grid; gap: 4px; font-size: 14px; }
+.db-crew-spark .sc-spark { width: 100%; height: 30px; max-width: none; }
+.db-crew-meta { display: grid; gap: 6px; justify-items: end; }
+.db-crew-meta .tw-secondary { margin-top: 0; }
+@media (max-width: 1200px) { .db-crew-row { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); } .db-crew-meta { justify-items: start; } }
+@media (max-width: 960px) { .db-hero-crew { grid-template-columns: minmax(0, 1fr); } .db-crew-row { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .tw-dash { animation: none; } }
+/* During the guided tour the caption sits at the bottom of the dashboard, off its headline. */
+#twin-root[data-experience="health"] .tw-caption { top: auto; bottom: 24px; }
