@@ -56,7 +56,7 @@ try {
   await context.close();
   for (const width of [390, 768, 1280, 1440, 1600, 1920]) {
     const { context, page, errors } = await open({ width, height: 900 });
-    for (const exp of ["mission", "health", "selfcheck", "evidence"]) {
+    for (const exp of ["mission", "health", "selfcheck", "crewmate", "evidence"]) {
       await page.evaluate(e => window.__astroboneTwin.setExperience(e), exp);
       const overflow = await page.evaluate(() => ({ page: document.documentElement.scrollWidth > innerWidth + 2, header: [...document.querySelectorAll(".tw-top > *")].some(n => { const r = n.getBoundingClientRect(); return r.width > 0 && (r.right > innerWidth + 1 || r.left < -1); }) }));
       assert.equal(overflow.page, false, `${width} ${exp}: page scrolls sideways`);

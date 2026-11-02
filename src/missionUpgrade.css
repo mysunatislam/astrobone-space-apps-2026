@@ -219,3 +219,15 @@
 @media(max-width:540px) { .tw-top { gap:7px; padding:9px; }.tw-top .tw-brand { display:none; }.tw-top .ab-profile-switch { grid-column:1/3;justify-self:start; }.tw-top .tw-start { grid-column:3;max-width:none;font-size:11px!important; }.ab-health-card { padding:14px; }.ab-health-card>strong { font-size:23px; }.ab-health-summary { gap:13px;flex-wrap:wrap; }.tw-nav button { padding:9px; }.ab-health-dashboard { margin-top:10px; } }
 
 @media(max-width:540px) { .tw-top .tw-brand { display:flex; grid-column:1;grid-row:1; }.tw-top .ab-profile-switch { grid-column:2/4;grid-row:1;justify-self:end; }.tw-top .tw-start { grid-column:2;grid-row:3; }.tw-top .ab-research-menu { grid-column:1;grid-row:3; }.tw-top .ab-lightweight-toggle { grid-column:3;grid-row:3; font-size:10px!important;padding:8px; }.ab-brand-logo { width:48px;height:43px; }.ab-profile-switch button { padding:8px;font-size:11px; } }
+
+/* The drawer's slide-in must not make the phone page scroll sideways while it runs. */
+@media (max-width: 960px) { #twin-root { overflow-x: clip; } }
+@media (prefers-reduced-motion: reduce) { .tw-drawer, .ab-demo-controls { animation: none !important; } }
+
+/* Panels start below the header, whose height changes with the width (one or two rows). --tw-top is
+   set from the header's measured bottom edge (src/twinApp.js). */
+@media (min-width: 961px) {
+  #twin-root .tw-dash, #twin-root .tw-drawer, #twin-root .tw-panels, #twin-root .tw-caption,
+  #twin-root[data-lightweight="true"] .tw-drawer, #twin-root .ab-health-dashboard, #twin-root .ab-mission-overview,
+  #twin-root[data-experience="mission"] .tw-nodes { top: var(--tw-top, 120px); }
+}

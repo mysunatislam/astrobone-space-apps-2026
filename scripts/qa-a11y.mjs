@@ -22,6 +22,7 @@ async function scan(page, label) {
 try {
   for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
     const page = await browser.newPage({ viewport });
+    await page.addInitScript(() => { try { sessionStorage.setItem("astrobone-twin-intro", "1"); } catch { /* storage unavailable */ } });
     await page.goto(base, { waitUntil: "load", timeout: 90000 }); await page.waitForTimeout(5000);
     for (const view of views) { await page.evaluate(v => { location.hash = v; }, view); await page.waitForTimeout(1500); await scan(page, `${viewport.width}px #${view}`); }
     await page.evaluate(() => { location.hash = "health"; }); await page.waitForTimeout(800);

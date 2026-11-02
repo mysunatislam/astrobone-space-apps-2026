@@ -50,7 +50,12 @@ const prov = kind => el("em", { class: `tw-prov tw-prov-${kind.toLowerCase()}`, 
 
 export function createTwinApp(root) {
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const state = { profile: getActiveProfile(), lightweight: (() => { try { return localStorage.getItem("astrobone-lightweight") !== "0"; } catch { return true; } })(), timedTest: false, experience: "mission", system: "multisystem", day: CURRENT_DAY, compare: false, physio: "cardio", impactDone: false, impactRunning: false, mc: null, engineCheck: null, demo: null, stressReady: false };
+  const state = { profile: getActiveProfile(), lightweight: (() => {
+    // A saved choice wins. Otherwise the 3D twin runs on desktops and pauses on phones, data-saver
+    // connections and low-memory devices.
+    try { const saved = localStorage.getItem("astrobone-lightweight"); if (saved === "0" || saved === "1") return saved === "1"; } catch { /* storage unavailable */ }
+    return matchMedia("(max-width: 960px)").matches || navigator.connection?.saveData === true || (navigator.deviceMemory ?? 8) <= 2;
+  })(), timedTest: false, experience: "mission", system: "multisystem", day: CURRENT_DAY, compare: false, physio: "cardio", impactDone: false, impactRunning: false, mc: null, engineCheck: null, demo: null, stressReady: false };
   const event = evaluateImpact();
   let simulation = null, research = null, current = twinState(state.day), stressField = null;
 
@@ -112,6 +117,10 @@ export function createTwinApp(root) {
   const closing = el("div", { class: "tw-closing", hidden: true }, el("b", {}, "ASTROBONE"), el("p", {}, ["PREDICT.", "OBSERVE.", "UPDATE.", "PROTECT."].map(w => el("span", {}, w))),
     el("small", {}, "Synthetic demonstration · research models · human medical review required"));
 
+  // Panels sit below the header, whatever its height at this width (src/missionUpgrade.css).
+  const placeBelowHeader = () => root.style.setProperty("--tw-top", `${Math.ceil(header.getBoundingClientRect().bottom + 10)}px`);
+  if (typeof ResizeObserver === "function") new ResizeObserver(placeBelowHeader).observe(header);
+  addEventListener("resize", placeBelowHeader);
   root.append(canvas, svg, labels, header, systemRail, panels, nodes, drawer, legend, timeline, tooltip, partCard, caption, closing, intro, loading);
   document.body.classList.add("tw-booting");
 
