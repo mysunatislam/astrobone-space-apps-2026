@@ -1,4 +1,4 @@
-// WCAG 2.1 A/AA scan (axe-core) of every view at desktop and phone width: the seven experiences,
+// WCAG 2.1 A/AA scan (axe-core) of every view at desktop and phone width: the eight experiences,
 // the self-check's own-profile steps with the passcode form open, and lab.html.
 // Usage: npx vite preview --base=/astrobone-space-apps-2026/ --port 5311, then
 //   AXE_CORE=/path/to/axe-core/axe.min.js node scripts/qa-a11y.mjs [base-url]
@@ -9,7 +9,7 @@ import { chromium } from "playwright";
 
 const base = process.argv[2] || "http://127.0.0.1:5311/astrobone-space-apps-2026/";
 const axe = readFileSync(process.env.AXE_CORE || "node_modules/axe-core/axe.min.js", "utf8");
-const views = ["mission", "selfcheck", "twin", "functional", "impact", "physiology", "evidence"];
+const views = ["mission", "health", "selfcheck", "twin", "functional", "impact", "physiology", "evidence"];
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 let failures = 0;
 async function scan(page, label) {

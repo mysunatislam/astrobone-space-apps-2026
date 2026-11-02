@@ -86,10 +86,17 @@ body.twin-body { overflow: hidden; }
 .tw-start:hover { border-color: var(--tw-cyan); }
 [data-demo="true"] .tw-start { border-color: rgba(255, 159, 67, .6); background: rgba(255, 159, 67, .16); }
 /* Narrower desktops: the astronaut's name gives way so every section stays visible. */
-@media (max-width: 1760px) { .tw-ident { display: none; } }
+@media (max-width: 1960px) { .tw-ident { display: none; } }
+@media (max-width: 1700px) { .tw-daybox { display: none; } }
 @media (max-width: 1500px) {
   .tw-start { padding: 10px 12px; letter-spacing: .06em; }
-  .tw-nav button, .tw-nav a { padding: 9px 8px; letter-spacing: .06em; }
+  .tw-nav button, .tw-nav a { padding: 9px 7px; letter-spacing: .04em; }
+  .tw-top { gap: 10px; }
+}
+@media (max-width: 1400px) and (min-width: 961px) {
+  .tw-brand small { display: none; }
+  .tw-nav button, .tw-nav a { padding: 9px 6px; font-size: 10.5px; letter-spacing: .03em; }
+  .tw-live { padding: 9px 9px; letter-spacing: .04em; }
   .tw-brand b { letter-spacing: .2em; }
   .tw-brand small { letter-spacing: .12em; }
   .tw-daybox { display: none; } /* the timeline shows the mission day */
@@ -393,3 +400,4 @@ body.twin-body { overflow: hidden; }
 .tw-hazards li { margin-bottom: 6px; }
 .tw-hazards li b { display: block; color: #fff; font-size: 12.5px; }
 .tw-hazards li span { display: block; }
+@media (max-width: 1300px) and (min-width: 961px) { .tw-nav button, .tw-nav a { padding: 9px 5px; } .tw-top { gap: 8px; } }
