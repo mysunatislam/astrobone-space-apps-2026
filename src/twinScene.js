@@ -45,7 +45,7 @@ const PALETTE = {
   ghost: C(0x5fd7ff), alert: C(0xffb347),
 };
 // Self-check domains that map onto anatomy. Behavioral and immune results have no anatomical layer.
-const ALERT_LAYERS = { musculoskeletal: [...["tibiaL", "tibiaR", "femurL", "femurR", "pelvis", "lumbar"], "quadriceps", "hamstrings", "gluteal", "calf"], cardiovascular: ["heart", "major"] };
+const ALERT_LAYERS = { musculoskeletal: [...["tibiaL", "tibiaR", "femurL", "femurR", "pelvis", "lumbar"], "quadriceps", "hamstrings", "gluteal", "calf"], cardiovascular: ["heart", "major"], renal: ["renal"] };
 
 // Per-system targets: opacity, rim, diffuse, solidity (1 = shaded solid, 0 = fresnel hologram).
 // Styles: "holo" = additive outer skin (with depth pre-pass), "glass" = alpha-blended, "solid" = alpha-blended with depth write.

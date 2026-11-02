@@ -9,7 +9,7 @@ import { chromium } from "playwright";
 
 const base = process.argv[2] || "http://127.0.0.1:5311/astrobone-space-apps-2026/";
 const axe = readFileSync(process.env.AXE_CORE || "node_modules/axe-core/axe.min.js", "utf8");
-const views = ["mission", "health", "selfcheck", "twin", "functional", "impact", "physiology", "evidence"];
+const views = ["mission", "health", "selfcheck", "crewmate", "twin", "functional", "impact", "physiology", "evidence"];
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 let failures = 0;
 async function scan(page, label) {
@@ -27,6 +27,8 @@ try {
     await page.evaluate(() => { location.hash = "health"; }); await page.waitForTimeout(800);
     await page.locator(".db-profile button", { hasText: "Crew" }).click(); await page.waitForTimeout(500); await scan(page, `${viewport.width}px #health crew`);
     await page.locator('[data-crew="daniel"]').click(); await page.waitForTimeout(500); await scan(page, `${viewport.width}px #health crew member`);
+    await page.evaluate(() => { location.hash = "crewmate"; }); await page.waitForTimeout(800);
+    await page.locator(".cm-demo").click(); await page.waitForTimeout(800); await scan(page, `${viewport.width}px #crewmate worked example`);
     await page.evaluate(() => { location.hash = "selfcheck"; }); await page.waitForTimeout(800);
     await page.getByRole("button", { name: "You · this device" }).click();
     await page.locator(".sc-consent input").check();

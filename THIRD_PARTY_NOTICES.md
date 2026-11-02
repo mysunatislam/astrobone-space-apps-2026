@@ -81,6 +81,19 @@ NASA public research pages and technical reports cited by AstroBone are listed i
 - Boundary: these models estimate landmarks and expression coefficients; the eye-closure cue is an unvalidated prototype rule and does not establish sleep or a health condition.
 - QA-only image: https://storage.googleapis.com/mediapipe-tasks/hand_landmarker/woman_hands.jpg, linked by the official MediaPipe sample notebook. Kept under `.artifacts`, not bundled or displayed as user data.
 
+### Silero VAD (speech detector for the crewmate check)
+
+- Source: https://github.com/snakers4/silero-vad (v5 ONNX model, `src/silero_vad/data/silero_vad.onnx`, unchanged)
+- License: MIT (`public/models/silero-vad/LICENSE-silero-vad.txt`)
+- File: `public/models/silero-vad/silero_vad.onnx` (SHA-256 `1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3`)
+- Runtime: onnxruntime-web, on the device; audio never leaves it
+- Use: speech and pause timing while a crewmate reads a fixed passage (`src/speechCheck.js`), compared only with their own earlier readings.
+
+### NeuroBridge Asha (same author)
+
+- Source: https://github.com/mysunatislam/neurobridge-asha-unified-app at commit `a145b2cc37f82d37ad76ee9a3752059bda66c1c2`, by the same author
+- Use: `app/vitalsense.js` copied unchanged into `scripts/validation/neurobridge/` to compare its camera pulse with AstroBone's on the same recordings; its mouth-corner asymmetry rule, blink counting and sad-like composite are re-implemented in `src/faceCues.js`.
+
 ### ME-rPPG (camera pulse model)
 
 - Paper: Kegang Wang et al., "Memory-efficient Low-latency Remote Photoplethysmography through Temporal-Spatial State Space Duality", arXiv 2504.01774 (2025)

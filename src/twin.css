@@ -88,12 +88,13 @@ body.twin-body { overflow: hidden; }
 /* Narrower desktops: the astronaut's name gives way so every section stays visible. */
 @media (max-width: 1960px) { .tw-ident { display: none; } }
 @media (max-width: 1700px) { .tw-daybox { display: none; } }
-@media (max-width: 1599px) {
+/* Nine sections: spacing tightens below 1760 px so the whole nav fits at 1600 px too. */
+@media (max-width: 1760px) {
   .tw-start { padding: 10px 12px; letter-spacing: .06em; }
   .tw-nav button, .tw-nav a { padding: 9px 7px; letter-spacing: .04em; }
   .tw-top { gap: 10px; }
 }
-@media (max-width: 1400px) and (min-width: 961px) {
+@media (max-width: 1480px) and (min-width: 961px) {
   .tw-brand small { display: none; }
   .tw-nav button, .tw-nav a { padding: 9px 6px; font-size: 10.5px; letter-spacing: .03em; }
   .tw-live { padding: 9px 9px; letter-spacing: .04em; }
@@ -400,7 +401,7 @@ body.twin-body { overflow: hidden; }
 .tw-hazards li { margin-bottom: 6px; }
 .tw-hazards li b { display: block; color: #fff; font-size: 12.5px; }
 .tw-hazards li span { display: block; }
-@media (max-width: 1300px) and (min-width: 961px) { .tw-nav button, .tw-nav a { padding: 9px 5px; } .tw-top { gap: 8px; } }
+@media (max-width: 1320px) and (min-width: 961px) { .tw-nav button, .tw-nav a { padding: 9px 4px; font-size: 10px; letter-spacing: .02em; } .tw-top { gap: 8px; } }
 
 /* Evidence: proof at a glance (src/evidenceCharts.js) */
 .ev-fig { margin: 12px 0 0; }

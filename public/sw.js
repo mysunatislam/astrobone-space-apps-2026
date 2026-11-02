@@ -8,6 +8,7 @@ const CORE = [
   "models/pose_landmarker_lite.task",
   "models/face_landmarker.task",
   "models/me-rppg/model.onnx", "models/me-rppg/state.json", "models/me-rppg/state.bin",
+  "models/silero-vad/silero_vad.onnx",
   // Every vision worker calls FilesetResolver.forVisionTasks(url, true), which loads only the module
   // build. The other two builds in public/mediapipe (23 MB) are never requested (src/offlinePack.test.js).
   "mediapipe/vision_wasm_module_internal.js", "mediapipe/vision_wasm_module_internal.wasm",
