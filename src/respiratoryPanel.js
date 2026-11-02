@@ -1,9 +1,14 @@
 import "./respiratoryPanel.css";
 import { estimateRespiratoryMotion, RESPIRATORY_PROTOCOL, validateDepthRecording } from "./respiratoryMotion.js";
-import { fingerprintDepthSamples, hasSavedRespiratoryCapture } from "./respiratoryHistory.js";
+import { fingerprintDepthSamples, hasSavedRespiratoryCapture, mergeRespiratoryRecords, migrateLegacyRespiratoryRecords, RESPIRATORY_HISTORY_PROFILE, LEGACY_RESPIRATORY_HISTORY_KEY } from "./respiratoryHistory.js";
+import { getHealthRecordStore, getHealthConsent, notifyHealthRecordsChanged } from "./healthRecordStore.js";
 
-const HISTORY_KEY = "astrobone.respiratory.accepted.v1";
+// Readings live in the same health record as the daily self-check ("respiratory:you"), under the same
+// consent and the same optional passcode. The old plaintext list, kept per crew code, is only read to
+// offer a one-time move; its rows are removed only after the move has reached storage.
+const HISTORY_KEY = LEGACY_RESPIRATORY_HISTORY_KEY;
 const PROFILE_KEY = "astrobone.respiratory.profile.v1";
+const SUBJECT = "you";
 const W = 160, H = 120, CAPTURE_SECONDS = 45;
 const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
 const median = xs => { const sorted = [...xs].sort((a, b) => a - b), count = sorted.length; return count ? (sorted[Math.floor((count - 1) / 2)] + sorted[Math.floor(count / 2)]) / 2 : 0; };
@@ -42,11 +47,8 @@ function torsoRegion(landmarks) {
   return { left, right, top, bottom, x: average(points.map(p => p.x)), y: average(points.map(p => p.y)), scale: bottom - top, visibility: Math.min(...points.map(p => p.visibility ?? 1)) };
 }
 
-function loadHistory() {
-  try {
-    const value = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-    return Array.isArray(value) ? value.filter(r => r && typeof r.id === "string" && typeof r.protocol === "string" && ["webcam", "depth"].includes(r.source) && Number.isFinite(r.rate) && r.rate >= 6 && r.rate <= 40 && Number.isFinite(r.quality) && Number.isFinite(Date.parse(r.recordedAt))).slice(-100) : [];
-  } catch { return []; }
+function loadLegacy() {
+  try { const value = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); return Array.isArray(value) ? value : []; } catch { return []; }
 }
 
 function syntheticSamples() {
@@ -57,7 +59,7 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
   if (!container) return { updatePose() {}, destroy() {} };
   container.classList.add("resp-panel");
   container.innerHTML = `<div class="resp-heading"><div><p class="resp-eyebrow">PHYSIOLOGICAL CONTEXT · MODULE 04</p><h2>Every breath. A clearer picture.</h2><p>Experimental respiratory motion estimation, processed on this device.</p></div><span class="resp-badge">EXPERIMENTAL</span></div>
-    <div class="resp-profile"><label>LOCAL CREW PROFILE <input data-resp="profile" type="text" maxlength="40" value="crew-01" autocomplete="off" spellcheck="false" aria-label="Local crew profile code"></label><span>Use your own profile code to keep personal trends separate.</span></div>
+    <div class="resp-profile" data-resp="record"><p data-resp="record-note"></p><form data-resp="unlock" class="resp-unlock" hidden><label>Passcode <input data-resp="passcode" type="password" autocomplete="current-password" minlength="8"></label><button type="submit">Unlock my record</button></form><div data-resp="legacy" class="resp-legacy" hidden><p>Older breathing readings on this device are stored in plain text under crew codes. Choose the code that is yours to move its readings into your health record. Other codes stay where they are.</p><label>My earlier crew code <select data-resp="legacy-code"></select></label><button type="button" data-resp="legacy-move">Move to my health record</button></div></div>
     <div class="resp-layout"><div class="resp-main"><div class="resp-statline"><div><span class="resp-label">RESPIRATORY MOTION RATE</span><p class="resp-rate"><strong data-resp="rate">—</strong><span>breaths/min</span></p></div><div class="resp-quality"><span class="resp-label">SIGNAL QUALITY</span><strong data-resp="quality">Awaiting capture</strong><span data-resp="source">Normal webcam · image motion</span></div></div>
       <div class="resp-wave-wrap"><span class="resp-wave-label" data-resp="wave-label">45-SECOND MOTION WINDOW</span><canvas data-resp="wave" width="900" height="180" aria-label="Respiratory motion waveform"></canvas><span class="resp-wave-foot">Relative motion · no lung volume measurement</span></div>
       <p class="resp-status" data-resp="status" role="status">Sit facing the camera with shoulders and hips visible. Wear textured clothing and keep the camera still.</p>
@@ -65,17 +67,41 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
       <div class="resp-actions"><button type="button" class="resp-primary" data-resp="capture">Start 45-second check</button><button type="button" data-resp="demo">Preview demo</button><button type="button" data-resp="save" disabled>Save usable reading</button><button type="button" data-resp="export" disabled>Export capture</button></div>
       <p class="resp-local-note">Saving is optional. Only aggregate readings stay in this browser; camera frames and raw video are never stored by this module.</p></div>
     <aside class="resp-diagnostics"><div class="resp-diag-title"><span class="resp-label">CAPTURE DIAGNOSTICS</span><span data-resp="capture-state">IDLE</span></div><div class="resp-body-map" aria-label="Chest and abdomen relative image motion map"><div class="resp-map-grid" data-resp="map"></div><span>CHEST</span><span>ABDOMEN</span></div><p class="resp-map-caption" data-resp="map-caption">Webcam: relative optical-flow map, not depth.</p><dl><div><dt>Torso tracking</dt><dd data-resp="tracking">Waiting</dd></div><div><dt>Usable samples</dt><dd data-resp="samples">0</dd></div><div><dt>Camera / body movement</dt><dd data-resp="movement">Waiting</dd></div><div><dt>Reference validation</dt><dd>Not yet validated</dd></div></dl></aside></div>
-    <div class="resp-lower"><div class="resp-history"><div class="resp-history-heading"><h3>Your usable measurements</h3><button type="button" data-resp="clear">Clear this profile</button></div><p data-resp="baseline">Save three usable readings with the same source to establish your own baseline.</p><div class="resp-history-trend" data-resp="trend"></div><div data-resp="history"></div></div><details class="resp-depth"><summary>Depth camera & research details</summary><p>An ordinary webcam cannot measure depth. Import a recording from a compatible RGB-D camera adapter with measured chest and abdomen distances, timestamps, and declared camera/body motion compensation.</p><label class="resp-import">Import depth JSON<input data-resp="depth" type="file" accept=".json,application/json"></label><p>Format: <code>schema: "astrobone-depth-respiratory-v1", units: "mm", motionCompensated: true, samples: [{t, chest, abdomen, motion, visibility}]</code>. Time is milliseconds; distances are millimeters. Region summaries are imported, not pixel depth heatmaps.</p><p>Supported motion periodicity: 6–40 breaths/min. Short, irregular, poorly tracked, or moving captures are rejected. A periodic motion signal alone does not prove that breathing caused it.</p><p>Respiratory-belt comparison is still required. This module does not measure oxygen saturation, diagnose illness, or infer bone loss.</p><a href="https://github.com/NoceAnto/breath_visual_depthcamera" target="_blank" rel="noopener noreferrer">Depth visualization research inspiration ↗</a><span class="resp-source-note">Independent implementation. Original project code is not bundled.</span></details></div>`;
+    <div class="resp-lower"><div class="resp-history"><div class="resp-history-heading"><h3>Your usable measurements</h3><button type="button" data-resp="clear">Delete saved readings</button></div><p data-resp="baseline">Save three usable readings with the same source to establish your own baseline.</p><div class="resp-history-trend" data-resp="trend"></div><div data-resp="history"></div></div><details class="resp-depth"><summary>Depth camera & research details</summary><p>An ordinary webcam cannot measure depth. Import a recording from a compatible RGB-D camera adapter with measured chest and abdomen distances, timestamps, and declared camera/body motion compensation.</p><label class="resp-import">Import depth JSON<input data-resp="depth" type="file" accept=".json,application/json"></label><p>Format: <code>schema: "astrobone-depth-respiratory-v1", units: "mm", motionCompensated: true, samples: [{t, chest, abdomen, motion, visibility}]</code>. Time is milliseconds; distances are millimeters. Region summaries are imported, not pixel depth heatmaps.</p><p>Supported motion periodicity: 6–40 breaths/min. Short, irregular, poorly tracked, or moving captures are rejected. A periodic motion signal alone does not prove that breathing caused it.</p><p>Respiratory-belt comparison is still required. This module does not measure oxygen saturation, diagnose illness, or infer bone loss.</p><a href="https://github.com/NoceAnto/breath_visual_depthcamera" target="_blank" rel="noopener noreferrer">Depth visualization research inspiration ↗</a><span class="resp-source-note">Independent implementation. Original project code is not bundled.</span></details></div>`;
   const $ = name => container.querySelector(`[data-resp="${name}"]`);
   const map = $("map");
   for (let i = 0; i < 24; i++) map.append(document.createElement("i"));
   const imageCanvas = document.createElement("canvas"); imageCanvas.width = W; imageCanvas.height = H;
   const context = imageCanvas.getContext("2d", { willReadFrequently: true });
+  const store = getHealthRecordStore();
+  const persist = () => getHealthConsent();
+  const isLocked = () => persist() && store.locked();
+  const loadHistory = () => (isLocked() ? [] : mergeRespiratoryRecords(store.load(RESPIRATORY_HISTORY_PROFILE, persist())));
   let samples = [], result = null, history = loadHistory(), active = false, demo = false, source = "webcam", previous = null, reference = null;
   let startedAt = 0, lastSample = -Infinity, lastPoseAt = -Infinity, timer = null, chest = 0, abdomen = 0, saved = false, destroyed = false, starting = false, captureId = null, stateVersion = 0;
-  let subjectId = "crew-01";
-  try { subjectId = localStorage.getItem(PROFILE_KEY)?.trim().slice(0, 40).toLowerCase() || subjectId; } catch { /* browser storage is optional */ }
-  $("profile").value = subjectId;
+  const subjectId = SUBJECT;
+  let busy = false;
+  function renderRecord() {
+    const locked = isLocked();
+    $("record-note").textContent = locked ? "Your health record is protected by a passcode. Unlock it to see and save breathing readings."
+      : persist() ? (store.sealed() ? "Readings are saved in your encrypted health record on this device, with your daily self-checks." : "Readings are saved in your health record on this device, with your daily self-checks.")
+      : "Saving is off, so readings stay in this tab only. Turn on saving in Self-Check to keep them and attach them to a daily check.";
+    $("unlock").hidden = !locked;
+    const legacy = loadLegacy(), codes = [...new Set(legacy.map(r => String(r?.subjectId || "crew-01").slice(0, 40)))];
+    $("legacy").hidden = !codes.length;
+    const select = $("legacy-code"), previousCode = select.value || (() => { try { return localStorage.getItem(PROFILE_KEY) || ""; } catch { return ""; } })();
+    select.replaceChildren(...codes.map(code => { const option = document.createElement("option"); option.value = code; option.textContent = `${code} · ${legacy.filter(r => String(r?.subjectId || "crew-01") === code).length} readings`; return option; }));
+    if (codes.includes(previousCode)) select.value = previousCode;
+    $("legacy-move").disabled = busy || locked || !persist();
+    $("legacy-move").title = !persist() ? "Turn on saving in Self-Check first, so moved readings are kept." : "";
+  }
+  async function saveRecords(records) {
+    if (isLocked()) throw new Error("Unlock your health record first.");
+    if (!store.save(RESPIRATORY_HISTORY_PROFILE, records, persist())) throw new Error("This reading could not be saved. Your existing records were kept.");
+    await store.flush();
+    if (persist() && store.writeFailed) throw new Error("The reading did not reach device storage. If another tab changed or locked the record, unlock again.");
+    history = loadHistory(); notifyHealthRecordsChanged();
+  }
 
   function setStatus(message) { $("status").textContent = message; }
   function drawWave(wave = []) {
@@ -94,8 +120,8 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
   }
   function updateHistory() {
     const el = $("history"); el.replaceChildren();
-    const personalHistory = history.filter(r => (r.subjectId || "crew-01") === subjectId);
-    if (!personalHistory.length) { const empty = document.createElement("p"); empty.className = "resp-empty-history"; empty.textContent = "No saved readings for this profile yet. Demo signals never enter your history."; el.append(empty); }
+    const personalHistory = history;
+    if (!personalHistory.length) { const empty = document.createElement("p"); empty.className = "resp-empty-history"; empty.textContent = isLocked() ? "Locked. Unlock your health record to see saved readings." : "No saved readings yet. Demo signals never enter your history."; el.append(empty); }
     for (const record of personalHistory.slice(-5).reverse()) {
       const row = document.createElement("div"); row.className = "resp-history-row";
       for (const text of [new Date(record.recordedAt).toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }), `${record.rate.toFixed(1)} breaths/min`, record.source === "depth" ? "RGB-D import" : "Webcam", `${Math.round(record.quality * 100)}% signal quality`]) { const span = document.createElement("span"); span.textContent = text; row.append(span); }
@@ -126,7 +152,7 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
       for (const [key, value] of Object.entries(attrs)) item.setAttribute(key, String(value));
       if (text !== null) item.textContent = text; return item;
     };
-    const svg = node("svg", { viewBox: "0 0 480 136", role: "img", "aria-label": `${records.length} saved ${source === "depth" ? "depth" : "webcam"} readings for ${subjectId}, in saved reading order: ${values.map(v => v.toFixed(1)).join(", ")} breaths per minute. Same source and protocol only.` });
+    const svg = node("svg", { viewBox: "0 0 480 136", role: "img", "aria-label": `${records.length} saved ${source === "depth" ? "depth" : "webcam"} readings in your health record, in saved reading order: ${values.map(v => v.toFixed(1)).join(", ")} breaths per minute. Same source and protocol only.` });
     svg.append(node("title", {}, "Personal respiratory motion history"));
     svg.append(node("desc", {}, "Only saved usable readings from the selected crew profile, capture source and protocol are shown. The vertical scale is labeled in breaths per minute; readings are evenly spaced in saved order, not elapsed time. Demo signals are excluded."));
     const y = value => 104 - (value - min) / (max - min) * 78;
@@ -144,7 +170,7 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
     svg.append(node("text", { x: 38, y: 127, class: "resp-trend-axis" }, "SAVED READING ORDER"));
     svg.append(node("text", { x: 466, y: 127, "text-anchor": "end", class: "resp-trend-axis" }, "LATEST"));
     target.append(svg);
-    const caption = document.createElement("p"); caption.textContent = `Last ${records.length} usable ${source === "depth" ? "RGB-D" : "webcam"} reading${records.length === 1 ? "" : "s"} · ${subjectId} · same protocol`; target.append(caption);
+    const caption = document.createElement("p"); caption.textContent = `Last ${records.length} usable ${source === "depth" ? "RGB-D" : "webcam"} reading${records.length === 1 ? "" : "s"} · same protocol`; target.append(caption);
   }
   function render(final = false) {
     result = estimateRespiratoryMotion(samples, { source });
@@ -157,7 +183,7 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
     container.dataset.state = demo ? "demo" : result.status;
     $("samples").textContent = String(samples.filter(s => s.valid !== false).length);
     const duplicate = hasSavedRespiratoryCapture(history, { captureId, subjectId, source, protocol: result.protocol });
-    $("save").disabled = active || demo || !canReport || saved || duplicate;
+    $("save").disabled = active || demo || !canReport || saved || duplicate || busy || isLocked();
     if (duplicate) $("save").textContent = "Recording already saved";
     $("export").disabled = active || samples.length === 0;
     if (result.waveform?.length) drawWave(result.waveform);
@@ -168,7 +194,7 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
   function stopCapture() {
     stateVersion++;
     active = false; clearInterval(timer); timer = null;
-    $("capture").textContent = "Start 45-second check"; $("demo").disabled = false; $("depth").disabled = false; $("profile").disabled = false;
+    $("capture").textContent = "Start 45-second check"; $("demo").disabled = false; $("depth").disabled = false;
     render(true);
   }
   function resetMotion() {
@@ -190,7 +216,7 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
     if (destroyed || stateVersion !== requestedVersion) return;
     if (getSourceKind() !== "camera" || !video?.srcObject || video.readyState < 2) { setStatus("Start the Live Capture camera above, then begin the respiratory check. Prerecorded video is not a live measurement."); return; }
     resetMotion(); active = true; demo = false; source = "webcam"; startedAt = performance.now(); lastPoseAt = startedAt;
-    $("capture").textContent = "Stop & review capture"; $("demo").disabled = true; $("depth").disabled = true; $("profile").disabled = true;
+    $("capture").textContent = "Stop & review capture"; $("demo").disabled = true; $("depth").disabled = true;
     $("map-caption").textContent = "Webcam: relative optical-flow map, not depth.";
     $("tracking").textContent = "Waiting for torso";
     timer = setInterval(() => {
@@ -250,21 +276,48 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
     }
   }
   const onCapture = () => void startCapture(); $("capture").addEventListener("click", onCapture);
-  $("profile").addEventListener("change", () => {
-    subjectId = $("profile").value.trim().slice(0, 40).toLowerCase() || "crew-01"; $("profile").value = subjectId;
-    try { localStorage.setItem(PROFILE_KEY, subjectId); } catch { /* history save reports storage failure */ }
-    resetMotion(); demo = false; render(); setStatus("Profile selected. Start a fresh capture or import a depth recording for this crew member.");
+  $("unlock").addEventListener("submit", async event => {
+    event.preventDefault();
+    try { await store.unlock($("passcode").value); $("passcode").value = ""; history = loadHistory(); notifyHealthRecordsChanged(); setStatus("Health record unlocked on this page."); }
+    catch (error) { setStatus(`Could not unlock: ${error.message}`); }
+    renderRecord(); updateHistory(); render(Boolean(result));
   });
+  $("legacy-move").addEventListener("click", async () => {
+    const code = $("legacy-code").value; if (!code || busy) return;
+    if (!persist()) { setStatus("Turn on saving in Self-Check first, so moved readings are kept."); return; }
+    busy = true; renderRecord();
+    try {
+      const legacy = loadLegacy(), moved = migrateLegacyRespiratoryRecords(history, legacy, code);
+      await saveRecords(moved.records);
+      // Only now that the readings are in the health record is the old plaintext copy removed.
+      try { if (moved.remaining.length) localStorage.setItem(HISTORY_KEY, JSON.stringify(moved.remaining)); else localStorage.removeItem(HISTORY_KEY); localStorage.removeItem(PROFILE_KEY); }
+      catch { setStatus(`Moved ${moved.migrated} readings, but the old copy could not be removed.`); return; }
+      setStatus(`Moved ${moved.migrated} readings from ${code} into your health record.`);
+    } catch (error) { setStatus(`Nothing was moved: ${error.message}`); }
+    finally { busy = false; renderRecord(); updateHistory(); }
+  });
+  const onRecordsChange = () => { history = loadHistory(); renderRecord(); updateHistory(); if (result) render(!active); };
+  globalThis.addEventListener("astrobone-records-change", onRecordsChange);
   $("demo").addEventListener("click", () => { clearInterval(timer); active = false; resetMotion(); demo = true; source = "webcam"; samples = syntheticSamples(); $("progress").value = 45; $("capture").textContent = "Start 45-second check"; $("map-caption").textContent = "Demo signal only. No motion heatmap was measured."; $("tracking").textContent = "Synthetic input"; $("movement").textContent = "Synthetic input"; render(true); });
-  $("save").addEventListener("click", () => {
-    if (active || demo || saved || result?.status !== "estimated") return;
-    if (hasSavedRespiratoryCapture(history, { captureId, subjectId, source, protocol: result.protocol })) { $("save").disabled = true; setStatus("This depth recording is already saved for this crew profile and protocol."); return; }
-    const record = { id: globalThis.crypto?.randomUUID?.() || `resp-${Date.now()}`, captureId, subjectId, recordedAt: new Date().toISOString(), rate: result.rate, quality: result.quality, duration: result.duration, source, protocol: result.protocol, validation: "Reference-belt validation pending" };
-    const next = [...history, record].slice(-100);
-    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(next)); history = next; saved = true; $("save").disabled = true; $("save").textContent = "Saved on this device"; updateHistory(); }
-    catch { setStatus("Browser storage is unavailable. You can export this capture instead."); }
+  $("save").addEventListener("click", async () => {
+    if (active || demo || saved || busy || result?.status !== "estimated") return;
+    if (hasSavedRespiratoryCapture(history, { captureId, subjectId, source, protocol: result.protocol })) { $("save").disabled = true; setStatus("This depth recording is already saved with this protocol."); return; }
+    const record = { id: globalThis.crypto?.randomUUID?.() || `resp-${Date.now()}`, captureId, subjectId, recordedAt: new Date().toISOString(), rate: result.rate, quality: result.quality, duration: result.duration, source, protocol: result.protocol, synthetic: false, status: "estimated", experimental: true, validation: "Reference-belt validation pending" };
+    const version = stateVersion; busy = true; $("save").disabled = true;
+    try {
+      const next = mergeRespiratoryRecords(history, [record]);
+      if (!next.some(r => r.id === record.id)) throw new Error("This reading did not pass the record checks.");
+      await saveRecords(next);
+      if (version === stateVersion) { saved = true; $("save").textContent = persist() ? "Saved to my health record" : "Kept for this tab"; }
+      setStatus(persist() ? "Saved. You can attach it to today's self-check." : "Kept for this tab only. Turn on saving in Self-Check to keep readings on this device.");
+    } catch (error) { setStatus(`${error.message} You can export this capture instead.`); }
+    finally { busy = false; updateHistory(); if (version === stateVersion) render(true); }
   });
-  $("clear").addEventListener("click", () => { try { const otherProfiles = history.filter(r => (r.subjectId || "crew-01") !== subjectId); localStorage.setItem(HISTORY_KEY, JSON.stringify(otherProfiles)); history = otherProfiles; updateHistory(); } catch { setStatus("Browser storage could not be cleared."); } });
+  $("clear").addEventListener("click", async () => {
+    if (isLocked() || !history.length || !confirm("Delete all saved breathing readings from your health record? Daily checks keep the readings already attached to them.")) return;
+    try { await saveRecords([]); setStatus("Saved breathing readings deleted."); } catch (error) { setStatus(error.message); }
+    updateHistory();
+  });
   $("export").addEventListener("click", () => {
     if (!samples.length || active) return;
     const payload = { schema: "astrobone-respiratory-capture-v1", exportedAt: new Date().toISOString(), captureId, subjectId, synthetic: demo, source, result, samples, notes: "Experimental respiratory motion estimation; reference-belt validation pending. No bone-loss inference." };
@@ -288,6 +341,6 @@ export function initRespiratoryPanel({ container, video, getSourceKind = () => "
     } catch (error) { if (!destroyed && stateVersion === importVersion) setStatus(`Depth import rejected: ${error.message}`); }
     finally { input.value = ""; }
   });
-  updateHistory(); drawWave();
-  return { updatePose, destroy() { destroyed = true; clearInterval(timer); active = false; container.replaceChildren(); } };
+  renderRecord(); updateHistory(); drawWave();
+  return { updatePose, destroy() { destroyed = true; clearInterval(timer); active = false; globalThis.removeEventListener("astrobone-records-change", onRecordsChange); container.replaceChildren(); } };
 }

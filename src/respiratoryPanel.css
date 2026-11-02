@@ -79,3 +79,12 @@
 .resp-panel[data-state="demo"] .resp-wave-label { color:#f6d38b; }
 @media (max-width:900px) { .resp-layout { grid-template-columns:minmax(0,1fr) 205px; gap:18px; } .resp-panel { padding:20px; } .resp-diagnostics { padding-left:16px; } .resp-lower { grid-template-columns:1fr; gap:18px; } }
 @media (max-width:620px) { .resp-panel { padding:18px 14px; border-radius:12px; } .resp-heading { gap:12px; } .resp-heading h2 { font-size:23px; } .resp-badge { font-size:8px; padding:5px 7px; } .resp-layout { grid-template-columns:1fr; } .resp-statline { gap:8px; } .resp-rate { gap:8px; } .resp-rate strong { font-size:44px; } .resp-rate span { font-size:10px; } .resp-quality strong { font-size:11px; } .resp-quality>span:last-child { max-width:145px; } .resp-diagnostics { border-left:0; border-top:1px solid #78b4d524; padding:16px 0 0; display:grid; grid-template-columns:1fr 1fr; gap:10px; } .resp-diag-title { grid-column:1/-1; } .resp-body-map { grid-column:1; grid-row:2; margin:5px auto; height:160px; width:135px; } .resp-map-caption { grid-column:1; margin:0; } .resp-diagnostics dl { grid-column:2; grid-row:2/4; } .resp-actions button { flex:1 1 40%; } }
+
+/* Shared health record: lock and one-time move of old crew-code readings */
+.resp-profile[data-resp="record"] { display: grid; gap: 10px; }
+.resp-profile[data-resp="record"] p { margin: 0; }
+.resp-unlock, .resp-legacy { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: end; }
+.resp-legacy p { flex-basis: 100%; }
+.resp-unlock input, .resp-legacy select { min-height: 40px; padding: 6px 10px; border: 1px solid #527386; border-radius: 7px; background: #0c1926; color: #e5f4ff; max-width: 100%; }
+.resp-unlock button, .resp-legacy button { min-height: 40px; }
+.resp-unlock :focus-visible, .resp-legacy :focus-visible { outline: 3px solid #75d8ef; outline-offset: 2px; }
