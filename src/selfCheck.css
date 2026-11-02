@@ -287,3 +287,6 @@
 .sc-sl-row input[type="number"] { width: 76px; }
 .sc-sl-row input[type="text"] { width: min(220px, 50vw); padding: 7px 10px; border-radius: 8px; border: 1px solid var(--tw-line-strong); background: rgba(2, 8, 18, .7); color: #fff; font: 13px var(--tw-sans); }
 .sc-sl-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Read a vital from a Bluetooth device (src/bleVitals.js) */
+.sc-ble { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.sc-ble .sc-secondary { padding: 7px 10px; }
