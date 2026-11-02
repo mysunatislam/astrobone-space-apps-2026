@@ -1,0 +1,33 @@
+/* Keep the breathing module in the capture flow on both workspace layouts. */
+body.lab-body .workspace > #respiratory-monitor {
+  display: block !important;
+  grid-area: respiratory;
+  min-width: 0;
+  scroll-margin-top: 100px;
+}
+body.lab-body:not(.health-active) .workspace {
+  grid-template-areas: "simulation controls" "respiratory respiratory" "telemetry controls" "decision decision" !important;
+}
+body.lab-body.health-active .workspace {
+  grid-template-areas: "overview overview" "simulation controls" "respiratory respiratory" !important;
+  grid-template-rows: auto auto auto !important;
+}
+body.lab-body .respiratory-jump {
+  display: inline-flex; align-items: center; gap: 7px; padding: 10px 12px;
+  border: 1px solid #376780; border-radius: 8px; color: #b9eaff;
+  text-decoration: none; white-space: nowrap; font-size: 12px;
+}
+body.lab-body .respiratory-jump:hover { background: #113149; }
+.resp-reference { grid-column: 1 / -1; padding: 16px 0 0; border-top: 1px solid #29465b; color: #a8bfd2; font-size: 12px; line-height: 1.7; }
+.resp-reference summary { color: #d5e8f8; cursor: pointer; font-weight: 600; }
+.resp-reference input { display: block; margin: 8px 0 16px; max-width: 100%; }
+.resp-reference [data-reference-report] { padding: 14px; border-radius: 8px; border: 1px solid #29465b; background: #0a1b2a; }
+@media (max-width: 1050px) {
+  body.lab-body.health-active .workspace {
+    grid-template-areas: "overview" "simulation" "respiratory" "controls" !important;
+    grid-template-rows: auto auto auto auto !important;
+  }
+  body.lab-body:not(.health-active) .workspace {
+    grid-template-areas: "simulation" "respiratory" "controls" "telemetry" "decision" !important;
+  }
+}

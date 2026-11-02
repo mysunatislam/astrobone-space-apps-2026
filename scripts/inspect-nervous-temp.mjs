@@ -1,0 +1,10 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import * as THREE from 'three';
+import {FBXLoader} from 'three/examples/jsm/loaders/FBXLoader.js';
+import {isAnatomySurface} from '../src/anatomyMetadata.js';
+globalThis.window={URL:globalThis.URL};THREE.TextureLoader.prototype.load=()=>new THREE.Texture();
+const b=await readFile('.artifacts/anatomy-source/NervousSystem100.fbx');
+const source=new FBXLoader().parse(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),''); source.updateMatrixWorld(true);
+const meshes=[];source.traverse(n=>{if(n.isMesh){const name=n.userData.originalName||n.name; const triangles=(n.geometry.index?.count??n.geometry.attributes.position.count)/3;const box=new THREE.Box3().setFromObject(n);meshes.push({name,triangles,keep:isAnatomySurface(name,triangles),min:box.min.toArray(),max:box.max.toArray(),materials:(Array.isArray(n.material)?n.material:[n.material]).map(m=>m.name)});}});
+await writeFile('.artifacts/nervous-inspect.json',JSON.stringify(meshes,null,2));
+console.log(JSON.stringify({all:meshes.length,kept:meshes.filter(m=>m.keep).length,names:meshes.filter(m=>m.keep).map(m=>[m.name,m.triangles])}));

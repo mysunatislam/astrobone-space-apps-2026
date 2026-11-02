@@ -2,6 +2,7 @@ import "./twin.css";
 import "./labTheme.css";
 import { EXPERIENCES, CAPTURE } from "./siteNav.js";
 import { registerOffline } from "./offline.js";
+import { applyAstroBoneBrand } from "./missionUpgrade.js";
 
 // Live Capture uses the twin's header, menu and palette, so the two pages read as one app. The page's
 // own (older) top bar stays in the DOM for the code that reads it, hidden by labTheme.css.
@@ -29,3 +30,4 @@ for (const [key, label] of EXPERIENCES) nav.append(link(`./#${key}`, label));
 const live = link(CAPTURE.href, CAPTURE.label, true); live.className = "tw-live"; live.prepend(Object.assign(document.createElement("i"), { ariaHidden: "true" }));
 nav.after(live);
 document.body.prepend(header);
+applyAstroBoneBrand(header);

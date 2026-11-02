@@ -1,5 +1,7 @@
 # AI Use Disclosure
 
+The November 2026 respiratory prototype, NASA table summaries, interface refinements, paired-reference comparison and engineering tests were developed with Codex assistance. The provided logo is owner-supplied artwork. New respiratory processing uses deterministic on-device signal analysis and the existing pose tracker; it does not call a hosted language model. Synthetic tests and browser checks do not establish respiratory accuracy on people. Respiratory-belt and depth-hardware evaluation remain pending.
+
 AstroBone is developed by Mysunat Islam with AI-assisted coding, debugging, documentation, and test generation. The owner supplied the project direction, datasets and model assets, training work, and UI revisions described in the project history. This disclosure does not assign authorship of third-party materials to the team.
 
 The development assistant helped implement the application, camera-to-rig integration, evidence summaries, comparison UI, tests, and draft documentation. Runtime computer vision uses MediaPipe Pose Landmarker and EfficientDet-Lite0. Fracture research components use DenseNet121 and U-Net++ outputs. The current in-app text assistant uses application-state explanations and is not evidence of an independently validated clinical language model.

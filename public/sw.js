@@ -1,8 +1,9 @@
 // AstroBone offline pack. After one online visit, the twin (home), Live Capture and their models,
 // NASA summaries and pose runtime are served from this device's cache.
-const CACHE = "astrobone-offline-v11";
+const CACHE = "astrobone-offline-v12";
 const CORE = [
   "./", "lab.html",
+  "brand/astrobone-logo.png",
   "models/anatomy/musculoskeletal.glb", "models/anatomy/musculoskeletal-rigged.glb", "models/anatomy/cardiovascular.glb", "models/anatomy/SOURCE-LICENSE.txt",
   "models/pose_landmarker_lite.task",
   "models/face_landmarker.task",
@@ -15,6 +16,7 @@ const CORE = [
   // Every file in public/data (src/offlinePack.test.js checks): the self-check's "tested on real crew"
   // card needs the Inspiration4 blood data offline too.
   "data/mission-research.json", "data/mission-research-extended.json", "data/osdr-804-summary.json", "data/circulation-reference.json", "data/i4-crew-blood.json", "data/iss-dosimetry.json", "data/donki-sep.json",
+  "data/nasa-research-expansion.json",
   "inference/demo/IMG0001739_prediction.json", "inference/demo/IMG0001739_overlay.png",
 ];
 // Left out on purpose (26 MB, optional Live Capture extras that load on demand and are cached once

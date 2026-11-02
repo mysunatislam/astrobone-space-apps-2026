@@ -14,9 +14,10 @@
     "data:donki": "python scripts/build_donki_space_weather.py",
     "data:dosimetry": "python scripts/build_iss_dosimetry.py",
     "data:circulation": "python scripts/build_circulation_reference.py",
+    "data:research:expansion": "node scripts/build_nasa_research_expansion.mjs",
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build && node scripts/write-sites-worker.mjs",
-    "build:github": "vite build --base=/astrobone/",
+    "build": "vite build",
+    "build:github": "vite build --base=/astrobone-space-apps-2026/",
     "build:android": "npm run prepare:vision && vite build --base=./ --mode android",
     "android:sync": "npm run build:android && npx cap sync android",
     "android:open": "npm run android:sync && npx cap open android",
@@ -24,6 +25,7 @@
     "android:apk": "npm run android:sync && node scripts/build-android-debug.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test src/*.test.js",
+    "test:respiratory": "node --test src/respiratoryMotion.test.js src/respiratoryHistory.test.js src/respiratoryValidation.test.js src/nasaResearchExpansion.test.js",
     "test:ui": "node scripts/qa-site.mjs"
   },
   "dependencies": {

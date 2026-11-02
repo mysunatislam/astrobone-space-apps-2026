@@ -2,6 +2,9 @@ import "./styles.css";
 import "./uiV5.js";
 import { initCompanion } from "./companionPanel.js";
 import { initHealthLayers } from "./healthLayers.js";
+import { initRespiratoryPanel } from "./respiratoryPanel.js";
+import { initRespiratoryValidationPanel } from "./respiratoryValidationPanel.js";
+import "./respiratoryIntegration.css";
 import { initLocalMesh } from "./localMesh.js";
 import { initResearchWorkspace } from "./researchWorkspace.js";
 import { applyTechnicalHuman } from "./technicalHuman.js";
@@ -405,6 +408,7 @@ const motionGuard = new MotionGuardAnalyzer({
   onAlert: handleSafetyAlert,
 });
 const faceActivityObserver = new FaceActivityObserver();
+let respiratoryPanel = null;
 const poseController = new PoseAssessmentController({
   video: refs.poseVideo,
   canvas: refs.poseOverlay,
@@ -1737,6 +1741,7 @@ function updateLivePose(frame) {
     frame.detailTimestamp = functionalState.currentDetails.timestamp;
   }
   functionalState.currentPose = frame;
+  respiratoryPanel?.updatePose(frame, poseController.lastPoseLandmarks);
   if (!frame) motionGuard.reset({ emit: false });
   const movementTime = poseController.sourceKind === "video" && Number.isFinite(frame?.mediaTime) ? frame.mediaTime * 1000 : frame?.timestamp ?? performance.now();
   const motionSnapshot = motionGuard.update(frame, movementTime);
@@ -3631,6 +3636,29 @@ const healthLayers = initHealthLayers({ scene, rig: externalSkeleton, video: ref
   getFace: () => functionalState.currentDetails,
   isLiveCamera: () => poseController.active && poseController.sourceKind === "camera",
 });
+respiratoryPanel = initRespiratoryPanel({
+  container: document.querySelector("#respiratory-monitor"),
+  video: refs.poseVideo,
+  getSourceKind: () => poseController.sourceKind,
+  getLandmarks: () => poseController.lastPoseLandmarks,
+  ensureCamera: async () => {
+    if (poseController.active && poseController.sourceKind === "camera" && !poseController.starting && refs.poseVideo.readyState >= 2) return;
+    if (poseController.sourceKind === "video") throw new Error("Close the recorded video and select the live camera first.");
+    if (poseController.starting) throw new Error("The camera is still loading. Wait for live tracking, then start the check.");
+    await toggleCamera();
+    if (!poseController.active || refs.poseVideo.readyState < 2) throw new Error("Start the camera and allow browser access before the breathing check.");
+  },
+});
+initRespiratoryValidationPanel(document.querySelector("#respiratory-monitor .resp-lower"));
+window.addEventListener("beforeunload", () => respiratoryPanel.destroy());
+const openRespiratory = () => {
+  if (location.hash !== "#respiratory-monitor") return;
+  document.querySelector("#twin-tab")?.click();
+  history.replaceState(null, "", `${location.pathname}${location.search}#respiratory-monitor`);
+  requestAnimationFrame(() => document.querySelector("#respiratory-monitor")?.scrollIntoView({ block: "start" }));
+};
+window.addEventListener("hashchange", openRespiratory);
+requestAnimationFrame(openRespiratory);
 const anatomicalMotion = initAnatomicalMotion({ rig: externalSkeleton,
   getFrame: () => functionalState.currentPose, isTracking: () => state.motionMode === "camera",
   isPaused: () => poseController.active && !poseController.starting && poseController.sourceKind === "video"
@@ -3646,6 +3674,7 @@ else setTimeout(warmPoseModel, 2000);
 // Read-only hook for the automated sync and vital-sign checks (scripts/qa-video-sync.mjs).
 window.__astroboneLab = {
   poseController,
+  respiratoryPanel,
   get frame() { return functionalState.currentPose; },
   get details() { return functionalState.currentDetails; },
   get pulse() { return healthLayers.getVitals(); },

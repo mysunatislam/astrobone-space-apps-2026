@@ -15,10 +15,12 @@ import { guidanceFor } from "./countermeasures.js";
 import { HRP_HAZARDS } from "./hazards.js";
 import { INDICATORS, SAFETY_LIMITS, SAFETY_LIMIT_SOURCES, describeBound } from "./selfCheck.js";
 import { testedOnRealData } from "./realDataValidation.js";
+import { getActiveProfile, setActiveProfile } from "./healthRecordStore.js";
+import { DEMO_CHAPTERS } from "./guidedHealthDemo.js";
 import { kneeDumbbell, pulseBars, alarmBars, evidenceTables } from "./evidenceCharts.js";
 
-const SYSTEMS = [["body", "Body"], ["skeleton", "Skeleton"], ["muscle", "Muscle"], ["cardiovascular", "Cardiovascular"], ["renal", "Renal"], ["radiation", "Radiation"], ["multisystem", "Multisystem"]];
-const SYSTEM_FOCUS = { body: "body", skeleton: "body", muscle: "body", cardiovascular: "thorax", renal: "kidneys", radiation: "body", multisystem: "body", functional: "legs", impact: "leftLeg" };
+const SYSTEMS = [["body", "Body"], ["skeleton", "Skeleton"], ["muscle", "Muscle"], ["nervous", "Nervous system"], ["cardiovascular", "Cardiovascular"], ["renal", "Renal"], ["radiation", "Radiation"], ["multisystem", "Multisystem"]];
+const SYSTEM_FOCUS = { body: "body", skeleton: "body", muscle: "body", nervous: "body", cardiovascular: "thorax", renal: "kidneys", radiation: "body", multisystem: "body", functional: "legs", impact: "leftLeg" };
 // Self-check step -> [scene system, camera focus].
 const SELF_STEP_VIEW = { safety: ["multisystem", "body"], movement: ["functional", "legs"], reaction: ["multisystem", "head"], mind: ["multisystem", "head"], body: ["cardiovascular", "thorax"], result: ["multisystem", "body"] };
 const PHYSIO_TABS = [["cardio", "Cardiovascular", "cardiovascular", "thorax"], ["renal", "Renal pathway", "renal", "kidneys"], ["radiation", "Radiation", "radiation", "body"], ["predicted", "Predicted vs observed", "skeleton", "legs"]];
@@ -48,22 +50,32 @@ const prov = kind => el("em", { class: `tw-prov tw-prov-${kind.toLowerCase()}`, 
 
 export function createTwinApp(root) {
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const state = { experience: "mission", system: "multisystem", day: CURRENT_DAY, compare: false, physio: "cardio", impactDone: false, impactRunning: false, mc: null, engineCheck: null, demo: null, stressReady: false };
+  const state = { profile: getActiveProfile(), lightweight: (() => {
+    // A saved choice wins. Otherwise the 3D twin runs on desktops and pauses on phones, data-saver
+    // connections and low-memory devices.
+    try { const saved = localStorage.getItem("astrobone-lightweight"); if (saved === "0" || saved === "1") return saved === "1"; } catch { /* storage unavailable */ }
+    return matchMedia("(max-width: 960px)").matches || navigator.connection?.saveData === true || (navigator.deviceMemory ?? 8) <= 2;
+  })(), timedTest: false, experience: "mission", system: "multisystem", day: CURRENT_DAY, compare: false, physio: "cardio", impactDone: false, impactRunning: false, mc: null, engineCheck: null, demo: null, stressReady: false };
   const event = evaluateImpact();
   let simulation = null, research = null, current = twinState(state.day), stressField = null;
 
   const canvas = el("canvas", { id: "tw-canvas", "aria-label": "Interactive 3D digital twin of the synthetic astronaut Elena. Reference anatomy, not her measured anatomy." });
   const tooltip = el("div", { class: "tw-tooltip", role: "status", hidden: true });
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.classList.add("tw-links"); svg.setAttribute("aria-hidden", "true");
-  const nav = el("nav", { class: "tw-nav", "aria-label": "AstroBone experiences" }, EXPERIENCES.map(([key, label]) =>
+  const nav = el("nav", { class: "tw-nav", "aria-label": "AstroBone experiences" }, [["mission", "Today"], ["health", "My Health"], ["selfcheck", "Self-Check"], ["crewmate", "Crewmate"], ["twin", "Anatomy"], ["evidence", "Evidence"]].map(([key, label]) =>
     el("button", { type: "button", "data-experience": key, onclick: () => { stopDemo(); setExperience(key); revealOnPhone(); } }, label)));
+  const researchMenu = el("details", { class: "ab-research-menu" }, el("summary", {}, "Research tools"), el("div", {},
+    EXPERIENCES.filter(([key]) => ["functional", "impact", "physiology"].includes(key)).map(([key, label]) => el("button", { type: "button", onclick: () => { stopDemo(); selectProfile("elena"); researchMenu.open = false; setExperience(key); revealOnPhone(); } }, label + " · demo")),
+    el("a", { href: CAPTURE.href }, "Live Capture")));
+  const profileSwitch = el("div", { class: "ab-profile-switch", role: "group", "aria-label": "Health profile" }, [["you", "My health"], ["elena", "Demo mission"]].map(([profile, text]) => el("button", { type: "button", "data-profile": profile, onclick: () => { stopDemo(); selectProfile(profile); setExperience("mission"); } }, text)));
+  const lightweightButton = el("button", { type: "button", class: "ab-lightweight-toggle", onclick: () => setLightweight(!state.lightweight) }, "Lightweight view");
   const liveLink = el("a", { class: "tw-live", href: CAPTURE.href, title: "Camera movement capture, crew records and research tools" }, el("i", { "aria-hidden": "true" }), CAPTURE.label);
   const dayValue = el("strong", { id: "tw-day" }, String(state.day));
-  const startButton = el("button", { type: "button", class: "tw-start", onclick: () => (state.demo ? stopDemo() : runDemo()) }, "Start mission simulation");
+  const startButton = el("button", { type: "button", class: "tw-start", onclick: () => (state.demo ? stopDemo() : runDemo()) }, "Guided demo");
   const header = el("header", { class: "tw-top" },
     el("a", { class: "tw-brand", href: "#", "aria-label": "AstroBone Digital Physiological Twin, home", onclick: e => { e.preventDefault(); stopDemo(); setExperience("mission"); } },
       el("span", { class: "tw-mark", "aria-hidden": "true" }), el("span", {}, el("b", {}, "ASTROBONE"), " ", el("small", {}, "DIGITAL PHYSIOLOGICAL TWIN"))),
-    nav, liveLink,
+    nav, researchMenu, profileSwitch, lightweightButton,
     el("div", { class: "tw-ident" }, el("b", {}, "ELENA TORRES"), el("small", {}, `SYNTHETIC ASTRONAUT · ${ELENA.identity.mission.value}`)),
     el("div", { class: "tw-daybox", "aria-live": "polite" }, el("small", {}, "MISSION DAY"), el("span", {}, dayValue, el("i", {}, `/ ${MISSION_LENGTH}`))),
     startButton);
@@ -97,11 +109,18 @@ export function createTwinApp(root) {
 
   const intro = el("div", { class: "tw-intro", role: "dialog", "aria-label": "AstroBone introduction" },
     el("div", { class: "tw-intro-title" }, el("b", {}, "ASTROBONE"), el("span", {}, "DIGITAL PHYSIOLOGICAL TWIN")),
-    el("ul", { class: "tw-intro-lines" }, ["ELENA", "SYNTHETIC ASTRONAUT", `MISSION DAY ${CURRENT_DAY}`, "DIGITAL TWIN ONLINE"].map(text => el("li", {}, text))),
+    el("h1", { class: "ab-welcome-title" }, "Your next health check starts here."),
+    el("p", { class: "ab-welcome-copy" }, "Gather a reading, understand a change, and keep track of your next step. Choose your own record or explore Elena’s synthetic mission."),
+    el("div", { class: "ab-welcome-actions" }, el("button", { type: "button", onclick: () => { finishIntro(); selectProfile("you"); setExperience("selfcheck"); } }, "Start my check"), el("button", { type: "button", onclick: () => { finishIntro(); runDemo(); } }, "Try the demo")),
+    el("p", { class: "ab-welcome-privacy" }, "Saving is optional. Camera permission is requested only when you start a camera test. You can use typed readings without a camera."),
     el("button", { type: "button", class: "tw-skip", onclick: () => finishIntro() }, "Skip"));
   const closing = el("div", { class: "tw-closing", hidden: true }, el("b", {}, "ASTROBONE"), el("p", {}, ["PREDICT.", "OBSERVE.", "UPDATE.", "PROTECT."].map(w => el("span", {}, w))),
     el("small", {}, "Synthetic demonstration · research models · human medical review required"));
 
+  // Panels sit below the header, whatever its height at this width (src/missionUpgrade.css).
+  const placeBelowHeader = () => root.style.setProperty("--tw-top", `${Math.ceil(header.getBoundingClientRect().bottom + 10)}px`);
+  if (typeof ResizeObserver === "function") new ResizeObserver(placeBelowHeader).observe(header);
+  addEventListener("resize", placeBelowHeader);
   root.append(canvas, svg, labels, header, systemRail, panels, nodes, drawer, legend, timeline, tooltip, partCard, caption, closing, intro, loading);
   document.body.classList.add("tw-booting");
 
@@ -124,9 +143,21 @@ export function createTwinApp(root) {
       const [system, focus] = SELF_STEP_VIEW[step]; scene.setSystem(system, { focusTarget: focus }); render();
     },
     onEvaluate: evaluation => { scene.setAlerts(Object.fromEntries(evaluation.domains.map(d => [d.key, d.status === "changed"]))); render(); },
-    onTimedTest: active => scene.setPaused(active),
+    onTimedTest: active => { state.timedTest = active; updateScenePause(); },
   });
 
+  function updateScenePause() { scene.setPaused(state.lightweight || state.timedTest || Boolean(document.querySelector(".ab-evidence-dialog[open]"))); }
+  function setLightweight(value) { state.lightweight = Boolean(value); try { localStorage.setItem("astrobone-lightweight", state.lightweight ? "1" : "0"); } catch {} updateScenePause(); render(); }
+  function selectProfile(profile) {
+    state.profile = profile === "elena" ? "elena" : "you";
+    if (selfCheck.state.profile !== state.profile) selfCheck.setProfile(state.profile);
+    if (getActiveProfile() !== state.profile) setActiveProfile(state.profile);
+    if (state.profile === "you") { stopPlay(); state.compare = false; scene.setCompare(false); scene.setState(twinState(1), { bonesSolidity: 0 }); }
+    else scene.setState(current, { bonesSolidity: current.bone.evidence.solidity });
+    render();
+  }
+  window.addEventListener("astrobone-profile-change", e => { const profile = e.detail?.profile ?? getActiveProfile(); if (profile !== state.profile) selectProfile(profile); });
+  window.addEventListener("astrobone-records-change", () => { render(); });
   // My Health: the astronaut's own dashboard, drawn from the self-check's records and judgement.
   const dashboard = createDashboardPanel({
     selfCheck,
@@ -304,6 +335,12 @@ export function createTwinApp(root) {
   }
 
   function systemCards() {
+    if (state.profile === "you") {
+      const snapshot = selfCheck.snapshot?.("you"), evaluation = snapshot?.evaluation;
+      return [card({ label: "Reference anatomy", value: "Explore the body", kind: "ATLAS", detail: "The model is a reference atlas. Personal bone density, muscle force and organ function are not measured." }),
+        ...(evaluation?.domains ?? []).filter(d => state.system === "multisystem" || state.system === "body" || (state.system === "skeleton" || state.system === "muscle" ? d.key === "musculoskeletal" : d.key === state.system)).map(d => card({ label: d.label ?? d.key, value: PART_STATUS[d.status] ?? "Not checked", kind: "DERIVED", detail: "From your latest saved check. Select a body part to view the relevant observations." })),
+        ...(!evaluation ? [card({ label: "Your health record", value: snapshot?.locked ? "Locked" : "No saved check", kind: "NONE", detail: snapshot?.locked ? "Unlock your record in Self-Check." : "Start a daily self-check to add your own observations." })] : [])];
+    }
     const s = current, o = s.observation, rec = o.recordDay === s.day ? `Recorded Day ${o.recordDay}` : `Last record Day ${o.recordDay}`;
     const bone = card({ label: "Bone capacity change", value: `−${fmt(s.bone.lossFraction * 100)}`, unit: "%", kind: "MODEL", quality: s.bone.evidence.solidity, qualityLabel: `PARAMETER ${s.bone.evidence.id} · EVIDENCE ${s.bone.evidence.level.toUpperCase()}`,
       detail: `Weight-bearing set · 1.25 %/month capacity modifier × ${fmt(s.day / 30.4375, 2)} months. Not imaging, not site-specific.` });
@@ -362,6 +399,7 @@ export function createTwinApp(root) {
       conf: .8, confLabel: key === "immune" ? "SELF-REPORT" : "TEST + SELF-REPORT", kind: "SYNTHETIC" };
   }
   function renderNodes() {
+    if (state.profile === "you") { nodes.replaceChildren(); return; }
     nodes.replaceChildren(...["left", "right"].map(side => el("div", { class: `tw-node-col tw-${side}` }, NODE_DEFS.filter(d => d[3] === side).map(([key, label, anchor, , system]) => {
       const c = nodeContent(key);
       return el("button", { type: "button", class: "tw-node", "data-node": key, "data-anchor": anchor, "data-kind": c.kind.toLowerCase(), disabled: system ? undefined : true, style: `--q:${c.conf}`,
@@ -373,6 +411,7 @@ export function createTwinApp(root) {
 
   function renderLegend() {
     legend.replaceChildren();
+    if (state.profile === "you") { legend.append(el("span", { class: "tw-eyebrow" }, "REFERENCE ANATOMY"), el("small", {}, "Explore structures and their functions. This atlas is not a scan, bone-density measurement or diagnosis.")); legend.hidden = state.experience === "mission"; return; }
     const system = sceneSystem();
     if (state.experience === "impact" && state.impactDone) {
       legend.append(el("span", { class: "tw-eyebrow" }, "RELATIVE BENDING STRESS σ/σmax"), el("div", { class: "tw-ramp tw-ramp-stress" }), el("div", { class: "tw-ramp-labels" }, el("span", {}, "LOW"), el("span", {}, "HIGH")),
@@ -398,6 +437,12 @@ export function createTwinApp(root) {
 
   function render() {
     const s = current;
+    root.dataset.profile = state.profile; root.dataset.lightweight = String(state.lightweight);
+    profileSwitch.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.profile === state.profile)));
+    lightweightButton.setAttribute("aria-pressed", String(state.lightweight)); lightweightButton.textContent = state.lightweight ? "Show 3D anatomy" : "Lightweight view";
+    canvas.setAttribute("aria-label", state.profile === "you" ? "Reference anatomy. Not a personal scan or measured organ function." : "Reference anatomy with Elena’s synthetic scenario.");
+    timeline.hidden = state.profile === "you";
+    systemRail.querySelector(".tw-compare").hidden = state.profile === "you";
     root.dataset.experience = state.experience; root.dataset.system = sceneSystem(); root.dataset.compare = String(state.compare);
     dayValue.textContent = String(s.day); slider.value = String(s.day);
     slider.setAttribute("aria-valuetext", `Day ${s.day}${s.authoredScenario ? ", authored scenario" : ""}`);
@@ -412,6 +457,7 @@ export function createTwinApp(root) {
     dashHost.hidden = state.experience !== "health";
     if (!dashHost.hidden) dashboard.render();
     renderDrawer(); renderLegend(); drawSpark();
+    root.dispatchEvent(new CustomEvent("astrobone-dashboard-render"));
   }
 
   function compareCards() {
@@ -818,51 +864,135 @@ export function createTwinApp(root) {
   intro.addEventListener("click", event => { if (event.target === intro) finishIntro(); });
   window.addEventListener("keydown", event => { if (!introDone && (event.key === "Escape" || event.key === "Enter" || event.key === " ")) finishIntro(); });
 
-  async function runDemo() {
-    stopPlay(); const token = {}; state.demo = token; startButton.textContent = "Stop simulation"; root.dataset.demo = "true";
-    const alive = () => state.demo === token;
-    const step = async (fn, caption_, wait) => { if (!alive()) throw new Error("stopped"); await fn?.(); if (caption_) showCaption(caption_, 0); if (wait) await sleep(reduceMotion ? Math.min(wait, 1500) : wait); if (!alive()) throw new Error("stopped"); };
+  // Guided demo: the whole mission simulation in chapters. Play runs it on its own; Back, Next and the
+  // chapter numbers jump, Pause holds the current view, Exit returns the person to where they were,
+  // including an unfinished check of their own. Playback never writes a personal record.
+  const demoControls = el("section", { class: "ab-demo-controls", hidden: true, "aria-label": "Guided demonstration" });
+  root.append(demoControls);
+  const tourChapters = () => {
+    const pvo = predictedVsObserved(CURRENT_DAY), mc = () => state.mc;
+    // prep() puts the app where the chapter starts, without waiting, so any chapter can be opened directly.
+    const selfCheckAt = async level => {
+      setDay(CURRENT_DAY); selfCheck.setProfile("elena"); selfCheck.reset(); setExperience("selfcheck");
+      if (level >= 1) { selfCheck.go(1); await selfCheck.demoCapture("usable", { immediate: true }); }
+      if (level >= 2) { selfCheck.go(2); selfCheck.applyDemoPvt(); }
+      if (level >= 3) selfCheck.go(5);
+    };
+    return [
+      { prep: () => { state.compare = false; scene.setCompare(false); scene.resetImpact(); state.impactDone = false; state.mc = null; }, steps: [
+        [() => { setExperience("mission"); setDay(1, { travel: true }); }, "DAY 1 · BASELINE SCAN · synthetic personal baseline locked", 3400],
+        [async () => { setExperience("twin", { system: "skeleton" }); await animateDay(30); }, `DAY 30 · MODEL-ESTIMATED SKELETAL CHANGE −${fmt(twinState(30).bone.lossFraction * 100)} % · weight-bearing bones`, 3600],
+        [async () => { setExperience("mission"); await animateDay(60); }, `DAY 60 · MULTISYSTEM · knee extension −2°, heart rate +2 bpm, ${ELENA.observations.find(r => r.day.value === 60).absorbedDose.value} mGy (synthetic records)`, 4000],
+        [async () => { setExperience("twin", { system: "cardiovascular" }); await animateDay(90); }, "DAY 90 · HEART RATE 69 bpm (+5) · the heart beats at the recorded rate", 4200]] },
+      { prep: () => setDay(90), steps: [
+        [async () => { setExperience("functional"); await animateDay(120); }, "DAY 120 · FUNCTIONAL ASSESSMENT · knee extension 157° (−8° vs Day 1)", 4200],
+        [async () => { setExperience("physiology", { physio: "predicted" }); await animateDay(CURRENT_DAY); }, `DAY ${CURRENT_DAY} · PREDICTED ${fmt(pvo.forecast.predicted)}° vs OBSERVED ${pvo.observed.value}° · within the 95 % interval`, 5000]] },
+      { prep: () => selfCheckAt(0), steps: [
+        [null, "DAILY SELF-CHECK · Elena gathers her own health indicators", 3200],
+        [() => selfCheck.go(1), "MOVEMENT · seated knee extension on camera", 1400],
+        [() => selfCheck.demoCapture("poor"), "POOR FRAMING · tracking 0.35 · comparison withheld, repeat requested", 4400],
+        [() => selfCheck.demoCapture("usable"), "REPEAT · usable capture · knee extension 151°", 3400]] },
+      { prep: () => selfCheckAt(1), steps: [
+        [() => { selfCheck.go(2); selfCheck.applyDemoPvt(); }, "REACTION TEST (PVT-B) · 9 attention lapses · her usual is 2–4", 3800],
+        [() => selfCheck.go(3), "SLEEP & MOOD · 5.2 h sleep · fatigue 4/7 (synthetic answers)", 3200],
+        [() => selfCheck.go(4), "BODY · no new symptoms · heart rate 76 bpm · blood pressure 112/72 · 37.3 °C · SpO2 97 % · blood sugar 97 mg/dL", 3400]] },
+      { prep: () => selfCheckAt(2), steps: [
+        [() => selfCheck.go(5), "EVALUATE · bone & muscle, cardiovascular and behavioral health are outside her usual range · vital signs inside the safety limits", 5400],
+        [null, "WHO TO TELL · on the way to Mars, Earth is 3–22 min away, so the crew medical officer acts first", 4200],
+        [() => selfCheck.saveCheck(), "ACT · re-check in 24 h and log for medical review at the next communication window", 4400]] },
+      { prep: () => selfCheckAt(3), steps: [
+        [() => setExperience("health"), "MY HEALTH · her whole check on one screen · knee extension, reaction speed and attention lapses outside her own range", 4800],
+        [() => dashboard.showCrew(), "CREW VIEW · four crew, most serious first · Daniel's blood pressure 144/92 is over the safety limit: tell the medical officer today", 5200]] },
+      { prep: () => selfCheckAt(3), steps: [
+        [() => { dashboard.showSelf(); setExperience("selfcheck"); selfCheck.setEnvironment("station"); drawer.querySelector(".sc-ladder")?.scrollIntoView({ block: "center" }); }, "SAME RESULT ON THE SPACE STATION · the flight surgeon can join in real time and Earth is a day away", 4200],
+        [() => { selfCheck.setEnvironment("marsTransit"); drawer.querySelector(".sc-ladder")?.scrollIntoView({ block: "center" }); }, "ON THE WAY TO MARS · every message to Earth takes 3–22 min, so the crew medical officer acts first", 4200]] },
+      { prep: () => { setDay(CURRENT_DAY); scene.resetImpact(); state.impactDone = false; state.mc = null; }, steps: [
+        [() => setExperience("twin", { system: "skeleton" }), null, 1400],
+        [() => showPart("tibiaL", scene.project("tibiaL") ?? undefined), "TAP THE BODY · the shin bone: what it does, how spaceflight affects it, and Elena's status today", 4600],
+        [() => setExperience("impact"), "UNEXPECTED EVENT · reconstructed from authored inputs", 1600],
+        [() => runImpact(), null, 900],
+        [() => runMonteCarloView(), null, 0],
+        [null, () => (mc() ? `MONTE CARLO · 10,000 RUNS · capacity exceeded in ${pct(mc().fractions.capacityExceeded)} of simulated runs · not a clinical probability` : "MONTE CARLO unavailable · simulation reference did not load"), 5200],
+        [() => setExperience("functional"), "POST-EVENT CHECK · Day 148 knee extension 141° · outside the prediction interval → human medical review", 5600]] },
+      { prep: () => {}, steps: [
+        [() => setExperience("evidence"), "THE EVIDENCE · NASA sources, population labels and what was tested on real people", 5200],
+        [() => { caption.hidden = true; closing.hidden = false; closing.classList.add("tw-in"); }, null, 4600],
+        [() => { closing.hidden = true; closing.classList.remove("tw-in"); }, null, 0]] },
+    ];
+  };
+  function renderDemoControls() {
+    const demo = state.demo; demoControls.hidden = !demo;
+    if (!demo) return;
+    const chapter = DEMO_CHAPTERS[demo.chapter], last = DEMO_CHAPTERS.length - 1;
+    fill(demoControls, el("div", { class: "ab-demo-heading" }, el("span", {}, "SYNTHETIC DEMO · " + (demo.chapter + 1) + " / " + DEMO_CHAPTERS.length), el("strong", {}, chapter.title)),
+      el("p", {}, chapter.description), el("div", { class: "ab-demo-chapters", role: "group", "aria-label": "Demo chapters" }, DEMO_CHAPTERS.map((item, i) => el("button", { type: "button", "aria-label": "Chapter " + (i + 1) + ": " + item.title, "aria-pressed": String(i === demo.chapter), onclick: () => showDemoChapter(i) }, String(i + 1)))),
+      el("div", { class: "ab-demo-actions" }, el("button", { type: "button", disabled: demo.chapter === 0 || undefined, onclick: () => showDemoChapter(demo.chapter - 1) }, "Back"),
+        el("button", { type: "button", "aria-pressed": String(!demo.paused), onclick: () => setDemoPaused(!demo.paused) }, demo.paused ? "Play" : "Pause"),
+        el("button", { type: "button", onclick: () => (demo.chapter === last ? stopDemo() : showDemoChapter(demo.chapter + 1)) }, demo.chapter === last ? "Finish" : "Next"),
+        el("button", { type: "button", onclick: stopDemo }, "Exit demo")));
+  }
+  function setDemoPaused(paused) {
+    const demo = state.demo; if (!demo || demo.paused === paused) return;
+    demo.paused = paused;
+    if (paused) demo.run?.hold?.();
+    else if (demo.run?.release) demo.run.release();
+    else { const next = demo.resume; demo.resume = null; next?.(); }
+    updateScenePause(); renderDemoControls();
+  }
+  // A caption's reading time: held while paused, ended early when the chapter changes or the demo stops.
+  function demoWait(run, ms) {
+    return new Promise(resolve => {
+      let left = reduceMotion ? Math.min(ms, 1500) : ms, startedAt = 0, timer = null, running = false;
+      const finish = ok => { clearTimeout(timer); run.hold = run.release = run.cancel = null; resolve(ok); };
+      const start = () => { if (running) return; running = true; startedAt = performance.now(); timer = setTimeout(() => finish(true), Math.max(0, left)); };
+      run.cancel = () => finish(false);
+      run.hold = () => { if (!running) return; running = false; clearTimeout(timer); left -= performance.now() - startedAt; };
+      run.release = start;
+      if (!state.demo?.paused) start();
+    });
+  }
+  async function showDemoChapter(index) {
+    const demo = state.demo; if (!demo) return;
+    demo.run?.cancel?.(); cancelAnimationFrame(dayAnimation);
+    const run = {}; demo.run = run; demo.resume = null;
+    demo.chapter = Math.max(0, Math.min(DEMO_CHAPTERS.length - 1, index));
+    closing.hidden = true; closing.classList.remove("tw-in"); caption.hidden = true;
+    renderDemoControls(); updateScenePause(); revealOnPhone();
+    const alive = () => state.demo === demo && demo.run === run;
+    const chapter = tourChapters()[demo.chapter];
     try {
-      state.compare = false; scene.setCompare(false); scene.resetImpact(); state.impactDone = false; state.mc = null;
-      await step(() => { setExperience("mission"); setDay(1, { travel: true }); }, "DAY 1 · BASELINE SCAN · synthetic personal baseline locked", 3400);
-      await step(async () => { setExperience("twin", { system: "skeleton" }); await animateDay(30); }, `DAY 30 · MODEL-ESTIMATED SKELETAL CHANGE −${fmt(twinState(30).bone.lossFraction * 100)} % · weight-bearing bones`, 3600);
-      await step(async () => { setExperience("mission"); await animateDay(60); }, `DAY 60 · MULTISYSTEM · knee extension −2°, heart rate +2 bpm, ${ELENA.observations.find(r => r.day.value === 60).absorbedDose.value} mGy (synthetic records)`, 4000);
-      await step(async () => { setExperience("twin", { system: "cardiovascular" }); await animateDay(90); }, "DAY 90 · HEART RATE 69 bpm (+5) · the heart beats at the recorded rate", 4200);
-      await step(async () => { setExperience("functional"); await animateDay(120); }, "DAY 120 · FUNCTIONAL ASSESSMENT · knee extension 157° (−8° vs Day 1)", 4200);
-      const pvo = predictedVsObserved(CURRENT_DAY);
-      await step(async () => { setExperience("physiology", { physio: "predicted" }); await animateDay(CURRENT_DAY); }, `DAY ${CURRENT_DAY} · PREDICTED ${fmt(pvo.forecast.predicted)}° vs OBSERVED ${pvo.observed.value}° · within the 95 % interval`, 5000);
-      await step(() => { selfCheck.setProfile("elena"); selfCheck.reset(); setExperience("selfcheck"); }, "DAILY SELF-CHECK · Elena gathers her own health indicators", 3200);
-      await step(() => selfCheck.go(1), "MOVEMENT · seated knee extension on camera", 1400);
-      await step(() => selfCheck.demoCapture("poor"), "POOR FRAMING · tracking 0.35 · comparison withheld, repeat requested", 4400);
-      await step(() => selfCheck.demoCapture("usable"), "REPEAT · usable capture · knee extension 151°", 3400);
-      await step(() => { selfCheck.go(2); selfCheck.applyDemoPvt(); }, "REACTION TEST (PVT-B) · 9 attention lapses · her usual is 2–4", 3800);
-      await step(() => selfCheck.go(3), "SLEEP & MOOD · 5.2 h sleep · fatigue 4/7 (synthetic answers)", 3200);
-      await step(() => selfCheck.go(4), "BODY · no new symptoms · heart rate 76 bpm · blood pressure 112/72 · 37.3 °C · SpO2 97 % · blood sugar 97 mg/dL", 3400);
-      await step(() => selfCheck.go(5), "EVALUATE · bone & muscle, cardiovascular and behavioral health are outside her usual range · vital signs inside the safety limits", 5400);
-      await step(null, "WHO TO TELL · on the way to Mars, Earth is 3–22 min away, so the crew medical officer acts first", 4200);
-      await step(() => selfCheck.saveCheck(), "ACT · re-check in 24 h and log for medical review at the next communication window", 4400);
-      await step(() => setExperience("health"), "MY HEALTH · her whole check on one screen · knee extension, reaction speed and attention lapses outside her own range", 4800);
-      await step(() => dashboard.showCrew(), "CREW VIEW · four crew, most serious first · Daniel's blood pressure 144/92 is over the safety limit: tell the medical officer today", 5200);
-      await step(() => { dashboard.showSelf(); setExperience("selfcheck"); selfCheck.setEnvironment("station"); drawer.querySelector(".sc-ladder")?.scrollIntoView({ block: "center" }); },
-        "SAME RESULT ON THE SPACE STATION · the flight surgeon can join in real time and Earth is a day away", 4200);
-      await step(() => { selfCheck.setEnvironment("marsTransit"); drawer.querySelector(".sc-ladder")?.scrollIntoView({ block: "center" }); },
-        "ON THE WAY TO MARS · every message to Earth takes 3–22 min, so the crew medical officer acts first", 4200);
-      await step(() => setExperience("twin", { system: "skeleton" }), null, 1400);
-      await step(() => showPart("tibiaL", scene.project("tibiaL") ?? undefined), "TAP THE BODY · the shin bone: what it does, how spaceflight affects it, and Elena's status today", 4600);
-      await step(async () => { setExperience("impact"); }, "UNEXPECTED EVENT · reconstructed from authored inputs", 1600);
-      await step(() => runImpact(), null, 900);
-      await step(() => runMonteCarloView(), null, 0);
-      const mc = state.mc;
-      await step(null, mc ? `MONTE CARLO · 10,000 RUNS · capacity exceeded in ${pct(mc.fractions.capacityExceeded)} of simulated runs · not a clinical probability` : "MONTE CARLO unavailable · simulation reference did not load", 5200);
-      await step(() => setExperience("functional"), "POST-EVENT CHECK · Day 148 knee extension 141° · outside the prediction interval → human medical review", 5600);
-      await step(() => { caption.hidden = true; closing.hidden = false; closing.classList.add("tw-in"); }, null, 4600);
-      closing.hidden = true; closing.classList.remove("tw-in"); setExperience("mission");
-    } catch { /* stopped by the user */ }
-    if (alive()) stopDemo();
+      await chapter.prep?.();
+      for (const [fn, text, wait] of chapter.steps) {
+        if (!alive()) return;
+        await fn?.();
+        if (!alive()) return;
+        const words = typeof text === "function" ? text() : text;
+        if (words) showCaption(words, 0);
+        if (wait && !(await demoWait(run, wait))) return;
+      }
+    } catch (error) { if (alive()) console.error(error); return; }
+    if (!alive()) return;
+    if (demo.chapter < DEMO_CHAPTERS.length - 1) {
+      if (demo.paused) { demo.resume = () => { if (alive()) showDemoChapter(demo.chapter + 1); }; return; }
+      showDemoChapter(demo.chapter + 1);
+    } else stopDemo();
+  }
+  function runDemo() {
+    finishIntro(); stopPlay();
+    if (state.demo) return;
+    const previous = { profile: state.profile, experience: state.experience, lightweight: state.lightweight, day: state.day };
+    // The tour shows the 3D twin, so the lightweight view is lifted for its duration and restored after.
+    state.demo = { chapter: 0, paused: false, previous }; state.lightweight = false; startButton.textContent = "Exit demo"; root.dataset.demo = "true";
+    selectProfile("elena"); showDemoChapter(0);
   }
   function stopDemo() {
-    if (!state.demo) return; state.demo = null; startButton.textContent = "Start mission simulation"; delete root.dataset.demo;
-    caption.hidden = true; closing.hidden = true; closing.classList.remove("tw-in"); cancelAnimationFrame(dayAnimation);
+    if (!state.demo) return;
+    const previous = state.demo.previous;
+    state.demo.run?.cancel?.(); state.demo = null; startButton.textContent = "Guided demo"; delete root.dataset.demo;
+    demoControls.hidden = true; caption.hidden = true; closing.hidden = true; closing.classList.remove("tw-in"); cancelAnimationFrame(dayAnimation);
+    dashboard.showSelf(); state.lightweight = previous.lightweight;
+    selectProfile(previous.profile); if (previous.profile === "elena") setDay(previous.day);
+    setExperience(previous.experience); updateScenePause(); render();
   }
   window.addEventListener("keydown", event => { if (event.key === "Escape" && state.demo) stopDemo(); });
 
@@ -871,7 +1001,7 @@ export function createTwinApp(root) {
   if (skipIntro) { introDone = true; intro.remove(); }
   const linked = experienceFromHash(location.hash);
   if (linked) state.experience = linked;
-  current = twinState(state.day); render();
+  current = twinState(state.day); updateScenePause(); render();
   const sceneLoad = scene.load();
   // Settles when the 3D anatomy has loaded or failed; the offline pack waits for it (src/offline.js).
   const loaded = sceneLoad.then(() => true, () => false);
@@ -884,14 +1014,13 @@ export function createTwinApp(root) {
       stressField = result; scene.setStressField(result.field, result.peakIndex); state.stressReady = true;
     }
     ensureSimulations();
-    if (!skipIntro) {
-      intro.classList.add("tw-play");
-      await scene.intro(); await sleep(400); finishIntro();
-    } else { document.body.classList.remove("tw-booting"); scene.intro(); }
+    if (!skipIntro) { intro.classList.add("tw-play"); } else { document.body.classList.remove("tw-booting"); if (!state.lightweight) scene.intro(); }
+    if (state.profile === "you") scene.setState(twinState(1), { bonesSolidity: 0 });
+    updateScenePause();
     render();
   }).catch(error => {
     loading.classList.add("tw-error"); loading.querySelector("span").textContent = "3D anatomy unavailable. Values, timeline and evidence remain usable.";
     canvas.dataset.error = error.message; finishIntro(); console.error(error);
   });
-  return { scene, state, loaded, setDay, setExperience, selfCheck, showPart, get stressField() { return stressField; } };
+  return { scene, state, loaded, setDay, setExperience, selfCheck, showPart, selectProfile, setLightweight, runDemo, stopDemo, showDemoChapter, updateScenePause, get stressField() { return stressField; } };
 }

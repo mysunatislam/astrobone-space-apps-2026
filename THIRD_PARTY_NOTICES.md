@@ -207,3 +207,9 @@ The Level-A Simulink model exports, deterministic web artifact, transformed NASA
   through OSDR file metadata. Derived descriptive summaries retain accession,
   canonical download URL, field, unit, exclusion rules and source SHA-256.
   No participant-level identifiers are bundled in the public summaries.
+
+## November 2026 additions
+
+- AstroBone logo supplied by the project owner and used without artwork alteration. Brand asset: `public/brand/astrobone-logo.png`.
+- NASA OSD-489 / LSDS-15 and OSD-654 / LSDS-66 public microCT tables: source file records, download URLs, public-access checks and SHA-256 hashes are recorded in `public/data/nasa-research-expansion.json` and `docs/RESPIRATORY_NASA_EVIDENCE.md`.
+- NoceAnto, [breath_visual_depthcamera](https://github.com/NoceAnto/breath_visual_depthcamera): credited as research inspiration. Its Python code and assets are not copied or distributed in this release. AstroBone's browser respiratory module is independently implemented and remains experimental.
