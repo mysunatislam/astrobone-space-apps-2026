@@ -114,7 +114,9 @@ export function createCameraPulse({ video, onStatus = () => {}, onSample = () =>
           clearInterval(tick);
           const result = fusedPulseFromSamples(settled);
           const fps = settled.length > 1 ? (settled.length - 1) / ((settled.at(-1).t - settled[0].t) / 1000) : 0;
-          resolve({ ...result, fps, frames: settled.length, protocol: RESTING_CAMERA_PROTOCOL, parts: result.parts?.map(p => ({ name: p.name, bpm: Math.round(p.hz * 60), quality: Number(p.quality.toFixed(2)) })) });
+          resolve({ ...result, fps, frames: settled.length, protocol: RESTING_CAMERA_PROTOCOL, parts: result.parts?.map(p => ({ name: p.name, bpm: Math.round(p.hz * 60), quality: Number(p.quality.toFixed(2)) })),
+            // Face cues and head height per frame, for the crewmate check (src/faceCues.js, breathingFromHead).
+            cues: samples.map(s => s.cues).filter(Boolean) });
         }
       }, 500);
     });

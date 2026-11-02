@@ -28,6 +28,8 @@ On a Mars transit a message to Earth can take up to 22 minutes one way, and ther
 
 The **digital twin** (home page) shows the astronaut's systems on 3D anatomy: skeleton, muscles, heart and vessels, across the mission timeline. Affected systems are highlighted after a self-check. Click any highlighted structure for a card with what it does, how spaceflight affects it, its status from the latest self-check, and a button to measure it now. Evidence maps NASA's five hazards of human spaceflight to the indicators that watch for them. **Live Capture** is the camera workspace: real-time pose tracking from a webcam or video, a musculoskeletal model that follows the tracked joints, and knee angle, range of motion and left-right difference with a quality gate. An uploaded video is analysed just ahead of playback, so the 3D model moves with the frame on screen. When a face is visible, an experimental camera pulse (and, with steady frames, heart-rate variability (RMSSD) from beat-to-beat timing) is shown.
 
+The **Crewmate check** (tab "Crewmate") answers the challenge's scenario: a crewmate suddenly has chest pain, or pain somewhere else. Tap where it hurts and how it feels, tick the warning signs public guidance lists (heart: AHA; stroke: BE-FAST; blood clot: NHLBI; kidney stone: NIDDK), then take a camera minute (the validated camera pulse plus face cues: pain-like expression from face-model blendshapes after the PSPI pain scale, eye closure (PERCLOS), held mouth-corner asymmetry, under-eye darkness, each against the crewmate's own earlier checks) and a 20-second reading of the Rainbow Passage (pauses from Silero VAD on the device, reading time, repeated words). The result is how fast to involve the crew medical officer and flight surgeon for the place the crew is in, the systems lit on the twin (heart and vessels, bones, muscles, kidneys), the reasons, and a summary to send. It never names a condition or a medicine. Breathing is counted by the crew: a camera head-movement estimate lost to a fixed guess on 40 recorded people. The face and speech cues were ported from the author's NeuroBridge Asha app; its camera pulse was compared with AstroBone's on the same 40 people and AstroBone's was kept (2.2 vs 6.4 bpm, [section 3b](docs/real-video-validation.md#3b-astrobones-camera-pulse-vs-neurobridge-ashas-vitalsense-2026-11-02)).
+
 ## NASA Data Drives the Checks
 
 Five datasets from the NASA Open Science Data Repository / Ames Life Sciences Data Archive, about 1,400 records, each source file verified by SHA-256. Every number below is computed from the data when the app loads ([`src/nasaWatch.js`](src/nasaWatch.js), tested in [`src/nasaWatch.test.js`](src/nasaWatch.test.js)).
@@ -60,7 +62,7 @@ Requires Node.js 20.19+ or 22.12+.
 ```bash
 npm install
 npm run dev        # http://127.0.0.1:5173/
-npm test           # 440 automated tests
+npm test           # 468 automated tests
 npm run build      # production build in dist/
 ```
 

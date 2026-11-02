@@ -60,6 +60,7 @@ export function testedOnRealData(v = REAL_DATA_VALIDATION, noise = KNEE_REPEAT_N
     notYet: [
       "No astronaut has used the camera checks; every camera test above is healthy adults on Earth.",
       "The seated knee test has not been compared with a goniometer on different days; the in-app angle check records exactly those pairs.",
+      "The crewmate check's face cues (pain-like expression, eye closure, mouth asymmetry, under-eye darkness) and reading pauses have not been tested on people in pain, drowsy or unwell; the pain-like expression uses face-model blendshapes in place of scored facial action units. Breathing from head movement lost to a fixed guess on 40 recorded people, so breaths are counted by the crew.",
       "The pulse is untested on darker skin tones, dim light and moving subjects, and on a real phone next to a pulse oximeter.",
       "The reaction test has not been timed with a robot finger on a real phone. Published measurements put the delay a touch screen or keyboard adds at 58–133 ms depending on the device and browser, so each result is compared only with tests answered the same way on the same kind of device.",
       "Heart rate, blood pressure, sleep and temperature spreads in the false-alarm simulation come from studies of adults on Earth, not astronauts. The reaction test's usual levels come from 45 adults who took it 16 times (Basner 2018); its day-to-day spread, oxygen and the ratings use stated assumptions.",

@@ -1,0 +1,15 @@
+method,mae_bpm,rmse_bpm,within_5_pct,bias_bpm,answered_pct,n
+NeuroBridge VitalSense (as shipped; vs PPG over its 12 s),6.38,13.28,76,-3.24,84.7,271
+"NeuroBridge VitalSense, only 'good' readings",6.24,13.23,76.9,-3.42,82.5,264
+"AstroBone hybrid, 30 s (as shipped, no gate)",2.22,6.97,89.6,-0.66,96.3,308
+"AstroBone hybrid, 30 s, quality gate 0.3",0.62,1.73,97.6,-0.16,76.9,246
+"AstroBone hybrid, 12 s (like for like)",2.36,7.44,92.8,0.07,95.6,306
+Both answered: NeuroBridge,6.17,13.16,77.6,-3.16,100,263
+Both answered: AstroBone 12 s,2.15,7.09,93.5,0.45,100,263
+Rest: NeuroBridge,5.04,10.97,78.3,-1.29,89.4,143
+Rest: AstroBone 30 s,2.19,7.05,89.7,0.01,97.5,156
+After squats: NeuroBridge,7.87,15.46,73.4,-5.41,80,128
+After squats: AstroBone 30 s,2.25,6.88,89.5,-1.33,95,152
+Breathing: NeuroBridge head-motion breathing (last 30 s),5.45,6.64,54.5,-4.18,55,44
+Breathing: AstroBone breathingFromHead (60 s),7.72,8.68,25.9,-7.31,33.8,27
+Breathing: Guessing the dataset mean every time,1.4,1.76,100,0,100,80

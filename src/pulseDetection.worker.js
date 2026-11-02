@@ -1,5 +1,6 @@
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { skinRegions } from "./rppg.js";
+import { frameCues, patchBoxes } from "./faceCues.js";
 import { FaceBoxSmoother, blazeBoxFromMesh, clampCropBox, rgbaToModelInput, loadMeRppg, ME_CROP } from "./meRppg.js";
 
 // Camera pulse worker: per frame, the ME-rPPG wave sample (face crop from the face mesh) and the mean skin colour of
@@ -8,6 +9,7 @@ import { FaceBoxSmoother, blazeBoxFromMesh, clampCropBox, rgbaToModelInput, load
 let mesh = null, me = null;
 const box = new FaceBoxSmoother();
 const crop = new OffscreenCanvas(ME_CROP, ME_CROP), cropCtx = crop.getContext("2d", { willReadFrequently: true });
+const patch = new OffscreenCanvas(8, 8), patchCtx = patch.getContext("2d", { willReadFrequently: true });
 const tiles = new OffscreenCanvas(32, 96), tilesCtx = tiles.getContext("2d", { willReadFrequently: true });
 let steady = null, previousCenter = null, previousT = null;
 
@@ -19,7 +21,7 @@ async function handle(message) {
       self.postMessage({ type: "progress", label: "Loading face models" });
       const vision = await FilesetResolver.forVisionTasks(message.wasmUrl, true);
       self.postMessage({ type: "progress", label: "Loading face mesh" });
-      mesh = await FaceLandmarker.createFromOptions(vision, { baseOptions: { modelAssetBuffer: await fetchModel(message.meshUrl), delegate: "CPU" }, runningMode: "VIDEO", numFaces: 1 });
+      mesh = await FaceLandmarker.createFromOptions(vision, { baseOptions: { modelAssetBuffer: await fetchModel(message.meshUrl), delegate: "CPU" }, runningMode: "VIDEO", numFaces: 1, outputFaceBlendshapes: true });
       self.postMessage({ type: "progress", label: "Loading pulse model" });
       me = await loadMeRppg(message.baseUrl);
       self.postMessage({ type: "ready" });
@@ -43,8 +45,24 @@ async function fetchModel(url) {
 }
 
 async function analyze(bitmap, t) {
-  const W = bitmap.width, H = bitmap.height, out = { bvp: null, rgb: null, motion: null, face: null };
-  const landmarks = mesh.detectForVideo(bitmap, t).faceLandmarks?.[0];
+  const W = bitmap.width, H = bitmap.height, out = { bvp: null, rgb: null, motion: null, face: null, cues: null };
+  const result = mesh.detectForVideo(bitmap, t), landmarks = result.faceLandmarks?.[0];
+  // Face cues for the crewmate check (src/faceCues.js): blendshapes, eye and mouth geometry, skin
+  // patches under the eyes and on the cheeks, and the head's height for the breathing estimate.
+  if (landmarks) {
+    const boxes = patchBoxes(landmarks), patches = {};
+    for (const [name, r] of Object.entries(boxes ?? {})) {
+      const x = Math.max(0, r.x) * W, y = Math.max(0, r.y) * H, w = Math.min(1 - Math.max(0, r.x), r.w) * W, h = Math.min(1 - Math.max(0, r.y), r.h) * H;
+      if (w < 1 || h < 1) continue;
+      patchCtx.drawImage(bitmap, x, y, w, h, 0, 0, 8, 8);
+      const d = patchCtx.getImageData(0, 0, 8, 8).data, c = [0, 0, 0];
+      for (let i = 0; i < d.length; i += 4) { c[0] += d[i]; c[1] += d[i + 1]; c[2] += d[i + 2]; }
+      patches[name] = c.map(v => v / 64);
+    }
+    const blendshapes = Object.fromEntries((result.faceBlendshapes?.[0]?.categories ?? []).map(c => [c.categoryName, Number(c.score.toFixed(3))]));
+    const { shapes, ...rest } = frameCues({ t, landmarks, blendshapes, patches });
+    out.cues = { ...rest, shapes, headY: landmarks.reduce((s, p) => s + p.y, 0) / landmarks.length };
+  }
   const found = blazeBoxFromMesh(landmarks, W, H);
   if (found) {
     const b = clampCropBox(box.update(found), W, H);
