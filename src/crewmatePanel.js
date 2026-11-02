@@ -192,7 +192,8 @@ export function createCrewmatePanel({ onAssess = () => {}, onSystem = () => {}, 
     result.replaceChildren(
       el("div", { class: `cm-level cm-level-${a.level}` }, el("em", {}, `${MARK[a.level]} ${a.word}`), el("strong", {}, a.headline), state.demo ? el("small", {}, "Synthetic example") : null),
       el("div", { class: "cm-systems", role: "group", "aria-label": "Systems to look at on the twin" }, el("span", {}, "Look at:"),
-        a.systems.map(s => s === "nervous" ? el("span", { class: "cm-sys cm-sys-soon", title: "Nervous-system model coming" }, `${SYSTEM_LABEL[s]} (model coming)`)
+        // The twin has no nervous-system anatomy; its Nervous view turns to the head and lists the brain checks.
+        a.systems.map(s => s === "nervous" ? el("button", { type: "button", class: "cm-sys", title: "The twin has no separate nervous-system model; this shows the head", onclick: () => onSystem("nervous", "head") }, "Head and nerves")
           : el("button", { type: "button", class: "cm-sys", onclick: () => onSystem(s, a.focus) }, SYSTEM_LABEL[s] ?? s))),
       el("h4", {}, "Why"), el("ul", { class: "cm-reasons" }, a.reasons.map(r => el("li", { class: `cm-r-${r.level}${r.kind === "context" ? " cm-r-context" : ""}` }, el("em", {}, r.kind === "measured" ? "MEASURED" : r.kind === "context" ? "CONTEXT" : "SAID"), r.text))),
       el("h4", {}, "Do next"), el("ol", { class: "cm-steps" }, a.steps.map(s => el("li", {}, s))),
