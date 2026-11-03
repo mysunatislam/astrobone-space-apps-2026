@@ -680,7 +680,7 @@ export function createTwinApp(root) {
   }
 
   // ---------- Physiology ----------
-  const chartCanvas = el("canvas", { class: "tw-chart", role: "img" });
+  const chartCanvas = el("canvas", { class: "tw-chart", role: "img", "aria-label": "Chart of the selected reading by mission day" }); // drawChart names the values
   function renderPhysiology() {
     const s = current, tabs = el("div", { class: "tw-subtabs", role: "group", "aria-label": "Physiology views" }, PHYSIO_TABS.map(([key, label]) =>
       el("button", { type: "button", "aria-pressed": String(state.physio === key), onclick: () => { stopDemo(); setExperience("physiology", { physio: key }); } }, label)));
@@ -1007,7 +1007,10 @@ export function createTwinApp(root) {
 
   // ---------- Boot ----------
   const skipIntro = (() => { try { return sessionStorage.getItem("astrobone-twin-intro") === "1"; } catch { return false; } })() || reduceMotion;
-  if (skipIntro) { introDone = true; intro.remove(); }
+  // Without the intro (a reload in the same tab, or reduced motion) the interface shows at once. It used to wait
+  // for the 3D anatomy, which kept the page blank for about 16 s on a 9 Mbit/s phone link, even in the lightweight
+  // view where the 3D is not drawn (scripts/qa-first-load.mjs). The checks never needed the 3D.
+  if (skipIntro) { introDone = true; intro.remove(); document.body.classList.remove("tw-booting"); }
   const linked = experienceFromHash(location.hash);
   if (linked) state.experience = linked;
   current = twinState(state.day); updateScenePause(); render();
@@ -1023,7 +1026,7 @@ export function createTwinApp(root) {
       stressField = result; scene.setStressField(result.field, result.peakIndex); state.stressReady = true;
     }
     ensureSimulations();
-    if (!skipIntro) { intro.classList.add("tw-play"); } else { document.body.classList.remove("tw-booting"); if (!state.lightweight) scene.intro(); }
+    if (!skipIntro) { intro.classList.add("tw-play"); } else if (!state.lightweight) scene.intro();
     if (state.profile === "you") scene.setState(twinState(1), { bonesSolidity: 0 });
     updateScenePause();
     render();
