@@ -40,6 +40,7 @@ import {
 } from "./movementEvidence.js";
 import { validateImageEvidence } from "./imageEvidence.js";
 import { XrayApiClient } from "./xrayApi.js";
+import { XrayBoneOverlay, findBoneMesh, loadBoneMesh } from "./xrayOverlay.js";
 import {
   buildTimestampedJsonFilename,
   nativeRuntime,
@@ -260,6 +261,9 @@ const refs = {
   apiBaseStatus: document.querySelector("#api-base-status"),
   poseVideo: document.querySelector("#pose-video"),
   poseOverlay: document.querySelector("#pose-overlay"),
+  xrayCanvas: document.querySelector("#xray-overlay"),
+  xrayToggle: document.querySelector("#xray-bones"),
+  xrayStatus: document.querySelector("#xray-bones-status"),
   poseViewport: document.querySelector("#pose-viewport"),
   poseEmpty: document.querySelector("#pose-empty"),
   poseLinkState: document.querySelector("#pose-link-state"),
@@ -426,6 +430,11 @@ const poseController = new PoseAssessmentController({
   onAssessment: completeFunctionalAssessment,
   // Each presented frame of an uploaded video, with its face mesh, feeds the camera pulse.
   onVideoFrame: frame => healthLayers.videoFrame(frame),
+  // X-ray bones: the rigged atlas skeleton placed on the tracked pose, hands and face.
+  onSkeletonOverlay: input => {
+    if (!input) { xrayOverlay?.clear(); return false; }
+    return xrayOverlay?.render(input) ?? false;
+  },
 });
 
 const scene = new THREE.Scene();
@@ -531,12 +540,40 @@ const externalSkeleton = {
 };
 const HUMAN_MODEL_URL = appAssetUrl("models/anatomy/musculoskeletal-rigged.glb");
 const liveRetargeter = new SkeletalRetargeter(externalSkeleton);
+let resolveRiggedHumanModel;
+const riggedHumanModel = new Promise(resolve => { resolveRiggedHumanModel = resolve; });
 const liveRootOffset = new THREE.Vector3();
 externalSkeleton.group.name = "Rigged human GLB display";
 externalSkeleton.group.position.set(-0.1, 0.45, -0.1);
 externalSkeleton.group.rotation.y = -0.32;
 scene.add(externalSkeleton.group);
 loadRiggedHuman();
+// X-ray bones on the camera image reuse the rig this page already loaded for the twin.
+const XRAY_STATE_LABELS = { off: "Off", waiting: "Ready", loading: "Loading bones", on: "On", unavailable: "Unavailable" };
+const xrayOverlay = refs.xrayCanvas ? new XrayBoneOverlay({
+  canvas: refs.xrayCanvas,
+  getBoneMesh: async () => findBoneMesh(await riggedHumanModel) ?? loadBoneMesh(HUMAN_MODEL_URL),
+  onState: state => {
+    setText(refs.xrayStatus, XRAY_STATE_LABELS[state] ?? state);
+    // A paused or finished video has no next frame: draw the bones on the frame that is showing.
+    if (state === "on" && poseController.active) poseController.drawLandmarks(poseController.lastPoseLandmarks, poseController.lastObjectDetections);
+  },
+}) : null;
+
+function setXrayBones(enabled) {
+  if (!xrayOverlay) return;
+  refs.poseViewport.dataset.xray = String(enabled);
+  xrayOverlay.setEnabled(enabled);
+  // Finger bones follow the hand model: look twice as often while they are drawn.
+  poseController.detailIntervalMs = enabled ? 120 : 250;
+  // Hands and face give the finger bones and the skull their pose.
+  if (enabled && !refs.detailTracking.checked) {
+    refs.detailTracking.checked = true;
+    poseController.setDetailDetectionEnabled(true);
+  }
+  // Swap bones and stick figure on the frame that is showing, without waiting for the next one.
+  if (poseController.active) poseController.drawLandmarks(poseController.lastPoseLandmarks, poseController.lastObjectDetections);
+}
 
 const impactMarker = new THREE.Mesh(
   new THREE.SphereGeometry(0.09, 24, 24),
@@ -828,6 +865,7 @@ function loadRiggedHuman(url = HUMAN_MODEL_URL) {
       fitModelToTwin(model, 4.35);
       externalSkeleton.group.add(model);
       externalSkeleton.model = model;
+      resolveRiggedHumanModel(model);
       const binding = bindHumanRig(model);
       externalSkeleton.bones = binding.bones;
       externalSkeleton.fingers = binding.fingers;
@@ -863,6 +901,7 @@ function loadRiggedHuman(url = HUMAN_MODEL_URL) {
       if (url === HUMAN_MODEL_URL) { loadRiggedHuman(appAssetUrl("models/human_body_clothed.glb")); return; }
       refs.canvas.dataset.rigReady = "false";
       refs.poseLinkState.textContent = "Human model unavailable";
+      resolveRiggedHumanModel(new THREE.Group());
     },
   );
 }
@@ -3562,6 +3601,11 @@ function bindEvents() {
       safetyMonitor.clearObjects();
     }
   });
+  refs.xrayToggle?.addEventListener("change", () => setXrayBones(refs.xrayToggle.checked));
+  if (refs.xrayToggle) {
+    if (new URLSearchParams(location.search).get("xray") === "0") refs.xrayToggle.checked = false;
+    setXrayBones(refs.xrayToggle.checked);
+  }
   refs.detailTracking.addEventListener("change", () => {
     poseController.setDetailDetectionEnabled(refs.detailTracking.checked);
   });

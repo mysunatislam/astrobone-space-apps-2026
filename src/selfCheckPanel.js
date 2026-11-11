@@ -8,6 +8,7 @@ import { guidanceFor, GUIDANCE_BOUNDARY } from "./countermeasures.js";
 import { hazardsForDomain } from "./hazards.js";
 import { ROUTINE, routineStatus, nextDue, dayNumber, newBadges } from "./routine.js";
 import { createSelfCheckCamera } from "./selfCheckCamera.js";
+import { XrayBoneOverlay, loadBoneMesh, XRAY_LIMITS } from "./xrayOverlay.js";
 import { createCameraPulse, CAMERA_PULSE, RESTING_CAMERA_PROTOCOL } from "./cameraPulse.js";
 import { cameraViewFor } from "./functionalAssessment.js";
 import { sparklineSvg } from "./trendSpark.js";
@@ -62,6 +63,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
   const overlay = el("canvas", { class: "sc-overlay", "aria-hidden": "true" });
   const camStatus = el("small", { class: "sc-cam-status", role: "status" }, "Camera off");
   let camera = null, liveAngle = el("b", {}, "--");
+  // X-ray bones: the rigged atlas skeleton placed on the tracked pose, over the camera image.
+  const xrayCanvas = el("canvas", { class: "sc-xray", "aria-hidden": "true" });
+  let xrayBones = null, xrayOn = true;
   // Resting pulse from the face: ME-rPPG-led hybrid with POS (src/cameraPulse.js).
   const pulseVideo = el("video", { class: "sc-video", playsinline: true, muted: true, "aria-label": "Face camera preview" });
   const pulseStatus = el("small", { class: "sc-cam-status", role: "status" }, "Camera off");
@@ -184,7 +188,10 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
     return true;
   }
   async function startCamera() {
-    camera ??= createSelfCheckCamera({ video, overlay, onStatus: text => { camStatus.textContent = text; }, onFrame: frame => {
+    xrayBones ??= new XrayBoneOverlay({ canvas: xrayCanvas, getBoneMesh: () => loadBoneMesh(`${import.meta.env.BASE_URL}models/anatomy/musculoskeletal-rigged.glb`) });
+    xrayBones.setEnabled(xrayOn);
+    camera ??= createSelfCheckCamera({ video, overlay, onSkeletonOverlay: input => { if (!input) { xrayBones.clear(); return false; } return xrayBones.render(input); },
+      onStatus: text => { camStatus.textContent = text; }, onFrame: frame => {
       // Show only knees the camera can see; a far knee in a side-on view is guesswork.
       const seen = frame?.angles ? ["left", "right"].filter(side => (frame.sideUsable ? frame.sideUsable[side] : true) && Number.isFinite(frame.angles[side]?.knee)) : [];
       const view = cameraViewFor(frame?.bodyYawDeg), shown = view === "side" && frame.nearSide ? seen.filter(side => side === frame.nearSide) : seen;
@@ -593,7 +600,9 @@ export function createSelfCheckPanel({ onEvaluate = () => {}, onStep = () => {},
         demo ? el("div", { class: "sc-row" },
           el("button", { type: "button", class: "sc-secondary", "data-demo": "poor", onclick: () => demoCapture("poor") }, "Demo capture · poor framing"),
           el("button", { type: "button", class: "sc-secondary", "data-demo": "usable", onclick: () => demoCapture("usable") }, "Demo capture · usable"))
-          : el("div", { class: "sc-camera" }, video, overlay, el("div", { class: "sc-cam-hud" }, camStatus, el("span", {}, "KNEE ", liveAngle)),
+          : el("div", { class: "sc-camera", "data-xray": String(xrayOn) }, video, xrayCanvas, overlay, el("div", { class: "sc-cam-hud" }, camStatus, el("span", {}, "KNEE ", liveAngle)),
+            el("label", { class: "sc-check", title: XRAY_LIMITS }, el("input", { type: "checkbox", id: "sc-xray-bones", checked: xrayOn || undefined, onchange: e => { xrayOn = e.target.checked; xrayBones?.setEnabled(xrayOn); e.target.closest(".sc-camera").dataset.xray = String(xrayOn); } }),
+              el("span", {}, "X-ray bones on the camera ", el("small", { class: "sc-xray-note" }, "atlas skeleton on your tracked pose, not a scan"))),
             el("div", { class: "sc-row" }, camOn ? null : el("button", { type: "button", class: "sc-secondary", onclick: startCamera }, "Start camera"),
               camOn ? el("button", { type: "button", class: "sc-primary", disabled: cap?.capturing || undefined, onclick: recordCamera }, cap?.capturing ? "Recording 10 s…" : "Record 10 s") : null,
               camOn ? el("button", { type: "button", class: "sc-secondary", onclick: () => { stopCamera(); render(); } }, "Stop camera") : null)),

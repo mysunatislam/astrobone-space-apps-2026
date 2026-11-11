@@ -47,6 +47,12 @@
 .sc-video, .sc-overlay { width: 100%; aspect-ratio: 4 / 3; border-radius: 10px; background: #01040a; object-fit: cover; }
 .sc-video { transform: scaleX(-1); }
 .sc-overlay { position: absolute; left: 0; top: 0; background: none; pointer-events: none; }
+/* X-ray bones: mirrored with the preview, glowing over a cooler, dimmer camera image. */
+.sc-xray { position: absolute; left: 0; top: 0; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; pointer-events: none; transform: scaleX(-1);
+  filter: drop-shadow(0 0 3px rgba(122, 216, 255, .85)) drop-shadow(0 0 10px rgba(95, 215, 255, .45)); }
+.sc-xray[hidden] { display: none; }
+.sc-camera[data-xray="true"] .sc-video { filter: saturate(.55) brightness(.78) contrast(1.08); }
+.sc-xray-note { color: var(--tw-dim); font-size: 11px; }
 .sc-cam-hud { display: flex; justify-content: space-between; gap: 8px; font: 600 10px var(--tw-mono); letter-spacing: .08em; color: var(--tw-dim); }
 .sc-cam-hud b { color: var(--tw-cyan); font-size: 13px; }
 .sc-result { display: grid; gap: 4px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(127, 227, 255, .35); background: rgba(127, 227, 255, .06); }
