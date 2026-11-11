@@ -6,7 +6,8 @@ import { analyzePoseLandmarks, summarizeKneeCapture } from "./functionalAssessme
 // knee-extension definition (95th percentile interior angle) is identical.
 const EDGES = [[11, 12], [11, 23], [12, 24], [23, 24], [23, 25], [25, 27], [24, 26], [26, 28], [27, 31], [28, 32], [11, 13], [13, 15], [12, 14], [14, 16]];
 
-export function createSelfCheckCamera({ video, overlay, onStatus = () => {}, onFrame = () => {} }) {
+// `onSkeletonOverlay` (optional) draws the X-ray bones from the same filtered landmarks; it returns true when it drew.
+export function createSelfCheckCamera({ video, overlay, onStatus = () => {}, onFrame = () => {}, onSkeletonOverlay = null }) {
   const base = import.meta.env.BASE_URL;
   let stream = null, worker = null, busy = false, running = false, session = 0, recording = null, raf = null;
   const worldFilter = new PoseLandmarkFilter({ minimumAlpha: 0.55, maximumAlpha: 0.9 });
@@ -60,19 +61,25 @@ export function createSelfCheckCamera({ video, overlay, onStatus = () => {}, onF
       if (filteredImage?.[i]) filteredImage[i].visibility = Math.min(filteredImage[i].visibility, quality);
     }
     const frame = filteredWorld ? analyzePoseLandmarks(filteredWorld, filteredImage ?? filteredWorld, { timestamp: message.timestamp, inferenceMs: message.inferenceMs, aspect: video.videoWidth / video.videoHeight }) : null;
-    draw(image, frame);
+    let bones = false;
+    try {
+      bones = Boolean(onSkeletonOverlay?.(image ? { pose: filteredImage ?? image, world: filteredWorld, hands: [], face: null, width: video.videoWidth, height: video.videoHeight, timestamp: message.timestamp } : null));
+    } catch (error) { console.warn("X-ray overlay frame failed", error); }
+    draw(image, frame, bones);
     if (recording && frame) recording.samples.push(frame);
     if (recording) recording.telemetry.push({ timestamp: message.timestamp, inferenceMs: message.inferenceMs, detected: Boolean(image) });
     onFrame(frame);
   }
 
-  function draw(points, frame) {
+  function draw(points, frame, bones = false) {
     const ctx = overlay.getContext("2d"), w = overlay.width = overlay.clientWidth * (devicePixelRatio || 1), h = overlay.height = overlay.clientHeight * (devicePixelRatio || 1);
     ctx.clearRect(0, 0, w, h); if (!points) return;
-    // The preview is mirrored, so mirror the overlay to match.
-    const x = p => (1 - p.x) * w, y = p => p.y * h;
+    // The preview is mirrored and fills its box by cropping (object-fit: cover), so the overlay does the same.
+    const vw = video.videoWidth || w, vh = video.videoHeight || h, fit = Math.max(w / vw, h / vh);
+    const x = p => (1 - p.x) * vw * fit + (w - vw * fit) / 2, y = p => p.y * vh * fit + (h - vh * fit) / 2;
     ctx.lineWidth = 3 * (devicePixelRatio || 1); ctx.strokeStyle = frame?.usable ? "rgba(127,227,255,.95)" : "rgba(255,190,110,.9)";
-    for (const [a, b] of EDGES) { const p = points[a], q = points[b]; if (!p || !q || p.visibility < .3 || q.visibility < .3) continue; ctx.beginPath(); ctx.moveTo(x(p), y(p)); ctx.lineTo(x(q), y(q)); ctx.stroke(); }
+    // With the X-ray bones drawn, only the knee dots and angles stay on top.
+    if (!bones) for (const [a, b] of EDGES) { const p = points[a], q = points[b]; if (!p || !q || p.visibility < .3 || q.visibility < .3) continue; ctx.beginPath(); ctx.moveTo(x(p), y(p)); ctx.lineTo(x(q), y(q)); ctx.stroke(); }
     ctx.fillStyle = "#fff"; for (const i of [23, 24, 25, 26, 27, 28]) { const p = points[i]; if (p?.visibility >= .3) { ctx.beginPath(); ctx.arc(x(p), y(p), 4 * (devicePixelRatio || 1), 0, Math.PI * 2); ctx.fill(); } }
     if (frame?.angles) {
       ctx.font = `${12 * (devicePixelRatio || 1)}px monospace`; ctx.fillStyle = "#fff";
@@ -105,6 +112,7 @@ export function createSelfCheckCamera({ video, overlay, onStatus = () => {}, onF
     try { worker?.postMessage({ type: "close" }); } catch { /* already closed */ }
     worker = null; busy = false;
     overlay.getContext("2d")?.clearRect(0, 0, overlay.width, overlay.height);
+    onSkeletonOverlay?.(null);
   }
 
   return { start, record, hold, stop, get running() { return running; } };

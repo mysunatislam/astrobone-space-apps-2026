@@ -476,3 +476,39 @@ test("a new selection replaces pending video metadata without closing the new se
   await assert.rejects(controller.startVideo({type:"text/plain",size:1000}), /MP4 or WebM/);
   assert.equal(controller.active, true, "an invalid file must not stop the running source");
 });
+
+test("X-ray bones replace the stick figure and get the filtered pose, hands, face and their times", (t) => {
+  const calls = [], drawn = [];
+  let bones = true;
+  cameraFixture(t);
+  const controller = new PoseAssessmentController({
+    video: { srcObject: null, play: async () => {}, pause() {} }, canvas: { getContext: () => ({ clearRect() {} }) },
+    modelUrl: "pose.task", wasmUrl: "mediapipe", onSkeletonOverlay: (input) => { calls.push(input); return bones; },
+  });
+  t.after(() => controller.dispose());
+  controller.canvas.width = 640; controller.canvas.height = 480;
+  controller.drawing = { drawConnectors: () => drawn.push("lines"), drawLandmarks: () => drawn.push("points") };
+  controller.detailDetectionEnabled = true; controller.drawObjectBoxes = () => {};
+  controller.lastDetails = { hands: [{ landmarks: [], side: "left" }], face: { landmarks: [{ x: 0.5, y: 0.1, z: 0 }] }, timestamp: performance.now() - 80 };
+  controller.handlePoseResult({ landmarks: [bodyPose()], worldLandmarks: [bodyPose()], timestamp: 1000, inferenceMs: 20 });
+  const input = calls.at(-1);
+  assert.equal(input.pose.length, 33); assert.equal(input.world.length, 33);
+  assert.equal(input.width, 640); assert.equal(input.height, 480);
+  assert.equal(input.timestamp, 1000); assert.equal(input.detailTimestamp, controller.lastDetails.timestamp);
+  assert.equal(input.hands[0].side, "left"); assert.equal(input.face.length, 1);
+  assert.deepEqual(drawn, [], "no stick figure, hand lines or face mesh under the bones");
+
+  bones = false; // bones still loading, or switched off: the stick figure is back
+  controller.handlePoseResult({ landmarks: [bodyPose()], worldLandmarks: [bodyPose()], timestamp: 1040, inferenceMs: 20 });
+  assert.ok(drawn.includes("lines") && drawn.includes("points"));
+
+  controller.onSkeletonOverlay = () => { throw new Error("context lost"); };
+  drawn.length = 0;
+  assert.doesNotThrow(() => controller.handlePoseResult({ landmarks: [bodyPose()], worldLandmarks: [bodyPose()], timestamp: 1080, inferenceMs: 20 }));
+  assert.ok(drawn.includes("lines"), "a failing overlay falls back to the stick figure");
+
+  controller.onSkeletonOverlay = (input) => { calls.push(input); return false; };
+  controller.handlePoseResult({ landmarks: [], worldLandmarks: [], timestamp: 1120, inferenceMs: 20 });
+  assert.equal(calls.at(-1).pose, null, "no body: the overlay is told so it can hide the bones");
+});
+

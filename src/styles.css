@@ -1374,7 +1374,8 @@ html[data-platform="android"] .topbar {
 }
 
 #pose-video,
-#pose-overlay {
+#pose-overlay,
+#xray-overlay {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -1383,13 +1384,29 @@ html[data-platform="android"] .topbar {
 }
 
 .pose-viewport[data-mirrored="true"] #pose-video,
-.pose-viewport[data-mirrored="true"] #pose-overlay {
+.pose-viewport[data-mirrored="true"] #pose-overlay,
+.pose-viewport[data-mirrored="true"] #xray-overlay {
   transform: scaleX(-1);
 }
 
 #pose-overlay {
   z-index: 2;
   pointer-events: none;
+}
+
+/* X-ray bones: additive glow over a cooler, dimmer camera image. */
+#xray-overlay {
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px rgba(122, 216, 255, 0.85)) drop-shadow(0 0 10px rgba(95, 215, 255, 0.45));
+}
+
+#xray-overlay[hidden] {
+  display: none;
+}
+
+.pose-viewport[data-xray="true"] #pose-video {
+  filter: saturate(0.55) brightness(0.78) contrast(1.08);
 }
 
 .pose-live-strip {

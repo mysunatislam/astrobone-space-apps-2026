@@ -122,6 +122,7 @@
               <div id="pose-viewport" class="pose-viewport twin-camera-viewport" data-mirrored="true">
                 <video id="pose-video" autoplay muted playsinline></video>
                 <canvas id="pose-overlay" aria-label="Live pose landmarks"></canvas>
+                <canvas id="xray-overlay" aria-label="X-ray bones placed on the tracked body" hidden></canvas>
                 <div class="pose-live-strip" aria-live="polite">
                   <span id="pose-link-state" data-state="waiting">Waiting for full body</span>
                   <strong id="pose-live-fps">-- fps</strong>
@@ -429,6 +430,10 @@
                 </div>
               </div>
               <div class="pose-settings">
+                <label class="compact-toggle" for="xray-bones" title="The atlas skeleton placed on the tracked landmarks. A visual reference, not imaging of this person's bones.">
+                  <input id="xray-bones" type="checkbox" checked />
+                  <span>X-ray bones on the camera <small id="xray-bones-status">Off</small></span>
+                </label>
                 <label class="compact-toggle" for="mirror-preview">
                   <input id="mirror-preview" type="checkbox" checked />
                   <span>Mirror camera + twin</span>

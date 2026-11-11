@@ -38,6 +38,8 @@ export class PoseAssessmentController {
     onObjects = () => {},
     onAssessment = () => {},
     onVideoFrame = () => {},
+    // Optional bone overlay drawn from the filtered landmarks; returns true when it drew this frame.
+    onSkeletonOverlay = null,
   }) {
     this.video = video;
     this.canvas = canvas;
@@ -58,6 +60,8 @@ export class PoseAssessmentController {
     this.onObjects = onObjects;
     this.onAssessment = onAssessment;
     this.onVideoFrame = onVideoFrame;
+    this.onSkeletonOverlay = onSkeletonOverlay;
+    this.lastOverlayPose = null;
     this.context = canvas.getContext("2d");
     this.drawing = new DrawingUtils(this.context);
     this.poseWorker = null;
@@ -509,6 +513,8 @@ export class PoseAssessmentController {
     this.videoObjectUrl = null;
     this.sourceKind = "none";
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.lastOverlayPose = null;
+    this.onSkeletonOverlay?.(null);
     this.assessment = null;
     this.worldFilter.reset();
     this.imageFilter.reset();
@@ -833,6 +839,7 @@ export class PoseAssessmentController {
       frameRate,
       inferenceMs: message.inferenceMs,
     };
+    this.lastOverlayPose = landmarks ? { image: filteredImage ?? landmarks, world: filteredWorld, timestamp: message.timestamp } : null;
     this.drawLandmarks(landmarks, this.lastObjectDetections);
     telemetry.mediaTime = message.mediaTime;
     this.onPose(frame);
@@ -1169,6 +1176,23 @@ export class PoseAssessmentController {
   drawLandmarks(landmarks, detections = []) {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawObjectBoxes(detections);
+    const details = this.detailDetectionEnabled && this.lastDetails
+      && performance.now() - this.lastDetails.timestamp < 900 ? this.lastDetails : null;
+    let xray = false;
+    try {
+      xray = Boolean(this.onSkeletonOverlay?.(landmarks || details ? {
+        pose: landmarks ? this.lastOverlayPose?.image ?? landmarks : null,
+        world: landmarks ? this.lastOverlayPose?.world ?? null : null,
+        hands: details?.hands ?? [], face: details?.face?.landmarks ?? null,
+        width: this.canvas.width, height: this.canvas.height,
+        // Face and hands are detected less often than the pose; the overlay carries them along by these times.
+        timestamp: this.lastOverlayPose?.timestamp ?? null, detailTimestamp: details?.timestamp ?? null,
+      } : null));
+    } catch (error) {
+      console.warn("X-ray overlay frame failed", error);
+    }
+    // With the X-ray bones drawn, the stick figure, hand lines and face mesh would only clutter them.
+    if (xray) return;
     if (landmarks) {
       this.drawing.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, {
         color: "#56e0c3", lineWidth: 3,
@@ -1177,8 +1201,6 @@ export class PoseAssessmentController {
         color: "#ffffff", fillColor: "#0b6f64", lineWidth: 1, radius: 3,
       });
     }
-    const details = this.detailDetectionEnabled && this.lastDetails
-      && performance.now() - this.lastDetails.timestamp < 900 ? this.lastDetails : null;
     for (const hand of details?.hands ?? []) {
       this.drawing.drawConnectors(hand.landmarks, HandLandmarker.HAND_CONNECTIONS, {
         color: hand.side === "left" ? "#ffca65" : "#86a5ff", lineWidth: 2,
