@@ -22,7 +22,7 @@ for cam in list(CAM) + [None]:
     for st in list(STATE) + [None]:
         ws = [w for w in W if (cam is None or w["camera"] == cam) and (st is None or w["state"] == st)]
         if not ws: continue
-        for key, label in (("hybrid", "Self-check hybrid (as shipped, gate 0.3)"), ("me", "ME-rPPG alone (gate 0.3)"), ("liveOld", "Live Capture colour pulse, earlier gate 0.3"), ("live", "Live Capture colour pulse, gate 0.5 (as shipped now)"), ("hybrid0", "Self-check hybrid, gate off")):
+        for key, label in (("hybrid", "Self-check hybrid, 30 s windows (gate 0.3)"), ("me", "ME-rPPG alone (gate 0.3)"), ("liveOld", "Live Capture colour pulse, earlier gate 0.3"), ("live", "Live Capture colour pulse, gate 0.5 (as shipped now)"), ("hybrid0", "Self-check hybrid, gate off")):
             rows.append(dict(camera=CAM.get(cam, "all three"), state=STATE.get(st, "both"), method=label, people=len({w["person"] for w in ws}), windows=len(ws), **stats(ws, key)))
 with open(f"{repo}/data/validation/mcd-scale-pulse.csv", "w", newline="") as f:
     wr = csv.DictWriter(f, fieldnames=list(rows[0])); wr.writeheader(); wr.writerows(rows)

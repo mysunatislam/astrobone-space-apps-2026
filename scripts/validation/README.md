@@ -71,8 +71,10 @@ node ../audit-claims.mjs                       # every README headline number, r
 python -I sync21_knee.py <dir> <out>           # Zenodo 19720803: unzip 02_markerbased_data.zip and 03_markerless_data.zip into <dir>
 python -I mcd_scale_worker.py jobs.txt <npz> 60 <shard> <shards>   # rows "person camera state"; 4 shards ran in parallel
 python -I mcd_scale_export.py <npz> <ecg cache> <signals>          # reference rate per window, PPG and ECG RMSSD
-node score-scale.mjs <signals> scale.json      # the app's JavaScript: self-check hybrid, Live Capture pulse, estimateStress
+node score-scale.mjs <signals> scale.json      # the app's JavaScript on 30 s windows: self-check estimator, Live Capture pulse, estimateStress
 python -I summarize_scale.py scale.json <repo> # writes data/validation/mcd-scale-*
+python -I mcd_selfcheck_export.py <npz> <repo> <clips>   # 42 s clips cut like the self-check's camera minute
+node score-selfcheck.mjs <clips> ../../data/validation/mcd-selfcheck-read.csv   # earlier vs shipped self-check read, gate by halves
 python -I write_expansion_doc.py <repo>        # writes docs/validation-expansion-2026-11.md
 ```
 

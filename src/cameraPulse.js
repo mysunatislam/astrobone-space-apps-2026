@@ -13,21 +13,36 @@ export const CAMERA_PULSE = Object.freeze({ seconds: 45, settleSeconds: 3, maxMo
 export const FUSION_WEIGHTS = Object.freeze({ me: 1, pos: 0.25, chrom: 0 });
 
 // Head-movement and lighting refusals shared by every camera pulse estimate.
-function colourGate(withColour) {
+const LIGHTING_REASON = "Lighting is too dark or too bright on the face";
+const outOfRange = s => s.rgb.some(v => v < 20 || v > 240);
+function colourGate(withColour, { lighting = "refuse" } = {}) {
   const moving = withColour.filter(s => !(s.motion <= CAMERA_PULSE.maxMotion)).length;
   if (withColour.length && moving > CAMERA_PULSE.maxMovingShare * withColour.length) return { status: "insufficient", reason: "Too much head movement: hold still", bpm: null, quality: 0 };
-  if (withColour.some(s => s.rgb.some(v => v < 20 || v > 240))) return { status: "insufficient", reason: "Lighting is too dark or too bright on the face", bpm: null, quality: 0 };
+  if (lighting === "refuse" && withColour.some(outOfRange)) return { status: "insufficient", reason: LIGHTING_REASON, bpm: null, quality: 0 };
   return null;
 }
 
+// The self-check's read of its camera minute: the whole 42 s left after settling (not only the last 30 s), with
+// the quality gate at 0.25. A longer window spreads the same pulse over a narrower peak band (±1.5/duration), so
+// its peak share runs lower than a 30 s window's for the same signal. On 58 new MCD-rPPG people, three cameras,
+// 655 clips cut like the self-check (data/validation/mcd-selfcheck-read.csv): 0.25 was chosen on half of the people
+// as the gate that kept the earlier read's answer rate with no answer more than 10 bpm off, and on the other half it
+// cut answers more than 10 bpm off from 4 to 1 for 2.7 points fewer answers. It does not make the phone answer more
+// often (47 % of phone clips, from 51 %); it makes fewer of its answers wrong. Light out of range no longer refuses on
+// its own: it becomes the reason when the pulse is unclear, because on the same clips the 4 that showed a clear pulse
+// under out-of-range light read within 0.5 bpm.
+export const SELF_CHECK_READ = Object.freeze({ windowSeconds: CAMERA_PULSE.seconds - CAMERA_PULSE.settleSeconds + 1, minQuality: 0.25, lighting: "advise" });
+
 // samples: [{ t (ms), bvp, rgb, motion }] from the pulse worker. Returns the fused estimate on the
-// last WAVE_PULSE.windowSeconds, with the same refusals the offline validation applied.
-export function fusedPulseFromSamples(samples, { weights = FUSION_WEIGHTS, ...options } = {}) {
+// last WAVE_PULSE.windowSeconds (or options.windowSeconds), with the same refusals the offline validation applied.
+// lighting: "refuse" (default, as validated on 30 s windows) refuses any window with a face frame out of range;
+// "advise" (the self-check, SELF_CHECK_READ) reads the pulse anyway and names the light only if the pulse is unclear.
+export function fusedPulseFromSamples(samples, { weights = FUSION_WEIGHTS, lighting = "refuse", ...options } = {}) {
   const usable = samples.filter(s => Number.isFinite(s.t));
   if (!usable.length) return { status: "insufficient", reason: "No face found yet", bpm: null, quality: 0 };
   const end = usable.at(-1).t, recent = usable.filter(s => end - s.t <= (options.windowSeconds ?? WAVE_PULSE.windowSeconds) * 1000);
   const withColour = recent.filter(s => s.rgb);
-  const refused = colourGate(withColour);
+  const refused = colourGate(withColour, { lighting });
   if (refused) return refused;
   const waves = [];
   const me = recent.filter(s => Number.isFinite(s.bvp)).map(s => ({ t: s.t, v: s.bvp }));
@@ -35,7 +50,10 @@ export function fusedPulseFromSamples(samples, { weights = FUSION_WEIGHTS, ...op
   const colour = weights.pos > 0 || weights.chrom > 0 ? colourWaves(withColour) : null;
   if (colour && weights.pos > 0) waves.push({ name: "POS", samples: colour.pos, weight: weights.pos });
   if (colour && weights.chrom > 0) waves.push({ name: "CHROM", samples: colour.chrom, weight: weights.chrom });
-  return estimateFusedPulse(waves, options);
+  const result = estimateFusedPulse(waves, options);
+  const unclear = result.status !== "estimated" && /ambiguous|No clear pulse/.test(result.reason);
+  if (lighting === "advise" && unclear && withColour.filter(outOfRange).length > CAMERA_PULSE.maxMovingShare * withColour.length) return { ...result, reason: LIGHTING_REASON };
+  return result;
 }
 
 // Live Capture has no deep model running, so its pulse is the face-colour POS wave alone, read by the
@@ -111,7 +129,8 @@ export function createCameraPulse({ video, onStatus = () => {}, onSample = () =>
     else requestAnimationFrame(now => next(now));
   }
 
-  // Measure for `seconds`, discarding the first settle seconds while the model state warms up.
+  // Measure for `seconds`, discarding the first settle seconds while the model state warms up, then read
+  // everything after the settle (SELF_CHECK_READ).
   function measure(seconds = CAMERA_PULSE.seconds, onProgress = () => {}) {
     if (!running) return Promise.reject(new Error("Camera is not running."));
     samples = []; worker.postMessage({ type: "reset" });
@@ -120,11 +139,12 @@ export function createCameraPulse({ video, onStatus = () => {}, onSample = () =>
       const tick = setInterval(() => {
         const elapsed = (performance.now() - started) / 1000;
         const settled = samples.filter(s => s.t - (samples[0]?.t ?? 0) >= CAMERA_PULSE.settleSeconds * 1000);
+        // The running "about N bpm" hint keeps the 30 s read validated for windows that short; the result reads all 42 s.
         const live = elapsed > 15 ? fusedPulseFromSamples(settled) : null;
         onProgress({ elapsed, seconds, live, faceShare: samples.length ? samples.filter(s => s.bvp !== null).length / samples.length : 0 });
         if (elapsed >= seconds || !running) {
           clearInterval(tick);
-          const result = fusedPulseFromSamples(settled);
+          const result = fusedPulseFromSamples(settled, SELF_CHECK_READ);
           const fps = settled.length > 1 ? (settled.length - 1) / ((settled.at(-1).t - settled[0].t) / 1000) : 0;
           resolve({ ...result, fps, frames: settled.length, protocol: RESTING_CAMERA_PROTOCOL, parts: result.parts?.map(p => ({ name: p.name, bpm: Math.round(p.hz * 60), quality: Number(p.quality.toFixed(2)) })),
             // Face cues and head height per frame, for the crewmate check (src/faceCues.js, breathingFromHead).

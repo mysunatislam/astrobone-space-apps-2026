@@ -1,5 +1,6 @@
 // Scale-up camera pulse validation (MCD-rPPG, every camera, at rest and after squats), scored with the app's own
-// JavaScript: the self-check hybrid (src/cameraPulse.js fusedPulseFromSamples as shipped), ME-rPPG alone, and the
+// JavaScript on 30 s windows: the self-check hybrid estimator (src/cameraPulse.js fusedPulseFromSamples with its 30 s
+// defaults; the self-check itself reads 42 s, scored by score-selfcheck.mjs), ME-rPPG alone, and the
 // Live Capture colour pulse (colourPulseFromSamples: the shipped gate, LIVE_PULSE, and the earlier 0.3). Also the Live Capture heart-rate variability
 // (src/rppg.js estimateStress, RMSSD) on the first 60 s against the finger PPG's RMSSD over the same 60 s.
 // Usage: node scripts/validation/score-scale.mjs <signals dir> <out.json>

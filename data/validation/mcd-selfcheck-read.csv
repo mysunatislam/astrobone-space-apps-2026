@@ -1,0 +1,97 @@
+half,camera,read,gate,people,clips,answered_pct,mae_bpm,within_5_bpm_pct,over_10_bpm,max_error_bpm
+choose,front webcam,earlier: last 30 s,0.3,29,110,84.5,0.48,97.8,0,8.5
+choose,front webcam,shipped: all 42 s,0.25,29,110,82.7,0.7,96.7,0,9.8
+choose,front webcam,sweep: all 42 s,0,29,110,99.1,1.12,94.5,1,20.9
+choose,front webcam,sweep: all 42 s,0.2,29,110,87.3,0.97,95.8,1,20.9
+choose,front webcam,sweep: all 42 s,0.22,29,110,83.6,0.7,96.7,0,9.8
+choose,front webcam,sweep: all 42 s,0.25,29,110,82.7,0.7,96.7,0,9.8
+choose,front webcam,sweep: all 42 s,0.27,29,110,74.5,0.58,97.6,0,6.9
+choose,front webcam,sweep: all 42 s,0.3,29,110,72.7,0.53,97.5,0,6.9
+choose,phone camera (Iriun),earlier: last 30 s,0.3,29,95,47.4,1.17,97.8,1,41
+choose,phone camera (Iriun),shipped: all 42 s,0.25,29,95,47.4,0.4,97.8,0,6.9
+choose,phone camera (Iriun),sweep: all 42 s,0,29,95,98.9,9.17,70.2,22,78.7
+choose,phone camera (Iriun),sweep: all 42 s,0.2,29,95,62.1,2.47,91.5,3,37.3
+choose,phone camera (Iriun),sweep: all 42 s,0.22,29,95,56.8,1.94,94.4,2,37.3
+choose,phone camera (Iriun),sweep: all 42 s,0.25,29,95,47.4,0.4,97.8,0,6.9
+choose,phone camera (Iriun),sweep: all 42 s,0.27,29,95,46.3,0.41,97.7,0,6.9
+choose,phone camera (Iriun),sweep: all 42 s,0.3,29,95,38.9,0.44,97.3,0,6.9
+choose,side USB camera,earlier: last 30 s,0.3,29,112,33,0.73,94.6,0,7.4
+choose,side USB camera,shipped: all 42 s,0.25,29,112,35.7,0.51,97.5,0,7.3
+choose,side USB camera,sweep: all 42 s,0,29,112,75.9,6.51,77.6,13,59.4
+choose,side USB camera,sweep: all 42 s,0.2,29,112,45.5,1.01,94.1,0,9.8
+choose,side USB camera,sweep: all 42 s,0.22,29,112,40.2,0.79,95.6,0,9.8
+choose,side USB camera,sweep: all 42 s,0.25,29,112,35.7,0.51,97.5,0,7.3
+choose,side USB camera,sweep: all 42 s,0.27,29,112,32.1,0.49,97.2,0,7.3
+choose,side USB camera,sweep: all 42 s,0.3,29,112,25,0.3,100,0,1.2
+choose,all three,earlier: last 30 s,0.3,29,317,55.2,0.71,97.1,1,41
+choose,all three,shipped: all 42 s,0.25,29,317,55.5,0.58,97.2,0,9.8
+choose,all three,sweep: all 42 s,0,29,317,90.9,5.34,81.6,36,78.7
+choose,all three,sweep: all 42 s,0.2,29,317,65,1.41,94.2,4,37.3
+choose,all three,sweep: all 42 s,0.22,29,317,60.3,1.07,95.8,2,37.3
+choose,all three,sweep: all 42 s,0.25,29,317,55.5,0.58,97.2,0,9.8
+choose,all three,sweep: all 42 s,0.27,29,317,51.1,0.51,97.5,0,7.3
+choose,all three,sweep: all 42 s,0.3,29,317,45.7,0.47,97.9,0,6.9
+check,front webcam,earlier: last 30 s,0.3,29,114,85.1,0.85,96.9,2,23
+check,front webcam,shipped: all 42 s,0.25,29,114,83.3,0.36,100,0,3.5
+check,front webcam,sweep: all 42 s,0,29,114,100,1.14,94.7,4,32.3
+check,front webcam,sweep: all 42 s,0.2,29,114,93,0.56,98.1,1,13.8
+check,front webcam,sweep: all 42 s,0.22,29,114,90.4,0.44,99,0,5.6
+check,front webcam,sweep: all 42 s,0.25,29,114,83.3,0.36,100,0,3.5
+check,front webcam,sweep: all 42 s,0.27,29,114,74.6,0.33,100,0,3.4
+check,front webcam,sweep: all 42 s,0.3,29,114,65.8,0.34,100,0,3.4
+check,phone camera (Iriun),earlier: last 30 s,0.3,29,108,53.7,0.75,94.8,1,15.1
+check,phone camera (Iriun),shipped: all 42 s,0.25,29,108,47.2,0.51,100,0,4.4
+check,phone camera (Iriun),sweep: all 42 s,0,29,108,100,7.4,74.1,25,67.6
+check,phone camera (Iriun),sweep: all 42 s,0.2,29,108,60.2,1.58,96.9,2,39.8
+check,phone camera (Iriun),sweep: all 42 s,0.22,29,108,55.6,1.65,96.7,2,39.8
+check,phone camera (Iriun),sweep: all 42 s,0.25,29,108,47.2,0.51,100,0,4.4
+check,phone camera (Iriun),sweep: all 42 s,0.27,29,108,41.7,0.41,100,0,4.4
+check,phone camera (Iriun),sweep: all 42 s,0.3,29,108,37,0.33,100,0,3.1
+check,side USB camera,earlier: last 30 s,0.3,29,116,40.5,0.96,97.9,1,17
+check,side USB camera,shipped: all 42 s,0.25,29,116,40.5,1.53,95.7,1,37.3
+check,side USB camera,sweep: all 42 s,0,29,116,81.9,5.75,71.6,20,43
+check,side USB camera,sweep: all 42 s,0.2,29,116,49.1,1.91,93,2,37.3
+check,side USB camera,sweep: all 42 s,0.22,29,116,47.4,1.61,94.5,1,37.3
+check,side USB camera,sweep: all 42 s,0.25,29,116,40.5,1.53,95.7,1,37.3
+check,side USB camera,sweep: all 42 s,0.27,29,116,38.8,1.58,95.6,1,37.3
+check,side USB camera,sweep: all 42 s,0.3,29,116,32.8,1.59,97.4,1,37.3
+check,all three,earlier: last 30 s,0.3,29,338,59.8,0.84,96.5,4,23
+check,all three,shipped: all 42 s,0.25,29,338,57.1,0.68,99,1,37.3
+check,all three,sweep: all 42 s,0,29,338,93.8,4.65,80.8,49,67.6
+check,all three,sweep: all 42 s,0.2,29,338,67.5,1.19,96.5,5,39.8
+check,all three,sweep: all 42 s,0.22,29,338,64.5,1.07,97.2,3,39.8
+check,all three,sweep: all 42 s,0.25,29,338,57.1,0.68,99,1,37.3
+check,all three,sweep: all 42 s,0.27,29,338,51.8,0.67,98.9,1,37.3
+check,all three,sweep: all 42 s,0.3,29,338,45.3,0.65,99.3,1,37.3
+all,front webcam,earlier: last 30 s,0.3,58,224,84.8,0.67,97.4,2,23
+all,front webcam,shipped: all 42 s,0.25,58,224,83,0.53,98.4,0,9.8
+all,front webcam,sweep: all 42 s,0,58,224,99.6,1.13,94.6,5,32.3
+all,front webcam,sweep: all 42 s,0.2,58,224,90.2,0.76,97,2,20.9
+all,front webcam,sweep: all 42 s,0.22,58,224,87.1,0.56,97.9,0,9.8
+all,front webcam,sweep: all 42 s,0.25,58,224,83,0.53,98.4,0,9.8
+all,front webcam,sweep: all 42 s,0.27,58,224,74.6,0.45,98.8,0,6.9
+all,front webcam,sweep: all 42 s,0.3,58,224,69.2,0.44,98.7,0,6.9
+all,phone camera (Iriun),earlier: last 30 s,0.3,58,203,50.7,0.93,96.1,2,41
+all,phone camera (Iriun),shipped: all 42 s,0.25,58,203,47.3,0.46,99,0,6.9
+all,phone camera (Iriun),sweep: all 42 s,0,58,203,99.5,8.23,72.3,47,78.7
+all,phone camera (Iriun),sweep: all 42 s,0.2,58,203,61.1,2,94.4,5,39.8
+all,phone camera (Iriun),sweep: all 42 s,0.22,58,203,56.2,1.79,95.6,4,39.8
+all,phone camera (Iriun),sweep: all 42 s,0.25,58,203,47.3,0.46,99,0,6.9
+all,phone camera (Iriun),sweep: all 42 s,0.27,58,203,43.8,0.41,98.9,0,6.9
+all,phone camera (Iriun),sweep: all 42 s,0.3,58,203,37.9,0.38,98.7,0,6.9
+all,side USB camera,earlier: last 30 s,0.3,58,228,36.8,0.86,96.4,1,17
+all,side USB camera,shipped: all 42 s,0.25,58,228,38.2,1.06,96.6,1,37.3
+all,side USB camera,sweep: all 42 s,0,58,228,78.9,6.11,74.4,33,59.4
+all,side USB camera,sweep: all 42 s,0.2,58,228,47.4,1.49,93.5,2,37.3
+all,side USB camera,sweep: all 42 s,0.22,58,228,43.9,1.24,95,1,37.3
+all,side USB camera,sweep: all 42 s,0.25,58,228,38.2,1.06,96.6,1,37.3
+all,side USB camera,sweep: all 42 s,0.27,58,228,35.5,1.1,96.3,1,37.3
+all,side USB camera,sweep: all 42 s,0.3,58,228,28.9,1.05,98.5,1,37.3
+all,all three,earlier: last 30 s,0.3,58,655,57.6,0.78,96.8,5,41
+all,all three,shipped: all 42 s,0.25,58,655,56.3,0.63,98.1,1,37.3
+all,all three,sweep: all 42 s,0,58,655,92.4,4.98,81.2,85,78.7
+all,all three,sweep: all 42 s,0.2,58,655,66.3,1.29,95.4,9,39.8
+all,all three,sweep: all 42 s,0.22,58,655,62.4,1.07,96.6,5,39.8
+all,all three,sweep: all 42 s,0.25,58,655,56.3,0.63,98.1,1,37.3
+all,all three,sweep: all 42 s,0.27,58,655,51.5,0.6,98.2,1,37.3
+all,all three,sweep: all 42 s,0.3,58,655,45.5,0.56,98.7,1,37.3

@@ -102,8 +102,8 @@ The data sets priority and timing only. It never sets a personal threshold: mice
 | --- | --- | --- |
 | Knee range of motion | REHAB24-6: 9 people, squats and lunges, Vicon motion capture | MediaPipe's 3D angle under-read squat range of motion by about 30° facing the camera. AstroBone's hybrid knee model (MediaPipe + learned trees) cut the error per rep from 21.7° to 13.2° (ICC 0.549 → 0.769) and was better for 9 of 9 people it never saw |
 | Knee repeat noise | Same data, consecutive reps | Side-on, ±5.8° (range of motion) and about ±4.4° (extension) with no change in the knee. The false-alarm simulation and the result screen use these measured figures ([section 5](docs/real-video-validation.md#5-repeat-noise-what-one-knee-check-can-tell)) |
-| Camera pulse | MCD-rPPG: 40 people at rest and after squats, finger PPG | The old method refused 95 % of webcam windows. The hybrid was within 2.1 bpm on average (90 % of windows within 5 bpm, 96 % answered, quality gate off); as shipped, with its quality gate, 0.6 bpm on the 77 % of windows it answers. It tracked each person's rise from rest within 4.2 bpm |
-| Camera pulse on three cameras | MCD-rPPG, 58 new people, front webcam, phone camera and side camera filmed at once, finger PPG | As shipped it answered 80 % of windows on the front webcam, 46 % on the phone and 34 % on the side camera, within 1.05 bpm when it answered. With the gate off it would have been 6.21 bpm off (10.22 on the phone): the gate refuses the bad windows ([November 2026](docs/validation-expansion-2026-11.md)) |
+| Camera pulse | MCD-rPPG: 40 people at rest and after squats, finger PPG | The old method refused 95 % of webcam windows. The hybrid was within 2.1 bpm on average (90 % of windows within 5 bpm, 96 % answered, quality gate off); with its quality gate, 0.6 bpm on the 77 % of 30-second windows it answers. It tracked each person's rise from rest within 4.2 bpm |
+| Camera pulse on three cameras | MCD-rPPG, 58 new people, front webcam, phone camera and side camera filmed at once, finger PPG | Read like the self-check's camera minute (655 clips of 42 s), it answered 83 % on the front webcam, 47 % on the phone and 38 % on the side camera, within 0.63 bpm when it answered, with 1 answer more than 10 bpm off (5 when it read only the last 30 s). With no quality gate, 30-second windows would have been 6.21 bpm off (10.22 on the phone): the gate refuses the bad windows ([November 2026](docs/validation-expansion-2026-11.md)) |
 | Second knee lab | Zenodo 19720803: 19 people, 1080 squats, OptiTrack against smartphone keypoints | Side-on, the knee angle the app falls back on was 7.8° off per squat (repeat noise ±3.6°); facing the camera, 52.1°. Confirms why the check asks you to sit side-on |
 | Live Capture heart-rate variability | The same 343 recordings, finger PPG RMSSD | Answered 16 of 343, about 53 ms off when it did, so the app no longer shows it |
 | Camera pulse vs an alternative | Same 40 people | AstroBone's pulse 2.2 bpm vs 6.4 bpm for the colour-only VitalSense pulse from the author's NeuroBridge Asha app, so AstroBone's was kept ([section 3b](docs/real-video-validation.md#3b-astrobones-camera-pulse-vs-neurobridge-ashas-vitalsense-2026-11-02)) |
@@ -112,7 +112,7 @@ The data sets priority and timing only. It never sets a personal threshold: mice
 **Engineering checks**
 
 - Claim audit: `node scripts/audit-claims.mjs` recomputes this README's headline numbers (NASA counts and statistics, the crew replay, report size, the false-alarm simulation, knee and pulse results) from the shipped code and data; every one reproduces, and a test keeps it so.
-- 523 automated tests (`npm test`) cover the review rules, quality gates, NASA rules, pose analysis, the bone overlay's placement, video synchronization, camera pulse, respiratory engineering and reference comparison, the shared health record and the models. The Monte Carlo reproduces a stored Simulink reference.
+- 524 automated tests (`npm test`) cover the review rules, quality gates, NASA rules, pose analysis, the bone overlay's placement, video synchronization, camera pulse, respiratory engineering and reference comparison, the shared health record and the models. The Monte Carlo reproduces a stored Simulink reference.
 - Reaction test timing: the stimulus onset is timed to the frame that draws it and the 3D view pauses during the test. A simulated 300 ms responder scores 300 ms; before, a software-rendered browser scored it 665 ms on average ([details](docs/core-analysis-2026-10-25.md#reaction-test-timing)).
 - Camera position: each frame records whether the person faces the camera or sits side-on. Side-on, only the near knee counts; a part-turned capture is refused. Side-on readings were the most accurate on real video, so the self-check recommends sitting side-on ([why](docs/core-analysis-2026-10-25.md#camera-position)).
 - An axe-core scan of every view at desktop and phone width finds no WCAG 2.1 A/AA violations (`scripts/qa-a11y.mjs`). Browser checks cover the health record and encryption, the guided demo and breathing capture (`scripts/qa-*.mjs`).
@@ -134,7 +134,7 @@ Requires Node.js 20.19+ or 22.12+.
 ```bash
 npm install
 npm run dev        # http://127.0.0.1:5173/
-npm test           # 523 automated tests (node --test)
+npm test           # 524 automated tests (node --test)
 npm run build      # production build in dist/
 ```
 

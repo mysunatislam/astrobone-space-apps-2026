@@ -39,7 +39,7 @@ test("the Evidence charts draw the saved per-person knee and per-method pulse ro
 test("the November 2026 knee and three-camera pulse numbers are the saved results", () => {
   assert.deepEqual(secondKneeSummary(read("sync21-knee-summary.csv")), REAL_DATA_VALIDATION.knee2);
   const summary = JSON.parse(readFileSync(new URL("../data/validation/mcd-scale-summary.json", import.meta.url), "utf8"));
-  assert.deepEqual(cameraPulseSummary(read("mcd-scale-pulse.csv"), summary), REAL_DATA_VALIDATION.cameras);
+  assert.deepEqual(cameraPulseSummary(read("mcd-scale-pulse.csv"), summary, read("mcd-selfcheck-read.csv")), REAL_DATA_VALIDATION.cameras);
   assert.deepEqual({ recordings: LIVE_VARIABILITY_CHECK.recordings, answered: LIVE_VARIABILITY_CHECK.answered, maeMs: LIVE_VARIABILITY_CHECK.maeMs },
     { recordings: summary.videos, answered: summary.hrv_answered, maeMs: summary.hrv_mae_ms });
   assert.ok(LIVE_VARIABILITY_CHECK.summary.includes(`${summary.videos} real recordings`) && LIVE_VARIABILITY_CHECK.summary.includes(`answered ${summary.hrv_answered} times`));

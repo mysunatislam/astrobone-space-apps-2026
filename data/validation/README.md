@@ -21,9 +21,10 @@ Added in November 2026 (`docs/validation-expansion-2026-11.md`, written by `scri
 | `sync21-knee-summary.csv` | Zenodo 19720803 (CC BY 4.0): per movement and camera position, range-of-motion and extension error, bias, repeat noise and MDC95 of the 2D knee angle against OptiTrack. |
 | `sync21-knee-trials.csv` | Per trial and knee: alignment (frame rate, correlation), frame-level error. |
 | `sync21-knee-reps.csv` | Per repetition and knee: extension and range of motion from motion capture and from the phone keypoints. |
-| `mcd-scale-pulse.csv` | MCD-rPPG, new people, three cameras: answered share and error per camera, state and method (self-check as shipped, gate off, ME-rPPG alone, Live Capture at 0.3 and 0.4). |
+| `mcd-scale-pulse.csv` | MCD-rPPG, new people, three cameras: answered share and error per camera, state and method (self-check estimator on 30 s windows, gate off, ME-rPPG alone, Live Capture at 0.3 and 0.4). |
 | `mcd-scale-rest-vs-squats.csv` | Per camera: change from rest to after squats, camera against finger sensor. |
 | `mcd-scale-hrv.csv` | Per recording: Live Capture's camera RMSSD or its refusal reason, finger-PPG RMSSD over the same 60 s, ECG RMSSD (separate 30 s strip). |
+| `mcd-selfcheck-read.csv` | Same new people, clips cut like the self-check's camera minute (42 s after a 3 s settle): the earlier read (last 30 s, gate 0.3) and the shipped read (`SELF_CHECK_READ`, all 42 s, gate 0.25), plus the gate sweep, per camera and per half (choose / check / all). |
 | `mcd-scale-summary.json` | Counts behind the Evidence view and the Live Capture panel. |
 
 Used by `scripts/validation/knee-repeatability.mjs` (docs/real-video-validation.md, section 5) and `src/realDataValidation.js` (the
