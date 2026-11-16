@@ -7,13 +7,14 @@ rd = lambda name: list(csv.DictReader(open(f"{V}/{name}")))
 knee = rd("sync21-knee-summary.csv"); trials = rd("sync21-knee-trials.csv")
 pulse = rd("mcd-scale-pulse.csv"); gate = rd("mcd-scale-live-gate.csv")
 gsel = lambda g, half: next(r for r in gate if float(r["gate"]) == g and r["half"] == half and r["camera"] == "all three")
-chg = rd("mcd-scale-rest-vs-squats.csv"); hrv = rd("mcd-scale-hrv.csv")
+chg = rd("mcd-scale-rest-vs-squats.csv"); hrv = rd("mcd-scale-hrv.csv"); sc = rd("mcd-selfcheck-read.csv")
+scr = lambda half, cam, read, gate=None: next(r for r in sc if r["half"] == half and r["camera"] == cam and r["read"].startswith(read) and (gate is None or float(r["gate"]) == gate))
 worst = json.load(open(f"{V}/mcd-scale-summary.json")).get("hybrid_worst_bpm")
 S = json.load(open(f"{V}/mcd-scale-summary.json"))
 k = {(r["movement"], r["camera"]): r for r in knee}
 p = lambda cam, state, method: next(r for r in pulse if r["camera"] == cam and r["state"] == state and r["method"].startswith(method))
 CAMS = ["front webcam", "phone camera (Iriun)", "side USB camera", "all three"]
-hy = {c: p(c, "both", "Self-check hybrid (as shipped") for c in CAMS}
+hy = {c: p(c, "both", "Self-check hybrid, 30 s windows") for c in CAMS}
 h0 = {c: p(c, "both", "Self-check hybrid, gate off") for c in CAMS}
 lo = {c: p(c, "both", "Live Capture colour pulse, earlier") for c in CAMS}
 ln = {c: p(c, "both", "Live Capture colour pulse, gate 0.5") for c in CAMS}
@@ -36,7 +37,8 @@ w("## Summary")
 w("")
 w(f"- **Every headline number checked.** `scripts/audit-claims.mjs` recomputes the README's and the submission's numbers (NASA DONKI and ISS dose counts, OSD-804 statistics, the Inspiration4 replay, report size, the false-alarm simulation, the knee and pulse results) from the shipped code and data. All reproduce; `src/claimsAudit.test.js` keeps it that way.")
 w(f"- **Knee, a second lab and 19 more people.** On an independent CC BY 4.0 dataset (21 men, OptiTrack motion capture, two smartphones), the side-on 2D knee angle that the app's knee model falls back on read squat range of motion within {sq['rom_mae_deg']}° per repetition (bias {sq['rom_bias_deg']}°); facing the camera the 2D angle was {sqf['rom_mae_deg']}° off. This is the reason the self-check asks people to sit side-on, now confirmed outside REHAB24-6. Repeat noise side-on: ±{sq['rom_repeat_sd_deg']}° (range of motion), below the ±5.8° the app already uses, so the app's figure is the cautious one.")
-w(f"- **Camera pulse on {S['people']} new people and three cameras, one a phone.** The self-check pulse, as shipped, answered {hy['front webcam']['answered_pct']} % of 30-second windows on the front webcam, {hy['phone camera (Iriun)']['answered_pct']} % on the phone and {hy['side USB camera']['answered_pct']} % on the side camera, and was within {hy['all three']['mae_bpm']} bpm of the finger sensor on average when it answered ({hy['all three']['within_5_bpm_pct']} % within 5 bpm). With its quality gate switched off it would have answered {h0['all three']['answered_pct']} % at {h0['all three']['mae_bpm']} bpm ({h0['phone camera (Iriun)']['mae_bpm']} bpm on the phone): the gate is what keeps most wrong numbers off the screen. It does not catch all: {round(100 - float(hy['all three']['within_5_bpm_pct']), 1)} % of its answers were more than 5 bpm off (worst {worst} bpm). One such reading just outside the usual range asks for a re-check, but one far outside goes to review, so these remain a source of false alarms.")
+w(f"- **Camera pulse on {S['people']} new people and three cameras, one a phone.** On 30-second windows, the self-check's pulse estimator answered {hy['front webcam']['answered_pct']} % of windows on the front webcam, {hy['phone camera (Iriun)']['answered_pct']} % on the phone and {hy['side USB camera']['answered_pct']} % on the side camera, and was within {hy['all three']['mae_bpm']} bpm of the finger sensor on average when it answered ({hy['all three']['within_5_bpm_pct']} % within 5 bpm). With its quality gate switched off it would have answered {h0['all three']['answered_pct']} % at {h0['all three']['mae_bpm']} bpm ({h0['phone camera (Iriun)']['mae_bpm']} bpm on the phone): the gate is what keeps most wrong numbers off the screen. It does not catch all: {round(100 - float(hy['all three']['within_5_bpm_pct']), 1)} % of its answers were more than 5 bpm off (worst {worst} bpm). One such reading just outside the usual range asks for a re-check, but one far outside goes to review, so these remain a source of false alarms.")
+w(f"- **The self-check now reads its whole camera minute.** It records 45 s and drops the first 3, but used to read only the last 30 s. On {scr('all', 'all three', 'shipped')['clips']} clips cut the same way from the same new people, reading all 42 s with the quality gate at 0.25 (chosen on half of the people, checked on the other half) gave {scr('all', 'all three', 'shipped')['over_10_bpm']} answer more than 10 bpm off instead of {scr('all', 'all three', 'earlier')['over_10_bpm']}, and {scr('all', 'all three', 'shipped')['within_5_bpm_pct']} % of answers within 5 bpm instead of {scr('all', 'all three', 'earlier')['within_5_bpm_pct']} %, for {round(float(scr('all', 'all three', 'earlier')['answered_pct']) - float(scr('all', 'all three', 'shipped')['answered_pct']), 1)} points fewer answers. It does not make the phone answer more often ({scr('all', 'phone camera (Iriun)', 'shipped')['answered_pct']} % of phone clips, from {scr('all', 'phone camera (Iriun)', 'earlier')['answered_pct']} %). Several other ways to make it answer more (voting across sub-windows, other POS and CHROM weights) let more wrong readings through and were not shipped. Light out of range no longer refuses on its own: it is named only when the pulse is unclear.")
 w(f"- **Live Capture heart-rate variability removed.** Its camera RMSSD answered {S['hrv_answered']} of {S['videos']} recordings, {S['hrv_mae_ms']} ms from the finger sensor on average when it did. The number is no longer shown; the panel says why.")
 w(f"- **Live Capture pulse gate raised from 0.3 to 0.5.** Its colour-only wave locked onto an artefact near 50 bpm on the phone and side cameras ({lo['phone camera (Iriun)']['mae_bpm']} and {lo['side USB camera']['mae_bpm']} bpm average error when it answered at 0.3). Choosing on half of the people picked 0.45 (worst reading {gsel(0.45, 'choose')['max_error_bpm']} bpm), but on the other half 0.45 still let a reading {gsel(0.45, 'check')['max_error_bpm']} bpm off through; at 0.5 the worst on either half was {max(float(gsel(0.5, 'choose')['max_error_bpm']), float(gsel(0.5, 'check')['max_error_bpm']))} bpm. So 0.5 was chosen after seeing both halves, and has no clean hold-out yet. At 0.5 it answers {f(ln['all three'], 'answered_pct', ' %')} of windows ({f(ln['front webcam'], 'answered_pct', ' %')} on the front webcam). Live Capture's colour-only pulse is a demonstration; the self-check's 45-second camera minute is the reading to use.")
 w("- **Still not tested:** darker skin tones (MCD-rPPG has no skin-type labels, and the face colour the three cameras record for the same person differs too much to sort people by it), the seated knee test against a goniometer, the breathing check against a belt (no open video dataset with a belt signal could be downloaded: the MPSC-RR videos are CC BY 4.0 but their belt signals are not published), Bluetooth import with a real cuff, and anyone in space.")
@@ -66,7 +68,7 @@ w("")
 w(f"**Data.** MCD-rPPG (Egorov et al., 2025; CC BY 4.0): {S['people']} people not used before (picked at random, seed 2026; the 6 who overlapped the first 40 are left out), each filmed at rest and right after 15 squats by three cameras at once: a front webcam (640 × 480), a phone streamed over Iriun and a USB camera to the side. "
   f"First 60 s of each recording ({S['videos']} recordings, {S['windows']} windows of 30 s every 10 s); truth is the frame-synchronised finger PPG.")
 w("")
-w("**Method.** `scripts/validation/mcd_scale_worker.py` runs the face mesh, the app's skin regions and ME-rPPG through the app's own ONNX file with the app's face-mesh crop; `score-scale.mjs` then scores the app's JavaScript as shipped (`fusedPulseFromSamples`, `colourPulseFromSamples`, `estimateStress`).")
+w("**Method.** `scripts/validation/mcd_scale_worker.py` runs the face mesh, the app's skin regions and ME-rPPG through the app's own ONNX file with the app's face-mesh crop; `score-scale.mjs` then scores the app's JavaScript on 30 s windows (`fusedPulseFromSamples` with its 30 s defaults, `colourPulseFromSamples`, `estimateStress`). The self-check itself reads 42 s; section 3b scores that read.")
 w("")
 w("| Camera | Method | People | Windows | Answered | Error when answered | Within 5 bpm |")
 w("|---|---|---|---|---|---|---|")
@@ -84,6 +86,28 @@ if chg:
     for r in chg:
         w(f"| {r['camera']} | {r['people']} | {r['both_answered']} | {r['change_mae_bpm']} bpm | {r['change_r']} | {r['true_rise_bpm']} bpm |")
     w("")
+w("### 3b. The self-check's own read")
+w("")
+w("The self-check records 45 s and drops the first 3 s while the deep model's state settles. `scripts/validation/mcd_selfcheck_export.py` cuts the same recordings that way (42 s starting 3 s and 18 s in) and `score-selfcheck.mjs` reads each clip the earlier way (last 30 s, gate 0.3, any frame with light out of range refused) and the shipped way (`SELF_CHECK_READ` in `src/cameraPulse.js`: all 42 s, gate 0.25, light named only when the pulse is unclear), each against the finger PPG over the span it read. A longer window spreads the same pulse over a narrower peak band (±1.5 / duration), so its peak share runs lower for the same signal, which is why its gate is lower.")
+w("")
+w("| Camera | Read | Clips | Answered | Error when answered | Within 5 bpm | More than 10 bpm off | Worst |")
+w("|---|---|---|---|---|---|---|---|")
+for c in CAMS:
+    for rd_ in ("earlier", "shipped"):
+        r = scr("all", c, rd_)
+        w(f"| {c} | {r['read']} | {r['clips']} | {r['answered_pct']} % | {f(r, 'mae_bpm', ' bpm')} | {f(r, 'within_5_bpm_pct', ' %')} | {r['over_10_bpm']} | {f(r, 'max_error_bpm', ' bpm')} |")
+w("")
+w("**Choosing the gate** (all three cameras; people sorted by id, every other one chooses, the rest check). 0.25 was the lowest gate that kept the earlier read's answer rate on the choosing half with no answer more than 10 bpm off; 0.22 let two through.")
+w("")
+w("| Read | Gate | Half | Answered | Error when answered | More than 10 bpm off | Worst |")
+w("|---|---|---|---|---|---|---|")
+for half in ("choose", "check"):
+    r = scr(half, "all three", "earlier"); w(f"| last 30 s (earlier) | 0.3 | {half} | {r['answered_pct']} % | {f(r, 'mae_bpm', ' bpm')} | {r['over_10_bpm']} | {f(r, 'max_error_bpm', ' bpm')} |")
+    for g in (0.2, 0.22, 0.25, 0.27, 0.3):
+        r = scr(half, "all three", "sweep", g); w(f"| all 42 s | {g} | {half} | {r['answered_pct']} % | {f(r, 'mae_bpm', ' bpm')} | {r['over_10_bpm']} | {f(r, 'max_error_bpm', ' bpm')} |")
+w("")
+w("**Reading it.** The longer read mainly removes wrong answers; the one left is on the side camera, where the pulse in two thirds of the clip pointed to 44 bpm and the finger read 82. The phone still answers about half the time. The earlier read's numbers on the first 40 people (docs/real-video-validation.md) describe 30-second windows and are unchanged.")
+w("")
 w("**Live Capture gate** (`data/validation/mcd-scale-live-gate.csv`; people sorted by id, every other one chooses, the rest check):")
 w("")
 w("| Gate | Half | Answered | Error when answered | Worst reading |")
@@ -112,6 +136,8 @@ w("python -I scripts/validation/mcd_scale_worker.py jobs.txt <npz dir> 60 <shard
 w("python -I scripts/validation/mcd_scale_export.py <npz dir> <ecg dir> <signals dir>")
 w("node scripts/validation/score-scale.mjs <signals dir> scale.json")
 w("python -I scripts/validation/summarize_scale.py scale.json <repo>")
+w("python -I scripts/validation/mcd_selfcheck_export.py <npz dir> <repo> <clips dir>")
+w("node scripts/validation/score-selfcheck.mjs <clips dir> data/validation/mcd-selfcheck-read.csv")
 w("python -I scripts/validation/write_expansion_doc.py <repo>")
 w("```")
 open(f"{repo}/docs/validation-expansion-2026-11.md", "w").write("\n".join(L) + "\n")

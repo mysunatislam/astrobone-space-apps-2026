@@ -11,7 +11,7 @@ export const REAL_DATA_VALIDATION = Object.freeze({
   pulse: Object.freeze({ dataset: "MCD-rPPG", people: 40, windows: 308, mae: 2.1, gatedMae: 0.6, gatedAnsweredPct: 76.9, gate: 0.3, changeError: 4.2, changePeople: 38 }),
   // November 2026 expansion (docs/validation-expansion-2026-11.md): a second knee lab and new pulse people on three cameras.
   knee2: Object.freeze({dataset: "Zenodo 19720803", people: 19, reps: 1080, sideOnSquatError: 7.8, facingSquatError: 52.1, sideOnRepeatSd: 3.6}),
-  cameras: Object.freeze({people: 58, windows: 1341, answeredFront: 80.5, answeredPhone: 45.7, answeredSide: 34, mae: 1.05, ungatedMae: 6.21, hrvRecordings: 343, hrvAnswered: 16, hrvMaeMs: 53.4}),
+  cameras: Object.freeze({people: 58, windows: 1341, clips: 655, answeredFront: 83, answeredPhone: 47.3, answeredSide: 38.2, mae: 0.63, over10: 1, earlierOver10: 5, ungatedMae: 6.21, hrvRecordings: 343, hrvAnswered: 16, hrvMaeMs: 53.4}),
 });
 
 // From data/validation/sync21-knee-summary.csv (Zenodo 19720803: OptiTrack vs smartphone keypoints).
@@ -20,13 +20,15 @@ export function secondKneeSummary(rows) {
   return { dataset: "Zenodo 19720803", people: side.people, reps: side.reps, sideOnSquatError: side.rom_mae_deg, facingSquatError: facing.rom_mae_deg, sideOnRepeatSd: side.rom_repeat_sd_deg };
 }
 
-// From data/validation/mcd-scale-pulse.csv and mcd-scale-summary.json (new MCD-rPPG people, three cameras).
-export function cameraPulseSummary(rows, summary) {
-  const row = (camera, method) => rows.find(r => r.camera === camera && r.state === "both" && r.method.startsWith(method));
-  const shipped = camera => row(camera, "Self-check hybrid (as shipped"), all = shipped("all three"), off = row("all three", "Self-check hybrid, gate off");
+// From data/validation/mcd-selfcheck-read.csv (clips cut like the self-check's camera minute, read as shipped),
+// mcd-scale-pulse.csv (30 s windows, gate off) and mcd-scale-summary.json (new MCD-rPPG people, three cameras).
+export function cameraPulseSummary(rows, summary, selfCheck) {
+  const off = rows.find(r => r.camera === "all three" && r.state === "both" && r.method.startsWith("Self-check hybrid, gate off"));
+  const read = (camera, which) => selfCheck.find(r => r.half === "all" && r.camera === camera && r.read.startsWith(which));
+  const shipped = camera => read(camera, "shipped"), all = shipped("all three");
   return {
-    people: summary.people, windows: summary.windows, answeredFront: shipped("front webcam").answered_pct, answeredPhone: shipped("phone camera (Iriun)").answered_pct,
-    answeredSide: shipped("side USB camera").answered_pct, mae: all.mae_bpm, ungatedMae: off.mae_bpm,
+    people: summary.people, windows: summary.windows, clips: all.clips, answeredFront: shipped("front webcam").answered_pct, answeredPhone: shipped("phone camera (Iriun)").answered_pct,
+    answeredSide: shipped("side USB camera").answered_pct, mae: all.mae_bpm, over10: all.over_10_bpm, earlierOver10: read("all three", "earlier").over_10_bpm, ungatedMae: off.mae_bpm,
     hrvRecordings: summary.videos, hrvAnswered: summary.hrv_answered, hrvMaeMs: summary.hrv_mae_ms,
   };
 }
@@ -76,7 +78,7 @@ export function testedOnRealData(v = REAL_DATA_VALIDATION, noise = KNEE_REPEAT_N
       `Camera pulse against a finger sensor (${v.pulse.dataset}, ${v.pulse.people} people at rest and after squats): ${v.pulse.mae} bpm average error on ${v.pulse.windows} 30-second windows; ${v.pulse.gatedMae} bpm on the ${Math.round(v.pulse.gatedAnsweredPct)} % the quality gate passes; the rise from rest tracked within ${v.pulse.changeError} bpm in ${v.pulse.changePeople} people.`,
       `False alarms, simulated with the measured knee noise and published day-to-day spreads for heart rate, blood pressure, sleep and temperature: a healthy astronaut doing all 14 checks daily sees REVIEW on ${sim.reviewPct} % of days; a real 10° knee drop is flagged within 3 checks in ${knee.withinThree} % of runs and within 14 in ${knee.withinTwoWeeks} %.`,
       `A second knee lab (${v.knee2.dataset}, ${v.knee2.people} people, ${v.knee2.reps} squats, motion capture against smartphone keypoints): side-on, the knee angle the app falls back on was ${v.knee2.sideOnSquatError}° off per squat; facing the camera, ${v.knee2.facingSquatError}°. That is why the check asks you to sit side-on.`,
-      `Camera pulse on ${v.cameras.people} more people and three cameras, one a phone: the self-check answered ${Math.round(v.cameras.answeredFront)} % of windows on the front webcam, ${Math.round(v.cameras.answeredPhone)} % on the phone and ${Math.round(v.cameras.answeredSide)} % on the side camera, ${v.cameras.mae} bpm from the finger sensor when it answered; with its quality gate off it would have been ${v.cameras.ungatedMae} bpm off.`,
+      `Camera pulse on ${v.cameras.people} more people and three cameras, one a phone, cut like the self-check's minute (${v.cameras.clips} clips): it answered ${Math.round(v.cameras.answeredFront)} % on the front webcam, ${Math.round(v.cameras.answeredPhone)} % on the phone and ${Math.round(v.cameras.answeredSide)} % on the side camera, ${v.cameras.mae} bpm from the finger sensor when it answered, ${v.cameras.over10} answer more than 10 bpm off (${v.cameras.earlierOver10} before it read the whole minute); with no quality gate it would have been ${v.cameras.ungatedMae} bpm off.`,
       "Real spaceflight: the personal-baseline rule replayed on the four Inspiration4 crew members' blood (NASA OSDR OSD-569 and OSD-575), each against their own pre-flight draws; ISS area-dosimeter rates from OSDR set the radiation comparison band.",
     ],
     notYet: [

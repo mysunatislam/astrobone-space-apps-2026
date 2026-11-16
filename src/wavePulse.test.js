@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { estimateWavePulse, estimateFusedPulse, colourWaves, resampleWave, WAVE_PULSE } from "./wavePulse.js";
-import { fusedPulseFromSamples, colourPulseFromSamples, CAMERA_PULSE, RESTING_CAMERA_PROTOCOL, LIVE_PULSE, FUSION_WEIGHTS } from "./cameraPulse.js";
+import { fusedPulseFromSamples, colourPulseFromSamples, CAMERA_PULSE, RESTING_CAMERA_PROTOCOL, LIVE_PULSE, FUSION_WEIGHTS, SELF_CHECK_READ } from "./cameraPulse.js";
 import { PulseCapture } from "./rppg.js";
 import { ME_CROP, Kalman1D, blazeBoxFromMesh, FaceBoxSmoother, clampCropBox, rgbaToModelInput, meTimeStep } from "./meRppg.js";
 
@@ -104,6 +104,28 @@ test("camera pulse: the deep model leads the fusion, POS at a quarter weight", (
   assert.ok(Math.abs(result.bpmExact - 64) < 1.5);
   assert.equal(RESTING_CAMERA_PROTOCOL, "resting-camera-hybrid-v1");
   assert.equal(CAMERA_PULSE.seconds, 45);
+});
+
+test("self-check read: all 42 s after the settle, gate 0.25, light named only when the pulse is unclear", () => {
+  assert.deepEqual({ ...SELF_CHECK_READ }, { windowSeconds: 43, minQuality: 0.25, lighting: "advise" });
+  // 45 s of skin: the default read uses the last 30 s, the self-check read all of it.
+  const long = skin(72, { seconds: 45 }).map(s => ({ ...s, bvp: null }));
+  const span = r => r.status === "estimated" ? r : null;
+  assert.ok(span(fusedPulseFromSamples(long, SELF_CHECK_READ)) && Math.abs(fusedPulseFromSamples(long, SELF_CHECK_READ).bpmExact - 72) < 1.5);
+  // A clear pulse with the face's blue channel under 20: refused by default, read by the self-check.
+  const warm = skin(70, { base: [120, 60, 15] }).map(s => ({ ...s, bvp: null }));
+  assert.match(fusedPulseFromSamples(warm).reason, /Lighting/);
+  const read = fusedPulseFromSamples(warm, SELF_CHECK_READ);
+  assert.equal(read.status, "estimated");
+  assert.ok(Math.abs(read.bpmExact - 70) < 1.5, `got ${read.bpmExact}`);
+  // No pulse at all under the same light: refused, and the light is the reason given.
+  const r = noise(21), flat = warm.map(s => ({ ...s, rgb: [120 + r() * 2, 60 + r() * 2, 15 + r() * 2] }));
+  const unclear = fusedPulseFromSamples(flat, SELF_CHECK_READ);
+  assert.equal(unclear.status, "insufficient", `read ${unclear.bpm} at quality ${unclear.quality}`);
+  assert.match(unclear.reason, /Lighting/);
+  // Movement still refuses outright.
+  const moving = long.map((s, i) => ({ ...s, motion: i % 5 === 0 ? 0.08 : 0.002 }));
+  assert.match(fusedPulseFromSamples(moving, SELF_CHECK_READ).reason, /movement/);
 });
 
 test("ME-rPPG crop: mesh box maps to the detector box, Kalman-smoothed, 20 % taller and raised", () => {

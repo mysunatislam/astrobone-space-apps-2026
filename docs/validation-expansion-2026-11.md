@@ -6,7 +6,8 @@ Added after the Space Apps 2026 local round, on the `post-judging-upgrades` bran
 
 - **Every headline number checked.** `scripts/audit-claims.mjs` recomputes the README's and the submission's numbers (NASA DONKI and ISS dose counts, OSD-804 statistics, the Inspiration4 replay, report size, the false-alarm simulation, the knee and pulse results) from the shipped code and data. All reproduce; `src/claimsAudit.test.js` keeps it that way.
 - **Knee, a second lab and 19 more people.** On an independent CC BY 4.0 dataset (21 men, OptiTrack motion capture, two smartphones), the side-on 2D knee angle that the app's knee model falls back on read squat range of motion within 7.8° per repetition (bias -0.1°); facing the camera the 2D angle was 52.1° off. This is the reason the self-check asks people to sit side-on, now confirmed outside REHAB24-6. Repeat noise side-on: ±3.6° (range of motion), below the ±5.8° the app already uses, so the app's figure is the cautious one.
-- **Camera pulse on 58 new people and three cameras, one a phone.** The self-check pulse, as shipped, answered 80.5 % of 30-second windows on the front webcam, 45.7 % on the phone and 34.0 % on the side camera, and was within 1.05 bpm of the finger sensor on average when it answered (95.3 % within 5 bpm). With its quality gate switched off it would have answered 90.2 % at 6.21 bpm (10.22 bpm on the phone): the gate is what keeps most wrong numbers off the screen. It does not catch all: 4.7 % of its answers were more than 5 bpm off (worst 41.0 bpm). One such reading just outside the usual range asks for a re-check, but one far outside goes to review, so these remain a source of false alarms.
+- **Camera pulse on 58 new people and three cameras, one a phone.** On 30-second windows, the self-check's pulse estimator answered 80.5 % of windows on the front webcam, 45.7 % on the phone and 34.0 % on the side camera, and was within 1.05 bpm of the finger sensor on average when it answered (95.3 % within 5 bpm). With its quality gate switched off it would have answered 90.2 % at 6.21 bpm (10.22 bpm on the phone): the gate is what keeps most wrong numbers off the screen. It does not catch all: 4.7 % of its answers were more than 5 bpm off (worst 41.0 bpm). One such reading just outside the usual range asks for a re-check, but one far outside goes to review, so these remain a source of false alarms.
+- **The self-check now reads its whole camera minute.** It records 45 s and drops the first 3, but used to read only the last 30 s. On 655 clips cut the same way from the same new people, reading all 42 s with the quality gate at 0.25 (chosen on half of the people, checked on the other half) gave 1 answer more than 10 bpm off instead of 5, and 98.1 % of answers within 5 bpm instead of 96.8 %, for 1.3 points fewer answers. It does not make the phone answer more often (47.3 % of phone clips, from 50.7 %). Several other ways to make it answer more (voting across sub-windows, other POS and CHROM weights) let more wrong readings through and were not shipped. Light out of range no longer refuses on its own: it is named only when the pulse is unclear.
 - **Live Capture heart-rate variability removed.** Its camera RMSSD answered 16 of 343 recordings, 53.4 ms from the finger sensor on average when it did. The number is no longer shown; the panel says why.
 - **Live Capture pulse gate raised from 0.3 to 0.5.** Its colour-only wave locked onto an artefact near 50 bpm on the phone and side cameras (12.95 and 12.05 bpm average error when it answered at 0.3). Choosing on half of the people picked 0.45 (worst reading 1.5 bpm), but on the other half 0.45 still let a reading 37.0 bpm off through; at 0.5 the worst on either half was 1.5 bpm. So 0.5 was chosen after seeing both halves, and has no clean hold-out yet. At 0.5 it answers 2.7 % of windows (7.7 % on the front webcam). Live Capture's colour-only pulse is a demonstration; the self-check's 45-second camera minute is the reading to use.
 - **Still not tested:** darker skin tones (MCD-rPPG has no skin-type labels, and the face colour the three cameras record for the same person differs too much to sort people by it), the seated knee test against a goniometer, the breathing check against a belt (no open video dataset with a belt signal could be downloaded: the MPSC-RR videos are CC BY 4.0 but their belt signals are not published), Bluetooth import with a real cuff, and anyone in space.
@@ -34,23 +35,23 @@ Added after the Space Apps 2026 local round, on the `post-judging-upgrades` bran
 
 **Data.** MCD-rPPG (Egorov et al., 2025; CC BY 4.0): 58 people not used before (picked at random, seed 2026; the 6 who overlapped the first 40 are left out), each filmed at rest and right after 15 squats by three cameras at once: a front webcam (640 × 480), a phone streamed over Iriun and a USB camera to the side. First 60 s of each recording (343 recordings, 1341 windows of 30 s every 10 s); truth is the frame-synchronised finger PPG.
 
-**Method.** `scripts/validation/mcd_scale_worker.py` runs the face mesh, the app's skin regions and ME-rPPG through the app's own ONNX file with the app's face-mesh crop; `score-scale.mjs` then scores the app's JavaScript as shipped (`fusedPulseFromSamples`, `colourPulseFromSamples`, `estimateStress`).
+**Method.** `scripts/validation/mcd_scale_worker.py` runs the face mesh, the app's skin regions and ME-rPPG through the app's own ONNX file with the app's face-mesh crop; `score-scale.mjs` then scores the app's JavaScript on 30 s windows (`fusedPulseFromSamples` with its 30 s defaults, `colourPulseFromSamples`, `estimateStress`). The self-check itself reads 42 s; section 3b scores that read.
 
 | Camera | Method | People | Windows | Answered | Error when answered | Within 5 bpm |
 |---|---|---|---|---|---|---|
-| front webcam | Self-check hybrid (as shipped, gate 0.3) | 58 | 452 | 80.5 % | 0.83 bpm | 96.2 % |
+| front webcam | Self-check hybrid, 30 s windows (gate 0.3) | 58 | 452 | 80.5 % | 0.83 bpm | 96.2 % |
 | front webcam | Self-check hybrid, gate off | 58 | 452 | 98.2 % | 1.79 bpm | 90.3 % |
 | front webcam | Live Capture colour pulse, earlier gate 0.3 | 58 | 452 | 29.4 % | 1.93 bpm | 94.7 % |
 | front webcam | Live Capture colour pulse, gate 0.5 (as shipped now) | 58 | 452 | 7.7 % | 0.13 bpm | 100.0 % |
-| phone camera (Iriun) | Self-check hybrid (as shipped, gate 0.3) | 58 | 433 | 45.7 % | 1.12 bpm | 94.9 % |
+| phone camera (Iriun) | Self-check hybrid, 30 s windows (gate 0.3) | 58 | 433 | 45.7 % | 1.12 bpm | 94.9 % |
 | phone camera (Iriun) | Self-check hybrid, gate off | 58 | 433 | 98.4 % | 10.22 bpm | 65.0 % |
 | phone camera (Iriun) | Live Capture colour pulse, earlier gate 0.3 | 58 | 433 | 7.4 % | 12.95 bpm | 68.8 % |
 | phone camera (Iriun) | Live Capture colour pulse, gate 0.5 (as shipped now) | 58 | 433 | 0.0 % | – | – |
-| side USB camera | Self-check hybrid (as shipped, gate 0.3) | 58 | 456 | 34.0 % | 1.48 bpm | 93.5 % |
+| side USB camera | Self-check hybrid, 30 s windows (gate 0.3) | 58 | 456 | 34.0 % | 1.48 bpm | 93.5 % |
 | side USB camera | Self-check hybrid, gate off | 58 | 456 | 74.3 % | 6.96 bpm | 70.2 % |
 | side USB camera | Live Capture colour pulse, earlier gate 0.3 | 58 | 456 | 9.2 % | 12.05 bpm | 59.5 % |
 | side USB camera | Live Capture colour pulse, gate 0.5 (as shipped now) | 58 | 456 | 0.2 % | 1.5 bpm | 100.0 % |
-| all three | Self-check hybrid (as shipped, gate 0.3) | 58 | 1341 | 53.5 % | 1.05 bpm | 95.3 % |
+| all three | Self-check hybrid, 30 s windows (gate 0.3) | 58 | 1341 | 53.5 % | 1.05 bpm | 95.3 % |
 | all three | Self-check hybrid, gate off | 58 | 1341 | 90.2 % | 6.21 bpm | 75.8 % |
 | all three | Live Capture colour pulse, earlier gate 0.3 | 58 | 1341 | 15.4 % | 5.69 bpm | 83.6 % |
 | all three | Live Capture colour pulse, gate 0.5 (as shipped now) | 58 | 1341 | 2.7 % | 0.17 bpm | 100.0 % |
@@ -64,6 +65,40 @@ Added after the Space Apps 2026 local round, on the `post-judging-upgrades` bran
 | front webcam | 56 | 33 | 2.33 bpm | 0.898 | 2.9 bpm |
 | phone camera (Iriun) | 57 | 7 | 2.0 bpm | 0.799 | 4.7 bpm |
 | side USB camera | 56 | 7 | 0.71 bpm | 0.986 | 0.2 bpm |
+
+### 3b. The self-check's own read
+
+The self-check records 45 s and drops the first 3 s while the deep model's state settles. `scripts/validation/mcd_selfcheck_export.py` cuts the same recordings that way (42 s starting 3 s and 18 s in) and `score-selfcheck.mjs` reads each clip the earlier way (last 30 s, gate 0.3, any frame with light out of range refused) and the shipped way (`SELF_CHECK_READ` in `src/cameraPulse.js`: all 42 s, gate 0.25, light named only when the pulse is unclear), each against the finger PPG over the span it read. A longer window spreads the same pulse over a narrower peak band (±1.5 / duration), so its peak share runs lower for the same signal, which is why its gate is lower.
+
+| Camera | Read | Clips | Answered | Error when answered | Within 5 bpm | More than 10 bpm off | Worst |
+|---|---|---|---|---|---|---|---|
+| front webcam | earlier: last 30 s | 224 | 84.8 % | 0.67 bpm | 97.4 % | 2 | 23 bpm |
+| front webcam | shipped: all 42 s | 224 | 83 % | 0.53 bpm | 98.4 % | 0 | 9.8 bpm |
+| phone camera (Iriun) | earlier: last 30 s | 203 | 50.7 % | 0.93 bpm | 96.1 % | 2 | 41 bpm |
+| phone camera (Iriun) | shipped: all 42 s | 203 | 47.3 % | 0.46 bpm | 99 % | 0 | 6.9 bpm |
+| side USB camera | earlier: last 30 s | 228 | 36.8 % | 0.86 bpm | 96.4 % | 1 | 17 bpm |
+| side USB camera | shipped: all 42 s | 228 | 38.2 % | 1.06 bpm | 96.6 % | 1 | 37.3 bpm |
+| all three | earlier: last 30 s | 655 | 57.6 % | 0.78 bpm | 96.8 % | 5 | 41 bpm |
+| all three | shipped: all 42 s | 655 | 56.3 % | 0.63 bpm | 98.1 % | 1 | 37.3 bpm |
+
+**Choosing the gate** (all three cameras; people sorted by id, every other one chooses, the rest check). 0.25 was the lowest gate that kept the earlier read's answer rate on the choosing half with no answer more than 10 bpm off; 0.22 let two through.
+
+| Read | Gate | Half | Answered | Error when answered | More than 10 bpm off | Worst |
+|---|---|---|---|---|---|---|
+| last 30 s (earlier) | 0.3 | choose | 55.2 % | 0.71 bpm | 1 | 41 bpm |
+| all 42 s | 0.2 | choose | 65 % | 1.41 bpm | 4 | 37.3 bpm |
+| all 42 s | 0.22 | choose | 60.3 % | 1.07 bpm | 2 | 37.3 bpm |
+| all 42 s | 0.25 | choose | 55.5 % | 0.58 bpm | 0 | 9.8 bpm |
+| all 42 s | 0.27 | choose | 51.1 % | 0.51 bpm | 0 | 7.3 bpm |
+| all 42 s | 0.3 | choose | 45.7 % | 0.47 bpm | 0 | 6.9 bpm |
+| last 30 s (earlier) | 0.3 | check | 59.8 % | 0.84 bpm | 4 | 23 bpm |
+| all 42 s | 0.2 | check | 67.5 % | 1.19 bpm | 5 | 39.8 bpm |
+| all 42 s | 0.22 | check | 64.5 % | 1.07 bpm | 3 | 39.8 bpm |
+| all 42 s | 0.25 | check | 57.1 % | 0.68 bpm | 1 | 37.3 bpm |
+| all 42 s | 0.27 | check | 51.8 % | 0.67 bpm | 1 | 37.3 bpm |
+| all 42 s | 0.3 | check | 45.3 % | 0.65 bpm | 1 | 37.3 bpm |
+
+**Reading it.** The longer read mainly removes wrong answers; the one left is on the side camera, where the pulse in two thirds of the clip pointed to 44 bpm and the finger read 82. The phone still answers about half the time. The earlier read's numbers on the first 40 people (docs/real-video-validation.md) describe 30-second windows and are unchanged.
 
 **Live Capture gate** (`data/validation/mcd-scale-live-gate.csv`; people sorted by id, every other one chooses, the rest check):
 
@@ -99,5 +134,7 @@ python -I scripts/validation/mcd_scale_worker.py jobs.txt <npz dir> 60 <shard> <
 python -I scripts/validation/mcd_scale_export.py <npz dir> <ecg dir> <signals dir>
 node scripts/validation/score-scale.mjs <signals dir> scale.json
 python -I scripts/validation/summarize_scale.py scale.json <repo>
+python -I scripts/validation/mcd_selfcheck_export.py <npz dir> <repo> <clips dir>
+node scripts/validation/score-selfcheck.mjs <clips dir> data/validation/mcd-selfcheck-read.csv
 python -I scripts/validation/write_expansion_doc.py <repo>
 ```
