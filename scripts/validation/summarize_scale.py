@@ -22,7 +22,7 @@ for cam in list(CAM) + [None]:
     for st in list(STATE) + [None]:
         ws = [w for w in W if (cam is None or w["camera"] == cam) and (st is None or w["state"] == st)]
         if not ws: continue
-        for key, label in (("hybrid", "Self-check hybrid (as shipped, gate 0.3)"), ("me", "ME-rPPG alone (gate 0.3)"), ("liveOld", "Live Capture colour pulse, earlier gate 0.3"), ("live", "Live Capture colour pulse, gate 0.4 (as shipped now)"), ("hybrid0", "Self-check hybrid, gate off")):
+        for key, label in (("hybrid", "Self-check hybrid (as shipped, gate 0.3)"), ("me", "ME-rPPG alone (gate 0.3)"), ("liveOld", "Live Capture colour pulse, earlier gate 0.3"), ("live", "Live Capture colour pulse, gate 0.5 (as shipped now)"), ("hybrid0", "Self-check hybrid, gate off")):
             rows.append(dict(camera=CAM.get(cam, "all three"), state=STATE.get(st, "both"), method=label, people=len({w["person"] for w in ws}), windows=len(ws), **stats(ws, key)))
 with open(f"{repo}/data/validation/mcd-scale-pulse.csv", "w", newline="") as f:
     wr = csv.DictWriter(f, fieldnames=list(rows[0])); wr.writeheader(); wr.writerows(rows)
@@ -62,7 +62,8 @@ with open(f"{repo}/data/validation/mcd-scale-hrv.csv", "w", newline="") as f:
     wr = csv.DictWriter(f, fieldnames=list(hrv[0])); wr.writeheader(); wr.writerows(hrv)
 
 ans = [h for h in hrv if h["camera_rmssd_ms"] != "" and h["finger_ppg_rmssd_ms"] != ""]
-summary = dict(people=len({w["person"] for w in W}), videos=len(V), windows=len(W),
+hyb = [abs(w["hybrid"] - w["gt"]) for w in W if w["hybrid"] is not None]
+summary = dict(hybrid_worst_bpm=round(float(max(hyb)), 1), people=len({w["person"] for w in W}), videos=len(V), windows=len(W),
                hrv_answered=len([h for h in hrv if h["camera_rmssd_ms"] != ""]),
                hrv_mae_ms=round(float(np.mean([abs(h["camera_rmssd_ms"] - h["finger_ppg_rmssd_ms"]) for h in ans])), 1) if ans else None,
                hrv_ratio=round(float(np.median([h["camera_rmssd_ms"] / h["finger_ppg_rmssd_ms"] for h in ans])), 2) if ans else None)

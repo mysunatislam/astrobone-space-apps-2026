@@ -39,7 +39,7 @@ export function initHealthLayers({ scene, rig, video, getFace, isLiveCamera, onC
   const capture = new PulseCapture({ estimate: colourPulseFromSamples, variability: false, onResult(result) {
     pulse = { ...result, source, receivedAt: performance.now() };
     value.textContent = result.bpm ? `${result.bpm} bpm` : "-- bpm";
-    const note = result.status === "estimated" ? "Experimental estimate" : result.reason;
+    const note = result.status === "estimated" ? "Experimental estimate" : `${result.reason}. For a resting pulse, use the Self-Check camera minute`;
     status.textContent = `${source === "video" ? "Recorded video" : "Live camera"} / ${note}${result.collectedSeconds && result.status !== "estimated" ? ` / ${Math.floor(result.collectedSeconds)} s collected` : ""}`;
     chip.hidden = !result.bpm;
     chip.textContent = result.bpm ? `♥ ${result.bpm} bpm` : "";

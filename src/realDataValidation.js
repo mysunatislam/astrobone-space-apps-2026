@@ -11,7 +11,7 @@ export const REAL_DATA_VALIDATION = Object.freeze({
   pulse: Object.freeze({ dataset: "MCD-rPPG", people: 40, windows: 308, mae: 2.1, gatedMae: 0.6, gatedAnsweredPct: 76.9, gate: 0.3, changeError: 4.2, changePeople: 38 }),
   // November 2026 expansion (docs/validation-expansion-2026-11.md): a second knee lab and new pulse people on three cameras.
   knee2: Object.freeze({dataset: "Zenodo 19720803", people: 19, reps: 1080, sideOnSquatError: 7.8, facingSquatError: 52.1, sideOnRepeatSd: 3.6}),
-  cameras: Object.freeze({people: 26, windows: 596, answeredFront: 82.4, answeredPhone: 43.2, answeredSide: 36.5, mae: 0.7, ungatedMae: 5.4, hrvRecordings: 152, hrvAnswered: 5, hrvMaeMs: 47.3}),
+  cameras: Object.freeze({people: 58, windows: 1341, answeredFront: 80.5, answeredPhone: 45.7, answeredSide: 34, mae: 1.05, ungatedMae: 6.21, hrvRecordings: 343, hrvAnswered: 16, hrvMaeMs: 53.4}),
 });
 
 // From data/validation/sync21-knee-summary.csv (Zenodo 19720803: OptiTrack vs smartphone keypoints).
