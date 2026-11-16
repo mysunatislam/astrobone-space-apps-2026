@@ -6,7 +6,7 @@
 
 NASA Space Apps Challenge 2026 · [Create Health Monitoring Software for Astronauts on Space Missions](https://www.spaceappschallenge.org/2026/challenges/health-monitoring-software/) · Team AstroBone, Barisal, Bangladesh
 
-> **Winner of the Barisal local round and a Global Nominee from Bangladesh.**
+> **Local Champion, NASA Space Apps 2026 Barisal, Bangladesh.**
 
 **Contents:** [The problem](#the-problem) · [What AstroBone does](#what-astrobone-does) · [NASA data](#nasa-data-drives-the-checks) · [Try it in 3 minutes](#try-it-in-3-minutes) · [Validation and limits](#validation-and-limits) · [Run locally](#run-locally) · [How it is built](#how-it-is-built) · [Team](#team) · [Project history](#project-history) · [Credits and licenses](#credits-and-licenses)
 
