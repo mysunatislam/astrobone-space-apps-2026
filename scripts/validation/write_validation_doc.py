@@ -24,6 +24,7 @@ w(f"Generated {d['generated'][:10]} by `scripts/validation/`. Every number below
   "against laboratory ground truth: Vicon motion capture for the knee and a finger pulse sensor (PPG) for heart rate. Fitted models are "
   "always scored on people they were not trained on. The interactive version of this report, with the replay and animated charts, "
   "is built from the same data (`scripts/validation/report/`).\n")
+w("> **Update, November 2026:** a second knee lab, the camera pulse on more people and three cameras (one a phone), and a check of Live Capture's heart-rate variability are in [validation-expansion-2026-11.md](validation-expansion-2026-11.md). Live Capture's pulse gate is now 0.4 and its camera RMSSD is no longer shown.\n")
 w("## Summary\n")
 w(f"- **Knee: the app's 3D knee angle missed squat depth.** Facing the camera, MediaPipe's 3D world-landmark angle made the knee's range of motion "
   f"{f1(abs(H['rep']['Ex6|front']['est3']['romBias']))}° too small on average in squats and {f1(abs(H['rep']['Ex5|front']['est3']['romBias']))}° in lunges. "

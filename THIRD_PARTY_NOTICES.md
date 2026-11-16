@@ -115,6 +115,9 @@ NASA public research pages and technical reports cited by AstroBone are listed i
 ### Validation datasets (offline only, not bundled)
 
 - MCD-rPPG (Egorov et al., arXiv 2508.17924, 2025), https://huggingface.co/datasets/kyegorov/mcd_rppg, CC BY 4.0: webcam face video with a finger PPG at rest and after exercise. Only derived heart-rate numbers and one normalized pulse trace are published in the validation report. `data/validation/mcd-pulse-*.csv` hold the derived per-method, per-gate and per-person rest/after-squats heart rates behind the Evidence view (no video).
+  The November 2026 expansion (`docs/validation-expansion-2026-11.md`) used new MCD-rPPG people and all three of its cameras (front webcam, phone over Iriun, side USB camera) with the frame-synchronised finger PPG and the ECG strip; `data/validation/mcd-scale-*` hold derived per-window summaries and per-recording RMSSD values only (no video, no face data).
+- Synchronized Dual-System Marker-based and Markerless Motion Capture Dataset for Gait and Fundamental Fitness Activities (Capital University of Physical Education and Sports, 2026), https://doi.org/10.5281/zenodo.19720803, CC BY 4.0: OptiTrack marker trajectories and smartphone YOLOv8n-pose keypoints of 21 adults. `data/validation/sync21-knee-*.csv` hold derived per-trial and per-repetition knee angles (`scripts/validation/sync21_knee.py`).
+- MPSC-RR (https://huggingface.co/datasets/justchugh/MPSC-RR, CC BY 4.0) was reviewed for the breathing check but not used: its respiration-belt signals are not published.
 - UBFC-rPPG (Bobbia et al., Pattern Recognition Letters 2019): used only if listed in `docs/real-video-validation.md`; derived numbers only.
 - open-rppg (https://github.com/KegangWangCCNU/open-rppg) published weights for FacePhys, ME-rPPG chunk, PhysNet and EfficientPhys, run offline for the comparison only.
 

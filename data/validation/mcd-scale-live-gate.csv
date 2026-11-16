@@ -1,0 +1,41 @@
+gate,half,camera,windows,answered_pct,mae_bpm,max_error_bpm
+0.3,choose,front webcam,112,28.6,0.33,4.5
+0.3,choose,phone camera (Iriun),107,14.0,5.3,35.0
+0.3,choose,side USB camera,108,11.1,1.79,12.5
+0.3,choose,all three,327,18.0,1.89,35.0
+0.3,check,front webcam,112,18.8,1.98,28.0
+0.3,check,phone camera (Iriun),104,4.8,27.1,50.0
+0.3,check,side USB camera,112,8.9,14.6,59.0
+0.3,check,all three,328,11.0,8.97,59.0
+0.35,choose,front webcam,112,22.3,0.4,4.5
+0.35,choose,phone camera (Iriun),107,7.5,0.75,2.0
+0.35,choose,side USB camera,108,6.5,0.36,1.0
+0.35,choose,all three,327,12.2,0.46,4.5
+0.35,check,front webcam,112,14.3,0.53,3.5
+0.35,check,phone camera (Iriun),104,1.0,37.5,37.5
+0.35,check,side USB camera,112,2.7,0.5,0.5
+0.35,check,all three,328,6.1,2.38,37.5
+0.4,choose,front webcam,112,17.0,0.42,4.5
+0.4,choose,phone camera (Iriun),107,1.9,1.0,1.0
+0.4,choose,side USB camera,108,2.8,0.33,0.5
+0.4,choose,all three,327,7.3,0.46,4.5
+0.4,check,front webcam,112,10.7,0.58,3.5
+0.4,check,phone camera (Iriun),104,0.0,,
+0.4,check,side USB camera,112,0.0,,
+0.4,check,all three,328,3.7,0.58,3.5
+0.45,choose,front webcam,112,9.8,0.14,0.5
+0.45,choose,phone camera (Iriun),107,0.9,1.0,1.0
+0.45,choose,side USB camera,108,0.9,0.0,0.0
+0.45,choose,all three,327,4.0,0.19,1.0
+0.45,check,front webcam,112,5.4,0.33,0.5
+0.45,check,phone camera (Iriun),104,0.0,,
+0.45,check,side USB camera,112,0.0,,
+0.45,check,all three,328,1.8,0.33,0.5
+0.5,choose,front webcam,112,5.4,0.17,0.5
+0.5,choose,phone camera (Iriun),107,0.0,,
+0.5,choose,side USB camera,108,0.0,,
+0.5,choose,all three,327,1.8,0.17,0.5
+0.5,check,front webcam,112,2.7,0.33,0.5
+0.5,check,phone camera (Iriun),104,0.0,,
+0.5,check,side USB camera,112,0.0,,
+0.5,check,all three,328,0.9,0.33,0.5

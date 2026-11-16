@@ -2,6 +2,8 @@
 
 Generated 2026-10-27 by `scripts/validation/`. Every number below was measured on recorded video of real people against laboratory ground truth: Vicon motion capture for the knee and a finger pulse sensor (PPG) for heart rate. Fitted models are always scored on people they were not trained on. The interactive version of this report, with the replay and animated charts, is built from the same data (`scripts/validation/report/`).
 
+> **Update, November 2026:** a second knee lab, the camera pulse on more people and three cameras (one a phone), and a check of Live Capture's heart-rate variability are in [validation-expansion-2026-11.md](validation-expansion-2026-11.md). Live Capture's pulse gate is now 0.4 and its camera RMSSD is no longer shown.
+
 ## Summary
 
 - **Knee: the app's 3D knee angle missed squat depth.** Facing the camera, MediaPipe's 3D world-landmark angle made the knee's range of motion 29.9° too small on average in squats and 26.9° in lunges. Larger MediaPipe models did not fix it.

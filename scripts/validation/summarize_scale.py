@@ -22,10 +22,22 @@ for cam in list(CAM) + [None]:
     for st in list(STATE) + [None]:
         ws = [w for w in W if (cam is None or w["camera"] == cam) and (st is None or w["state"] == st)]
         if not ws: continue
-        for key, label in (("hybrid", "Self-check hybrid (as shipped, gate 0.3)"), ("me", "ME-rPPG alone (gate 0.3)"), ("live", "Live Capture colour pulse (gate 0.3)"), ("hybrid0", "Self-check hybrid, gate off")):
+        for key, label in (("hybrid", "Self-check hybrid (as shipped, gate 0.3)"), ("me", "ME-rPPG alone (gate 0.3)"), ("liveOld", "Live Capture colour pulse, earlier gate 0.3"), ("live", "Live Capture colour pulse, gate 0.4 (as shipped now)"), ("hybrid0", "Self-check hybrid, gate off")):
             rows.append(dict(camera=CAM.get(cam, "all three"), state=STATE.get(st, "both"), method=label, people=len({w["person"] for w in ws}), windows=len(ws), **stats(ws, key)))
 with open(f"{repo}/data/validation/mcd-scale-pulse.csv", "w", newline="") as f:
     wr = csv.DictWriter(f, fieldnames=list(rows[0])); wr.writeheader(); wr.writerows(rows)
+
+# Live Capture gate: chosen on half of the people (every other id, sorted), checked on the other half.
+people = sorted({w["person"] for w in W}); tune = set(people[0::2]); sweep = []
+for g in (0.3, 0.35, 0.4, 0.45, 0.5):
+    for half, members in (("choose", tune), ("check", set(people) - tune)):
+        for cam in list(CAM) + [None]:
+            ws = [w for w in W if w["person"] in members and (cam is None or w["camera"] == cam)]
+            ok = [w for w in ws if w["live0"] is not None and w["liveQ"] >= g]; e = np.array([abs(w["live0"] - w["gt"]) for w in ok])
+            sweep.append(dict(gate=g, half=half, camera=CAM.get(cam, "all three"), windows=len(ws), answered_pct=round(100 * len(ok) / max(len(ws), 1), 1),
+                              mae_bpm=round(float(e.mean()), 2) if len(e) else "", max_error_bpm=round(float(e.max()), 1) if len(e) else ""))
+with open(f"{repo}/data/validation/mcd-scale-live-gate.csv", "w", newline="") as f:
+    wr = csv.DictWriter(f, fieldnames=list(sweep[0])); wr.writeheader(); wr.writerows(sweep)
 
 # Rest -> after squats, first 30 s window, per camera (the personal-baseline use).
 chg = []

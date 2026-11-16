@@ -9,7 +9,27 @@ const mean = xs => xs.reduce((a, b) => a + b, 0) / xs.length;
 export const REAL_DATA_VALIDATION = Object.freeze({
   knee: Object.freeze({ dataset: "REHAB24-6", people: 9, reps: 928, romErrorBefore: 21.7, romErrorAfter: 13.2, iccBefore: 0.549, iccAfter: 0.769, improvedPeople: 9, sideOnSquatError: 6.5 }),
   pulse: Object.freeze({ dataset: "MCD-rPPG", people: 40, windows: 308, mae: 2.1, gatedMae: 0.6, gatedAnsweredPct: 76.9, gate: 0.3, changeError: 4.2, changePeople: 38 }),
+  // November 2026 expansion (docs/validation-expansion-2026-11.md): a second knee lab and new pulse people on three cameras.
+  knee2: Object.freeze({dataset: "Zenodo 19720803", people: 19, reps: 1080, sideOnSquatError: 7.8, facingSquatError: 52.1, sideOnRepeatSd: 3.6}),
+  cameras: Object.freeze({people: 26, windows: 596, answeredFront: 82.4, answeredPhone: 43.2, answeredSide: 36.5, mae: 0.7, ungatedMae: 5.4, hrvRecordings: 152, hrvAnswered: 5, hrvMaeMs: 47.3}),
 });
+
+// From data/validation/sync21-knee-summary.csv (Zenodo 19720803: OptiTrack vs smartphone keypoints).
+export function secondKneeSummary(rows) {
+  const side = rows.find(r => r.movement === "Squat" && r.camera === "side-on"), facing = rows.find(r => r.movement === "Squat" && r.camera === "facing");
+  return { dataset: "Zenodo 19720803", people: side.people, reps: side.reps, sideOnSquatError: side.rom_mae_deg, facingSquatError: facing.rom_mae_deg, sideOnRepeatSd: side.rom_repeat_sd_deg };
+}
+
+// From data/validation/mcd-scale-pulse.csv and mcd-scale-summary.json (new MCD-rPPG people, three cameras).
+export function cameraPulseSummary(rows, summary) {
+  const row = (camera, method) => rows.find(r => r.camera === camera && r.state === "both" && r.method.startsWith(method));
+  const shipped = camera => row(camera, "Self-check hybrid (as shipped"), all = shipped("all three"), off = row("all three", "Self-check hybrid, gate off");
+  return {
+    people: summary.people, windows: summary.windows, answeredFront: shipped("front webcam").answered_pct, answeredPhone: shipped("phone camera (Iriun)").answered_pct,
+    answeredSide: shipped("side USB camera").answered_pct, mae: all.mae_bpm, ungatedMae: off.mae_bpm,
+    hrvRecordings: summary.videos, hrvAnswered: summary.hrv_answered, hrvMaeMs: summary.hrv_mae_ms,
+  };
+}
 
 // The per-person and per-method rows the Evidence charts draw (data/validation/rehab24-knee-per-person.csv
 // and mcd-pulse-methods.csv; src/realDataValidation.test.js checks every value against the files).
@@ -55,13 +75,16 @@ export function testedOnRealData(v = REAL_DATA_VALIDATION, noise = KNEE_REPEAT_N
       `Knee repeat noise on the same videos: the side-on reading moved ±${noise.kneeExtension.sd}° (extension) and ±${noise.kneeRom.sd}° (range) between repetitions with no change in the knee, so two checks must differ by about ${Math.round(noise.kneeExtension.mdc95)}° before noise is an unlikely cause.`,
       `Camera pulse against a finger sensor (${v.pulse.dataset}, ${v.pulse.people} people at rest and after squats): ${v.pulse.mae} bpm average error on ${v.pulse.windows} 30-second windows; ${v.pulse.gatedMae} bpm on the ${Math.round(v.pulse.gatedAnsweredPct)} % the quality gate passes; the rise from rest tracked within ${v.pulse.changeError} bpm in ${v.pulse.changePeople} people.`,
       `False alarms, simulated with the measured knee noise and published day-to-day spreads for heart rate, blood pressure, sleep and temperature: a healthy astronaut doing all 14 checks daily sees REVIEW on ${sim.reviewPct} % of days; a real 10° knee drop is flagged within 3 checks in ${knee.withinThree} % of runs and within 14 in ${knee.withinTwoWeeks} %.`,
+      `A second knee lab (${v.knee2.dataset}, ${v.knee2.people} people, ${v.knee2.reps} squats, motion capture against smartphone keypoints): side-on, the knee angle the app falls back on was ${v.knee2.sideOnSquatError}° off per squat; facing the camera, ${v.knee2.facingSquatError}°. That is why the check asks you to sit side-on.`,
+      `Camera pulse on ${v.cameras.people} more people and three cameras, one a phone: the self-check answered ${Math.round(v.cameras.answeredFront)} % of windows on the front webcam, ${Math.round(v.cameras.answeredPhone)} % on the phone and ${Math.round(v.cameras.answeredSide)} % on the side camera, ${v.cameras.mae} bpm from the finger sensor when it answered; with its quality gate off it would have been ${v.cameras.ungatedMae} bpm off.`,
       "Real spaceflight: the personal-baseline rule replayed on the four Inspiration4 crew members' blood (NASA OSDR OSD-569 and OSD-575), each against their own pre-flight draws; ISS area-dosimeter rates from OSDR set the radiation comparison band.",
     ],
     notYet: [
       "No astronaut has used the camera checks; every camera test above is healthy adults on Earth.",
       "The seated knee test has not been compared with a goniometer on different days; the in-app angle check records exactly those pairs.",
       "The crewmate check's face cues (pain-like expression, eye closure, mouth asymmetry, under-eye darkness) and reading pauses have not been tested on people in pain, drowsy or unwell; the pain-like expression uses face-model blendshapes in place of scored facial action units. Breathing from head movement lost to a fixed guess on 40 recorded people, so breaths are counted by the crew.",
-      "The pulse is untested on darker skin tones, dim light and moving subjects, and on a real phone next to a pulse oximeter.",
+      "The pulse is untested on darker skin tones, dim light and moving subjects. On recorded phone video it was accurate when it answered but answered less than half the time; a live phone next to a pulse oximeter is still untested.",
+      `Heart-rate variability from the camera is not shown: on ${v.cameras.hrvRecordings} recordings it answered ${v.cameras.hrvAnswered} times, ${v.cameras.hrvMaeMs} ms from a finger sensor on average.`,
       "The reaction test has not been timed with a robot finger on a real phone. Published measurements put the delay a touch screen or keyboard adds at 58–133 ms depending on the device and browser, so each result is compared only with tests answered the same way on the same kind of device.",
       "Heart rate, blood pressure, sleep and temperature spreads in the false-alarm simulation come from studies of adults on Earth, not astronauts. The reaction test's usual levels come from 45 adults who took it 16 times (Basner 2018); its day-to-day spread, oxygen and the ratings use stated assumptions.",
     ],

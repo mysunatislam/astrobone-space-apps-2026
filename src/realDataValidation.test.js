@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { parseCsv } from "./kneeRepeatability.js";
-import { REAL_DATA_VALIDATION, KNEE_PER_PERSON, PULSE_METHODS, kneeSummary, pulseSummary, testedOnRealData } from "./realDataValidation.js";
+import { REAL_DATA_VALIDATION, KNEE_PER_PERSON, PULSE_METHODS, kneeSummary, pulseSummary, secondKneeSummary, cameraPulseSummary, testedOnRealData } from "./realDataValidation.js";
+import { LIVE_VARIABILITY_CHECK } from "./cameraPulse.js";
 
 const read = name => parseCsv(readFileSync(new URL(`../data/validation/${name}`, import.meta.url), "utf8"));
 
@@ -20,7 +21,7 @@ test("the pulse numbers on the Evidence view are the saved real-video results", 
 
 test("the Evidence view says what was tested and what was not", () => {
   const { tested, notYet } = testedOnRealData();
-  assert.equal(tested.length, 5); assert.ok(notYet.length >= 3);
+  assert.equal(tested.length, 7); assert.ok(notYet.length >= 3);
   assert.match(tested[0], /21\.7° → 13\.2°/); assert.match(tested[1], /±4\.4°/); assert.match(tested[2], /0\.6 bpm/);
   assert.ok(notYet.some(t => /No astronaut/.test(t)) && notYet.some(t => /goniometer/.test(t)));
   for (const line of [...tested, ...notYet]) assert.doesNotMatch(line, /diagnos|detects bone loss|predicts injury|\bvalidated\b/i, line);
@@ -33,4 +34,13 @@ test("the Evidence charts draw the saved per-person knee and per-method pulse ro
   const methods = read("mcd-pulse-methods.csv");
   for (const m of PULSE_METHODS) assert.equal(m.mae, methods.find(r => r.method === m.method)?.mae_bpm, m.method);
   assert.equal(PULSE_METHODS[0].method, "AstroBone hybrid");
+});
+
+test("the November 2026 knee and three-camera pulse numbers are the saved results", () => {
+  assert.deepEqual(secondKneeSummary(read("sync21-knee-summary.csv")), REAL_DATA_VALIDATION.knee2);
+  const summary = JSON.parse(readFileSync(new URL("../data/validation/mcd-scale-summary.json", import.meta.url), "utf8"));
+  assert.deepEqual(cameraPulseSummary(read("mcd-scale-pulse.csv"), summary), REAL_DATA_VALIDATION.cameras);
+  assert.deepEqual({ recordings: LIVE_VARIABILITY_CHECK.recordings, answered: LIVE_VARIABILITY_CHECK.answered, maeMs: LIVE_VARIABILITY_CHECK.maeMs },
+    { recordings: summary.videos, answered: summary.hrv_answered, maeMs: summary.hrv_mae_ms });
+  assert.ok(LIVE_VARIABILITY_CHECK.summary.includes(`${summary.videos} real recordings`) && LIVE_VARIABILITY_CHECK.summary.includes(`answered ${summary.hrv_answered} times`));
 });

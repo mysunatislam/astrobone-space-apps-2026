@@ -61,3 +61,20 @@ python report/video_kit.py report/report_data.json <out>         # narration dra
 
 `pose_driver.sh` reads the model list from `MODELS` (default: all eight). MoveNet, ViTPose-B and SynthPose-B crop each frame
 with the YOLO11m person box, so run `yolo11m` first.
+
+## November 2026 expansion
+
+Claim audit, a second knee dataset and the camera pulse on more people and three cameras (`docs/validation-expansion-2026-11.md`):
+
+```sh
+node ../audit-claims.mjs                       # every README headline number, recomputed (--quick, --tests, --json)
+python -I sync21_knee.py <dir> <out>           # Zenodo 19720803: unzip 02_markerbased_data.zip and 03_markerless_data.zip into <dir>
+python -I mcd_scale_worker.py jobs.txt <npz> 60 <shard> <shards>   # rows "person camera state"; 4 shards ran in parallel
+python -I mcd_scale_export.py <npz> <ecg cache> <signals>          # reference rate per window, PPG and ECG RMSSD
+node score-scale.mjs <signals> scale.json      # the app's JavaScript: self-check hybrid, Live Capture pulse, estimateStress
+python -I summarize_scale.py scale.json <repo> # writes data/validation/mcd-scale-*
+python -I write_expansion_doc.py <repo>        # writes docs/validation-expansion-2026-11.md
+```
+
+The jobs list was 120 random MCD-rPPG people (Python `random.seed(2026)`, `random.sample` of the sorted ids) x 3 cameras x 2 states; the run stopped
+after the people listed in `data/validation/mcd-scale-summary.json`, and people from the first 40 are left out of every number.
