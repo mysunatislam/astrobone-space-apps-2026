@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { PulseCapture } from "./rppg.js";
-import { colourPulseFromSamples } from "./cameraPulse.js";
+import { colourPulseFromSamples, LIVE_VARIABILITY_CHECK } from "./cameraPulse.js";
 
 export function initHealthLayers({ scene, rig, video, getFace, isLiveCamera, onCameraMeasuring = () => {} }) {
   let layer = "body", pulse = null, history = null, helper = null;
@@ -20,30 +20,29 @@ export function initHealthLayers({ scene, rig, video, getFace, isLiveCamera, onC
     toolbar.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b === button)));
   }));
   window.addEventListener("astrobone-health-history", event => { history = event.detail; });
-  // Pulse and stress from the face: on request for the live camera, automatically for an uploaded video.
+  // Pulse from the face: on request for the live camera, automatically for an uploaded video. Beat-to-beat
+  // variability (RMSSD) is not shown: on real webcam and phone video it was refused almost every time and read about
+  // twice the finger sensor's value when it answered (LIVE_VARIABILITY_CHECK, docs/validation-expansion-2026-11.md).
   const panel = document.createElement("section"); panel.className = "pulse-capture"; panel.setAttribute("aria-labelledby", "pulse-title");
-  panel.innerHTML = `<div class="pulse-heading"><h4 id="pulse-title">Pulse and stress from the face</h4><button type="button" id="pulse-start" aria-pressed="false">Measure from camera</button></div>
-    <div class="pulse-readouts"><div><span>Pulse</span><output id="pulse-value">-- bpm</output></div><div><span>Heart-rate variability</span><output id="stress-value">--</output><small id="stress-detail"></small></div></div>
+  panel.innerHTML = `<div class="pulse-heading"><h4 id="pulse-title">Pulse from the face</h4><button type="button" id="pulse-start" aria-pressed="false">Measure from camera</button></div>
+    <div class="pulse-readouts"><div><span>Pulse</span><output id="pulse-value">-- bpm</output></div><div><span>Heart-rate variability</span><output id="stress-value">Not shown</output><small id="stress-detail">${LIVE_VARIABILITY_CHECK.summary}</small></div></div>
     <p id="pulse-status" role="status">Upload a video with a visible face, or start the camera and press Measure.</p><canvas width="400" height="60" aria-label="Experimental pulse signal" role="img"></canvas>
-    <small>Experimental, processed on this device. Needs a close, still face and steady light: pulse after 12 s, stress after 30 s. Stress is Baevsky's index from beat-to-beat timing; compare only with the same person's own readings. No SpO2, diagnosis or medical alerting.</small>`;
+    <small>Experimental, processed on this device. Needs a close, still face and steady light: pulse after 12 s. Compare only with the same person's own readings. No SpO2, heart-rate variability, diagnosis or medical alerting.</small>`;
   (document.querySelector(".detail-analysis") ?? document.querySelector(".motionguard-capture-details")).after(panel);
   const chip = document.createElement("span"); chip.id = "pose-vitals"; chip.className = "pose-vitals"; chip.hidden = true;
   const strip = document.querySelector(".pose-live-strip");
   strip?.insertBefore(chip, strip.querySelector("#pose-live-fps"));
-  const value = panel.querySelector("#pulse-value"), stressValue = panel.querySelector("#stress-value"), stressDetail = panel.querySelector("#stress-detail");
+  const value = panel.querySelector("#pulse-value");
   const status = panel.querySelector("p"), chart = panel.querySelector("canvas"), start = panel.querySelector("button");
   let source = null, cameraMeasuring = false, cameraFrame = 0, cameraToken = 0, lastCameraTime = -1;
   // Validated on real webcam video (docs/real-video-validation.md): see colourPulseFromSamples.
-  const capture = new PulseCapture({ estimate: colourPulseFromSamples, onResult(result) {
+  const capture = new PulseCapture({ estimate: colourPulseFromSamples, variability: false, onResult(result) {
     pulse = { ...result, source, receivedAt: performance.now() };
-    const stress = result.stress?.status === "estimated" ? result.stress : null;
     value.textContent = result.bpm ? `${result.bpm} bpm` : "-- bpm";
-    stressValue.textContent = stress ? `RMSSD ${stress.rmssdMs} ms` : "--";
-    stressDetail.textContent = stress ? `${stress.beats} beats${stress.level ? ` / stress ${stress.level} (SI ${stress.stressIndex})` : ` / ${stress.levelNote}`}` : "";
-    const note = result.status === "estimated" ? result.stress?.status === "estimated" ? "Experimental estimate" : result.stress?.reason ?? "" : result.reason;
-    status.textContent = `${source === "video" ? "Recorded video" : "Live camera"} / ${note}${result.collectedSeconds && !stress ? ` / ${Math.floor(result.collectedSeconds)} s collected` : ""}`;
+    const note = result.status === "estimated" ? "Experimental estimate" : result.reason;
+    status.textContent = `${source === "video" ? "Recorded video" : "Live camera"} / ${note}${result.collectedSeconds && result.status !== "estimated" ? ` / ${Math.floor(result.collectedSeconds)} s collected` : ""}`;
     chip.hidden = !result.bpm;
-    chip.textContent = result.bpm ? `♥ ${result.bpm} bpm${stress ? ` · RMSSD ${stress.rmssdMs} ms` : ""}` : "";
+    chip.textContent = result.bpm ? `♥ ${result.bpm} bpm` : "";
     const ctx = chart.getContext("2d"); ctx.clearRect(0, 0, 400, 60);
     if (result.waveform?.length) {
       const max = Math.max(...result.waveform.map(Math.abs), 1e-6); ctx.strokeStyle = "#d76283"; ctx.beginPath();

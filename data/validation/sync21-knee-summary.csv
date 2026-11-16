@@ -1,0 +1,5 @@
+movement,camera,people,reps,true_rom_deg,rom_mae_deg,rom_bias_deg,rom_sd_deg,rom_repeat_sd_deg,rom_mdc95_deg,ext_mae_deg,ext_bias_deg,ext_repeat_sd_deg,ext_mdc95_deg,median_trace_corr
+Lunges,facing,15,907,62.7,39.6,-35.8,28.0,26.5,73.4,15.1,14.9,3.3,9.1,0.572
+Lunges,side-on,15,841,62.5,22.1,-17.0,25.2,17.2,47.7,6.9,5.1,3.8,10.7,0.657
+Squat,facing,19,1043,93.1,52.1,-51.8,20.1,5.7,15.9,11.2,11.0,1.0,2.8,0.877
+Squat,side-on,19,1080,93.8,7.8,-0.1,10.0,3.6,9.9,9.1,9.1,1.1,3.1,0.992

@@ -1,0 +1,129 @@
+camera,state,camera_rmssd_ms,refused_reason,finger_ppg_rmssd_ms,ecg_rmssd_ms
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,38.4,33.7
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,56.4,51.5
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,39.4,33.7
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,55.2,51.5
+side USB camera,after 15 squats,,No clear pulse peak,38.6,33.7
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,56.8,51.5
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,30.6,32.6
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,25.0,20.1
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,32.0,32.6
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,26.5,20.1
+side USB camera,after 15 squats,,Too much head movement: hold still,30.2,32.6
+side USB camera,at rest,,Too much head movement: hold still,23.9,20.1
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,48.6,42.2
+front webcam,at rest,34,,51.9,37.3
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,41.9,42.2
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,49.0,37.3
+side USB camera,after 15 squats,,Camera cadence is too low or irregular,51.1,42.2
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,54.7,37.3
+front webcam,after 15 squats,110,,81.0,85.6
+front webcam,at rest,101,,70.8,40.3
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,86.5,85.6
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,71.0,40.3
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,80.3,85.6
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,68.7,40.3
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,27.2,17.0
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,73.6,49.7
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,29.0,17.0
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,75.6,49.7
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,27.1,17.0
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,76.6,49.7
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,27.2,23.7
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,42.5,26.7
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,26.3,23.7
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,45.4,26.7
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,26.6,23.7
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,40.3,26.7
+front webcam,after 15 squats,,Lighting is too dark or too bright on the face,31.4,30.6
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,34.8,13.4
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,22.7,30.6
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,31.8,13.4
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,26.1,30.6
+side USB camera,at rest,,Too much head movement: hold still,27.1,13.4
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,84.5,64.9
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,79.1,52.8
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,57.7,64.9
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,81.1,52.8
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,67.6,64.9
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,74.0,52.8
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,61.2,71.0
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,,84.0
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,48.9,71.0
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,70.9,84.0
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,48.5,71.0
+side USB camera,at rest,,No clear pulse peak,87.7,84.0
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,22.8,19.6
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,21.9,18.1
+phone camera (Iriun),after 15 squats,,No clear pulse peak,,19.6
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,21.2,18.1
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,21.6,19.6
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,21.3,18.1
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,30.4,52.7
+front webcam,at rest,94,,30.6,22.7
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,29.6,52.7
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,32.0,22.7
+side USB camera,after 15 squats,,Lighting is too dark or too bright on the face,31.4,52.7
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,30.7,22.7
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,,35.2
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,40.2,36.1
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,61.3,69.6
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,68.6,87.9
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,47.2,69.6
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,65.9,87.9
+side USB camera,after 15 squats,,Stress needs at least 24 frames per second; this device is skipping frames,86.1,69.6
+side USB camera,at rest,,Too much head movement: hold still,70.3,87.9
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,31.2,20.5
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,29.0,33.5
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,32.4,20.5
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,34.9,33.5
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,35.0,20.5
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,39.5,33.5
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,,7.2
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,51.3,8.7
+phone camera (Iriun),after 15 squats,,No clear pulse peak,23.4,7.2
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,18.6,8.7
+side USB camera,after 15 squats,,Camera cadence is too low or irregular,13.6,7.2
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,17.8,8.7
+front webcam,after 15 squats,,Lighting is too dark or too bright on the face,104.4,83.8
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,106.5,52.5
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,78.5,83.8
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,109.6,52.5
+side USB camera,after 15 squats,,Too much head movement: hold still,61.8,83.8
+side USB camera,at rest,,Too much head movement: hold still,102.4,52.5
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,39.8,44.5
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,61.0,45.7
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,49.9,44.5
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,63.8,45.7
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,45.7,44.5
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,72.4,45.7
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,50.3,23.1
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,68.7,51.5
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,30.0,23.1
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,41.1,51.5
+side USB camera,after 15 squats,,Too much head movement: hold still,31.8,23.1
+side USB camera,at rest,,No clear pulse peak,54.5,51.5
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,20.7,22.2
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,26.6,14.4
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,20.5,22.2
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,26.9,14.4
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,25.4,22.2
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,26.1,14.4
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,45.2,23.0
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,63.0,15.4
+phone camera (Iriun),after 15 squats,,No clear pulse peak,40.1,23.0
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,67.9,15.4
+side USB camera,after 15 squats,,Beat timing is too irregular for a stress estimate,37.8,23.0
+side USB camera,at rest,,Beat timing is too irregular for a stress estimate,68.1,15.4
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,23.5,14.8
+front webcam,at rest,,No clear pulse peak,42.4,31.1
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,29.1,14.8
+phone camera (Iriun),at rest,,Beat timing is too irregular for a stress estimate,42.1,31.1
+side USB camera,after 15 squats,,Lighting is too dark or too bright on the face,29.3,14.8
+side USB camera,at rest,,Lighting is too dark or too bright on the face,38.2,31.1
+front webcam,after 15 squats,,Beat timing is too irregular for a stress estimate,48.4,30.4
+front webcam,at rest,,Beat timing is too irregular for a stress estimate,54.7,23.7
+phone camera (Iriun),after 15 squats,,Beat timing is too irregular for a stress estimate,40.5,30.4
+phone camera (Iriun),at rest,,No clear pulse peak,55.3,23.7
+side USB camera,after 15 squats,,Too much head movement: hold still,62.4,30.4
+side USB camera,at rest,,Too much head movement: hold still,52.1,23.7

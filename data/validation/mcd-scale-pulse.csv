@@ -1,0 +1,49 @@
+camera,state,method,people,windows,answered_pct,mae_bpm,within_5_bpm_pct,bias_bpm
+front webcam,at rest,"Self-check hybrid (as shipped, gate 0.3)",22,88,78.4,0.75,97.1,-0.14
+front webcam,at rest,ME-rPPG alone (gate 0.3),22,88,81.8,0.9,95.8,-0.31
+front webcam,at rest,Live Capture colour pulse (gate 0.3),22,88,19.3,2.06,94.1,-1.35
+front webcam,at rest,"Self-check hybrid, gate off",22,88,100.0,1.15,93.2,-0.44
+front webcam,after 15 squats,"Self-check hybrid (as shipped, gate 0.3)",21,84,79.8,0.6,97.0,0.13
+front webcam,after 15 squats,ME-rPPG alone (gate 0.3),21,84,79.8,0.61,97.0,0.13
+front webcam,after 15 squats,Live Capture colour pulse (gate 0.3),21,84,23.8,0.6,100.0,0.35
+front webcam,after 15 squats,"Self-check hybrid, gate off",21,84,91.7,1.41,92.2,-0.45
+front webcam,both,"Self-check hybrid (as shipped, gate 0.3)",22,172,79.1,0.67,97.1,-0.0
+front webcam,both,ME-rPPG alone (gate 0.3),22,172,80.8,0.76,96.4,-0.1
+front webcam,both,Live Capture colour pulse (gate 0.3),22,172,21.5,1.27,97.3,-0.43
+front webcam,both,"Self-check hybrid, gate off",22,172,95.9,1.27,92.7,-0.45
+phone camera (Iriun),at rest,"Self-check hybrid (as shipped, gate 0.3)",21,83,43.4,0.5,97.2,0.39
+phone camera (Iriun),at rest,ME-rPPG alone (gate 0.3),21,83,45.8,0.51,97.4,0.38
+phone camera (Iriun),at rest,Live Capture colour pulse (gate 0.3),21,83,8.4,10.0,71.4,-9.86
+phone camera (Iriun),at rest,"Self-check hybrid, gate off",21,83,98.8,7.37,72.0,-6.3
+phone camera (Iriun),after 15 squats,"Self-check hybrid (as shipped, gate 0.3)",22,80,35.0,0.96,96.4,-0.46
+phone camera (Iriun),after 15 squats,ME-rPPG alone (gate 0.3),22,80,36.2,0.97,96.6,-0.41
+phone camera (Iriun),after 15 squats,Live Capture colour pulse (gate 0.3),22,80,11.2,5.17,88.9,-3.94
+phone camera (Iriun),after 15 squats,"Self-check hybrid, gate off",22,80,98.8,13.25,57.0,-12.41
+phone camera (Iriun),both,"Self-check hybrid (as shipped, gate 0.3)",22,163,39.3,0.7,96.9,0.02
+phone camera (Iriun),both,ME-rPPG alone (gate 0.3),22,163,41.1,0.71,97.0,0.04
+phone camera (Iriun),both,Live Capture colour pulse (gate 0.3),22,163,9.8,7.28,81.2,-6.53
+phone camera (Iriun),both,"Self-check hybrid, gate off",22,163,98.8,10.25,64.6,-9.3
+side USB camera,at rest,"Self-check hybrid (as shipped, gate 0.3)",21,84,35.7,0.7,96.7,0.47
+side USB camera,at rest,ME-rPPG alone (gate 0.3),21,84,35.7,0.7,96.7,0.47
+side USB camera,at rest,Live Capture colour pulse (gate 0.3),21,84,9.5,7.25,87.5,-6.5
+side USB camera,at rest,"Self-check hybrid, gate off",21,84,75.0,5.57,76.2,0.46
+side USB camera,after 15 squats,"Self-check hybrid (as shipped, gate 0.3)",21,84,29.8,1.72,92.0,-0.48
+side USB camera,after 15 squats,ME-rPPG alone (gate 0.3),21,84,33.3,1.86,89.3,-0.21
+side USB camera,after 15 squats,Live Capture colour pulse (gate 0.3),21,84,8.3,13.79,57.1,-13.21
+side USB camera,after 15 squats,"Self-check hybrid, gate off",21,84,69.0,7.66,69.0,-2.69
+side USB camera,both,"Self-check hybrid (as shipped, gate 0.3)",21,168,32.7,1.16,94.5,0.04
+side USB camera,both,ME-rPPG alone (gate 0.3),21,168,34.5,1.26,93.1,0.14
+side USB camera,both,Live Capture colour pulse (gate 0.3),21,168,8.9,10.3,73.3,-9.63
+side USB camera,both,"Self-check hybrid, gate off",21,168,72.0,6.57,72.7,-1.05
+all three,at rest,"Self-check hybrid (as shipped, gate 0.3)",22,255,52.9,0.67,97.0,0.14
+all three,at rest,ME-rPPG alone (gate 0.3),22,255,54.9,0.75,96.4,0.04
+all three,at rest,Live Capture colour pulse (gate 0.3),22,255,12.5,5.09,87.5,-4.5
+all three,at rest,"Self-check hybrid, gate off",22,255,91.4,4.53,81.1,-2.26
+all three,after 15 squats,"Self-check hybrid (as shipped, gate 0.3)",22,248,48.4,0.92,95.8,-0.13
+all three,after 15 squats,ME-rPPG alone (gate 0.3),22,248,50.0,0.98,95.2,-0.07
+all three,after 15 squats,Live Capture colour pulse (gate 0.3),22,248,14.5,4.31,88.9,-3.36
+all three,after 15 squats,"Self-check hybrid, gate off",22,248,86.3,7.47,72.9,-5.47
+all three,both,"Self-check hybrid (as shipped, gate 0.3)",22,503,50.7,0.79,96.5,0.01
+all three,both,ME-rPPG alone (gate 0.3),22,503,52.5,0.86,95.8,-0.01
+all three,both,Live Capture colour pulse (gate 0.3),22,503,13.5,4.68,88.2,-3.9
+all three,both,"Self-check hybrid, gate off",22,503,88.9,5.94,77.2,-3.8

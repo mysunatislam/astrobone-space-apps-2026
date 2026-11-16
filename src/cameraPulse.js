@@ -39,9 +39,18 @@ export function fusedPulseFromSamples(samples, { weights = FUSION_WEIGHTS, ...op
 }
 
 // Live Capture has no deep model running, so its pulse is the face-colour POS wave alone, read by the
-// same wave estimator and quality gate scored on real webcam video (docs/real-video-validation.md),
-// in place of the strict 60 % peak-share gate that refused every real 30-second window.
-export const LIVE_PULSE = Object.freeze({ minSeconds: 12, minQuality: 0.3 });
+// same wave estimator scored on real webcam video (docs/real-video-validation.md). The gate was 0.3 (chosen on
+// 40 people, front webcam). On new people filmed by a phone and a side camera (docs/validation-expansion-2026-11.md),
+// windows that passed 0.3 but not 0.4 included confident wrong readings near 50 bpm (an artefact, 20-60 bpm off),
+// so the gate is 0.4: chosen on half of the new people, then never more than 1 bpm off on the other half.
+export const LIVE_PULSE = Object.freeze({ minSeconds: 12, minQuality: 0.4 });
+// Beat-to-beat heart-rate variability (RMSSD) from the face colour, as Live Capture computed it, scored against the
+// finger PPG over the same 60 s (scripts/validation/score-scale.mjs, data/validation/mcd-scale-hrv.csv). It is not
+// shown in the app: it answered almost never, and read far from the finger sensor when it did.
+export const LIVE_VARIABILITY_CHECK = Object.freeze({
+  recordings: 128, answered: 4, maeMs: 35.1,
+  summary: "On 128 real recordings it answered 4 times, about 35 ms from a finger sensor",
+});
 export function colourPulseFromSamples(samples, options = {}) {
   const withColour = samples.filter(s => Number.isFinite(s.t) && s.rgb);
   if (!withColour.length) return { status: "insufficient", reason: "A clearly visible face is required", bpm: null, quality: 0 };
