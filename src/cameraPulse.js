@@ -39,9 +39,21 @@ export function fusedPulseFromSamples(samples, { weights = FUSION_WEIGHTS, ...op
 }
 
 // Live Capture has no deep model running, so its pulse is the face-colour POS wave alone, read by the
-// same wave estimator and quality gate scored on real webcam video (docs/real-video-validation.md),
-// in place of the strict 60 % peak-share gate that refused every real 30-second window.
-export const LIVE_PULSE = Object.freeze({ minSeconds: 12, minQuality: 0.3 });
+// same wave estimator scored on real webcam video (docs/real-video-validation.md). The gate was 0.3 (chosen on
+// 40 people, front webcam). On 58 new people filmed by a front webcam, a phone and a side camera
+// (docs/validation-expansion-2026-11.md, data/validation/mcd-scale-live-gate.csv), the colour-only wave locked onto
+// an artefact near 50 bpm with peak shares up to 0.45, up to 67 bpm off. 0.45 looked safe on half of the people and
+// still let a 37 bpm error through on the other half; at 0.5 the worst reading on either half was 1.5 bpm. So the
+// gate is 0.5. It rarely answers on a phone: the self-check's 45-second camera minute (deep-led hybrid) is the
+// reading to use.
+export const LIVE_PULSE = Object.freeze({ minSeconds: 12, minQuality: 0.5 });
+// Beat-to-beat heart-rate variability (RMSSD) from the face colour, as Live Capture computed it, scored against the
+// finger PPG over the same 60 s (scripts/validation/score-scale.mjs, data/validation/mcd-scale-hrv.csv). It is not
+// shown in the app: it answered almost never, and read far from the finger sensor when it did.
+export const LIVE_VARIABILITY_CHECK = Object.freeze({
+  recordings: 343, answered: 16, maeMs: 53.4,
+  summary: "On 343 real recordings it answered 16 times, about 53 ms from a finger sensor",
+});
 export function colourPulseFromSamples(samples, options = {}) {
   const withColour = samples.filter(s => Number.isFinite(s.t) && s.rgb);
   if (!withColour.length) return { status: "insufficient", reason: "A clearly visible face is required", bpm: null, quality: 0 };
