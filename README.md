@@ -8,6 +8,8 @@ NASA Space Apps Challenge 2026 · [Create Health Monitoring Software for Astrona
 
 > **Local Champion, NASA Space Apps 2026 Barisal, Bangladesh.**
 
+**Judges:** please review the code as submitted, commit [`524852f`](https://github.com/mysunatislam/astrobone-space-apps-2026/tree/524852f387b09f8ea3cd2c2c20de8aca9d0f8847) (Nov 11, 2026), the last commit before the Nov 14 deadline. Later commits change documentation only; the app code is frozen until judging ends.
+
 **Contents:** [The problem](#the-problem) · [What AstroBone does](#what-astrobone-does) · [NASA data](#nasa-data-drives-the-checks) · [Try it in 3 minutes](#try-it-in-3-minutes) · [Validation and limits](#validation-and-limits) · [Run locally](#run-locally) · [How it is built](#how-it-is-built) · [Team](#team) · [Project history](#project-history) · [Credits and licenses](#credits-and-licenses)
 
 ## The Problem
